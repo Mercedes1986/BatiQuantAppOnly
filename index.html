@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"
+    />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta name="color-scheme" content="light" />
+
+    <!-- ✅ AdSense : association du site au compte (UNIFIÉ) -->
+    <meta name="google-adsense-account" content="ca-pub-2793469545509663" />
+
+    <!-- ✅ AdSense : script en dur dans le HEAD (visible en Ctrl+U) -->
+    <script
+      id="adsense-script"
+      async
+      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2793469545509663"
+      crossorigin="anonymous"
+    ></script>
+
+    <title>BatiQuant</title>
+    <meta
+      name="description"
+      content="BatiQuant : calculez vos quantités de matériaux et votre budget chantier (béton, placo, peinture, carrelage, électricité, plomberie, toiture…)."
+    />
+    <link rel="canonical" href="https://www.batiquant.fr/" />
+
+    <meta property="og:site_name" content="BatiQuant" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="BatiQuant" />
+    <meta
+      property="og:description"
+      content="Calculez vos quantités et budgets chantier : béton, placo, peinture, carrelage, électricité, plomberie, toiture…"
+    />
+    <meta property="og:url" content="https://www.batiquant.fr/" />
+    <meta
+      property="og:image"
+      content="https://www.batiquant.fr/landing/hero-bg.png"
+    />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="BatiQuant" />
+    <meta
+      name="twitter:description"
+      content="Calculez vos quantités et budgets chantier : béton, placo, placo/isolation, toiture…"
+    />
+    <meta
+      name="twitter:image"
+      content="https://www.batiquant.fr/landing/hero-bg.png"
+    />
+
+    <!-- ✅ Favicons / PWA -->
+    <link rel="icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="theme-color" content="#2563eb" />
+
+    <meta name="robots" content="index,follow" />
+
+    <!-- ✅ Perf : preconnect -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://pagead2.googlesyndication.com" />
+    <link rel="preconnect" href="https://tpc.googlesyndication.com" />
+    <link rel="preconnect" href="https://googleads.g.doubleclick.net" />
+    <link rel="preconnect" href="https://www.googletagmanager.com" />
+    <link rel="preconnect" href="https://www.google-analytics.com" />
+
+    <!-- ✅ Perf LCP : preload du visuel hero (si utilisé en homepage) -->
+    <link
+      rel="preload"
+      as="image"
+      href="/landing/hero-bg.png"
+      imagesrcset="/landing/hero-bg.png"
+    />
+
+    <!-- ✅ dataLayer + Consent "par défaut = denied" (ne charge PAS GTM ici) -->
+    <script>
+      (function () {
+        window.dataLayer = window.dataLayer || [];
+        function gtag() {
+          window.dataLayer.push(arguments);
+        }
+        window.gtag = window.gtag || gtag;
+
+        // Default (opt-in) : tout refusé tant que l'utilisateur n'a pas accepté
+        try {
+          window.dataLayer.push({
+            event: "default_consent",
+            ad_storage: "denied",
+            analytics_storage: "denied",
+            ad_user_data: "denied",
+            ad_personalization: "denied",
+          });
+        } catch {}
+
+        // Loader GTM (appelé uniquement après consentement "accepted")
+        window.__bqLoadGTM =
+          window.__bqLoadGTM ||
+          function (gtmId) {
+            try {
+              if (!gtmId) return;
+              if (window.__bqGtmLoaded) return;
+              window.__bqGtmLoaded = true;
+
+              // Standard GTM loader
+              window.dataLayer = window.dataLayer || [];
+              window.dataLayer.push({
+                "gtm.start": new Date().getTime(),
+                event: "gtm.js",
+              });
+
+              var f = document.getElementsByTagName("script")[0];
+              var j = document.createElement("script");
+              j.async = true;
+              j.src =
+                "https://www.googletagmanager.com/gtm.js?id=" +
+                encodeURIComponent(gtmId);
+              f.parentNode.insertBefore(j, f);
+
+              // Noscript iframe (injection dynamique, uniquement après acceptation)
+              var ns = document.getElementById("gtm-noscript");
+              if (ns && !ns.dataset.loaded) {
+                ns.dataset.loaded = "true";
+                var ifr = document.createElement("iframe");
+                ifr.src =
+                  "https://www.googletagmanager.com/ns.html?id=" +
+                  encodeURIComponent(gtmId);
+                ifr.height = "0";
+                ifr.width = "0";
+                ifr.style.display = "none";
+                ifr.style.visibility = "hidden";
+                ns.appendChild(ifr);
+              }
+            } catch (e) {
+              try {
+                window.__bqGtmLoaded = false;
+              } catch {}
+            }
+          };
+      })();
+    </script>
+  </head>
+
+  <body
+    class="bg-slate-50 text-slate-900 font-sans antialiased selection:bg-blue-100 pb-safe"
+  >
+    <!-- ✅ Réceptacle (vide) : l’iframe GTM n’est injectée qu’après consentement -->
+    <div id="gtm-noscript" aria-hidden="true"></div>
+
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

@@ -1,0 +1,165 @@
+
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { getQuote, getInvoice, getCompanyProfile } from '../../services/documentsStorage';
+import { BaseDocument, CompanyProfile } from '../../types';
+
+export const PrintDocumentPage: React.FC = () => {
+  const { type, id } = useParams<{ type: string; id: string }>();
+  const [doc, setDoc] = useState<BaseDocument | null>(null);
+  const [company, setCompany] = useState<CompanyProfile | null>(null);
+
+  useEffect(() => {
+    if (id && type) {
+      const d = type === 'quote' ? getQuote(id) : getInvoice(id);
+      if (d) setDoc(d);
+      setCompany(getCompanyProfile());
+    }
+  }, [id, type]);
+
+  useEffect(() => {
+    // Auto-print after small delay to allow render and image loading
+    if (doc && company) {
+      const timer = setTimeout(() => {
+        window.print();
+      }, 800);
+      return () => clearTimeout(timer);
+    }
+  }, [doc, company]);
+
+  if (!doc || !company) return <div className="p-8 text-center text-slate-500">Chargement du document...</div>;
+
+  const isQuote = type === 'quote';
+
+  return (
+    <div className="min-h-screen bg-white text-slate-900 font-sans print:p-0 p-8 max-w-[210mm] mx-auto box-border">
+      
+      {/* HEADER SECTION */}
+      <div className="flex justify-between items-start mb-12 border-b border-slate-100 pb-8">
+        
+        {/* Company Info (Left) */}
+        <div className="flex-1 pr-8">
+          {company.logoUrl ? (
+             <img src={company.logoUrl} alt="Logo" className="h-24 max-w-[200px] object-contain mb-4" />
+          ) : (
+             <h1 className="text-3xl font-extrabold uppercase mb-2 text-slate-800 tracking-tight">{company.name}</h1>
+          )}
+          
+          <div className="text-sm text-slate-600 leading-snug space-y-1">
+            {company.logoUrl && <p className="font-bold text-slate-800 text-lg mb-1">{company.name}</p>}
+            <p>{company.address}</p>
+            <p>{company.zip} {company.city}</p>
+            <div className="mt-3 pt-3 border-t border-slate-100 w-32"></div>
+            <p>Tél: {company.phone}</p>
+            <p>Email: {company.email}</p>
+            <p>SIRET: {company.siret}</p>
+            {company.tvaNumber && <p>TVA: {company.tvaNumber}</p>}
+          </div>
+        </div>
+
+        {/* Client Info (Right) */}
+        <div className="w-[300px]">
+          <div className="bg-slate-50 border border-slate-200 p-6 rounded-xl">
+            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Destinataire</h3>
+            <div className="text-base text-slate-800 leading-relaxed">
+              <p className="font-bold text-lg">{doc.client.name}</p>
+              <p>{doc.client.address}</p>
+              <p>{doc.client.zip} {doc.client.city}</p>
+              {doc.client.phone && <p className="text-sm text-slate-500 mt-2">{doc.client.phone}</p>}
+              {doc.client.email && <p className="text-sm text-slate-500">{doc.client.email}</p>}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* DOCUMENT TITLE & META */}
+      <div className="flex justify-between items-end mb-8">
+        <div>
+          <span className="block text-sm font-bold text-blue-600 uppercase tracking-wide mb-1">
+            {isQuote ? 'Devis Client' : 'Facture Client'}
+          </span>
+          <h2 className="text-4xl font-bold text-slate-900">N° {doc.number}</h2>
+        </div>
+        <div className="text-right text-sm text-slate-600">
+          <p><span className="font-medium text-slate-400">Date d'émission :</span> {new Date(doc.date).toLocaleDateString()}</p>
+          {doc.validUntil && <p><span className="font-medium text-slate-400">Valable jusqu'au :</span> {new Date(doc.validUntil).toLocaleDateString()}</p>}
+          {!isQuote && (doc as any).paymentDate && <p><span className="font-medium text-slate-400">Date paiement :</span> {new Date((doc as any).paymentDate).toLocaleDateString()}</p>}
+        </div>
+      </div>
+
+      {/* LINES TABLE */}
+      <table className="w-full text-sm mb-10 border-collapse">
+        <thead>
+          <tr className="border-b-2 border-slate-800">
+            <th className="text-left py-3 pr-4 font-bold text-slate-800 w-[55%]">Désignation</th>
+            <th className="text-center py-3 font-bold text-slate-800 w-[15%]">Quantité</th>
+            <th className="text-right py-3 font-bold text-slate-800 w-[15%]">P.U. HT</th>
+            <th className="text-right py-3 pl-4 font-bold text-slate-800 w-[15%]">Total HT</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-slate-100">
+          {doc.lines.map((line, idx) => (
+            <tr key={idx} className={line.unitPrice === 0 ? "bg-slate-50 break-inside-avoid" : "break-inside-avoid"}>
+              <td className={`py-3 pr-4 align-top ${line.unitPrice === 0 ? 'font-bold pt-6 text-slate-900 uppercase tracking-wide text-xs' : 'text-slate-700'}`}>
+                {line.description}
+              </td>
+              <td className="text-center py-3 align-top text-slate-600">
+                {line.unitPrice !== 0 ? `${line.quantity} ${line.unit}` : ''}
+              </td>
+              <td className="text-right py-3 align-top text-slate-600">
+                {line.unitPrice !== 0 ? line.unitPrice.toFixed(2) + ' €' : ''}
+              </td>
+              <td className="text-right py-3 pl-4 align-top font-bold text-slate-800">
+                {line.unitPrice !== 0 ? (line.quantity * line.unitPrice).toFixed(2) + ' €' : ''}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      {/* TOTALS SECTION */}
+      <div className="flex justify-end mb-16 break-inside-avoid">
+        <div className="w-[300px] bg-slate-50 p-6 rounded-xl border border-slate-200">
+          <div className="flex justify-between mb-3 text-sm text-slate-600">
+            <span>Total HT</span>
+            <span className="font-bold">{doc.totalHT.toFixed(2)} €</span>
+          </div>
+          <div className="flex justify-between mb-4 text-sm text-slate-600 border-b border-slate-200 pb-4">
+            <span>TVA ({((doc.totalVAT / doc.totalHT) * 100 || 20).toFixed(1)}%)</span>
+            <span>{doc.totalVAT.toFixed(2)} €</span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-base font-bold text-slate-800">NET À PAYER</span>
+            <span className="text-2xl font-bold text-blue-600">{doc.totalTTC.toFixed(2)} €</span>
+          </div>
+        </div>
+      </div>
+
+      {/* FOOTER */}
+      <div className="text-xs text-slate-500 mt-auto pt-8 border-t border-slate-200 break-inside-avoid">
+        {doc.notes && (
+          <div className="mb-6 p-4 bg-slate-50 rounded-lg border border-slate-100">
+            <p className="font-bold text-slate-700 mb-1">Notes / Conditions :</p>
+            <p className="whitespace-pre-line leading-relaxed">{doc.notes}</p>
+          </div>
+        )}
+        
+        <div className="text-center space-y-1">
+          <p className="font-bold text-slate-700">{company.name}</p>
+          <p className="text-[10px] uppercase tracking-wide">
+            {company.footerNote || `SIRET ${company.siret} - ${company.address} ${company.city}`}
+          </p>
+          <p className="text-[10px] text-slate-300 pt-2">Document généré par BatiQuant</p>
+        </div>
+      </div>
+
+      <style>{`
+        @media print {
+          @page { margin: 15mm; size: A4; }
+          body { print-color-adjust: exact; -webkit-print-color-adjust: exact; background: white; }
+          .no-print { display: none !important; }
+        }
+      `}</style>
+    </div>
+  );
+};

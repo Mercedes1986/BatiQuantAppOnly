@@ -1,0 +1,39 @@
+{
+  "name": "version-site-web-batiquant",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "typecheck": "tsc -p . --noEmit",
+    "build": "vite build",
+    "preview": "vite preview",
+    "clean": "node -e \"const fs=require('fs'); const p=['node_modules','dist','package-lock.json']; for (const x of p){ if(fs.existsSync(x)) fs.rmSync(x,{recursive:true,force:true}); }\"",
+    "audit": "npm audit --omit=dev",
+    "ci": "npm run typecheck && npm run build && npm run audit"
+  },
+  "dependencies": {
+    "lucide-react": "0.344.0",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-router-dom": "^6.30.3",
+    "recharts": "2.12.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.14.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.0.0",
+    "autoprefixer": "^10.4.24",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^3.4.19",
+    "tsx": "^4.21.0",
+    "typescript": "~5.8.2",
+    "vite": "^6.2.0"
+  },
+  "overrides": {
+    "undici": "^7.0.0",
+    "path-to-regexp": "^8.0.0",
+    "crypto-js": "^4.2.0"
+  }
+}

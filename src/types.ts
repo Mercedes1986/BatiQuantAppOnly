@@ -1,0 +1,3 @@
+// Compat: certains fichiers importent "../types" depuis /src/... 
+// On ré-exporte la définition centrale située à la racine du projet.
+export * from '../types';
