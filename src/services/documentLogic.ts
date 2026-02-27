@@ -1,13 +1,15 @@
-
-import { 
-  HouseProject, Project, QuoteDocument, InvoiceDocument, 
-  ClientInfo, DocumentLine, CompanyProfile 
-} from '../types';
-import { ComputedQuote } from './quote';
-import { generateId } from './storage';
-import { generateDocumentNumber, saveQuote, saveInvoice, getQuote } from './documentsStorage';
-
-// --- LOGIC FOR HOUSE PROJECTS (CHANTIER) ---
+import {
+  HouseProject,
+  Project,
+  QuoteDocument,
+  InvoiceDocument,
+  ClientInfo,
+  DocumentLine,
+  CompanyProfile,
+} from "../types";
+import { ComputedQuote } from "./quote";
+import { generateId } from "./storage";
+import { generateDocumentNumber, saveQuote, saveInvoice, getQuote } from "./documentsStorage";
 
 export const createQuoteFromProject = (
   project: HouseProject,
@@ -16,24 +18,24 @@ export const createQuoteFromProject = (
   client: ClientInfo
 ): string => {
   const docId = generateId();
-  const docNumber = generateDocumentNumber('quote');
-  
-  // Transform sections/items into flat lines
+  const docNumber = generateDocumentNumber("quote");
+
+  const vatRate = project.quote?.settings?.taxRate ?? 20;
+
   const lines: DocumentLine[] = [];
-  
-  computed.sections.forEach(section => {
-    // Header Line for Section
+
+  computed.sections.forEach((section) => {
     lines.push({
       id: generateId(),
-      description: `--- ${section.label.toUpperCase()} ---`,
+      description: `--- ${String(section.label || "").toUpperCase()} ---`,
       quantity: 1,
-      unit: '',
+      unit: "",
       unitPrice: 0,
       totalHT: 0,
-      vatRate: 0
+      vatRate: 0,
     });
 
-    section.items.forEach(item => {
+    section.items.forEach((item) => {
       lines.push({
         id: generateId(),
         description: item.label,
@@ -41,33 +43,31 @@ export const createQuoteFromProject = (
         unit: item.unit,
         unitPrice: item.unitPrice,
         totalHT: item.totalPrice,
-        vatRate: project.quote?.settings?.taxRate || 20
+        vatRate,
       });
     });
   });
 
   const quote: QuoteDocument = {
     id: docId,
-    type: 'quote',
-    status: 'draft',
+    type: "quote",
+    status: "draft",
     projectId: project.id,
     number: docNumber,
     createdAt: new Date().toISOString(),
-    date: new Date().toISOString().split('T')[0],
-    validUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // +30 days
+    date: new Date().toISOString().split("T")[0],
+    validUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
     client,
     lines,
     totalHT: computed.finalHT,
     totalVAT: computed.taxAmount,
     totalTTC: computed.totalTTC,
-    notes: `Devis généré depuis le chantier "${project.name}"`
+    notes: `Devis généré depuis le chantier "${project.name}"`,
   };
 
   saveQuote(quote);
   return docId;
 };
-
-// --- LOGIC FOR SIMPLE PROJECTS (CALCULATOR LISTS) ---
 
 export const createQuoteFromSimpleProject = (
   project: Project,
@@ -75,100 +75,101 @@ export const createQuoteFromSimpleProject = (
   client: ClientInfo
 ): string => {
   const docId = generateId();
-  const docNumber = generateDocumentNumber('quote');
-  
+  const docNumber = generateDocumentNumber("quote");
+
   const lines: DocumentLine[] = [];
   let totalHT = 0;
-  
-  project.items.forEach(item => {
+
+  project.items.forEach((item) => {
     const lineTotal = item.quantity * item.unitPrice;
     totalHT += lineTotal;
-    
+
     lines.push({
       id: generateId(),
-      description: item.name + (item.details ? ` (${item.details})` : ''),
+      description: item.name + (item.details ? ` (${item.details})` : ""),
       quantity: item.quantity,
       unit: item.unit,
       unitPrice: item.unitPrice,
       totalHT: lineTotal,
-      vatRate: 20 // Default 20% for simple projects
+      vatRate: 20,
     });
   });
 
-  const totalVAT = totalHT * 0.20;
+  const totalVAT = totalHT * 0.2;
 
   const quote: QuoteDocument = {
     id: docId,
-    type: 'quote',
-    status: 'draft',
-    projectId: project.id, // Links to simple project ID
+    type: "quote",
+    status: "draft",
+    projectId: project.id,
     number: docNumber,
     createdAt: new Date().toISOString(),
-    date: new Date().toISOString().split('T')[0],
-    validUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+    date: new Date().toISOString().split("T")[0],
+    validUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
     client,
     lines,
-    totalHT: totalHT,
-    totalVAT: totalVAT,
+    totalHT,
+    totalVAT,
     totalTTC: totalHT + totalVAT,
-    notes: `Devis généré depuis la liste "${project.name}"`
+    notes: `Devis généré depuis la liste "${project.name}"`,
   };
 
   saveQuote(quote);
   return docId;
 };
-
-// --- SHARED ---
 
 export const convertQuoteToInvoice = (quoteId: string): string | null => {
   const quote = getQuote(quoteId);
   if (!quote) return null;
 
   const docId = generateId();
-  const docNumber = generateDocumentNumber('invoice');
+  const docNumber = generateDocumentNumber("invoice");
 
   const invoice: InvoiceDocument = {
     id: docId,
-    type: 'invoice',
-    status: 'draft',
+    type: "invoice",
+    status: "draft",
     projectId: quote.projectId,
     quoteSourceId: quote.id,
     number: docNumber,
     createdAt: new Date().toISOString(),
-    date: new Date().toISOString().split('T')[0],
+    date: new Date().toISOString().split("T")[0],
     client: quote.client,
-    lines: quote.lines,
+    lines: quote.lines.map((l) => ({ ...l })),
     totalHT: quote.totalHT,
     totalVAT: quote.totalVAT,
     totalTTC: quote.totalTTC,
-    notes: `Facture issue du devis ${quote.number}`
+    notes: `Facture issue du devis ${quote.number}`,
   };
 
   saveInvoice(invoice);
-  
-  // Update quote status
-  quote.status = 'invoiced';
+
+  quote.status = "invoiced";
   saveQuote(quote);
 
   return docId;
 };
 
-export const recalculateTotals = (doc: QuoteDocument | InvoiceDocument): QuoteDocument | InvoiceDocument => {
+export const recalculateTotals = (doc: QuoteDocument | InvoiceDocument) => {
   let totalHT = 0;
   let totalVAT = 0;
 
-  doc.lines.forEach(line => {
-    if (line.unitPrice !== 0) { // Ignore headers
-      const lineTotal = line.quantity * line.unitPrice;
-      line.totalHT = lineTotal;
-      totalHT += lineTotal;
-      totalVAT += lineTotal * (line.vatRate / 100);
-    }
+  const nextLines = doc.lines.map((line) => {
+    if (line.unitPrice === 0) return { ...line };
+
+    const lineTotal = (Number(line.quantity) || 0) * (Number(line.unitPrice) || 0);
+    const vatRate = Number(line.vatRate) || 0;
+    totalHT += lineTotal;
+    totalVAT += lineTotal * (vatRate / 100);
+
+    return { ...line, totalHT: lineTotal, vatRate };
   });
 
-  doc.totalHT = totalHT;
-  doc.totalVAT = totalVAT;
-  doc.totalTTC = totalHT + totalVAT;
-  
-  return { ...doc };
+  return {
+    ...doc,
+    lines: nextLines,
+    totalHT,
+    totalVAT,
+    totalTTC: totalHT + totalVAT,
+  };
 };

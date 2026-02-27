@@ -1,6 +1,6 @@
-// src/components/ads/AdSlot.tsx
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 import { AD_CONFIG, getAdPermission } from "../../config/adsConfig";
 import { getAdsMode } from "../../services/consentService";
@@ -29,13 +29,9 @@ const isBrowser = () =>
 function findExistingAdSenseScript(): HTMLScriptElement | null {
   if (!isBrowser()) return null;
 
-  // 1) par id (recommandé : mis dans index.html)
-  const byId = document.getElementById(
-    "adsense-script"
-  ) as HTMLScriptElement | null;
+  const byId = document.getElementById("adsense-script") as HTMLScriptElement | null;
   if (byId) return byId;
 
-  // 2) fallback par src (au cas où l'id change)
   const bySrc = Array.from(document.scripts).find((sc) =>
     (sc as HTMLScriptElement).src?.includes("pagead/js/adsbygoogle.js")
   ) as HTMLScriptElement | undefined;
@@ -58,11 +54,12 @@ function ensureAdSenseScriptLoaded(): Promise<void> {
   adsenseLoadPromise = new Promise((resolve, reject) => {
     const existing = findExistingAdSenseScript();
 
-    // ✅ déjà chargé
+    // ✅ déjà prêt
     if (isAdSenseProbablyReady()) return resolve();
 
     if (existing) {
-      if ((existing as any).dataset?.loaded === "true") return resolve();
+      // si déjà marqué loaded
+      if ((existing as any)?.dataset?.loaded === "true") return resolve();
 
       const onLoad = () => {
         try {
@@ -75,6 +72,7 @@ function ensureAdSenseScriptLoaded(): Promise<void> {
       existing.addEventListener("load", onLoad, { once: true });
       existing.addEventListener("error", onError, { once: true });
 
+      // micro-check
       setTimeout(() => {
         if (isAdSenseProbablyReady()) resolve();
       }, 0);
@@ -110,19 +108,15 @@ export const AdSlot: React.FC<AdSlotProps> = ({
   format = "auto",
   layoutKey,
   className = "",
-  label = "Publicité",
+  label,
   variant = "content",
   minHeight = 280,
 }) => {
+  const { t } = useTranslation();
   const location = useLocation();
 
-  /**
-   * ⚠️ IMPORTANT :
-   * Dans certains setups TS/@types/react, <ins> est typé avec HTMLModElement (!)
-   * et/ou lib.dom ne contient pas HTMLInsElement.
-   * => On garde un ref "large" et on cast uniquement au moment du JSX.
-   */
-  const adRef = useRef<any>(null);
+  // ✅ ref stable, large type (évite HTMLModElement / lib.dom)
+  const adRef = useRef<HTMLElement | null>(null);
 
   const [shouldRender, setShouldRender] = useState(false);
   const [adsMode, setAdsMode] = useState<"personalized" | "limited">("limited");
@@ -133,13 +127,15 @@ export const AdSlot: React.FC<AdSlotProps> = ({
   const safeStyles =
     variant === "safe" ? "my-12 py-4 bg-slate-50/50 rounded-xl" : "my-8";
 
+  const effectiveLabel =
+    label ?? t("ads.label", { defaultValue: "Publicité" });
+
   // 1) Permissions par route
   useEffect(() => {
     const permission = getAdPermission(location.pathname);
 
     if (permission === "deny") return setShouldRender(false);
-    if (permission === "safe_only" && variant !== "safe")
-      return setShouldRender(false);
+    if (permission === "safe_only" && variant !== "safe") return setShouldRender(false);
 
     setShouldRender(true);
   }, [location.pathname, variant]);
@@ -157,10 +153,9 @@ export const AdSlot: React.FC<AdSlotProps> = ({
 
     update();
     const handler = () => update();
-    window.addEventListener("consent-updated", handler as EventListener);
 
-    return () =>
-      window.removeEventListener("consent-updated", handler as EventListener);
+    window.addEventListener("consent-updated", handler as EventListener);
+    return () => window.removeEventListener("consent-updated", handler as EventListener);
   }, []);
 
   const slotKey = useMemo(
@@ -174,20 +169,21 @@ export const AdSlot: React.FC<AdSlotProps> = ({
     if (!isBrowser()) return;
     if (!shouldRender) return;
 
-    const el = adRef.current as any;
+    const el = adRef.current;
     if (!el) return;
 
     // éviter double push sur même instance
-    if (el.dataset?.bqPushed === "true") return;
-    el.dataset.bqPushed = "true";
+    const ds = (el as any).dataset || {};
+    if (ds.bqPushed === "true") return;
+    ds.bqPushed = "true";
+    (el as any).dataset = ds;
 
     let cancelled = false;
 
     // ✅ définir NPA AVANT tout push
     try {
       window.adsbygoogle = window.adsbygoogle || [];
-      window.adsbygoogle.requestNonPersonalizedAds =
-        adsMode === "personalized" ? 0 : 1;
+      window.adsbygoogle.requestNonPersonalizedAds = adsMode === "personalized" ? 0 : 1;
     } catch {}
 
     ensureAdSenseScriptLoaded()
@@ -197,14 +193,11 @@ export const AdSlot: React.FC<AdSlotProps> = ({
 
         try {
           window.adsbygoogle = window.adsbygoogle || [];
-          window.adsbygoogle.requestNonPersonalizedAds =
-            adsMode === "personalized" ? 0 : 1;
-
-          // push
+          window.adsbygoogle.requestNonPersonalizedAds = adsMode === "personalized" ? 0 : 1;
           window.adsbygoogle.push({});
         } catch (e) {
           try {
-            (adRef.current as any).dataset.bqPushed = "false";
+            if (adRef.current) (adRef.current as any).dataset.bqPushed = "false";
           } catch {}
           console.error("AdSense push error", e);
         }
@@ -224,11 +217,9 @@ export const AdSlot: React.FC<AdSlotProps> = ({
   if (!isDev && !shouldRender) return null;
 
   return (
-    <div
-      className={`w-full flex flex-col items-center print:hidden ${safeStyles} ${className}`}
-    >
+    <div className={`w-full flex flex-col items-center print:hidden ${safeStyles} ${className}`}>
       <span className="text-[10px] text-slate-300 uppercase tracking-widest mb-2 select-none">
-        {label}
+        {effectiveLabel}
       </span>
 
       <div
@@ -240,20 +231,27 @@ export const AdSlot: React.FC<AdSlotProps> = ({
             className="flex flex-col items-center justify-center text-slate-400 p-4 text-center border-2 border-dashed border-slate-200 w-full rounded-lg"
             style={{ height: minHeight }}
           >
-            <span className="font-bold text-slate-500">AdSlot: {variant}</span>
+            <span className="font-bold text-slate-500">
+              {t("ads.dev.title", { defaultValue: "Emplacement pub" })}: {variant}
+            </span>
             <span className="text-xs mt-1 font-mono">ID: {slotId}</span>
-            <span className="text-xs">Format: {format}</span>
+            <span className="text-xs">
+              {t("ads.dev.format", { defaultValue: "Format" })}: {format}
+            </span>
             <span className="text-[10px] mt-2 text-amber-500 bg-amber-50 px-2 py-1 rounded">
-              Visible en Dev Mode uniquement
+              {t("ads.dev.only", { defaultValue: "Visible en Dev Mode uniquement" })}
             </span>
             <span className="text-[10px] mt-2 text-slate-400">
-              Mode pub: <span className="font-mono">{adsMode}</span>
+              {t("ads.dev.mode", { defaultValue: "Mode pub" })}:{" "}
+              <span className="font-mono">{adsMode}</span>
             </span>
           </div>
         ) : (
           <ins
             key={slotKey}
-            ref={adRef as any}
+            ref={(node) => {
+              adRef.current = node as unknown as HTMLElement | null;
+            }}
             className="adsbygoogle"
             style={{ display: "block", width: "100%", minHeight }}
             data-ad-client={AD_CONFIG.PUBLISHER_ID}

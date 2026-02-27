@@ -6,7 +6,8 @@ export type TutorialContentBlock =
   | { type: "step"; title: string; value: string; tip?: string }
   | { type: "alert"; title: string; value: string; level: "info" | "warning" | "danger" }
   | { type: "formula"; title: string; value: string }
-  | { type: "image"; src: string; alt: string; caption?: string }; // ✅ AJOUT
+  | { type: "image"; src: string; alt: string; caption?: string }
+  | { type: "quote"; value: string; author?: string }; // optionnel mais pratique
 
 export interface TutorialSection {
   title: string;
@@ -19,10 +20,10 @@ export interface Tutorial {
   category: "Gros Œuvre" | "Second Œuvre" | "Finitions" | "Sols" | "Technique" | "Extérieur";
   level: TutorialLevel;
   duration: string; // ex: "5 min"
-  lastUpdated: string;
+  lastUpdated: string; // idéalement "YYYY-MM-DD"
   tags: string[];
   intro: string;
-  prerequisites: string[]; // Données à préparer
+  prerequisites: string[];
   sections: TutorialSection[];
   faq: { question: string; answer: string }[];
 }

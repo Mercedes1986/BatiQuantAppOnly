@@ -1,20 +1,22 @@
 import React, { useEffect, useRef, useState } from "react";
-import { getConsent, setConsentChoice } from "../../services/consentService";
+import { getConsent, setConsentChoice, openConsent } from "../../services/consentService";
 import { ShieldCheck, SlidersHorizontal } from "lucide-react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 export const CookieConsentBanner: React.FC = () => {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+
   const [isVisible, setIsVisible] = useState(false);
   const timerRef = useRef<number | null>(null);
 
   useEffect(() => {
     const openIfNeeded = () => {
       const c = getConsent();
-      // visible si aucun choix explicite
       if (c.choice === "unknown") setIsVisible(true);
     };
 
-    // petit délai pour éviter flash
     timerRef.current = window.setTimeout(() => openIfNeeded(), 800);
 
     const onOpen = () => setIsVisible(true);
@@ -36,6 +38,15 @@ export const CookieConsentBanner: React.FC = () => {
     setIsVisible(false);
   };
 
+  const handleCustomize = () => {
+    // ✅ app-only : on ouvre Settings
+    setIsVisible(false);
+    try {
+      openConsent(); // notifie l’app qu’on veut afficher un écran de préférences
+    } catch {}
+    navigate("/app/settings");
+  };
+
   if (!isVisible) return null;
 
   return (
@@ -44,41 +55,43 @@ export const CookieConsentBanner: React.FC = () => {
         <div className="mb-4 md:mb-0 md:mr-6">
           <div className="flex items-center mb-2">
             <ShieldCheck className="text-blue-600 mr-2" size={20} />
-            <h3 className="font-bold text-slate-800">Votre vie privée</h3>
+            <h3 className="font-extrabold text-slate-800">
+              {t("consent.title", { defaultValue: "Votre vie privée" })}
+            </h3>
           </div>
 
           <p className="text-sm text-slate-600 leading-snug">
-            Nous utilisons des technologies publicitaires. Vous pouvez accepter la
-            personnalisation (meilleure pertinence) ou continuer avec des annonces
-            non personnalisées.
-            <Link to="/legal/privacy" className="text-blue-600 underline ml-1">
-              En savoir plus
-            </Link>
-            .
+            {t("consent.text", {
+              defaultValue:
+                "Nous utilisons des technologies publicitaires. Vous pouvez accepter la personnalisation (meilleure pertinence) ou continuer avec des annonces non personnalisées.",
+            })}
           </p>
         </div>
 
         <div className="flex flex-col sm:flex-row gap-2 min-w-fit">
-          <Link
-            to="/legal/privacy"
-            className="px-4 py-2.5 text-sm font-bold text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 rounded-xl transition-colors inline-flex items-center justify-center"
+          <button
+            onClick={handleCustomize}
+            className="px-4 py-2.5 text-sm font-extrabold text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 rounded-xl transition-colors inline-flex items-center justify-center"
+            type="button"
           >
             <SlidersHorizontal size={16} className="mr-2" />
-            Personnaliser
-          </Link>
+            {t("consent.customize", { defaultValue: "Personnaliser" })}
+          </button>
 
           <button
             onClick={handleDecline}
-            className="px-4 py-2.5 text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors"
+            className="px-4 py-2.5 text-sm font-extrabold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors"
+            type="button"
           >
-            Refuser
+            {t("consent.refuse", { defaultValue: "Refuser" })}
           </button>
 
           <button
             onClick={handleAccept}
-            className="px-6 py-2.5 text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow-md transition-colors"
+            className="px-6 py-2.5 text-sm font-extrabold text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow-md transition-colors"
+            type="button"
           >
-            Accepter
+            {t("consent.accept", { defaultValue: "Accepter" })}
           </button>
         </div>
       </div>

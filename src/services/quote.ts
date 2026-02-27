@@ -1,6 +1,5 @@
-
-import { HouseProject, ConstructionStepId, QuoteManualLine, Unit } from '../types';
-import { CONSTRUCTION_STEPS } from '../constants';
+import { HouseProject, QuoteManualLine, Unit } from "../types";
+import { CONSTRUCTION_STEPS } from "../constants";
 
 export interface QuoteSection {
   id: string;
@@ -17,77 +16,86 @@ export interface QuoteItem {
   unitPrice: number;
   totalPrice: number;
   isManual?: boolean;
-  type: 'material' | 'labor' | 'service';
+  type: "material" | "labor" | "service";
 }
 
 export interface ComputedQuote {
   sections: QuoteSection[];
   totalMaterialsHT: number;
   totalLaborHT: number;
-  subTotalHT: number; // Before margin
+  subTotalHT: number;
   marginAmount: number;
-  totalHT: number; // After margin
+  totalHT: number;
   discountAmount: number;
-  finalHT: number; // After discount
+  finalHT: number;
   taxAmount: number;
   totalTTC: number;
 }
 
+type QuoteSettings = {
+  taxRate: number;
+  marginPercent: number;
+  discountAmount: number;
+  showLabor: boolean;
+};
+
+const DEFAULT_SETTINGS: QuoteSettings = { taxRate: 20, marginPercent: 0, discountAmount: 0, showLabor: true };
+
 export const calculateQuote = (project: HouseProject): ComputedQuote => {
-  const settings = project.quote?.settings || { taxRate: 20, marginPercent: 0, discountAmount: 0, showLabor: true };
-  const manualLines = project.quote?.manualLines || [];
+  const settings: QuoteSettings = { ...DEFAULT_SETTINGS, ...(project.quote?.settings || {}) };
+  const manualLines: QuoteManualLine[] = project.quote?.manualLines || [];
 
   let totalMaterialsHT = 0;
   let totalLaborHT = 0;
   const sections: QuoteSection[] = [];
 
-  // 1. Iterate through defined construction steps to preserve order
-  CONSTRUCTION_STEPS.forEach(group => {
-    group.steps.forEach(step => {
+  CONSTRUCTION_STEPS.forEach((group) => {
+    group.steps.forEach((step) => {
       const stepId = step.id;
       const stepData = project.steps[stepId];
-      const stepManualLines = manualLines.filter(l => l.stepId === stepId);
+      const stepManualLines = manualLines.filter((l) => l.stepId === stepId);
 
-      // Skip if no data and no manual lines
       if (!stepData && stepManualLines.length === 0) return;
 
       const items: QuoteItem[] = [];
       let sectionTotal = 0;
 
-      // A. Automated Materials from Calculator
-      if (stepData && stepData.materials) {
-        stepData.materials.forEach(mat => {
-          const total = mat.quantity * mat.unitPrice;
+      if (stepData && Array.isArray((stepData as any).materials)) {
+        (stepData as any).materials.forEach((mat: any) => {
+          const total = (Number(mat.quantity) || 0) * (Number(mat.unitPrice) || 0);
+
           items.push({
             id: mat.id,
             label: mat.name,
-            quantity: mat.quantity,
+            quantity: Number(mat.quantity) || 0,
             unit: mat.unit,
-            unitPrice: mat.unitPrice,
+            unitPrice: Number(mat.unitPrice) || 0,
             totalPrice: total,
-            type: 'material',
-            isManual: false
+            type: "material",
+            isManual: false,
           });
+
           totalMaterialsHT += total;
           sectionTotal += total;
         });
       }
 
-      // B. Manual Lines (Labor/Extras) for this step
-      stepManualLines.forEach(line => {
-        const total = line.quantity * line.unitPrice;
+      stepManualLines.forEach((line) => {
+        const total = (Number(line.quantity) || 0) * (Number(line.unitPrice) || 0);
+
         items.push({
           id: line.id,
           label: line.label,
-          quantity: line.quantity,
+          quantity: Number(line.quantity) || 0,
           unit: line.unit,
-          unitPrice: line.unitPrice,
+          unitPrice: Number(line.unitPrice) || 0,
           totalPrice: total,
           type: line.category,
-          isManual: true
+          isManual: true,
         });
-        if (line.category === 'labor') totalLaborHT += total;
-        else totalMaterialsHT += total; // Service counts as mat/other for base
+
+        if (line.category === "labor") totalLaborHT += total;
+        else totalMaterialsHT += total;
         sectionTotal += total;
       });
 
@@ -96,56 +104,53 @@ export const calculateQuote = (project: HouseProject): ComputedQuote => {
           id: stepId,
           label: step.label,
           items,
-          totalHT: sectionTotal
+          totalHT: sectionTotal,
         });
       }
     });
   });
 
-  // 2. Global Manual Lines (General items)
-  const globalLines = manualLines.filter(l => l.stepId === 'global');
+  const globalLines = manualLines.filter((l) => l.stepId === "global");
   if (globalLines.length > 0) {
     const items: QuoteItem[] = [];
     let sectionTotal = 0;
-    
-    globalLines.forEach(line => {
-      const total = line.quantity * line.unitPrice;
+
+    globalLines.forEach((line) => {
+      const total = (Number(line.quantity) || 0) * (Number(line.unitPrice) || 0);
+
       items.push({
         id: line.id,
         label: line.label,
-        quantity: line.quantity,
+        quantity: Number(line.quantity) || 0,
         unit: line.unit,
-        unitPrice: line.unitPrice,
+        unitPrice: Number(line.unitPrice) || 0,
         totalPrice: total,
         type: line.category,
-        isManual: true
+        isManual: true,
       });
-      if (line.category === 'labor') totalLaborHT += total;
+
+      if (line.category === "labor") totalLaborHT += total;
       else totalMaterialsHT += total;
       sectionTotal += total;
     });
 
     sections.push({
-      id: 'global',
-      label: 'Frais Généraux / Divers',
+      id: "global",
+      label: "Frais Généraux / Divers",
       items,
-      totalHT: sectionTotal
+      totalHT: sectionTotal,
     });
   }
 
-  // 3. Totals Calculation
   const subTotalHT = totalMaterialsHT + totalLaborHT;
-  
-  // Margin (applied on subtotal)
-  const marginAmount = subTotalHT * (settings.marginPercent / 100);
+
+  const marginAmount = subTotalHT * ((Number(settings.marginPercent) || 0) / 100);
   const totalHT = subTotalHT + marginAmount;
 
-  // Discount (applied on totalHT)
-  const discountAmount = settings.discountAmount;
+  const discountAmount = Number(settings.discountAmount) || 0;
   const finalHT = Math.max(0, totalHT - discountAmount);
 
-  // Tax
-  const taxAmount = finalHT * (settings.taxRate / 100);
+  const taxAmount = finalHT * ((Number(settings.taxRate) || 0) / 100);
   const totalTTC = finalHT + taxAmount;
 
   return {
@@ -158,36 +163,60 @@ export const calculateQuote = (project: HouseProject): ComputedQuote => {
     discountAmount,
     finalHT,
     taxAmount,
-    totalTTC
+    totalTTC,
   };
 };
 
-export const generateQuoteCSV = (quote: ComputedQuote, projectName: string): string => {
-  const headers = ['Poste', 'Désignation', 'Type', 'Quantité', 'Unité', 'Prix U. HT', 'Total HT'];
-  const rows = [];
+export const generateQuoteCSV = (
+  quote: ComputedQuote,
+  projectName: string,
+  t?: (k: string, opt?: any) => string
+): string => {
+  const tr = (key: string, def: string) => (t ? t(key, { defaultValue: def }) : def);
 
-  quote.sections.forEach(sec => {
-    sec.items.forEach(item => {
-      rows.push([
-        sec.label,
-        item.label,
-        item.type === 'labor' ? 'Main d\'œuvre' : 'Matériel',
-        item.quantity.toString().replace('.', ','),
-        item.unit,
-        item.unitPrice.toFixed(2).replace('.', ','),
-        item.totalPrice.toFixed(2).replace('.', ',')
-      ].join(';'));
+  const headers = [
+    tr("csv.section", "Poste"),
+    tr("csv.label", "Désignation"),
+    tr("csv.type", "Type"),
+    tr("csv.qty", "Quantité"),
+    tr("csv.unit", "Unité"),
+    tr("csv.unit_price_ht", "Prix U. HT"),
+    tr("csv.total_ht", "Total HT"),
+  ];
+
+  const rows: string[] = [];
+
+  const f = (n: number) => String(n.toFixed(2)).replace(".", ",");
+
+  quote.sections.forEach((sec) => {
+    sec.items.forEach((item) => {
+      rows.push(
+        [
+          sec.label,
+          item.label,
+          item.type === "labor" ? tr("csv.labor", "Main d'œuvre") : tr("csv.material", "Matériel"),
+          String(item.quantity).replace(".", ","),
+          String(item.unit),
+          f(item.unitPrice),
+          f(item.totalPrice),
+        ].join(";")
+      );
     });
   });
 
-  // Footer rows
-  rows.push(['', '', '', '', '', '', '']);
-  rows.push(['TOTAL MATERIEL', '', '', '', '', '', quote.totalMaterialsHT.toFixed(2).replace('.', ',')].join(';'));
-  rows.push(['TOTAL MO', '', '', '', '', '', quote.totalLaborHT.toFixed(2).replace('.', ',')].join(';'));
-  rows.push(['MARGE', `${(quote.marginAmount / quote.subTotalHT * 100).toFixed(1)}%`, '', '', '', '', quote.marginAmount.toFixed(2).replace('.', ',')].join(';'));
-  rows.push(['TOTAL HT', '', '', '', '', '', quote.totalHT.toFixed(2).replace('.', ',')].join(';'));
-  rows.push(['TVA', `${(quote.taxAmount / quote.finalHT * 100).toFixed(1)}%`, '', '', '', '', quote.taxAmount.toFixed(2).replace('.', ',')].join(';'));
-  rows.push(['TOTAL TTC', '', '', '', '', '', quote.totalTTC.toFixed(2).replace('.', ',')].join(';'));
+  rows.push(["", "", "", "", "", "", ""].join(";"));
+  rows.push([tr("csv.total_materials", "TOTAL MATERIEL"), "", "", "", "", "", f(quote.totalMaterialsHT)].join(";"));
+  rows.push([tr("csv.total_labor", "TOTAL MO"), "", "", "", "", "", f(quote.totalLaborHT)].join(";"));
 
-  return headers.join(';') + '\n' + rows.join('\n');
+  const marginPct = quote.subTotalHT > 0 ? (quote.marginAmount / quote.subTotalHT) * 100 : 0;
+  rows.push([tr("csv.margin", "MARGE"), `${marginPct.toFixed(1).replace(".", ",")}%`, "", "", "", "", f(quote.marginAmount)].join(";"));
+
+  rows.push([tr("csv.total_ht", "TOTAL HT"), "", "", "", "", "", f(quote.totalHT)].join(";"));
+
+  const taxPct = quote.finalHT > 0 ? (quote.taxAmount / quote.finalHT) * 100 : 0;
+  rows.push([tr("csv.vat", "TVA"), `${taxPct.toFixed(1).replace(".", ",")}%`, "", "", "", "", f(quote.taxAmount)].join(";"));
+
+  rows.push([tr("csv.total_ttc", "TOTAL TTC"), "", "", "", "", "", f(quote.totalTTC)].join(";"));
+
+  return headers.join(";") + "\n" + rows.join("\n");
 };

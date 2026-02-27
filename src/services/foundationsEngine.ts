@@ -1,6 +1,11 @@
-
-import { FoundationProjectInputs, MaterialItem, Unit, CalculatorType } from '../types';
-import { SOIL_PROPERTIES } from '../constants';
+// src/services/foundationsEngine.ts (ou là où est ton engine)
+import {
+  FoundationProjectInputs,
+  MaterialItem,
+  Unit,
+  CalculatorType,
+} from "../types";
+import { SOIL_PROPERTIES } from "../constants";
 
 interface FoundationsResult {
   volumes: {
@@ -21,270 +26,295 @@ interface FoundationsResult {
   warnings: string[];
 }
 
+const r2 = (n: number) => Math.round((n + Number.EPSILON) * 100) / 100;
+const n0 = (v: unknown) => (Number.isFinite(Number(v)) ? Number(v) : 0);
+
 export const calculateFoundations = (
   inputs: FoundationProjectInputs,
   prices: Record<string, number>
 ): FoundationsResult => {
   const warnings: string[] = [];
-  
-  // --- 1. Dimensions Helper ---
-  // Convert all cm to meters for internal calc
-  const excavDepth = inputs.excavationDepthCm / 100;
-  const margin = inputs.trenchOverwidthCm / 100;
-  const stripW = inputs.stripWidthCm / 100;
-  const stripH = inputs.stripHeightCm / 100;
-  const leanThick = inputs.cleanConcreteThickCm / 100;
 
-  // --- 2. Volume Calculations ---
-  
+  // --- Helpers ---
+  const p = (key: string) => n0(prices[key]); // safe price getter
+
+  // Convert all cm to meters for internal calc
+  const excavDepth = (n0(inputs.excavationDepthCm) || 0) / 100;
+  const margin = (n0(inputs.trenchOverwidthCm) || 0) / 100;
+
+  const stripW = (n0(inputs.stripWidthCm) || 0) / 100;
+  const stripH = (n0(inputs.stripHeightCm) || 0) / 100;
+
+  const leanThick = (n0(inputs.cleanConcreteThickCm) || 0) / 100;
+
+  // --- 1. Volumes ---
   let volConcrete = 0;
   let volExcavation = 0;
   let volCleanConcrete = 0;
   let areaFormwork = 0;
   let lenDrain = 0;
 
-  // A. STRIP FOUNDATIONS
-  if (inputs.type === 'strip') {
-    const L = inputs.totalLengthMl;
-    
-    // Concrete Volume
+  // A) STRIP
+  if (inputs.type === "strip") {
+    const L = n0(inputs.totalLengthMl);
+
+    const trenchW = stripW + 2 * margin;
+
     volConcrete = L * stripW * stripH;
-    
-    // Excavation Volume: Length * (Width + 2*Margin) * Depth
-    const trenchW = stripW + (2 * margin);
     volExcavation = L * trenchW * excavDepth;
-    
-    // Clean Concrete
+
     if (inputs.cleanConcrete) {
       volCleanConcrete = L * trenchW * leanThick;
     }
 
-    // Formwork (Sides)
-    // Only if margin > 0 implies we have space, otherwise poured against earth?
-    // Let's assume if formwork checked, we calculate side area
     if (inputs.formwork) {
       areaFormwork = L * 2 * stripH;
     }
 
-    // Drainage
     if (inputs.drainage) {
       lenDrain = L;
     }
   }
 
-  // B. PADS (Semelles Isolées)
-  if (inputs.type === 'pad') {
-    inputs.pads.forEach(pad => {
-      const pL = pad.lengthCm / 100;
-      const pW = pad.widthCm / 100;
-      const pH = pad.heightCm / 100;
-      const pD = pad.depthCm / 100; // specific depth per pad type, or use global
-      
-      const count = pad.count;
-      
-      // Concrete
-      volConcrete += count * pL * pW * pH;
-      
-      // Excavation
-      const holeL = pL + (2 * margin);
-      const holeW = pW + (2 * margin);
-      // Use pad specific depth if > 0, else global
+  // B) PADS
+  if (inputs.type === "pad") {
+    (inputs.pads || []).forEach((pad) => {
+      const count = n0(pad.count);
+      const pL = n0(pad.lengthCm) / 100;
+      const pW = n0(pad.widthCm) / 100;
+      const pH = n0(pad.heightCm) / 100;
+      const pD = n0(pad.depthCm) / 100;
+
+      const holeL = pL + 2 * margin;
+      const holeW = pW + 2 * margin;
       const depth = pD > 0 ? pD : excavDepth;
-      
+
+      volConcrete += count * pL * pW * pH;
       volExcavation += count * holeL * holeW * depth;
-      
-      // Clean Concrete
+
       if (inputs.cleanConcrete) {
         volCleanConcrete += count * holeL * holeW * leanThick;
       }
-      
-      // Formwork
+
       if (inputs.formwork) {
         areaFormwork += count * 2 * (pL + pW) * pH;
       }
     });
+
+    // Drainage : pas automatique sur plots (à toi de décider en V2)
+    if (inputs.drainage) {
+      warnings.push(
+        "Drainage activé sur semelles isolées : la longueur de drain n'est pas calculée automatiquement (vérifie la configuration)."
+      );
+    }
   }
 
-  // C. GRADE BEAM (Simplification for V1: treated mostly like strip but with ratio change)
-  if (inputs.type === 'grade_beam') {
-     // Reuse strip logic for now, but usually implies piles (V2)
-     const L = inputs.totalLengthMl;
-     volConcrete = L * stripW * stripH;
-     const trenchW = stripW + (2 * margin);
-     volExcavation = L * trenchW * excavDepth; // Often less deep for grade beams between piles
-     if (inputs.formwork) areaFormwork = L * 2 * stripH;
+  // C) GRADE BEAM (v1 simplifiée)
+  if (inputs.type === "grade_beam") {
+    const L = n0(inputs.totalLengthMl);
+    const trenchW = stripW + 2 * margin;
+
+    volConcrete = L * stripW * stripH;
+    volExcavation = L * trenchW * excavDepth;
+
+    if (inputs.cleanConcrete) {
+      volCleanConcrete = L * trenchW * leanThick;
+    }
+    if (inputs.formwork) areaFormwork = L * 2 * stripH;
+    if (inputs.drainage) lenDrain = L;
   }
 
-  // --- 3. Derived Quantities ---
+  // --- 2. Sol / déblais ---
+  const soilProp =
+    SOIL_PROPERTIES.find((s) => s.id === inputs.soilType) || SOIL_PROPERTIES[0];
 
-  // Soil Bulking
-  const soilProp = SOIL_PROPERTIES.find(s => s.id === inputs.soilType) || SOIL_PROPERTIES[0];
-  const volSpoil = volExcavation * soilProp.bulkingFactor;
-  
-  // Evacuation
+  const volSpoil = volExcavation * n0(soilProp.bulkingFactor);
+
+  // Evacuation (foisonné)
   let volEvac = 0;
   if (inputs.evacuateSpoil) {
-    // If reusing spoil, assume we keep ~40% for backfill (simplified)
+    // si réutilisation, on évacue ~40% (on garde 60%) -> ton ancien code gardait 60% => évac 40%
+    // Ici on garde la même logique que ton précédent: keptRatio = 0.6 => évac 40%
     const keptRatio = inputs.reuseSpoil ? 0.6 : 0;
     volEvac = Math.max(0, volSpoil * (1 - keptRatio));
   }
 
-  // Steel
-  const steelKg = volConcrete * inputs.steelRatio;
+  // --- 3. Quantités ---
+  const steelKg = volConcrete * n0(inputs.steelRatio);
 
-  // Drainage Gravel
   let volGravel = 0;
-  if (inputs.drainage && inputs.drainageGravel) {
-    // 30cm x 30cm approx trench section for gravel around pipe
-    volGravel = lenDrain * 0.3 * 0.3; 
-  }
-  
-  // Geotextile (Drainage wrapping + under clean concrete option?)
-  let areaGeo = 0;
-  if (inputs.drainage) {
-      areaGeo += lenDrain * 1.5; // Wrapping the gravel trench
+  if (inputs.drainage && inputs.drainageGravel && lenDrain > 0) {
+    // 30cm x 30cm autour du drain (approx)
+    volGravel = lenDrain * 0.3 * 0.3;
   }
 
-  // --- 4. Materials List Generation ---
-  
+  let areaGeo = 0;
+  if (inputs.drainage && lenDrain > 0) {
+    // enrobage géotextile : largeur utile ~1.5m (approx)
+    areaGeo = lenDrain * 1.5;
+  }
+
+  // --- 4. Matériaux ---
   const materials: MaterialItem[] = [];
 
-  // Concrete
+  // Béton fondations
   if (volConcrete > 0) {
-    const cost = volConcrete * prices['CONC_M3'];
+    const cost = volConcrete * p("CONC_M3");
     materials.push({
-      id: 'conc',
-      name: 'Béton de fondation (C25/30)',
-      quantity: parseFloat(volConcrete.toFixed(2)),
+      id: "conc",
+      name: "Béton de fondation (C25/30)",
+      quantity: r2(volConcrete),
       quantityRaw: volConcrete,
       unit: Unit.M3,
-      unitPrice: prices['CONC_M3'],
-      totalPrice: cost,
+      unitPrice: p("CONC_M3"),
+      totalPrice: r2(cost),
       category: CalculatorType.FOUNDATIONS,
-      details: 'Dosage standard structure'
+      details: "Dosage standard structure",
     });
   }
 
-  // Steel
+  // Acier
   if (steelKg > 0) {
-    const cost = steelKg * prices['STEEL_KG'];
+    const cost = steelKg * p("STEEL_KG");
     materials.push({
-      id: 'steel',
-      name: 'Acier (Ratio moyen)',
+      id: "steel",
+      name: "Acier (Ratio moyen)",
       quantity: Math.ceil(steelKg),
       quantityRaw: steelKg,
       unit: Unit.KG,
-      unitPrice: prices['STEEL_KG'],
-      totalPrice: cost,
+      unitPrice: p("STEEL_KG"),
+      totalPrice: r2(cost),
       category: CalculatorType.FOUNDATIONS,
-      details: `Ratio: ${inputs.steelRatio}kg/m³`
+      details: `Ratio: ${n0(inputs.steelRatio)} kg/m³`,
     });
   }
 
-  // Excavation
+  // Fouilles
   if (volExcavation > 0) {
-    const cost = volExcavation * prices['EXCAV_M3'];
+    const cost = volExcavation * p("EXCAV_M3");
     materials.push({
-      id: 'excav',
-      name: 'Terrassement (Fouilles)',
-      quantity: parseFloat(volExcavation.toFixed(2)),
+      id: "excav",
+      name: "Terrassement (Fouilles)",
+      quantity: r2(volExcavation),
       quantityRaw: volExcavation,
       unit: Unit.M3,
-      unitPrice: prices['EXCAV_M3'],
-      totalPrice: cost,
-      category: CalculatorType.GROUNDWORK
+      unitPrice: p("EXCAV_M3"),
+      totalPrice: r2(cost),
+      category: CalculatorType.GROUNDWORK,
     });
   }
 
-  // Clean Concrete
+  // Béton propreté
   if (volCleanConcrete > 0) {
-    const cost = volCleanConcrete * prices['LEANCONC_M3'];
+    const cost = volCleanConcrete * p("LEANCONC_M3");
     materials.push({
-      id: 'clean_conc',
-      name: 'Béton de propreté',
-      quantity: parseFloat(volCleanConcrete.toFixed(2)),
+      id: "clean_conc",
+      name: "Béton de propreté",
+      quantity: r2(volCleanConcrete),
       quantityRaw: volCleanConcrete,
       unit: Unit.M3,
-      unitPrice: prices['LEANCONC_M3'],
-      totalPrice: cost,
+      unitPrice: p("LEANCONC_M3"),
+      totalPrice: r2(cost),
       category: CalculatorType.FOUNDATIONS,
-      details: `Épaisseur ${inputs.cleanConcreteThickCm}cm`
+      details: `Épaisseur ${n0(inputs.cleanConcreteThickCm)} cm`,
     });
   }
 
-  // Formwork
+  // Coffrage
   if (areaFormwork > 0) {
-    const cost = areaFormwork * prices['FORMWORK_M2'];
+    const cost = areaFormwork * p("FORMWORK_M2");
     materials.push({
-      id: 'formwork',
-      name: 'Coffrage',
-      quantity: parseFloat(areaFormwork.toFixed(2)),
+      id: "formwork",
+      name: "Coffrage",
+      quantity: r2(areaFormwork),
       quantityRaw: areaFormwork,
       unit: Unit.M2,
-      unitPrice: prices['FORMWORK_M2'],
-      totalPrice: cost,
-      category: CalculatorType.FOUNDATIONS
+      unitPrice: p("FORMWORK_M2"),
+      totalPrice: r2(cost),
+      category: CalculatorType.FOUNDATIONS,
     });
   }
 
-  // Evacuation
+  // Evacuation déblais
   if (volEvac > 0) {
-    const cost = volEvac * prices['WASTE_M3'];
+    const cost = volEvac * p("WASTE_M3");
     materials.push({
-      id: 'evac',
-      name: 'Évacuation des terres',
-      quantity: parseFloat(volEvac.toFixed(2)),
+      id: "evac",
+      name: "Évacuation des terres",
+      quantity: r2(volEvac),
       quantityRaw: volEvac,
       unit: Unit.M3,
-      unitPrice: prices['WASTE_M3'],
-      totalPrice: cost,
+      unitPrice: p("WASTE_M3"),
+      totalPrice: r2(cost),
       category: CalculatorType.GROUNDWORK,
-      details: `Vol. foisonné (Coef ${soilProp.bulkingFactor})`
+      details: `Foisonnement x${n0(soilProp.bulkingFactor)}`,
     });
   }
 
   // Drain
   if (lenDrain > 0) {
-    const cost = lenDrain * prices['DRAIN_ML'];
+    const cost = lenDrain * p("DRAIN_ML");
     materials.push({
-      id: 'drain',
-      name: 'Drain routier / agricole',
+      id: "drain",
+      name: "Drain routier / agricole",
       quantity: Math.ceil(lenDrain),
       quantityRaw: lenDrain,
       unit: Unit.METER,
-      unitPrice: prices['DRAIN_ML'],
-      totalPrice: cost,
-      category: CalculatorType.FOUNDATIONS
+      unitPrice: p("DRAIN_ML"),
+      totalPrice: r2(cost),
+      category: CalculatorType.FOUNDATIONS,
     });
+  } else if (inputs.drainage && inputs.type !== "pad") {
+    warnings.push("Drainage activé mais longueur de drain = 0 (vérifie la longueur).");
   }
 
-  // Gravel
+  // Gravier drainant
   if (volGravel > 0) {
-    const cost = volGravel * prices['GRAVEL_M3'];
+    const cost = volGravel * p("GRAVEL_M3");
     materials.push({
-      id: 'gravel',
-      name: 'Gravier drainant',
-      quantity: parseFloat(volGravel.toFixed(2)),
+      id: "gravel",
+      name: "Gravier drainant",
+      quantity: r2(volGravel),
       quantityRaw: volGravel,
       unit: Unit.M3,
-      unitPrice: prices['GRAVEL_M3'],
-      totalPrice: cost,
-      category: CalculatorType.FOUNDATIONS
+      unitPrice: p("GRAVEL_M3"),
+      totalPrice: r2(cost),
+      category: CalculatorType.FOUNDATIONS,
     });
   }
 
-  // --- 5. Validation & Warnings ---
-  if (inputs.frostDepthCm > 0 && inputs.excavationDepthCm < inputs.frostDepthCm) {
-    warnings.push(`Attention: Profondeur de fouille (${inputs.excavationDepthCm}cm) inférieure au hors-gel (${inputs.frostDepthCm}cm).`);
+  // Géotextile
+  if (areaGeo > 0) {
+    // Clé prix optionnelle (si tu l’as en catalogue)
+    const geoUnit = p("GEOTEXTILE_M2");
+    const cost = areaGeo * geoUnit;
+    materials.push({
+      id: "geotextile",
+      name: "Géotextile (Drain)",
+      quantity: Math.ceil(areaGeo),
+      quantityRaw: areaGeo,
+      unit: Unit.M2,
+      unitPrice: geoUnit,
+      totalPrice: r2(cost),
+      category: CalculatorType.FOUNDATIONS,
+      details: "Enrobage tranchée drainante",
+    });
   }
-  if (inputs.soilType === 'clay') {
-    warnings.push("Sol Argileux : Risque de retrait-gonflement. Étude de sol recommandée.");
+
+  // --- 5. Warnings ---
+  if (n0(inputs.frostDepthCm) > 0 && n0(inputs.excavationDepthCm) < n0(inputs.frostDepthCm)) {
+    warnings.push(
+      `Profondeur de fouille (${n0(inputs.excavationDepthCm)}cm) < hors-gel (${n0(inputs.frostDepthCm)}cm).`
+    );
+  }
+  if (inputs.soilType === "clay") {
+    warnings.push("Sol argileux : risque de retrait-gonflement. Étude de sol recommandée.");
   }
   if (inputs.groundwater && !inputs.drainage) {
-    warnings.push("Nappe phréatique possible : Drainage fortement recommandé.");
+    warnings.push("Nappe possible : drainage fortement recommandé.");
   }
   if (!inputs.evacuateSpoil && !inputs.reuseSpoil) {
-    warnings.push("Attention : Aucune gestion des déblais (ni évacuation, ni réutilisation).");
+    warnings.push("Aucune gestion des déblais (ni évacuation, ni réutilisation).");
   }
 
   return {
@@ -294,15 +324,15 @@ export const calculateFoundations = (
       excavation: volExcavation,
       spoil: volSpoil,
       evac: volEvac,
-      gravel: volGravel
+      gravel: volGravel,
     },
     quantities: {
       steel: steelKg,
       formwork: areaFormwork,
       drain: lenDrain,
-      geotextile: areaGeo
+      geotextile: areaGeo,
     },
     materials,
-    warnings
+    warnings,
   };
 };

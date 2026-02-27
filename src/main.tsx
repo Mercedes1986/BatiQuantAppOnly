@@ -5,6 +5,9 @@ import ReactDOM from "react-dom/client";
 import App from "./App";
 import { initConsent } from "./services/consentService";
 
+// ✅ i18n boot (doit être importé AVANT le render)
+import "./i18n";
+
 // ✅ Migration : anciens liens en /#/xxx -> /xxx (HashRouter -> BrowserRouter)
 (() => {
   if (typeof window === "undefined") return;
@@ -28,6 +31,7 @@ const KEEP_KEYS = new Set<string>([
   BUILD_KEY,
   "batiquant_consent",
   "baticalc_consent",
+  "i18nextLng", // ✅ language mémorisée par i18next
 ]);
 
 const isBrowser = () =>

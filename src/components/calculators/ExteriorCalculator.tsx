@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { CalculatorType, CalculationResult, Unit } from "../../../types";
 import { MATERIAL_METADATA, DEFAULT_PRICES } from "../../constants";
 import { getUnitPrice, incrementUsage } from "../../services/materialsService";
@@ -17,6 +17,7 @@ import {
   Pencil,
   X,
   AlertTriangle,
+  Settings,
 } from "lucide-react";
 
 // --- TYPES ---
@@ -98,6 +99,8 @@ interface Props {
   onCalculate: (result: CalculationResult) => void;
 }
 
+const fmt2 = (n: number) => Number.isFinite(n) ? Number(n.toFixed(2)) : 0;
+
 export const ExteriorCalculator: React.FC<Props> = ({ onCalculate }) => {
   const [step, setStep] = useState(1);
   const [proMode, setProMode] = useState(false);
@@ -113,17 +116,18 @@ export const ExteriorCalculator: React.FC<Props> = ({ onCalculate }) => {
   const [overrides, setOverrides] = useState<Record<string, number>>({});
 
   /**
-   * ✅ Helper prix (cohérent avec le reste de l’app)
-   * Priorité : Override local > Catalogue (Matériaux & Prix) > DEFAULT_PRICES > fallback
+   * Prix: Override local > Catalogue > DEFAULT_PRICES > fallback
    */
   const getP = (key: string, defaultVal: number = 0): number => {
-    if (overrides[key] !== undefined) return overrides[key];
+    const o = overrides[key];
+    if (o !== undefined && Number.isFinite(o)) return o;
 
     const catalog = getUnitPrice(key);
     if (catalog && catalog !== 0) return catalog;
 
-    if ((DEFAULT_PRICES as any)[key] !== undefined) {
-      const v = Number((DEFAULT_PRICES as any)[key]);
+    const dp = (DEFAULT_PRICES as any)[key];
+    if (dp !== undefined) {
+      const v = Number(dp);
       return !Number.isNaN(v) ? v : defaultVal;
     }
 
@@ -137,7 +141,7 @@ export const ExteriorCalculator: React.FC<Props> = ({ onCalculate }) => {
 
   const [wallLen, setWallLen] = useState("");
   const [wallHeight, setWallHeight] = useState("1.60");
-  const [wallWidth, setWallWidth] = useState("20"); // ✅ cm
+  const [wallWidth, setWallWidth] = useState("20"); // cm
 
   const [fenceLen, setFenceLen] = useState("");
   const [fenceType, setFenceType] = useState("mesh_rigid");
@@ -179,10 +183,10 @@ export const ExteriorCalculator: React.FC<Props> = ({ onCalculate }) => {
       ...prev,
       {
         id: Date.now().toString(),
-        label: newZoneLabel,
+        label: newZoneLabel || "Zone",
         type: newZoneType,
         area,
-        perimeter: Math.sqrt(area) * 4, // simple estimation
+        perimeter: Math.sqrt(area) * 4, // estimation simple
         coating: def.coating!,
         excavationDepth: def.excavationDepth!,
         foundationThick: def.foundationThick!,
@@ -330,7 +334,6 @@ export const ExteriorCalculator: React.FC<Props> = ({ onCalculate }) => {
     const warnings: string[] = [];
     const usedKeys = new Set<string>();
 
-    // ✅ add material helper (stores systemKey)
     const addMat = (
       id: string,
       name: string,
@@ -341,19 +344,23 @@ export const ExteriorCalculator: React.FC<Props> = ({ onCalculate }) => {
       details?: string
     ) => {
       const unitPrice = getP(key);
-      const total = qty * unitPrice;
+      const q = Number.isFinite(qty) ? qty : 0;
+      const total = q * unitPrice;
+
       usedKeys.add(key);
+
       materialsList.push({
         id,
         name,
-        quantity: qty,
+        quantity: fmt2(q),
         unit,
-        unitPrice,
-        totalPrice: total,
+        unitPrice: fmt2(unitPrice),
+        totalPrice: fmt2(total),
         category: cat,
         details,
         systemKey: key,
       });
+
       return total;
     };
 
@@ -368,7 +375,7 @@ export const ExteriorCalculator: React.FC<Props> = ({ onCalculate }) => {
         totalCost += addMat(
           `excav_${z.id}`,
           `Décaissement ${z.label}`,
-          parseFloat(excavVol.toFixed(2)),
+          fmt2(excavVol),
           Unit.M3,
           "EXCAVATION_M3",
           CalculatorType.EXTERIOR,
@@ -392,7 +399,7 @@ export const ExteriorCalculator: React.FC<Props> = ({ onCalculate }) => {
         totalCost += addMat(
           `found_${z.id}`,
           "Tout-venant (Grave)",
-          parseFloat(tons.toFixed(2)),
+          fmt2(tons),
           Unit.TON,
           "GRAVEL_FOUNDATION_TON",
           CalculatorType.EXTERIOR,
@@ -405,7 +412,7 @@ export const ExteriorCalculator: React.FC<Props> = ({ onCalculate }) => {
         totalCost += addMat(
           `bed_${z.id}`,
           "Sable (Lit de pose)",
-          parseFloat(tons.toFixed(2)),
+          fmt2(tons),
           Unit.TON,
           "SAND_TON",
           CalculatorType.EXTERIOR,
@@ -417,7 +424,7 @@ export const ExteriorCalculator: React.FC<Props> = ({ onCalculate }) => {
         totalCost += addMat(
           `slab_${z.id}`,
           "Béton (Dalle)",
-          parseFloat(slabVol.toFixed(2)),
+          fmt2(slabVol),
           Unit.M3,
           "BPE_M3",
           CalculatorType.EXTERIOR,
@@ -425,26 +432,23 @@ export const ExteriorCalculator: React.FC<Props> = ({ onCalculate }) => {
         );
       }
 
-      // revêtement
+      // Revêtement
       let coatKey = "";
       let coatUnit: Unit = Unit.M2;
-      let qty = z.area;
+      let coatQty = z.area;
 
       if (z.coating === "pavers") coatKey = "PAVERS_M2";
       else if (z.coating === "wood") coatKey = "WOOD_DECK_M2";
       else if (z.coating === "composite") coatKey = "COMPOSITE_DECK_M2";
       else if (z.coating === "tile") coatKey = "TILE_M2";
+      else if (z.coating === "asphalt") coatKey = "ASPHALT_M2";
       else if (z.coating === "gravel") {
         coatKey = "DECOR_GRAVEL_TON";
         coatUnit = Unit.TON;
-        // approx 5 cm * 1.5 t/m3
-        qty = z.area * 0.05 * 1.5;
+        coatQty = z.area * 0.05 * 1.5; // ~ 5cm, 1.5 t/m3
       } else if (z.coating === "concrete") {
-        // si l'utilisateur sélectionne "concrete" mais slabThick=0 => warning
         if (z.slabThick <= 0) {
-          warnings.push(
-            `Zone "${z.label}" : revêtement béton mais épaisseur dalle = 0 cm.`
-          );
+          warnings.push(`Zone "${z.label}" : revêtement béton mais dalle = 0 cm.`);
         }
       }
 
@@ -452,7 +456,7 @@ export const ExteriorCalculator: React.FC<Props> = ({ onCalculate }) => {
         totalCost += addMat(
           `coat_${z.id}`,
           `Revêtement ${z.coating}`,
-          parseFloat(qty.toFixed(2)),
+          fmt2(coatQty),
           coatUnit,
           coatKey,
           CalculatorType.EXTERIOR
@@ -480,7 +484,7 @@ export const ExteriorCalculator: React.FC<Props> = ({ onCalculate }) => {
         totalCost += addMat(
           `w_found_${w.id}`,
           `Semelle ${w.label}`,
-          parseFloat(vol.toFixed(2)),
+          fmt2(vol),
           Unit.M3,
           "BPE_M3",
           CalculatorType.EXTERIOR,
@@ -488,12 +492,6 @@ export const ExteriorCalculator: React.FC<Props> = ({ onCalculate }) => {
         );
       }
 
-      /**
-       * ✅ Blocs : on garde simple (parpaings standard) MAIS on choisit la clé prix
-       * en fonction de l’épaisseur si l’utilisateur change wallWidth :
-       * 10 => BLOCK_10_UNIT ; 15 => BLOCK_15_UNIT ; 20 => BLOCK_20_UNIT ; 25 => BLOCK_25_UNIT
-       * fallback => BLOCK_20_UNIT
-       */
       const t = Math.round(w.width || 20);
       const blockKey =
         t === 10
@@ -504,7 +502,6 @@ export const ExteriorCalculator: React.FC<Props> = ({ onCalculate }) => {
           ? "BLOCK_25_UNIT"
           : "BLOCK_20_UNIT";
 
-      // consommation basique (à affiner si tu veux) : 10 u/m²
       const blocks = Math.ceil(area * 10);
       totalCost += addMat(
         `w_blk_${w.id}`,
@@ -515,8 +512,7 @@ export const ExteriorCalculator: React.FC<Props> = ({ onCalculate }) => {
         CalculatorType.EXTERIOR
       );
 
-      // Mortier (clé catalogue)
-      const bags = Math.ceil(area / 3); // ~1 sac / 3m² (cohérent avec murs)
+      const bags = Math.ceil(area / 3);
       totalCost += addMat(
         `w_mor_${w.id}`,
         "Mortier",
@@ -553,21 +549,20 @@ export const ExteriorCalculator: React.FC<Props> = ({ onCalculate }) => {
     });
 
     // 3) ITEMS
-    items.forEach((item) => {
+    items.forEach((it) => {
       totalCost += addMat(
-        item.id,
-        item.label,
-        item.quantity,
-        item.category === "fence" ? Unit.METER : Unit.PIECE,
-        item.systemKey,
+        it.id,
+        it.label,
+        it.quantity,
+        it.category === "fence" ? Unit.METER : Unit.PIECE,
+        it.systemKey,
         CalculatorType.EXTERIOR
       );
 
-      if (item.category === "fence") {
-        // posts ~1 tous les 2.5m + extrémités
-        const posts = Math.ceil(item.quantity / 2.5) + 1;
+      if (it.category === "fence") {
+        const posts = Math.ceil(it.quantity / 2.5) + 1;
         totalCost += addMat(
-          `${item.id}_post`,
+          `${it.id}_post`,
           "Poteaux",
           posts,
           Unit.PIECE,
@@ -576,13 +571,13 @@ export const ExteriorCalculator: React.FC<Props> = ({ onCalculate }) => {
         );
       }
 
-      if (item.optionKey && item.optionQty && item.optionQty > 0) {
+      if (it.optionKey && it.optionQty && it.optionQty > 0) {
         totalCost += addMat(
-          `${item.id}_opt`,
-          `Option / Pose (${item.label})`,
-          item.optionQty,
+          `${it.id}_opt`,
+          `Option / Pose (${it.label})`,
+          it.optionQty,
           Unit.PIECE,
-          item.optionKey,
+          it.optionKey,
           CalculatorType.EXTERIOR
         );
       }
@@ -590,7 +585,6 @@ export const ExteriorCalculator: React.FC<Props> = ({ onCalculate }) => {
 
     // 4) NETWORKS
     networks.forEach((n) => {
-      // ✅ clé et unité cohérentes
       let pipeKey = "ELECTRIC_CONDUIT_M";
       if (n.type === "water") pipeKey = "WATER_PIPE_M";
       if (n.type === "sewer") pipeKey = "SEWER_PIPE_M";
@@ -601,28 +595,25 @@ export const ExteriorCalculator: React.FC<Props> = ({ onCalculate }) => {
         totalCost += addMat(
           `tr_${n.id}`,
           `Tranchée ${n.label}`,
-          parseFloat(vol.toFixed(2)),
+          fmt2(vol),
           Unit.M3,
           "TRENCH_EXCAVATION_M3",
           CalculatorType.EXTERIOR,
           `${n.trenchW}x${n.trenchD} cm`
         );
 
-        // Remblai (volume)
         const volBackfill = n.length * (n.trenchW / 100) * 0.1;
         totalCost += addMat(
           `bk_${n.id}`,
           "Remblai (sable/grave)",
-          parseFloat(volBackfill.toFixed(2)),
+          fmt2(volBackfill),
           Unit.M3,
           "BACKFILL_M3",
           CalculatorType.EXTERIOR
         );
       }
 
-      // ✅ Tuyau/Gaine
       if (n.type === "drain") {
-        // rouleaux 50m
         const rolls = Math.ceil(n.length / 50);
         totalCost += addMat(
           `pp_${n.id}`,
@@ -637,7 +628,7 @@ export const ExteriorCalculator: React.FC<Props> = ({ onCalculate }) => {
         totalCost += addMat(
           `pp_${n.id}`,
           `Gaine/Tuyau ${n.label}`,
-          parseFloat(n.length.toFixed(1)),
+          fmt2(n.length),
           Unit.METER,
           pipeKey,
           CalculatorType.EXTERIOR
@@ -680,12 +671,12 @@ export const ExteriorCalculator: React.FC<Props> = ({ onCalculate }) => {
     });
 
     return {
-      totalCost,
+      totalCost: fmt2(totalCost),
       materials: materialsList,
       warnings,
       activeKeys: Array.from(usedKeys),
     };
-  }, [zones, walls, items, networks, gardenItems, overrides]);
+  }, [zones, walls, items, networks, gardenItems, overrides]); // getP is stable enough here via overrides + services
 
   useEffect(() => {
     onCalculate({
@@ -694,22 +685,20 @@ export const ExteriorCalculator: React.FC<Props> = ({ onCalculate }) => {
         { label: "Sols", value: zones.length, unit: "zones" },
         {
           label: "Clôtures/Murs",
-          value:
-            items.filter((i) => i.category === "fence").length + walls.length,
+          value: items.filter((i) => i.category === "fence").length + walls.length,
           unit: "éléments",
         },
         {
           label: "Réseaux",
-          value: networks.reduce((a, b) => a + b.length, 0),
+          value: fmt2(networks.reduce((a, b) => a + b.length, 0)),
           unit: "ml",
         },
       ],
       materials: calculationData.materials,
-      totalCost: parseFloat(calculationData.totalCost.toFixed(2)),
+      totalCost: calculationData.totalCost,
       warnings: calculationData.warnings,
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [calculationData]);
+  }, [calculationData, onCalculate, zones.length, walls.length, items, networks]);
 
   // --- SUB-COMPONENT: Price Editor ---
   const PriceEditor: React.FC = () => {
@@ -718,13 +707,13 @@ export const ExteriorCalculator: React.FC<Props> = ({ onCalculate }) => {
 
     const startEdit = (key: string, current: number) => {
       setEditingKey(key);
-      setEditValue(current.toString());
+      setEditValue(String(current));
     };
 
     const saveEdit = () => {
       if (!editingKey) return;
       const val = parseFloat(editValue);
-      if (!isNaN(val)) {
+      if (!Number.isNaN(val)) {
         setOverrides((prev) => ({ ...prev, [editingKey]: val }));
       }
       setEditingKey(null);
@@ -742,17 +731,13 @@ export const ExteriorCalculator: React.FC<Props> = ({ onCalculate }) => {
     return (
       <div className="bg-white p-3 rounded-xl border border-slate-200">
         <div className="flex justify-between items-center mb-3">
-          <h4 className="text-xs font-bold text-slate-500 uppercase">
-            Ajustement Prix Unitaires
-          </h4>
-          <div className="text-[10px] text-slate-400 italic">
-            Modifications locales au projet
-          </div>
+          <h4 className="text-xs font-bold text-slate-500 uppercase">Ajustement Prix Unitaires</h4>
+          <div className="text-[10px] text-slate-400 italic">Modifications locales au projet</div>
         </div>
 
         <div className="space-y-2 max-h-60 overflow-y-auto pr-1">
           {calculationData.activeKeys.map((key) => {
-            const meta = MATERIAL_METADATA[key] || { label: key, unit: "" };
+            const meta = (MATERIAL_METADATA as any)[key] || { label: key, unit: "" };
             const currentPrice = getP(key);
             const isOverridden = overrides[key] !== undefined;
             const isEditing = editingKey === key;
@@ -762,15 +747,11 @@ export const ExteriorCalculator: React.FC<Props> = ({ onCalculate }) => {
               <div
                 key={key}
                 className={`flex justify-between items-center p-2 rounded text-xs ${
-                  isOverridden
-                    ? "bg-amber-50 border border-amber-100"
-                    : "bg-slate-50 border border-slate-100"
+                  isOverridden ? "bg-amber-50 border border-amber-100" : "bg-slate-50 border border-slate-100"
                 }`}
               >
                 <div className="flex-1 mr-2">
-                  <span className="font-bold text-slate-700 block truncate">
-                    {meta.label}
-                  </span>
+                  <span className="font-bold text-slate-700 block truncate">{meta.label}</span>
                   {isOverridden && (
                     <span className="text-[9px] text-amber-600 font-bold">
                       Modifié (Catalogue: {(catalog || 0).toFixed(2)}€)
@@ -788,30 +769,21 @@ export const ExteriorCalculator: React.FC<Props> = ({ onCalculate }) => {
                         value={editValue}
                         onChange={(e) => setEditValue(e.target.value)}
                       />
-                      <button
-                        onClick={saveEdit}
-                        className="ml-1 p-1 bg-blue-600 text-white rounded"
-                      >
+                      <button onClick={saveEdit} className="ml-1 p-1 bg-blue-600 text-white rounded">
                         <Check size={14} />
                       </button>
-                      <button
-                        onClick={() => setEditingKey(null)}
-                        className="ml-1 p-1 text-slate-400"
-                      >
+                      <button onClick={() => setEditingKey(null)} className="ml-1 p-1 text-slate-400">
                         <X size={14} />
                       </button>
                     </div>
                   ) : (
                     <>
-                      <span className="font-bold w-16 text-right">
-                        {currentPrice.toFixed(2)} €
-                      </span>
-                      <span className="text-slate-400 w-8 text-right">
-                        {(meta.unit || "").replace("€/", "")}
-                      </span>
+                      <span className="font-bold w-16 text-right">{currentPrice.toFixed(2)} €</span>
+                      <span className="text-slate-400 w-8 text-right">{String(meta.unit || "").replace("€/", "")}</span>
                       <button
                         onClick={() => startEdit(key, currentPrice)}
                         className="p-1.5 hover:bg-slate-200 rounded text-slate-500"
+                        title="Modifier"
                       >
                         <Pencil size={12} />
                       </button>
@@ -843,6 +815,7 @@ export const ExteriorCalculator: React.FC<Props> = ({ onCalculate }) => {
         {[1, 2, 3, 4, 5].map((s) => (
           <button
             key={s}
+            type="button"
             onClick={() => setStep(s)}
             className={`flex-1 min-w-[70px] py-2 text-xs font-bold rounded transition-all ${
               step === s ? "bg-white shadow text-blue-600" : "text-slate-400"
@@ -867,10 +840,7 @@ export const ExteriorCalculator: React.FC<Props> = ({ onCalculate }) => {
 
           <div className="space-y-3">
             {zones.map((z) => (
-              <div
-                key={z.id}
-                className="bg-white border border-slate-200 rounded-lg p-3 relative"
-              >
+              <div key={z.id} className="bg-white border border-slate-200 rounded-lg p-3">
                 <div className="flex justify-between items-start mb-2">
                   <div>
                     <span className="font-bold text-slate-700">{z.label}</span>
@@ -879,12 +849,14 @@ export const ExteriorCalculator: React.FC<Props> = ({ onCalculate }) => {
                     </span>
                   </div>
                   <button
-                    onClick={() => setZones(zones.filter((x) => x.id !== z.id))}
+                    type="button"
+                    onClick={() => setZones((prev) => prev.filter((x) => x.id !== z.id))}
                     className="text-red-400"
                   >
                     <Trash2 size={16} />
                   </button>
                 </div>
+
                 <div className="grid grid-cols-2 gap-2 text-[10px] text-slate-500 bg-slate-50 p-2 rounded">
                   <span>Décaissement: {z.excavationDepth}cm</span>
                   <span>Fondation: {z.foundationThick}cm</span>
@@ -907,6 +879,7 @@ export const ExteriorCalculator: React.FC<Props> = ({ onCalculate }) => {
                 <option value="path">Chemin Piéton</option>
                 <option value="other">Autre</option>
               </select>
+
               <input
                 type="number"
                 placeholder="Surface m²"
@@ -925,6 +898,7 @@ export const ExteriorCalculator: React.FC<Props> = ({ onCalculate }) => {
             />
 
             <button
+              type="button"
               onClick={addZone}
               className="w-full py-2 bg-blue-600 text-white font-bold rounded text-xs flex justify-center items-center"
             >
@@ -933,6 +907,7 @@ export const ExteriorCalculator: React.FC<Props> = ({ onCalculate }) => {
           </div>
 
           <button
+            type="button"
             onClick={() => setStep(2)}
             className="w-full py-3 bg-white border border-slate-200 text-slate-700 rounded-xl font-bold mt-2"
           >
@@ -946,21 +921,18 @@ export const ExteriorCalculator: React.FC<Props> = ({ onCalculate }) => {
         <div className="space-y-4">
           <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
             <Fence size={16} className="mr-2 shrink-0 mt-0.5" />
-            Délimitation, Maçonnerie Paysagère et Piscine.
+            Délimitation, maçonnerie paysagère et piscine.
           </div>
 
           <div className="space-y-2">
-            {/* Walls */}
             {walls.map((w) => (
-              <div
-                key={w.id}
-                className="bg-white border rounded p-2 flex justify-between items-center"
-              >
+              <div key={w.id} className="bg-white border rounded p-2 flex justify-between items-center">
                 <span className="text-sm font-bold">
-                  {w.label} ({w.length} ml • {w.height} m)
+                  {w.label} ({w.length} ml • {w.height} m • {Math.round(w.width)} cm)
                 </span>
                 <button
-                  onClick={() => setWalls(walls.filter((x) => x.id !== w.id))}
+                  type="button"
+                  onClick={() => setWalls((prev) => prev.filter((x) => x.id !== w.id))}
                   className="text-red-400"
                 >
                   <Trash2 size={16} />
@@ -968,21 +940,14 @@ export const ExteriorCalculator: React.FC<Props> = ({ onCalculate }) => {
               </div>
             ))}
 
-            {/* Items */}
             {items.map((it) => (
-              <div
-                key={it.id}
-                className="bg-white border rounded p-2 flex justify-between items-center"
-              >
+              <div key={it.id} className="bg-white border rounded p-2 flex justify-between items-center">
                 <span className="text-sm font-bold">
-                  {it.label} (
-                  {it.category === "fence"
-                    ? `${it.quantity} ml`
-                    : `${it.quantity} u`}
-                  )
+                  {it.label} ({it.category === "fence" ? `${it.quantity} ml` : `${it.quantity} u`})
                 </span>
                 <button
-                  onClick={() => setItems(items.filter((x) => x.id !== it.id))}
+                  type="button"
+                  onClick={() => setItems((prev) => prev.filter((x) => x.id !== it.id))}
                   className="text-red-400"
                 >
                   <Trash2 size={16} />
@@ -991,11 +956,8 @@ export const ExteriorCalculator: React.FC<Props> = ({ onCalculate }) => {
             ))}
           </div>
 
-          {/* Add Wall */}
           <div className="bg-white p-3 rounded border border-slate-200">
-            <h4 className="text-xs font-bold text-slate-500 uppercase mb-2">
-              Mur / Muret
-            </h4>
+            <h4 className="text-xs font-bold text-slate-500 uppercase mb-2">Mur / Muret</h4>
             <div className="flex gap-2 mb-2">
               <input
                 type="number"
@@ -1018,20 +980,14 @@ export const ExteriorCalculator: React.FC<Props> = ({ onCalculate }) => {
                 onChange={(e) => setWallWidth(e.target.value)}
                 className="w-20 p-2 text-xs border rounded bg-white text-slate-900"
               />
-              <button
-                onClick={addWall}
-                className="bg-blue-100 text-blue-700 px-3 rounded font-bold text-xs"
-              >
+              <button type="button" onClick={addWall} className="bg-blue-100 text-blue-700 px-3 rounded font-bold text-xs">
                 +
               </button>
             </div>
           </div>
 
-          {/* Add Fence */}
           <div className="bg-white p-3 rounded border border-slate-200">
-            <h4 className="text-xs font-bold text-slate-500 uppercase mb-2">
-              Clôture
-            </h4>
+            <h4 className="text-xs font-bold text-slate-500 uppercase mb-2">Clôture</h4>
             <div className="flex gap-2 mb-2">
               <select
                 value={fenceType}
@@ -1042,6 +998,7 @@ export const ExteriorCalculator: React.FC<Props> = ({ onCalculate }) => {
                 <option value="mesh_soft">Souple</option>
                 <option value="wood">Bois</option>
               </select>
+
               <input
                 type="number"
                 placeholder="L (ml)"
@@ -1049,24 +1006,23 @@ export const ExteriorCalculator: React.FC<Props> = ({ onCalculate }) => {
                 onChange={(e) => setFenceLen(e.target.value)}
                 className="w-24 p-2 text-xs border rounded bg-white text-slate-900"
               />
-              <button
-                onClick={addFence}
-                className="bg-blue-100 text-blue-700 px-3 rounded font-bold text-xs"
-              >
+
+              <button type="button" onClick={addFence} className="bg-blue-100 text-blue-700 px-3 rounded font-bold text-xs">
                 +
               </button>
             </div>
           </div>
 
-          {/* Gate/Pool */}
           <div className="grid grid-cols-2 gap-2">
             <button
+              type="button"
               onClick={addGate}
               className="py-2 border border-dashed border-slate-300 rounded text-xs font-bold text-slate-600 hover:bg-slate-50"
             >
               + Portail
             </button>
             <button
+              type="button"
               onClick={addPool}
               className="py-2 border border-dashed border-slate-300 rounded text-xs font-bold text-slate-600 hover:bg-slate-50"
             >
@@ -1075,16 +1031,10 @@ export const ExteriorCalculator: React.FC<Props> = ({ onCalculate }) => {
           </div>
 
           <div className="flex gap-3 mt-2">
-            <button
-              onClick={() => setStep(1)}
-              className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold"
-            >
+            <button type="button" onClick={() => setStep(1)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
               Retour
             </button>
-            <button
-              onClick={() => setStep(3)}
-              className="flex-1 py-3 bg-white border border-slate-200 text-slate-700 rounded-xl font-bold"
-            >
+            <button type="button" onClick={() => setStep(3)} className="flex-1 py-3 bg-white border border-slate-200 text-slate-700 rounded-xl font-bold">
               Suivant
             </button>
           </div>
@@ -1096,25 +1046,21 @@ export const ExteriorCalculator: React.FC<Props> = ({ onCalculate }) => {
         <div className="space-y-4">
           <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
             <Pickaxe size={16} className="mr-2 shrink-0 mt-0.5" />
-            VRD : Eau, Électricité, Évacuation. Calcul tranchée inclus.
+            VRD : eau, électricité, évacuation. Calcul tranchée inclus.
           </div>
 
           <div className="space-y-2">
             {networks.map((n) => (
-              <div
-                key={n.id}
-                className="bg-white border rounded p-2 flex justify-between items-center"
-              >
+              <div key={n.id} className="bg-white border rounded p-2 flex justify-between items-center">
                 <div>
                   <span className="text-sm font-bold block">{n.label}</span>
                   <span className="text-xs text-slate-500">
-                    {n.length}ml • {n.trench ? "Tranchée" : "Sol"}
+                    {n.length} ml • {n.trench ? "Tranchée" : "Pose au sol"}
                   </span>
                 </div>
                 <button
-                  onClick={() =>
-                    setNetworks(networks.filter((x) => x.id !== n.id))
-                  }
+                  type="button"
+                  onClick={() => setNetworks((prev) => prev.filter((x) => x.id !== n.id))}
                   className="text-red-400"
                 >
                   <Trash2 size={16} />
@@ -1134,8 +1080,9 @@ export const ExteriorCalculator: React.FC<Props> = ({ onCalculate }) => {
                 <option value="water">Eau (PEHD)</option>
                 <option value="sewer">Tout-à-l'égout</option>
                 <option value="drain">Drainage Pluvial</option>
-                <option value="light">Eclairage Jardin</option>
+                <option value="light">Éclairage Jardin</option>
               </select>
+
               <input
                 type="number"
                 placeholder="Long. (ml)"
@@ -1143,26 +1090,18 @@ export const ExteriorCalculator: React.FC<Props> = ({ onCalculate }) => {
                 onChange={(e) => setNetLen(e.target.value)}
                 className="w-24 p-2 text-xs border rounded bg-white text-slate-900"
               />
-              <button
-                onClick={addNetwork}
-                className="bg-blue-600 text-white px-3 rounded font-bold text-xs"
-              >
+
+              <button type="button" onClick={addNetwork} className="bg-blue-600 text-white px-3 rounded font-bold text-xs">
                 +
               </button>
             </div>
           </div>
 
           <div className="flex gap-3 mt-2">
-            <button
-              onClick={() => setStep(2)}
-              className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold"
-            >
+            <button type="button" onClick={() => setStep(2)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
               Retour
             </button>
-            <button
-              onClick={() => setStep(4)}
-              className="flex-1 py-3 bg-white border border-slate-200 text-slate-700 rounded-xl font-bold"
-            >
+            <button type="button" onClick={() => setStep(4)} className="flex-1 py-3 bg-white border border-slate-200 text-slate-700 rounded-xl font-bold">
               Suivant
             </button>
           </div>
@@ -1174,22 +1113,18 @@ export const ExteriorCalculator: React.FC<Props> = ({ onCalculate }) => {
         <div className="space-y-4">
           <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
             <Sprout size={16} className="mr-2 shrink-0 mt-0.5" />
-            Végétaux, Gazon et Arrosage.
+            Végétaux, gazon et arrosage.
           </div>
 
           <div className="space-y-2">
             {gardenItems.map((g) => (
-              <div
-                key={g.id}
-                className="bg-white border rounded p-2 flex justify-between items-center"
-              >
+              <div key={g.id} className="bg-white border rounded p-2 flex justify-between items-center">
                 <span className="text-sm font-bold">
                   {g.quantity} {g.unit} {g.label}
                 </span>
                 <button
-                  onClick={() =>
-                    setGardenItems(gardenItems.filter((x) => x.id !== g.id))
-                  }
+                  type="button"
+                  onClick={() => setGardenItems((prev) => prev.filter((x) => x.id !== g.id))}
                   className="text-red-400"
                 >
                   <Trash2 size={16} />
@@ -1198,7 +1133,6 @@ export const ExteriorCalculator: React.FC<Props> = ({ onCalculate }) => {
             ))}
           </div>
 
-          {/* Add LAWN */}
           <div className="bg-white p-3 rounded-lg border border-slate-200">
             <h4 className="text-xs font-bold text-emerald-600 uppercase mb-2 flex items-center">
               <Sun size={14} className="mr-1" /> Gazon
@@ -1212,14 +1146,9 @@ export const ExteriorCalculator: React.FC<Props> = ({ onCalculate }) => {
                 className="w-24 p-2 text-xs border rounded bg-white text-slate-900"
               />
               <button
+                type="button"
                 onClick={() => {
-                  addGarden(
-                    "lawn",
-                    "LAWN_ROLL_M2",
-                    "Gazon Rouleau",
-                    parseFloat(lawnArea),
-                    Unit.M2
-                  );
+                  addGarden("lawn", "LAWN_ROLL_M2", "Gazon rouleau", parseFloat(lawnArea), Unit.M2);
                   setLawnArea("");
                 }}
                 className="flex-1 bg-emerald-50 text-emerald-700 font-bold text-xs rounded border border-emerald-200"
@@ -1227,16 +1156,11 @@ export const ExteriorCalculator: React.FC<Props> = ({ onCalculate }) => {
                 Rouleau
               </button>
               <button
+                type="button"
                 onClick={() => {
                   const area = parseFloat(lawnArea) || 0;
                   const kg = area * 0.04;
-                  addGarden(
-                    "lawn",
-                    "LAWN_SEED_KG",
-                    "Semence Gazon",
-                    parseFloat(kg.toFixed(1)),
-                    Unit.KG
-                  );
+                  addGarden("lawn", "LAWN_SEED_KG", "Semence gazon", fmt2(kg), Unit.KG);
                   setLawnArea("");
                 }}
                 className="flex-1 bg-slate-50 text-slate-700 font-bold text-xs rounded border border-slate-200"
@@ -1246,7 +1170,6 @@ export const ExteriorCalculator: React.FC<Props> = ({ onCalculate }) => {
             </div>
           </div>
 
-          {/* Add PLANTS */}
           <div className="bg-white p-3 rounded-lg border border-slate-200">
             <h4 className="text-xs font-bold text-emerald-600 uppercase mb-2 flex items-center">
               <Flower2 size={14} className="mr-1" /> Plantation
@@ -1262,6 +1185,7 @@ export const ExteriorCalculator: React.FC<Props> = ({ onCalculate }) => {
                 <option value="HEDGE_PLANT_UNIT">Haie</option>
                 <option value="TREE_UNIT">Arbre</option>
               </select>
+
               <input
                 type="number"
                 placeholder="Qté"
@@ -1269,7 +1193,9 @@ export const ExteriorCalculator: React.FC<Props> = ({ onCalculate }) => {
                 onChange={(e) => setPlantCount(e.target.value)}
                 className="w-16 p-2 text-xs border rounded bg-white text-slate-900"
               />
+
               <button
+                type="button"
                 onClick={() => {
                   const q = parseFloat(plantCount) || 0;
                   const labelMap: Record<string, string> = {
@@ -1278,13 +1204,7 @@ export const ExteriorCalculator: React.FC<Props> = ({ onCalculate }) => {
                     HEDGE_PLANT_UNIT: "Haie",
                     TREE_UNIT: "Arbre",
                   };
-                  addGarden(
-                    "planting",
-                    plantType,
-                    labelMap[plantType] || "Plant",
-                    q,
-                    Unit.PIECE
-                  );
+                  addGarden("planting", plantType, labelMap[plantType] || "Plante", q, Unit.PIECE);
                   setPlantCount("");
                 }}
                 className="bg-emerald-600 text-white px-3 rounded font-bold text-xs"
@@ -1295,16 +1215,10 @@ export const ExteriorCalculator: React.FC<Props> = ({ onCalculate }) => {
           </div>
 
           <div className="flex gap-3 mt-2">
-            <button
-              onClick={() => setStep(3)}
-              className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold"
-            >
+            <button type="button" onClick={() => setStep(3)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
               Retour
             </button>
-            <button
-              onClick={() => setStep(5)}
-              className="flex-1 py-3 bg-white border border-slate-200 text-slate-700 rounded-xl font-bold"
-            >
+            <button type="button" onClick={() => setStep(5)} className="flex-1 py-3 bg-white border border-slate-200 text-slate-700 rounded-xl font-bold">
               Suivant
             </button>
           </div>
@@ -1319,33 +1233,32 @@ export const ExteriorCalculator: React.FC<Props> = ({ onCalculate }) => {
             Récapitulatif. Les prix peuvent être modifiés pour ce calcul.
           </div>
 
+          <div className="flex justify-end">
+            <button
+              type="button"
+              onClick={() => setProMode((p) => !p)}
+              className="text-xs flex items-center text-blue-600"
+            >
+              <Settings size={12} className="mr-1" /> {proMode ? "Mode Pro" : "Mode Simple"}
+            </button>
+          </div>
+
           <PriceEditor />
 
           <div className="bg-white p-4 rounded-xl border border-slate-200">
-            <h3 className="font-bold text-lg mb-4 text-slate-800">
-              Coût Total Estimé
-            </h3>
-            <div className="text-3xl font-bold text-blue-600 mb-6">
-              {calculationData.totalCost.toFixed(2)} €
-            </div>
+            <h3 className="font-bold text-lg mb-4 text-slate-800">Coût Total Estimé</h3>
+            <div className="text-3xl font-bold text-blue-600 mb-6">{calculationData.totalCost.toFixed(2)} €</div>
 
             <div className="space-y-2 text-sm">
               {calculationData.materials.map((m: any) => (
-                <div
-                  key={m.id}
-                  className="flex justify-between items-center py-1 border-b border-slate-50"
-                >
+                <div key={m.id} className="flex justify-between items-center py-1 border-b border-slate-50">
                   <div>
-                    <span className="block font-medium text-slate-700">
-                      {m.name}
-                    </span>
+                    <span className="block font-medium text-slate-700">{m.name}</span>
                     <span className="text-xs text-slate-400">
                       {m.quantity} {m.unit} x {Number(m.unitPrice).toFixed(2)}€
                     </span>
                   </div>
-                  <span className="font-bold text-slate-600">
-                    {Number(m.totalPrice).toFixed(2)}€
-                  </span>
+                  <span className="font-bold text-slate-600">{Number(m.totalPrice).toFixed(2)}€</span>
                 </div>
               ))}
             </div>
@@ -1362,13 +1275,10 @@ export const ExteriorCalculator: React.FC<Props> = ({ onCalculate }) => {
           )}
 
           <div className="flex gap-3 mt-2">
-            <button
-              onClick={() => setStep(4)}
-              className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold"
-            >
+            <button type="button" onClick={() => setStep(4)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
               Retour
             </button>
-            <button className="flex-1 py-3 bg-emerald-100 text-emerald-700 rounded-xl font-bold flex justify-center items-center">
+            <button type="button" className="flex-1 py-3 bg-emerald-100 text-emerald-700 rounded-xl font-bold flex justify-center items-center">
               <Check size={18} className="mr-2" /> Terminé
             </button>
           </div>

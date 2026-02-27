@@ -1,23 +1,26 @@
 // src/data/blockSpecs.ts
+import i18next from "i18next";
+
+const tr = (key: string, fallback: string) =>
+  i18next.t(key, { defaultValue: fallback });
+
 export type MortarKind = "mortier" | "colle";
 
 export type WallBlockSpec = {
   id: string;
-  label: string;          // affichage UI
+  label: string; // affichage UI
   family: "parpaing" | "brique" | "cellulaire" | "stepoc";
-  thicknessCm: number;    // épaisseur du mur
-  dimsCm: { l: number; h: number; p: number }; // longueur, hauteur, épaisseur
-  unitsPerM2: number;     // consommation en u/m²
-  mortarKind: MortarKind; // mortier ou colle
-  // utile Stepoc (bloc à bancher)
-  fillM3PerM2?: number;   // m3 de béton par m² de mur (approx)
+  thicknessCm: number;
+  dimsCm: { l: number; h: number; p: number };
+  unitsPerM2: number;
+  mortarKind: MortarKind;
+  fillM3PerM2?: number;
 };
 
 export const WALL_BLOCK_SPECS: WallBlockSpec[] = [
-  // Parpaings (20x20x50 => 10 u/m²)
   {
     id: "parpaing-20",
-    label: "Parpaing creux 20×20×50 (standard)",
+    label: tr("wallspecs.parpaing20", "Parpaing creux 20×20×50 (standard)"),
     family: "parpaing",
     thicknessCm: 20,
     dimsCm: { l: 50, h: 20, p: 20 },
@@ -26,7 +29,7 @@ export const WALL_BLOCK_SPECS: WallBlockSpec[] = [
   },
   {
     id: "parpaing-15",
-    label: "Parpaing creux 15×20×50",
+    label: tr("wallspecs.parpaing15", "Parpaing creux 15×20×50"),
     family: "parpaing",
     thicknessCm: 15,
     dimsCm: { l: 50, h: 20, p: 15 },
@@ -35,7 +38,7 @@ export const WALL_BLOCK_SPECS: WallBlockSpec[] = [
   },
   {
     id: "parpaing-10",
-    label: "Parpaing creux 10×20×50",
+    label: tr("wallspecs.parpaing10", "Parpaing creux 10×20×50"),
     family: "parpaing",
     thicknessCm: 10,
     dimsCm: { l: 50, h: 20, p: 10 },
@@ -44,7 +47,7 @@ export const WALL_BLOCK_SPECS: WallBlockSpec[] = [
   },
   {
     id: "parpaing-25",
-    label: "Parpaing creux 25×20×50",
+    label: tr("wallspecs.parpaing25", "Parpaing creux 25×20×50"),
     family: "parpaing",
     thicknessCm: 25,
     dimsCm: { l: 50, h: 20, p: 25 },
@@ -52,10 +55,9 @@ export const WALL_BLOCK_SPECS: WallBlockSpec[] = [
     mortarKind: "mortier",
   },
 
-  // Brique (exemples : ajuste selon tes références)
   {
     id: "brique-g7-roulee",
-    label: "Brique roulée (G7 / Optibric) — (exemple)",
+    label: tr("wallspecs.brick_g7", "Brique roulée (G7 / Optibric) — (exemple)"),
     family: "brique",
     thicknessCm: 20,
     dimsCm: { l: 50, h: 20, p: 20 },
@@ -63,10 +65,9 @@ export const WALL_BLOCK_SPECS: WallBlockSpec[] = [
     mortarKind: "colle",
   },
 
-  // Béton cellulaire (60x25 => 1/(0.60*0.25)=6.67 u/m²)
   {
     id: "siporex-60x25-20",
-    label: "Béton cellulaire 60×25×20",
+    label: tr("wallspecs.cellular_60x25x20", "Béton cellulaire 60×25×20"),
     family: "cellulaire",
     thicknessCm: 20,
     dimsCm: { l: 60, h: 25, p: 20 },
@@ -74,26 +75,25 @@ export const WALL_BLOCK_SPECS: WallBlockSpec[] = [
     mortarKind: "colle",
   },
 
-  // Stepoc / Bloc à bancher (approx béton/m² selon épaisseur)
   {
     id: "stepoc-20",
-    label: "Bloc à bancher (Stepoc) 20",
+    label: tr("wallspecs.stepoc20", "Bloc à bancher (Stepoc) 20"),
     family: "stepoc",
     thicknessCm: 20,
     dimsCm: { l: 50, h: 20, p: 20 },
     unitsPerM2: 10,
     mortarKind: "mortier",
-    fillM3PerM2: 0.13, // approximation à affiner
+    fillM3PerM2: 0.13,
   },
   {
     id: "stepoc-25",
-    label: "Bloc à bancher (Stepoc) 25",
+    label: tr("wallspecs.stepoc25", "Bloc à bancher (Stepoc) 25"),
     family: "stepoc",
     thicknessCm: 25,
     dimsCm: { l: 50, h: 20, p: 25 },
     unitsPerM2: 10,
     mortarKind: "mortier",
-    fillM3PerM2: 0.16, // approximation à affiner
+    fillM3PerM2: 0.16,
   },
 ];
 

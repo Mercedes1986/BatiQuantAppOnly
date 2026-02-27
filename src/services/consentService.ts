@@ -131,6 +131,14 @@ function writeStoredState(state: ConsentState) {
   }
 }
 
+const getGtmId = (): string => {
+  try {
+    return (import.meta as any)?.env?.VITE_GTM_ID || DEFAULT_GTM_ID;
+  } catch {
+    return DEFAULT_GTM_ID;
+  }
+};
+
 export const getConsent = (): ConsentState => {
   if (!isBrowser()) return { ...DEFAULT_STATE };
 
@@ -159,17 +167,13 @@ export const canServePersonalizedAds = (): boolean => {
   );
 };
 
-export const canServeLimitedAds = (): boolean => {
-  return true;
-};
+export const canServeLimitedAds = (): boolean => true;
 
-export const getAdsMode = (): "personalized" | "limited" => {
-  return canServePersonalizedAds() ? "personalized" : "limited";
-};
+export const getAdsMode = (): "personalized" | "limited" =>
+  canServePersonalizedAds() ? "personalized" : "limited";
 
 /**
  * ✅ Pousse les signaux dans dataLayer (sans dépendre de gtag)
- * (Si GTM est chargé, il pourra lire dataLayer; sinon c’est inoffensif.)
  */
 function pushConsentToDataLayer(state: ConsentState) {
   if (!isBrowser()) return;
@@ -195,7 +199,7 @@ function loadGtmIfAccepted(state: ConsentState) {
   if (!isBrowser()) return;
   if (state.choice !== "accepted") return;
 
-  const gtmId = (import.meta as any)?.env?.VITE_GTM_ID || DEFAULT_GTM_ID;
+  const gtmId = getGtmId();
 
   try {
     const loader = (window as any).__bqLoadGTM;
@@ -203,20 +207,10 @@ function loadGtmIfAccepted(state: ConsentState) {
   } catch {}
 }
 
-/**
- * Appelle ça une fois au boot (par exemple dans main.tsx / App.tsx)
- * - remet dataLayer en cohérence
- * - si déjà accepté (cookie existant) => charge GTM
- */
 export const initConsent = (): ConsentState => {
   const state = getConsent();
-
-  // On publie l’état au runtime (utile si GTM se charge ensuite)
   pushConsentToDataLayer(state);
-
-  // Si déjà accepté, on charge GTM immédiatement
   loadGtmIfAccepted(state);
-
   return state;
 };
 
@@ -238,11 +232,7 @@ export const setConsentChoice = (
 
   if (isBrowser()) {
     writeStoredState(state);
-
-    // ✅ runtime signals
     pushConsentToDataLayer(state);
-
-    // ✅ GTM only after accept
     loadGtmIfAccepted(state);
 
     try {
@@ -275,6 +265,16 @@ export const resetConsent = () => {
   try {
     window.dispatchEvent(new Event("consent-updated"));
   } catch {}
+  try {
+    window.dispatchEvent(new Event("consent-open"));
+  } catch {}
+};
+
+/**
+ * ✅ Ouvre l’UI de consentement (banner ou page settings)
+ */
+export const openConsent = () => {
+  if (!isBrowser()) return;
   try {
     window.dispatchEvent(new Event("consent-open"));
   } catch {}

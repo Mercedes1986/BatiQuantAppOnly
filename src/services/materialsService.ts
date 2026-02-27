@@ -13,7 +13,7 @@ import type {
  * - Nouvelles clés localStorage : batiquant_*
  * - Compat lecture anciennes clés : baticalc_*
  * - Migration automatique (copie) si nouvelles vides
- * - Ajout d’un event global "batiquant:materials_changed" pour forcer les recalculs UI
+ * - Event global "batiquant:materials_changed"
  */
 
 const BRAND_NEW = "batiquant";
@@ -84,11 +84,9 @@ const safeParse = <T>(raw: string | null, fallback: T): T => {
 };
 
 const getJSON = <T>(keyNew: string, keyOld: string, defaultVal: T): T => {
-  // priorité NEW
   const newRaw = localStorage.getItem(keyNew);
   if (newRaw != null) return safeParse<T>(newRaw, defaultVal);
 
-  // fallback OLD
   const oldRaw = localStorage.getItem(keyOld);
   if (oldRaw != null) return safeParse<T>(oldRaw, defaultVal);
 
@@ -99,7 +97,7 @@ const setJSON = (keyNew: string, data: any) => {
   localStorage.setItem(keyNew, JSON.stringify(data));
 };
 
-// --- One-time migration (copy OLD -> NEW if NEW missing) ---
+// --- One-time migration ---
 const migrateOnce = (() => {
   let done = false;
   return () => {
@@ -157,13 +155,6 @@ export const setLaborSettings = (s: LaborSettings) => {
 };
 
 // --- CORE PRICING ENGINE ---
-
-/**
- * Retourne le prix HT (sans TVA) selon:
- * 1) mapping -> custom material
- * 2) override -> prix forcé
- * 3) DEFAULT_PRICES
- */
 const getUnitPriceHT = (systemKey: string): number => {
   if (!systemKey) return 0;
 
@@ -182,9 +173,16 @@ const getUnitPriceHT = (systemKey: string): number => {
       []
     );
     const customMat = customs.find((m) => m.id === customId);
+
     if (customMat) return customMat.price;
 
-    // mapping cassé -> fallback default
+    // mapping cassé -> fallback override puis default
+    const overrides = getJSON<Record<string, number>>(
+      STORAGE_KEYS_NEW.PRICES,
+      STORAGE_KEYS_OLD.PRICES,
+      {}
+    );
+    if (overrides[systemKey] !== undefined) return overrides[systemKey];
     return (DEFAULT_PRICES as any)[systemKey] || 0;
   }
 
@@ -200,12 +198,9 @@ const getUnitPriceHT = (systemKey: string): number => {
   return (DEFAULT_PRICES as any)[systemKey] || 0;
 };
 
-/**
- * ✅ Fonction publique utilisée partout
- * - applique la TVA si mode TTC
- */
 export const getUnitPrice = (systemKey: string): number => {
   migrateOnce();
+  if (!systemKey) return 0;
   const baseHT = getUnitPriceHT(systemKey);
   const tax = getTaxSettings();
   return tax.mode === "TTC" ? baseHT * (1 + tax.vatRate / 100) : baseHT;
@@ -283,7 +278,6 @@ export const deleteCustomMaterial = (id: string) => {
   const list = getCustomMaterials().filter((m) => m.id !== id);
   setJSON(STORAGE_KEYS_NEW.CUSTOM_MATS, list);
 
-  // clean mappings
   const mappings = getJSON<Record<string, string>>(
     STORAGE_KEYS_NEW.MAPPINGS,
     STORAGE_KEYS_OLD.MAPPINGS,
@@ -428,14 +422,11 @@ export const getSystemMaterialsList = () => {
     const mappedId = mappings[key];
     const mappedMaterial = mappedId ? customs.find((c) => c.id === mappedId) : null;
 
-    // Base HT
     let priceHT = defaultPrice;
     if (mappedMaterial) priceHT = mappedMaterial.price;
     else if (userOverride !== undefined) priceHT = userOverride;
 
-    // Display (HT/TTC)
-    const displayPrice =
-      tax.mode === "TTC" ? priceHT * (1 + tax.vatRate / 100) : priceHT;
+    const displayPrice = tax.mode === "TTC" ? priceHT * (1 + tax.vatRate / 100) : priceHT;
 
     return {
       key,

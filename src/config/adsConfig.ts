@@ -1,3 +1,4 @@
+// src/config/adsConfig.ts
 export const AD_CONFIG = {
   // ✅ UNIFIÉ : doit matcher index.html (meta + script)
   PUBLISHER_ID: "ca-pub-2793469545509663",
@@ -14,16 +15,12 @@ export const AD_CONFIG = {
     "/app/projects",
     "/app/materials",
   ],
-};
+} as const;
 
-const startsWithAny = (pathname: string, routes: string[]) =>
+const startsWithAny = (pathname: string, routes: readonly string[]) =>
   routes.some((route) => pathname === route || pathname.startsWith(route + "/"));
 
-export const getAdPermission = (
-  pathname: string
-): "deny" | "content" | "safe_only" => {
+export const getAdPermission = (pathname: string): "deny" | "content" | "safe_only" => {
   if (startsWithAny(pathname, AD_CONFIG.DENY_LIST)) return "deny";
-
-  // Plus de pages “contenu” : l’appli uniquement.
   return "safe_only";
 };

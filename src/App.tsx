@@ -10,12 +10,12 @@ import {
   Navigate,
   useOutletContext,
   Link,
-  useParams,
 } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import i18next from "i18next";
 
 // Layout / UI
 import { BottomNav } from "@/components/BottomNav";
-// (Site vitrine / SEO / tutos retirés : on garde uniquement l'application)
 
 // App pages
 import { DashboardPage } from "@/pages/DashboardPage";
@@ -38,7 +38,7 @@ import { getHouseProjects, saveHouseProject } from "@/services/storage";
 import { CalculatorType, ConstructionStepId } from "@/types";
 import type { HouseProject } from "@/types";
 
-import { ArrowLeft, Save, Loader2, AlertTriangle, ArrowRight } from "lucide-react";
+import { ArrowLeft, Save, Loader2, AlertTriangle } from "lucide-react";
 
 // --- helper: garde le typage des props pour React.lazy ---
 const lazyNamed = <T extends React.ComponentType<any>>(factory: () => Promise<{ default: T }>) =>
@@ -46,6 +46,7 @@ const lazyNamed = <T extends React.ComponentType<any>>(factory: () => Promise<{ 
 
 // -------------------------
 // ErrorBoundary anti "page blanche"
+// (class => utilise i18next.t directement)
 // -------------------------
 class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean }> {
   state = { hasError: false };
@@ -63,13 +64,10 @@ class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { has
       return (
         <div className="min-h-screen flex items-center justify-center bg-slate-50 p-6">
           <div className="max-w-xl w-full bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-            <h1 className="text-xl font-extrabold text-slate-900">Une erreur est survenue</h1>
-            <p className="mt-2 text-slate-600">
-              La page a rencontré un problème de chargement. Rafraîchis la page. Si ça persiste, ouvre la console pour
-              voir l’erreur.
-            </p>
+            <h1 className="text-xl font-extrabold text-slate-900">{i18next.t("errors.generic_title")}</h1>
+            <p className="mt-2 text-slate-600">{i18next.t("errors.generic_hint")}</p>
             <Link to="/" className="inline-flex mt-4 px-4 py-2 rounded-lg bg-blue-600 text-white font-bold">
-              Retour à l’accueil
+              {i18next.t("common.back_home")}
             </Link>
           </div>
         </div>
@@ -132,15 +130,16 @@ const FoundationsCalculator = lazyNamed(() =>
   import("@/components/calculators/FoundationsCalculator").then((m) => ({ default: m.FoundationsCalculator }))
 );
 
-// (Tutos / Guides retirés)
-
 // Loading Component
-const PageLoader = () => (
-  <div className="flex flex-col items-center justify-center h-64 text-slate-400">
-    <Loader2 size={32} className="animate-spin mb-2" />
-    <span className="text-sm">Chargement...</span>
-  </div>
-);
+const PageLoader: React.FC = () => {
+  const { t } = useTranslation();
+  return (
+    <div className="flex flex-col items-center justify-center h-64 text-slate-400">
+      <Loader2 size={32} className="animate-spin mb-2" />
+      <span className="text-sm">{t("common.loading")}</span>
+    </div>
+  );
+};
 
 // ✅ Scroll to top on route change
 const ScrollToTop: React.FC = () => {
@@ -151,9 +150,39 @@ const ScrollToTop: React.FC = () => {
   return null;
 };
 
+// -------------------------
+// ✅ calc resolver (alias + validation)
+// -------------------------
+const resolveCalcFromParam = (raw: string | null): CalculatorType | null => {
+  const s = String(raw || "").trim().toUpperCase();
+  if (!s) return null;
+
+  const alias: Record<string, CalculatorType> = {
+    STRUCTURAL: CalculatorType.WALLS,
+    PARPAING: CalculatorType.WALLS,
+    BETON: CalculatorType.CONCRETE,
+    PLACO: CalculatorType.PLACO,
+    PEINTURE: CalculatorType.PAINT,
+    CARRELAGE: CalculatorType.TILES,
+    ELECTRICITE: CalculatorType.ELECTRICITY,
+    PLOMBERIE: CalculatorType.PLUMBING,
+    TOITURE: CalculatorType.ROOF,
+    FONDATIONS: CalculatorType.FOUNDATIONS,
+    RAGREAGE: CalculatorType.RAGREAGE,
+    TERRASSEMENT: CalculatorType.SUBSTRUCTURE,
+  };
+
+  const resolved = (alias[s] as unknown as string) || s;
+
+  const allowed = new Set<string>(Object.values(CalculatorType) as unknown as string[]);
+  if (!allowed.has(resolved)) return null;
+
+  return resolved as CalculatorType;
+};
 
 // --- 1. Project Context Wrapper ---
 const ProjectCalculatorWrapper: React.FC = () => {
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
@@ -283,7 +312,7 @@ const ProjectCalculatorWrapper: React.FC = () => {
       case CalculatorType.STAIRS:
         return <StairCalculator {...props} />;
       default:
-        return <div>Inconnu</div>;
+        return <div>{t("common.unknown")}</div>;
     }
   };
 
@@ -294,15 +323,17 @@ const ProjectCalculatorWrapper: React.FC = () => {
     }
   }, [calcType, navigate, searchParams]);
 
+  const euro = new Intl.NumberFormat(undefined, { style: "currency", currency: "EUR" });
+
   return (
     <div className="flex flex-col h-screen bg-slate-50">
       <div className="bg-white text-slate-800 p-4 flex justify-between items-center shadow-sm border-b border-slate-200">
         <button onClick={handleBack} className="flex items-center text-sm font-medium text-slate-500 hover:text-blue-600">
           <ArrowLeft size={18} className="mr-1" />
-          Retour
+          {t("common.back")}
         </button>
 
-        <h1 className="font-bold text-slate-900">{project?.name || "Calcul"}</h1>
+        <h1 className="font-bold text-slate-900">{project?.name || t("calculator.title_fallback")}</h1>
 
         <button
           onClick={handleSave}
@@ -313,7 +344,7 @@ const ProjectCalculatorWrapper: React.FC = () => {
           ].join(" ")}
         >
           <Save size={16} className="mr-1" />
-          Enregistrer
+          {t("common.save")}
         </button>
       </div>
 
@@ -325,7 +356,9 @@ const ProjectCalculatorWrapper: React.FC = () => {
         {result && (
           <div className="mt-4 space-y-4 animate-in slide-in-from-bottom-2">
             <div className="bg-white p-6 rounded-2xl shadow-md border-l-4 border-blue-600">
-              <h2 className="text-sm uppercase tracking-wider text-slate-500 mb-1">Résultat estimé</h2>
+              <h2 className="text-sm uppercase tracking-wider text-slate-500 mb-1">
+                {t("calculator.result_estimated")}
+              </h2>
               <p className="text-3xl font-bold text-slate-900 mb-4">{result.summary}</p>
 
               <div className="grid grid-cols-2 gap-4 text-sm border-t border-slate-100 pt-4">
@@ -344,7 +377,7 @@ const ProjectCalculatorWrapper: React.FC = () => {
                 <div className="mt-4 bg-red-50 border border-red-200 p-3 rounded-lg text-sm text-red-700">
                   <div className="flex items-center mb-1 font-extrabold">
                     <AlertTriangle size={16} className="mr-2" />
-                    Attention
+                    {t("common.attention")}
                   </div>
                   <ul className="list-disc pl-4 space-y-1">
                     {result.warnings.map((w: string, i: number) => (
@@ -357,9 +390,9 @@ const ProjectCalculatorWrapper: React.FC = () => {
 
             <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
               <div className="flex justify-between items-center mb-4">
-                <h3 className="font-extrabold text-slate-800">Matériaux estimés</h3>
+                <h3 className="font-extrabold text-slate-800">{t("calculator.materials_estimated")}</h3>
                 <span className="text-emerald-600 font-extrabold text-lg">
-                  ~ {Number(result.totalCost || 0).toFixed(2)} €
+                  ~ {euro.format(Number(result.totalCost || 0))}
                 </span>
               </div>
 
@@ -384,13 +417,13 @@ const ProjectCalculatorWrapper: React.FC = () => {
             </div>
 
             <div className="p-4 bg-blue-50 rounded-xl border border-blue-100 flex justify-between items-center">
-              <span className="text-sm text-blue-800">Cliquer pour valider l'étape</span>
+              <span className="text-sm text-blue-800">{t("calculator.click_to_validate_step")}</span>
               <button
                 onClick={handleSave}
                 className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg font-extrabold text-sm shadow-md hover:bg-blue-700 transition-colors"
               >
                 <Save size={16} className="mr-2" />
-                Enregistrer le résultat
+                {t("calculator.save_result")}
               </button>
             </div>
           </div>
@@ -398,38 +431,6 @@ const ProjectCalculatorWrapper: React.FC = () => {
       </div>
     </div>
   );
-};
-
-// -------------------------
-// ✅ calc resolver (alias + validation)
-// -------------------------
-const resolveCalcFromParam = (raw: string | null): CalculatorType | null => {
-  const s = String(raw || "").trim().toUpperCase();
-  if (!s) return null;
-
-  const alias: Record<string, CalculatorType> = {
-    // ancien alias qui traînait
-    STRUCTURAL: CalculatorType.WALLS,
-    PARPAING: CalculatorType.WALLS,
-    BETON: CalculatorType.CONCRETE,
-    // alias utiles
-    PLACO: CalculatorType.PLACO,
-    PEINTURE: CalculatorType.PAINT,
-    CARRELAGE: CalculatorType.TILES,
-    ELECTRICITE: CalculatorType.ELECTRICITY,
-    PLOMBERIE: CalculatorType.PLUMBING,
-    TOITURE: CalculatorType.ROOF,
-    FONDATIONS: CalculatorType.FOUNDATIONS,
-    RAGREAGE: CalculatorType.RAGREAGE,
-    TERRASSEMENT: CalculatorType.SUBSTRUCTURE,
-  };
-
-  const resolved = (alias[s] as unknown as string) || s;
-
-  const allowed = new Set<string>(Object.values(CalculatorType) as unknown as string[]);
-  if (!allowed.has(resolved)) return null;
-
-  return resolved as CalculatorType;
 };
 
 // --- 2. Layouts ---
@@ -500,18 +501,19 @@ const AppLayout = () => {
   );
 };
 
-// Site vitrine retiré : pas de layout public.
-
 // --- Simple 404 ---
-const NotFoundPage = () => (
-  <div className="max-w-3xl mx-auto px-4 py-16">
-    <h1 className="text-3xl font-extrabold text-slate-900">Page introuvable</h1>
-    <p className="mt-3 text-slate-600">L’URL demandée n’existe pas (ou a été déplacée).</p>
-    <Link to="/app" className="inline-flex mt-6 px-4 py-2 rounded-lg bg-blue-600 text-white font-bold">
-      Aller à l’application
-    </Link>
-  </div>
-);
+const NotFoundPage: React.FC = () => {
+  const { t } = useTranslation();
+  return (
+    <div className="max-w-3xl mx-auto px-4 py-16">
+      <h1 className="text-3xl font-extrabold text-slate-900">{t("notfound.title")}</h1>
+      <p className="mt-3 text-slate-600">{t("notfound.description")}</p>
+      <Link to="/app" className="inline-flex mt-6 px-4 py-2 rounded-lg bg-blue-600 text-white font-bold">
+        {t("notfound.go_to_app")}
+      </Link>
+    </div>
+  );
+};
 
 // --- 3. Main Router ---
 const App: React.FC = () => {

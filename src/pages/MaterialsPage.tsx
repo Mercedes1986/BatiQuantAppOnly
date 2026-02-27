@@ -1,9 +1,8 @@
-import React, { useState, useEffect, useRef, useMemo, useCallback } from "react";
+import React, { useEffect, useRef, useMemo, useState, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
 import {
   Search,
   RotateCcw,
-  Save,
   Plus,
   Trash2,
   Edit2,
@@ -16,6 +15,8 @@ import {
   Users,
   Info,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
+
 import {
   getSystemMaterialsList,
   getCustomMaterials,
@@ -34,6 +35,7 @@ import {
   importAppData,
   setMapping,
 } from "../services/materialsService";
+
 import { CustomMaterial, Unit, TaxSettings, LaborSettings } from "../types";
 import { generateId } from "../services/storage";
 import { MATERIAL_METADATA } from "../constants";
@@ -41,6 +43,7 @@ import { MATERIAL_METADATA } from "../constants";
 type TabKey = "system" | "custom" | "labor" | "data";
 
 export const MaterialsPage: React.FC = () => {
+  const { t, i18n } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [activeTab, setActiveTab] = useState<TabKey>("system");
@@ -48,7 +51,6 @@ export const MaterialsPage: React.FC = () => {
   const [categoryFilter, setCategoryFilter] = useState("All");
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
 
-  // Data
   const [systemMaterials, setSystemMaterials] = useState<any[]>([]);
   const [customMaterials, setCustomMaterials] = useState<CustomMaterial[]>([]);
   const [favorites, setFavorites] = useState<string[]>([]);
@@ -56,19 +58,30 @@ export const MaterialsPage: React.FC = () => {
   const [tax, setTax] = useState<TaxSettings>({ mode: "HT", vatRate: 20 });
   const [labor, setLabor] = useState<LaborSettings>({ enabled: false, globalHourlyRate: 45 });
 
-  // Modals / Forms
   const [editingCustom, setEditingCustom] = useState<CustomMaterial | null>(null);
   const [showCustomForm, setShowCustomForm] = useState(false);
   const [mappingTarget, setMappingTarget] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const categories = useMemo(
-    () => Array.from(new Set(Object.values(MATERIAL_METADATA).map((m: any) => m.category))).sort(),
-    []
+  const euro = useMemo(
+    () =>
+      new Intl.NumberFormat(i18n.language || undefined, {
+        style: "currency",
+        currency: "EUR",
+        maximumFractionDigits: 2,
+      }),
+    [i18n.language]
   );
 
-  // Load all data
+  // ✅ categories basées sur la liste système (pas sur MATERIAL_METADATA traduite)
+  const categories = useMemo(() => {
+    const list = getSystemMaterialsList();
+    return Array.from(new Set(list.map((m: any) => String(m.category || ""))))
+      .filter(Boolean)
+      .sort((a, b) => a.localeCompare(b));
+  }, []);
+
   const loadAll = useCallback(() => {
     setSystemMaterials(getSystemMaterialsList());
     setCustomMaterials(getCustomMaterials());
@@ -78,26 +91,22 @@ export const MaterialsPage: React.FC = () => {
     setLabor(getLaborSettings());
   }, []);
 
-  // initial load
   useEffect(() => {
     loadAll();
   }, [loadAll]);
 
-  // ✅ Read URL (tab + cat) when URL changes, but DO NOT write URL here (prevents loops)
   useEffect(() => {
-    const t = String(searchParams.get("tab") || "").toLowerCase().trim();
+    const rawTab = String(searchParams.get("tab") || "").toLowerCase().trim();
     const allowed: TabKey[] = ["system", "custom", "labor", "data"];
-    const nextTab: TabKey = allowed.includes(t as TabKey) ? (t as TabKey) : "system";
+    const nextTab: TabKey = allowed.includes(rawTab as TabKey) ? (rawTab as TabKey) : "system";
 
     const rawCat = String(searchParams.get("cat") || "").trim();
     const nextCat = rawCat && categories.includes(rawCat) ? rawCat : "All";
 
-    // Update states only if different (avoid useless re-render)
     setActiveTab((prev) => (prev !== nextTab ? nextTab : prev));
     setCategoryFilter((prev) => (prev !== nextCat ? nextCat : prev));
   }, [searchParams, categories]);
 
-  // ✅ Write URL only from user actions (no loop)
   const updateUrl = useCallback(
     (patch: { tab?: TabKey; cat?: string | null }, replace = true) => {
       const next = new URLSearchParams(searchParams);
@@ -116,35 +125,24 @@ export const MaterialsPage: React.FC = () => {
     [searchParams, setSearchParams]
   );
 
-  const setTab = (t: TabKey) => {
-    setActiveTab(t);
-
-    // si on sort de system, on retire cat
-    if (t !== "system") {
-      updateUrl({ tab: t, cat: null });
-    } else {
-      // system: garder la cat actuelle (si All -> pas de cat)
-      updateUrl({ tab: t, cat: categoryFilter });
-    }
+  const setTab = (tab: TabKey) => {
+    setActiveTab(tab);
+    if (tab !== "system") updateUrl({ tab, cat: null });
+    else updateUrl({ tab, cat: categoryFilter });
   };
 
   const setCategory = (c: string) => {
     setCategoryFilter(c);
-
-    // la catégorie n’a de sens que sur system
     setActiveTab("system");
     updateUrl({ tab: "system", cat: c });
   };
 
-  // --- Handlers ---
   const handlePriceChange = (key: string, val: string) => {
     const num = parseFloat(val);
-    if (isNaN(num)) return;
+    if (Number.isNaN(num)) return;
 
     let priceToSave = num;
-    if (tax.mode === "TTC") {
-      priceToSave = num / (1 + tax.vatRate / 100);
-    }
+    if (tax.mode === "TTC") priceToSave = num / (1 + tax.vatRate / 100);
 
     saveCustomPrice(key, priceToSave);
     loadAll();
@@ -180,34 +178,49 @@ export const MaterialsPage: React.FC = () => {
   };
 
   const handleExport = () => {
-    const json = exportAppData();
-    const blob = new Blob([json], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const linkEl = document.createElement("a");
-    linkEl.href = url;
-    linkEl.download = `BatiQuant_Backup_${new Date().toISOString().split("T")[0]}.json`;
-    linkEl.click();
+    try {
+      const json = exportAppData();
+      const blob = new Blob([json], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+
+      const linkEl = document.createElement("a");
+      linkEl.href = url;
+      linkEl.download = `BatiQuant_Backup_${new Date().toISOString().split("T")[0]}.json`;
+      linkEl.click();
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      console.error(e);
+      window.alert(t("materials.export_error", { defaultValue: "Erreur lors de l’export." }));
+    }
   };
 
   const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
     const reader = new FileReader();
     reader.onload = (evt) => {
-      if (evt.target?.result) {
-        const success = importAppData(evt.target.result as string, "replace");
-        if (success) {
-          alert("Import réussi !");
+      try {
+        const content = evt.target?.result;
+        if (!content || typeof content !== "string") throw new Error("invalid");
+
+        const ok = importAppData(content, "replace");
+        if (ok) {
+          window.alert(t("materials.import_ok", { defaultValue: "Import réussi !" }));
           loadAll();
         } else {
-          alert("Erreur: Fichier invalide.");
+          window.alert(t("materials.import_invalid", { defaultValue: "Erreur: Fichier invalide." }));
         }
+      } catch (err) {
+        console.error(err);
+        window.alert(t("materials.import_invalid", { defaultValue: "Erreur: Fichier invalide." }));
+      } finally {
+        if (fileInputRef.current) fileInputRef.current.value = "";
       }
     };
     reader.readAsText(file);
   };
 
-  // --- Filtering System List ---
   const filteredSystemList = systemMaterials.filter((m) => {
     const matchesSearch = String(m.label || "").toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCat = categoryFilter === "All" || m.category === categoryFilter;
@@ -215,50 +228,59 @@ export const MaterialsPage: React.FC = () => {
     return matchesSearch && matchesCat && matchesFav;
   });
 
-  const tabLabel = (t: TabKey) =>
-    t === "system" ? "Catalogue" : t === "custom" ? "Mes Matériaux" : t === "labor" ? "Main d'œuvre" : "Données";
+  const tabLabel = (tab: TabKey) =>
+    tab === "system"
+      ? t("materials.tabs.catalog", { defaultValue: "Catalogue" })
+      : tab === "custom"
+      ? t("materials.tabs.custom", { defaultValue: "Mes Matériaux" })
+      : tab === "labor"
+      ? t("materials.tabs.labor", { defaultValue: "Main d'œuvre" })
+      : t("materials.tabs.data", { defaultValue: "Données" });
 
   return (
     <div className="pb-20 min-h-screen bg-slate-50">
-      {/* Header */}
       <div className="bg-white sticky top-0 z-20 border-b border-slate-200 shadow-sm">
         <div className="p-4">
           <div className="flex justify-between items-center mb-4">
-            <h1 className="text-2xl font-bold text-slate-800">Matériaux & Prix</h1>
+            <h1 className="text-2xl font-extrabold text-slate-800">
+              {t("materials.title", { defaultValue: "Matériaux & Prix" })}
+            </h1>
 
             <div className="flex items-center space-x-2 bg-slate-100 p-1 rounded-lg">
               <button
                 onClick={() => handleTaxChange({ mode: "HT" })}
-                className={`text-xs font-bold px-3 py-1 rounded ${
+                className={`text-xs font-extrabold px-3 py-1 rounded ${
                   tax.mode === "HT" ? "bg-white shadow text-blue-600" : "text-slate-500"
                 }`}
+                type="button"
               >
-                HT
+                {t("materials.tax.ht", { defaultValue: "HT" })}
               </button>
               <button
                 onClick={() => handleTaxChange({ mode: "TTC" })}
-                className={`text-xs font-bold px-3 py-1 rounded ${
+                className={`text-xs font-extrabold px-3 py-1 rounded ${
                   tax.mode === "TTC" ? "bg-white shadow text-blue-600" : "text-slate-500"
                 }`}
+                type="button"
               >
-                TTC
+                {t("materials.tax.ttc", { defaultValue: "TTC" })}
               </button>
             </div>
           </div>
 
-          {/* Tabs */}
           <div className="mx-auto w-fit max-w-full">
             <div className="flex items-center gap-2 overflow-x-auto no-scrollbar rounded-xl bg-slate-300/70 p-1.5 shadow-sm border border-slate-200">
-              {(["system", "custom", "labor", "data"] as const).map((t) => (
+              {(["system", "custom", "labor", "data"] as const).map((tb) => (
                 <button
-                  key={t}
-                  onClick={() => setTab(t)}
+                  key={tb}
+                  onClick={() => setTab(tb)}
                   className={[
-                    "px-4 py-2 text-sm font-bold rounded-lg whitespace-nowrap transition-colors",
-                    activeTab === t ? "bg-white text-slate-900 shadow" : "text-slate-800 hover:bg-white/60",
+                    "px-4 py-2 text-sm font-extrabold rounded-lg whitespace-nowrap transition-colors",
+                    activeTab === tb ? "bg-white text-slate-900 shadow" : "text-slate-800 hover:bg-white/60",
                   ].join(" ")}
+                  type="button"
                 >
-                  {tabLabel(t)}
+                  {tabLabel(tb)}
                 </button>
               ))}
             </div>
@@ -266,33 +288,34 @@ export const MaterialsPage: React.FC = () => {
         </div>
       </div>
 
-      {/* --- TAB: SYSTEM MATERIALS --- */}
       {activeTab === "system" && (
         <div className="p-4 space-y-4 animate-in fade-in">
-          {/* Search Bar */}
           <div className="flex gap-2">
             <div className="relative flex-1">
               <Search size={18} className="absolute left-3 top-3 text-slate-400" />
               <input
                 type="text"
-                placeholder="Rechercher..."
+                placeholder={t("materials.search", { defaultValue: "Rechercher..." })}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-10 p-2.5 bg-white border border-slate-200 rounded-lg text-sm text-slate-800 focus:ring-2 focus:ring-blue-100 outline-none"
               />
             </div>
+
             <button
               onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
               className={`p-2.5 rounded-lg border ${
-                showFavoritesOnly ? "bg-amber-100 border-amber-300 text-amber-600" : "bg-white border-slate-200 text-slate-400"
+                showFavoritesOnly
+                  ? "bg-amber-100 border-amber-300 text-amber-600"
+                  : "bg-white border-slate-200 text-slate-400"
               }`}
-              title="Favoris"
+              title={t("materials.favorites", { defaultValue: "Favoris" })}
+              type="button"
             >
               <Star size={20} fill={showFavoritesOnly ? "currentColor" : "none"} />
             </button>
           </div>
 
-          {/* Category Filter */}
           <div className="rounded-xl bg-slate-300/60 p-2 shadow-sm border border-slate-200">
             <div className="flex gap-2 overflow-x-auto no-scrollbar">
               <button
@@ -302,9 +325,11 @@ export const MaterialsPage: React.FC = () => {
                     ? "bg-white text-slate-900 border-white"
                     : "bg-white/40 text-slate-800 border-slate-200 hover:bg-white/70"
                 }`}
+                type="button"
               >
-                Tout
+                {t("materials.all", { defaultValue: "Tout" })}
               </button>
+
               {categories.map((c) => (
                 <button
                   key={c}
@@ -314,6 +339,7 @@ export const MaterialsPage: React.FC = () => {
                       ? "bg-white text-slate-900 border-white"
                       : "bg-white/25 text-slate-800 border-slate-200 hover:bg-white/60"
                   }`}
+                  type="button"
                 >
                   {c}
                 </button>
@@ -321,7 +347,6 @@ export const MaterialsPage: React.FC = () => {
             </div>
           </div>
 
-          {/* List */}
           <div className="space-y-3">
             {filteredSystemList.map((item) => (
               <div
@@ -334,7 +359,7 @@ export const MaterialsPage: React.FC = () => {
               >
                 <div className="flex justify-between items-start mb-2">
                   <div className="flex items-start gap-2">
-                    <button onClick={() => handleFavorite(item.key)} className="mt-0.5" title="Favori">
+                    <button onClick={() => handleFavorite(item.key)} className="mt-0.5" title={t("materials.favorite", { defaultValue: "Favori" })} type="button">
                       <Star
                         size={16}
                         className={favorites.includes(item.key) ? "text-amber-400 fill-amber-400" : "text-slate-400"}
@@ -342,13 +367,14 @@ export const MaterialsPage: React.FC = () => {
                     </button>
 
                     <div>
-                      <span className="font-bold text-slate-900 block text-sm">{item.label}</span>
+                      <span className="font-extrabold text-slate-900 block text-sm">{item.label}</span>
                       <div className="flex flex-wrap gap-1 mt-1">
-                        <span className="text-[10px] uppercase font-bold text-slate-800 bg-white/45 px-1.5 py-0.5 rounded border border-slate-200">
+                        <span className="text-[10px] uppercase font-extrabold text-slate-800 bg-white/45 px-1.5 py-0.5 rounded border border-slate-200">
                           {item.category}
                         </span>
+
                         {item.isMapped && (
-                          <span className="text-[10px] font-bold text-emerald-800 bg-emerald-100/70 px-1.5 py-0.5 rounded border border-emerald-200 flex items-center">
+                          <span className="text-[10px] font-extrabold text-emerald-800 bg-emerald-100/70 px-1.5 py-0.5 rounded border border-emerald-200 flex items-center">
                             <LinkIcon size={10} className="mr-1" /> {item.mappedLabel}
                           </span>
                         )}
@@ -361,7 +387,8 @@ export const MaterialsPage: React.FC = () => {
                       <button
                         onClick={() => handleReset(item.key)}
                         className="text-slate-700 hover:text-red-600 p-1.5 bg-white/45 rounded border border-slate-200"
-                        title="Réinitialiser"
+                        title={t("materials.reset", { defaultValue: "Réinitialiser" })}
+                        type="button"
                       >
                         <RotateCcw size={14} />
                       </button>
@@ -371,7 +398,8 @@ export const MaterialsPage: React.FC = () => {
                       className={`p-1.5 rounded border border-slate-200 ${
                         item.isMapped ? "text-emerald-800 bg-emerald-100/70" : "text-slate-700 bg-white/45"
                       }`}
-                      title="Associer un matériau"
+                      title={t("materials.map", { defaultValue: "Associer un matériau" })}
+                      type="button"
                     >
                       <LinkIcon size={14} />
                     </button>
@@ -387,7 +415,7 @@ export const MaterialsPage: React.FC = () => {
                       value={Number(item.displayPrice || 0).toFixed(2)}
                       onChange={(e) => handlePriceChange(item.key, e.target.value)}
                       disabled={item.isMapped}
-                      className={`w-full p-2 pl-8 border rounded-lg font-mono font-bold text-sm ${
+                      className={`w-full p-2 pl-8 border rounded-lg font-mono font-extrabold text-sm ${
                         item.isMapped
                           ? "bg-slate-200/70 text-slate-700 cursor-not-allowed border-slate-200"
                           : item.isModified
@@ -397,6 +425,7 @@ export const MaterialsPage: React.FC = () => {
                     />
                     <span className="absolute left-3 top-2 text-slate-500 text-xs mt-0.5">€</span>
                   </div>
+
                   <span className="text-xs font-medium text-slate-700 w-12 text-right">
                     {String(item.unit || "").replace("€/", "/ ")}
                   </span>
@@ -405,13 +434,14 @@ export const MaterialsPage: React.FC = () => {
             ))}
 
             {filteredSystemList.length === 0 && (
-              <div className="text-center py-10 text-slate-400 text-sm">Aucun matériau trouvé.</div>
+              <div className="text-center py-10 text-slate-400 text-sm">
+                {t("materials.none_found", { defaultValue: "Aucun matériau trouvé." })}
+              </div>
             )}
           </div>
         </div>
       )}
 
-      {/* --- TAB: CUSTOM MATERIALS --- */}
       {activeTab === "custom" && (
         <div className="p-4 animate-in fade-in">
           {showCustomForm ? (
@@ -433,9 +463,10 @@ export const MaterialsPage: React.FC = () => {
                 setEditingCustom(null);
                 setShowCustomForm(true);
               }}
-              className="w-full py-3 mb-4 bg-blue-600 text-white rounded-xl font-bold flex justify-center items-center shadow-md text-sm"
+              className="w-full py-3 mb-4 bg-blue-600 text-white rounded-xl font-extrabold flex justify-center items-center shadow-md text-sm"
+              type="button"
             >
-              <Plus size={18} className="mr-2" /> Créer un matériau
+              <Plus size={18} className="mr-2" /> {t("materials.create_custom", { defaultValue: "Créer un matériau" })}
             </button>
           )}
 
@@ -446,16 +477,16 @@ export const MaterialsPage: React.FC = () => {
                 className="bg-slate-300/55 hover:bg-slate-300/70 transition-colors p-3 rounded-xl border border-slate-200 shadow-sm flex justify-between items-center"
               >
                 <div>
-                  <span className="font-bold text-slate-900 block text-sm">{mat.label}</span>
+                  <span className="font-extrabold text-slate-900 block text-sm">{mat.label}</span>
                   <div className="text-xs text-slate-700 mt-0.5 flex items-center space-x-2">
                     <span className="bg-white/45 px-1.5 rounded uppercase border border-slate-200">{mat.category}</span>
                     <span>•</span>
-                    <span className="font-mono text-blue-800 font-bold">
-                      {(tax.mode === "TTC" ? mat.price * (1 + tax.vatRate / 100) : mat.price).toFixed(2)} € {tax.mode} /{" "}
-                      {mat.unit}
+                    <span className="font-mono text-blue-800 font-extrabold">
+                      {euro.format(tax.mode === "TTC" ? mat.price * (1 + tax.vatRate / 100) : mat.price)} {tax.mode} / {mat.unit}
                     </span>
                   </div>
                 </div>
+
                 <div className="flex space-x-1">
                   <button
                     onClick={() => {
@@ -463,19 +494,23 @@ export const MaterialsPage: React.FC = () => {
                       setShowCustomForm(true);
                     }}
                     className="p-2 text-slate-700 hover:bg-white/45 rounded border border-transparent hover:border-slate-200"
-                    title="Modifier"
+                    title={t("common.edit", { defaultValue: "Modifier" })}
+                    type="button"
                   >
                     <Edit2 size={16} />
                   </button>
+
                   <button
                     onClick={() => {
-                      if (confirm("Supprimer ?")) {
+                      const ok = window.confirm(t("materials.confirm_delete_custom", { defaultValue: "Supprimer ?" }));
+                      if (ok) {
                         deleteCustomMaterial(mat.id);
                         loadAll();
                       }
                     }}
                     className="p-2 text-slate-700 hover:text-red-600 hover:bg-red-50 rounded border border-transparent hover:border-red-200"
-                    title="Supprimer"
+                    title={t("common.delete", { defaultValue: "Supprimer" })}
+                    type="button"
                   >
                     <Trash2 size={16} />
                   </button>
@@ -486,22 +521,24 @@ export const MaterialsPage: React.FC = () => {
             {customMaterials.length === 0 && !showCustomForm && (
               <div className="text-center py-10 text-slate-400 border-2 border-dashed border-slate-200 rounded-xl bg-white">
                 <Package size={32} className="mx-auto mb-2 opacity-50" />
-                <p className="text-sm">Aucun matériau personnalisé.</p>
+                <p className="text-sm">{t("materials.none_custom", { defaultValue: "Aucun matériau personnalisé." })}</p>
               </div>
             )}
           </div>
         </div>
       )}
 
-      {/* --- TAB: LABOR --- */}
       {activeTab === "labor" && (
         <div className="p-4 animate-in fade-in">
           <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm mb-4">
             <div className="flex justify-between items-center mb-4">
               <div className="flex items-center">
                 <Users size={20} className="text-blue-600 mr-2" />
-                <span className="font-bold text-slate-800">Paramètres Main d'œuvre</span>
+                <span className="font-extrabold text-slate-800">
+                  {t("materials.labor.title", { defaultValue: "Paramètres Main d'œuvre" })}
+                </span>
               </div>
+
               <label className="relative inline-flex items-center cursor-pointer">
                 <input
                   type="checkbox"
@@ -515,36 +552,44 @@ export const MaterialsPage: React.FC = () => {
 
             <div className={`space-y-4 transition-opacity ${labor.enabled ? "opacity-100" : "opacity-50 pointer-events-none"}`}>
               <div>
-                <label className="block text-xs font-bold text-slate-500 mb-1">Taux Horaire Moyen (€/h)</label>
+                <label className="block text-xs font-extrabold text-slate-500 mb-1">
+                  {t("materials.labor.rate", { defaultValue: "Taux Horaire Moyen (€/h)" })}
+                </label>
                 <div className="relative">
                   <input
                     type="number"
                     value={labor.globalHourlyRate}
                     onChange={(e) => handleLaborChange({ globalHourlyRate: parseFloat(e.target.value) })}
-                    className="w-full p-2 pl-8 border rounded-lg bg-slate-50 text-slate-900 font-bold"
+                    className="w-full p-2 pl-8 border rounded-lg bg-slate-50 text-slate-900 font-extrabold"
                   />
                   <span className="absolute left-3 top-2.5 text-slate-400 text-xs">€</span>
                 </div>
               </div>
+
               <div className="text-xs text-slate-500 bg-blue-50 p-2 rounded border border-blue-100">
                 <Info size={14} className="inline mr-1 -mt-0.5" />
-                Ce taux sera utilisé pour estimer le coût de la main d'œuvre dans les calculateurs si le mode "Pro" est activé.
+                {t("materials.labor.info", {
+                  defaultValue:
+                    "Ce taux sera utilisé pour estimer le coût de la main d'œuvre dans les calculateurs si le mode Pro est activé.",
+                })}
               </div>
             </div>
           </div>
         </div>
       )}
 
-      {/* --- TAB: DATA --- */}
       {activeTab === "data" && (
         <div className="p-4 space-y-4 animate-in fade-in">
           <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-            <h3 className="font-bold text-slate-800 mb-3 flex items-center">
-              <Settings size={18} className="mr-2" /> Configuration Fiscale
+            <h3 className="font-extrabold text-slate-800 mb-3 flex items-center">
+              <Settings size={18} className="mr-2" /> {t("materials.tax_config", { defaultValue: "Configuration Fiscale" })}
             </h3>
+
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold text-slate-500 mb-1">Taux TVA (%)</label>
+                <label className="block text-xs font-extrabold text-slate-500 mb-1">
+                  {t("materials.vat_rate", { defaultValue: "Taux TVA (%)" })}
+                </label>
                 <select
                   value={tax.vatRate}
                   onChange={(e) => handleTaxChange({ vatRate: parseFloat(e.target.value) })}
@@ -560,60 +605,80 @@ export const MaterialsPage: React.FC = () => {
           </div>
 
           <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-            <h3 className="font-bold text-slate-800 mb-3 flex items-center">
-              <Save size={18} className="mr-2" /> Sauvegarde & Restauration
+            <h3 className="font-extrabold text-slate-800 mb-3 flex items-center">
+              <Download size={18} className="mr-2 text-blue-600" /> {t("materials.backup_restore", { defaultValue: "Sauvegarde & Restauration" })}
             </h3>
+
             <div className="grid grid-cols-2 gap-3">
               <button
                 onClick={handleExport}
                 className="flex flex-col items-center justify-center p-4 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors"
+                type="button"
               >
                 <Download size={24} className="text-blue-600 mb-2" />
-                <span className="text-sm font-bold text-slate-700">Exporter JSON</span>
+                <span className="text-sm font-extrabold text-slate-700">{t("materials.export_json", { defaultValue: "Exporter JSON" })}</span>
               </button>
+
               <label className="flex flex-col items-center justify-center p-4 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors cursor-pointer">
                 <Upload size={24} className="text-emerald-600 mb-2" />
-                <span className="text-sm font-bold text-slate-700">Importer JSON</span>
-                <input type="file" ref={fileInputRef} className="hidden" accept=".json" onChange={handleImport} />
+                <span className="text-sm font-extrabold text-slate-700">{t("materials.import_json", { defaultValue: "Importer JSON" })}</span>
+                <input type="file" ref={fileInputRef} className="hidden" accept=".json,application/json" onChange={handleImport} />
               </label>
             </div>
-            <p className="text-xs text-slate-400 mt-3 text-center">Exportez vos données pour les transférer sur un autre appareil.</p>
+
+            <p className="text-xs text-slate-400 mt-3 text-center">
+              {t("materials.backup_hint", { defaultValue: "Exportez vos données pour les transférer sur un autre appareil." })}
+            </p>
           </div>
         </div>
       )}
 
-      {/* --- MODAL: MAPPING --- */}
       {mappingTarget && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl w-full max-w-sm max-h-[80vh] flex flex-col shadow-xl">
             <div className="p-4 border-b">
-              <h3 className="font-bold text-lg">Associer un matériau</h3>
-              <p className="text-xs text-slate-500">Remplace {MATERIAL_METADATA[mappingTarget]?.label}</p>
+              <h3 className="font-extrabold text-lg">{t("materials.map_title", { defaultValue: "Associer un matériau" })}</h3>
+              <p className="text-xs text-slate-500">
+                {t("materials.map_replace", { defaultValue: "Remplace" })}{" "}
+                {MATERIAL_METADATA[mappingTarget]?.label || mappingTarget}
+              </p>
             </div>
+
             <div className="flex-1 overflow-y-auto p-2">
               <button
                 onClick={() => handleMapping(mappingTarget, null)}
-                className="w-full text-left p-3 rounded hover:bg-slate-50 text-sm text-red-600 font-bold border-b border-slate-100"
+                className="w-full text-left p-3 rounded hover:bg-slate-50 text-sm text-red-600 font-extrabold border-b border-slate-100"
+                type="button"
               >
-                Aucune association (Défaut)
+                {t("materials.map_none", { defaultValue: "Aucune association (Défaut)" })}
               </button>
+
               {customMaterials.map((m) => (
                 <button
                   key={m.id}
                   onClick={() => handleMapping(mappingTarget, m.id)}
                   className="w-full text-left p-3 rounded hover:bg-blue-50 text-sm flex justify-between items-center"
+                  type="button"
                 >
                   <span className="font-medium text-slate-700">{m.label}</span>
-                  <span className="text-xs bg-slate-100 px-2 py-1 rounded">{m.price}€</span>
+                  <span className="text-xs bg-slate-100 px-2 py-1 rounded">{euro.format(m.price)}</span>
                 </button>
               ))}
+
               {customMaterials.length === 0 && (
-                <div className="p-4 text-center text-slate-400 text-sm">Créez d'abord des matériaux personnalisés.</div>
+                <div className="p-4 text-center text-slate-400 text-sm">
+                  {t("materials.map_need_custom", { defaultValue: "Créez d'abord des matériaux personnalisés." })}
+                </div>
               )}
             </div>
+
             <div className="p-3 border-t">
-              <button onClick={() => setMappingTarget(null)} className="w-full py-2 bg-slate-100 rounded-lg text-slate-600 font-bold text-sm">
-                Annuler
+              <button
+                onClick={() => setMappingTarget(null)}
+                className="w-full py-2 bg-slate-100 rounded-lg text-slate-600 font-extrabold text-sm"
+                type="button"
+              >
+                {t("common.cancel", { defaultValue: "Annuler" })}
               </button>
             </div>
           </div>
@@ -623,12 +688,13 @@ export const MaterialsPage: React.FC = () => {
   );
 };
 
-// --- SUB-COMPONENT: CUSTOM MATERIAL FORM ---
 const CustomMaterialForm: React.FC<{
   initial: CustomMaterial | null;
   onSave: (m: CustomMaterial) => void;
   onCancel: () => void;
 }> = ({ initial, onSave, onCancel }) => {
+  const { t } = useTranslation();
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
@@ -636,7 +702,7 @@ const CustomMaterialForm: React.FC<{
     onSave({
       id: initial?.id || generateId(),
       label: (formData.get("label") as string) || "",
-      category: (formData.get("category") as string) || "Divers",
+      category: (formData.get("category") as string) || t("materials.misc", { defaultValue: "Divers" }),
       unit: (formData.get("unit") as string) as any,
       price: parseFloat(formData.get("price") as string),
       createdAt: initial?.createdAt || Date.now(),
@@ -645,30 +711,36 @@ const CustomMaterialForm: React.FC<{
 
   return (
     <div className="bg-white p-4 rounded-xl border border-blue-200 shadow-lg mb-4 animate-in zoom-in-95">
-      <h3 className="font-bold text-lg mb-4 text-slate-800">{initial ? "Modifier" : "Nouveau"} Matériau</h3>
+      <h3 className="font-extrabold text-lg mb-4 text-slate-800">
+        {initial ? t("common.edit", { defaultValue: "Modifier" }) : t("materials.new", { defaultValue: "Nouveau" })}{" "}
+        {t("materials.material", { defaultValue: "Matériau" })}
+      </h3>
+
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-xs font-bold text-slate-500 mb-1">Nom</label>
+          <label className="block text-xs font-extrabold text-slate-500 mb-1">{t("materials.name", { defaultValue: "Nom" })}</label>
           <input
             name="label"
             defaultValue={initial?.label}
             required
             className="w-full p-2 border rounded bg-white text-slate-900 text-sm"
-            placeholder="Ex: Peinture Luxe"
+            placeholder={t("materials.name_placeholder", { defaultValue: "Ex: Peinture Luxe" })}
           />
         </div>
+
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-xs font-bold text-slate-500 mb-1">Catégorie</label>
+            <label className="block text-xs font-extrabold text-slate-500 mb-1">{t("materials.category", { defaultValue: "Catégorie" })}</label>
             <input
               name="category"
               defaultValue={initial?.category}
               className="w-full p-2 border rounded bg-white text-slate-900 text-sm"
-              placeholder="Ex: Peinture"
+              placeholder={t("materials.category_placeholder", { defaultValue: "Ex: Peinture" })}
             />
           </div>
+
           <div>
-            <label className="block text-xs font-bold text-slate-500 mb-1">Unité</label>
+            <label className="block text-xs font-extrabold text-slate-500 mb-1">{t("materials.unit", { defaultValue: "Unité" })}</label>
             <select name="unit" defaultValue={initial?.unit || Unit.PIECE} className="w-full p-2 border rounded bg-white text-slate-900 text-sm">
               {Object.values(Unit).map((u) => (
                 <option key={u} value={u}>
@@ -678,23 +750,25 @@ const CustomMaterialForm: React.FC<{
             </select>
           </div>
         </div>
+
         <div>
-          <label className="block text-xs font-bold text-slate-500 mb-1">Prix Unitaire HT (€)</label>
+          <label className="block text-xs font-extrabold text-slate-500 mb-1">{t("materials.unit_price_ht", { defaultValue: "Prix Unitaire HT (€)" })}</label>
           <input
             name="price"
             type="number"
             step="0.01"
             defaultValue={initial?.price}
             required
-            className="w-full p-2 border rounded bg-white text-slate-900 text-sm font-bold"
+            className="w-full p-2 border rounded bg-white text-slate-900 text-sm font-extrabold"
           />
         </div>
+
         <div className="flex gap-3 pt-2">
-          <button type="button" onClick={onCancel} className="flex-1 py-2 text-slate-500 text-sm font-bold">
-            Annuler
+          <button type="button" onClick={onCancel} className="flex-1 py-2 text-slate-500 text-sm font-extrabold">
+            {t("common.cancel", { defaultValue: "Annuler" })}
           </button>
-          <button type="submit" className="flex-1 py-2 bg-blue-600 text-white rounded-lg font-bold text-sm shadow-sm">
-            Enregistrer
+          <button type="submit" className="flex-1 py-2 bg-blue-600 text-white rounded-lg font-extrabold text-sm shadow-sm">
+            {t("common.save", { defaultValue: "Enregistrer" })}
           </button>
         </div>
       </form>

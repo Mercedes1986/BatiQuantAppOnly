@@ -1,9 +1,17 @@
-import React, { useState } from "react";
-import { ArrowLeft, Plus, Share2, Lightbulb, CheckCircle2, AlertTriangle } from "lucide-react";
+import React, { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
+import {
+  ArrowLeft,
+  Plus,
+  Share2,
+  Lightbulb,
+  CheckCircle2,
+  AlertTriangle,
+} from "lucide-react";
+
 import { CalculatorType, CalculatorConfig, CalculationResult, Project } from "../types";
 import { CALCULATORS, STATIC_TIPS } from "../constants";
 
-// ✅ Chemins corrects depuis src/pages/CalculatorPage.tsx
 import { PaintCalculator } from "../components/calculators/PaintCalculator";
 import { ConcreteCalculator } from "../components/calculators/ConcreteCalculator";
 import { TileCalculator } from "../components/calculators/TileCalculator";
@@ -32,7 +40,12 @@ interface Props {
 }
 
 export const CalculatorPage: React.FC<Props> = ({ type, onBack, onNavigateProjects }) => {
-  const config = CALCULATORS.find((c) => c.id === type) as CalculatorConfig;
+  const { t, i18n } = useTranslation();
+
+  const config = useMemo(() => {
+    const c = CALCULATORS.find((x) => x.id === type) as CalculatorConfig | undefined;
+    return c;
+  }, [type]);
 
   const [result, setResult] = useState<CalculationResult | null>(null);
   const [showSaveModal, setShowSaveModal] = useState(false);
@@ -40,6 +53,23 @@ export const CalculatorPage: React.FC<Props> = ({ type, onBack, onNavigateProjec
   const [showTips, setShowTips] = useState(false);
 
   const tips = STATIC_TIPS[type] || [];
+
+  const euro = useMemo(
+    () =>
+      new Intl.NumberFormat(i18n.language || undefined, {
+        style: "currency",
+        currency: "EUR",
+      }),
+    [i18n.language]
+  );
+
+  if (!config) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6 text-center text-slate-600">
+        {t("calculator.missing_config", { defaultValue: "Calculateur indisponible." })}
+      </div>
+    );
+  }
 
   const renderCalculator = () => {
     switch (type) {
@@ -78,7 +108,6 @@ export const CalculatorPage: React.FC<Props> = ({ type, onBack, onNavigateProjec
       case CalculatorType.STAIRS:
         return <StairCalculator onCalculate={setResult} />;
 
-      // New modules
       case CalculatorType.ROOF:
         return <RoofCalculator onCalculate={setResult} />;
 
@@ -104,18 +133,28 @@ export const CalculatorPage: React.FC<Props> = ({ type, onBack, onNavigateProjec
         return <ExteriorCalculator onCalculate={setResult} />;
 
       default:
-        return <div className="p-4 text-center text-slate-500">Calculateur en cours de développement...</div>;
+        return (
+          <div className="p-4 text-center text-slate-500">
+            {t("calculator.in_dev", { defaultValue: "Calculateur en cours de développement..." })}
+          </div>
+        );
     }
   };
 
   const handleAddToProject = () => {
     if (!result) return;
 
-    const projectNotes = tips.length > 0 ? "Conseils Pro:\n" + tips.map((t: string) => `- ${t}`).join("\n") : "";
+    const dateLabel = new Date().toLocaleDateString(i18n.language || "fr-FR");
+    const projectNotes =
+      tips.length > 0
+        ? t("calculator.tips_prefix", { defaultValue: "Conseils Pro:" }) +
+          "\n" +
+          tips.map((x: string) => `- ${x}`).join("\n")
+        : "";
 
     const project: Project = {
       id: generateId(),
-      name: newProjectName || `${config.name} - ${new Date().toLocaleDateString("fr-FR")}`,
+      name: newProjectName || `${config.name} - ${dateLabel}`,
       date: new Date().toISOString(),
       items: result.materials,
       notes: projectNotes,
@@ -129,16 +168,16 @@ export const CalculatorPage: React.FC<Props> = ({ type, onBack, onNavigateProjec
   const handleShare = async () => {
     if (!result) return;
 
-    const text = `BatiQuant - ${config.name}
+    const text = `${t("app.name", { defaultValue: "BatiQuant" })} - ${config.name}
 -------------------------
 ${result.summary}
-Coût estimé: ~${result.totalCost} €
+${t("calculator.estimated_cost", { defaultValue: "Coût estimé" })}: ~ ${euro.format(result.totalCost)}
 -------------------------
 
-DÉTAILS TECHNIQUES:
+${t("calculator.tech_details", { defaultValue: "DÉTAILS TECHNIQUES" })}:
 ${result.details.map((d) => `• ${d.label}: ${d.value} ${d.unit || ""}`).join("\n")}
 
-LISTE D'ACHAT:
+${t("calculator.shopping_list", { defaultValue: "LISTE D'ACHAT" })}:
 ${result.materials
   .map((m) => {
     const line = `- ${m.name}: ${m.quantity} ${m.unit}`;
@@ -146,53 +185,63 @@ ${result.materials
   })
   .join("\n")}
 
-${result.warnings ? "\nATTENTION:\n" + result.warnings.join("\n") : ""}
+${
+  result.warnings && result.warnings.length > 0
+    ? "\n" +
+      t("common.attention", { defaultValue: "ATTENTION" }) +
+      ":\n" +
+      result.warnings.join("\n")
+    : ""
+}
 
-Généré par BatiQuant (Offline)`;
+${t("calculator.generated_by", { defaultValue: "Généré par BatiQuant (Offline)" })}`;
 
     if (navigator.share) {
       try {
         await navigator.share({
-          title: `Calcul ${config.name}`,
+          title: `${t("calculator.share_title", { defaultValue: "Calcul" })} ${config.name}`,
           text,
         });
       } catch {
-        // user cancelled share
+        // cancel
       }
     } else {
       await navigator.clipboard.writeText(text);
-      alert("Résultat copié dans le presse-papier !");
+      // pas d'alert native : UX plus clean
+      window.dispatchEvent(new CustomEvent("toast", { detail: { type: "success", text: t("calculator.copied", { defaultValue: "Résultat copié !" }) } }));
     }
   };
 
   return (
     <div className="flex flex-col h-full bg-slate-50 pb-20 overflow-y-auto no-scrollbar">
-      {/* Header */}
       <div className={`sticky top-0 z-10 flex items-center p-4 ${config.color} text-white shadow-md`}>
         <button
           onClick={onBack}
           className="mr-4 p-2 hover:bg-white/20 rounded-full transition-colors"
           type="button"
+          aria-label={t("common.back", { defaultValue: "Retour" })}
         >
           <ArrowLeft size={24} />
         </button>
 
         <div className="flex-1">
-          <h1 className="text-xl font-bold">{config.name}</h1>
-          <p className="text-xs opacity-90">Calculateur de précision</p>
+          <h1 className="text-xl font-extrabold">{config.name}</h1>
+          <p className="text-xs opacity-90">
+            {t("calculator.precision", { defaultValue: "Calculateur de précision" })}
+          </p>
         </div>
       </div>
 
-      {/* Content */}
       <div className="p-4 space-y-6">
         <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">{renderCalculator()}</div>
 
-        {/* Results Section */}
         {result && (
           <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div className="bg-white p-6 rounded-2xl shadow-lg border-2 border-blue-600 relative overflow-hidden">
-              <h2 className="text-sm uppercase tracking-wider text-slate-500 mb-1">Résultat estimé</h2>
-              <p className="text-4xl font-bold text-blue-600 mb-4">{result.summary}</p>
+              <h2 className="text-sm uppercase tracking-wider text-slate-500 mb-1">
+                {t("calculator.result_estimated", { defaultValue: "Résultat estimé" })}
+              </h2>
+              <p className="text-4xl font-extrabold text-blue-600 mb-4">{result.summary}</p>
 
               <div className="grid grid-cols-2 gap-4 text-sm border-t border-slate-100 pt-4">
                 {result.details.map((d, i) => (
@@ -207,8 +256,9 @@ Généré par BatiQuant (Offline)`;
 
               {result.warnings && result.warnings.length > 0 && (
                 <div className="mt-4 bg-red-50 border border-red-200 p-3 rounded-lg text-sm text-red-700">
-                  <div className="flex items-center mb-1 font-bold">
-                    <AlertTriangle size={16} className="mr-2" /> Attention
+                  <div className="flex items-center mb-1 font-extrabold">
+                    <AlertTriangle size={16} className="mr-2" />{" "}
+                    {t("common.attention", { defaultValue: "Attention" })}
                   </div>
                   <ul className="list-disc pl-4 space-y-1">
                     {result.warnings.map((w, i) => (
@@ -221,8 +271,12 @@ Généré par BatiQuant (Offline)`;
 
             <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
               <div className="flex justify-between items-center mb-4">
-                <h3 className="font-bold text-slate-800">Matériaux estimés</h3>
-                <span className="text-emerald-600 font-bold text-lg">~ {result.totalCost.toFixed(2)} €</span>
+                <h3 className="font-extrabold text-slate-800">
+                  {t("calculator.materials_estimated", { defaultValue: "Matériaux estimés" })}
+                </h3>
+                <span className="text-emerald-600 font-extrabold text-lg">
+                  ~ {euro.format(result.totalCost)}
+                </span>
               </div>
 
               <ul className="space-y-4 text-sm">
@@ -230,7 +284,7 @@ Généré par BatiQuant (Offline)`;
                   <li key={m.id} className="border-b border-slate-50 last:border-0 pb-2">
                     <div className="flex justify-between items-start">
                       <span className="font-medium text-slate-700">{m.name}</span>
-                      <span className="font-bold bg-slate-100 px-2 py-0.5 rounded text-slate-800">
+                      <span className="font-extrabold bg-slate-100 px-2 py-0.5 rounded text-slate-800">
                         {m.quantity} {m.unit}
                       </span>
                     </div>
@@ -245,25 +299,29 @@ Généré par BatiQuant (Offline)`;
               </ul>
             </div>
 
-            {/* Actions */}
             <div className="grid grid-cols-2 gap-3">
               <button
                 type="button"
                 onClick={() => setShowTips(!showTips)}
-                className={`col-span-2 flex items-center justify-center space-x-2 p-3 rounded-xl font-semibold shadow-md active:scale-95 transition-all ${
+                className={`col-span-2 flex items-center justify-center space-x-2 p-3 rounded-xl font-extrabold shadow-md active:scale-95 transition-all ${
                   showTips
                     ? "bg-amber-100 text-amber-800 border-amber-200"
                     : "bg-white text-slate-700 border border-slate-200"
                 }`}
               >
                 <Lightbulb size={20} className={showTips ? "fill-amber-500 text-amber-500" : ""} />
-                <span>{showTips ? "Masquer les conseils" : "Conseils Pro"}</span>
+                <span>
+                  {showTips
+                    ? t("calculator.hide_tips", { defaultValue: "Masquer les conseils" })
+                    : t("calculator.pro_tips", { defaultValue: "Conseils Pro" })}
+                </span>
               </button>
 
               {showTips && tips.length > 0 && (
                 <div className="col-span-2 bg-amber-50 p-4 rounded-xl border border-amber-100 text-sm text-amber-900 animate-in fade-in slide-in-from-top-2">
-                  <h4 className="font-bold mb-2 flex items-center">
-                    <CheckCircle2 size={16} className="mr-2" /> Bonnes pratiques
+                  <h4 className="font-extrabold mb-2 flex items-center">
+                    <CheckCircle2 size={16} className="mr-2" />{" "}
+                    {t("calculator.best_practices", { defaultValue: "Bonnes pratiques" })}
                   </h4>
                   <ul className="space-y-2">
                     {tips.map((tip: string, idx: number) => (
@@ -279,23 +337,22 @@ Généré par BatiQuant (Offline)`;
               <button
                 type="button"
                 onClick={() => setShowSaveModal(true)}
-                className="flex items-center justify-center space-x-2 bg-blue-600 text-white p-3 rounded-xl font-semibold shadow-md active:scale-95 transition-transform"
+                className="flex items-center justify-center space-x-2 bg-blue-600 text-white p-3 rounded-xl font-extrabold shadow-md active:scale-95 transition-transform"
               >
                 <Plus size={20} />
-                <span>Sauvegarder</span>
+                <span>{t("common.save", { defaultValue: "Enregistrer" })}</span>
               </button>
 
               <button
                 type="button"
                 onClick={handleShare}
-                className="flex items-center justify-center space-x-2 bg-white text-slate-700 border border-slate-200 p-3 rounded-xl font-semibold active:scale-95 transition-transform"
+                className="flex items-center justify-center space-x-2 bg-white text-slate-700 border border-slate-200 p-3 rounded-xl font-extrabold active:scale-95 transition-transform"
               >
                 <Share2 size={20} />
-                <span>Partager</span>
+                <span>{t("common.share", { defaultValue: "Partager" })}</span>
               </button>
             </div>
 
-            {/* AdSlot Safe Zone */}
             <div className="pt-4">
               <AdSlot slotId="APP_RESULT_SLOT" variant="safe" minHeight={280} />
             </div>
@@ -303,28 +360,37 @@ Généré par BatiQuant (Offline)`;
         )}
       </div>
 
-      {/* Save Modal Overlay */}
       {showSaveModal && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl p-6 w-full max-w-sm">
-            <h3 className="text-lg font-bold mb-4">Nom du projet</h3>
+            <h3 className="text-lg font-extrabold mb-4">
+              {t("calculator.project_name", { defaultValue: "Nom du projet" })}
+            </h3>
 
             <input
               autoFocus
               type="text"
-              placeholder="Ex: Rénovation Salon"
+              placeholder={t("calculator.project_placeholder", { defaultValue: "Ex: Rénovation Salon" })}
               className="w-full p-3 border border-slate-300 rounded-lg mb-4 bg-white text-slate-900"
               value={newProjectName}
               onChange={(e) => setNewProjectName(e.target.value)}
             />
 
             <div className="flex gap-3">
-              <button type="button" onClick={() => setShowSaveModal(false)} className="flex-1 p-3 text-slate-600 font-medium">
-                Annuler
+              <button
+                type="button"
+                onClick={() => setShowSaveModal(false)}
+                className="flex-1 p-3 text-slate-600 font-extrabold"
+              >
+                {t("common.cancel", { defaultValue: "Annuler" })}
               </button>
 
-              <button type="button" onClick={handleAddToProject} className="flex-1 p-3 bg-blue-600 text-white rounded-lg font-bold shadow-lg">
-                Enregistrer
+              <button
+                type="button"
+                onClick={handleAddToProject}
+                className="flex-1 p-3 bg-blue-600 text-white rounded-lg font-extrabold shadow-lg"
+              >
+                {t("common.save", { defaultValue: "Enregistrer" })}
               </button>
             </div>
           </div>

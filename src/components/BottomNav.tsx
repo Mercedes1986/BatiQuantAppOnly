@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
 import { Home, FolderOpen, Settings, Hammer, Package, Menu } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface BottomNavProps {
   currentTab: string;
@@ -13,16 +14,18 @@ type NavItem = {
 };
 
 export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, onChange }) => {
+  const { t } = useTranslation();
+
   const navItems: NavItem[] = useMemo(
     () => [
-      { id: "menu", icon: Menu, label: "Menu" },
-      { id: "home", icon: Home, label: "Calcul" },
-      { id: "house", icon: Hammer, label: "Chantier" },
-      { id: "projects", icon: FolderOpen, label: "Projets" },
-      { id: "materials", icon: Package, label: "Mat." },
-      { id: "settings", icon: Settings, label: "Réglages" },
+      { id: "menu", icon: Menu, label: t("nav.menu", { defaultValue: "Menu" }) },
+      { id: "home", icon: Home, label: t("nav.calc", { defaultValue: "Calcul" }) },
+      { id: "house", icon: Hammer, label: t("nav.site", { defaultValue: "Chantier" }) },
+      { id: "projects", icon: FolderOpen, label: t("nav.projects", { defaultValue: "Projets" }) },
+      { id: "materials", icon: Package, label: t("nav.materials", { defaultValue: "Mat." }) },
+      { id: "settings", icon: Settings, label: t("nav.settings", { defaultValue: "Réglages" }) },
     ],
-    []
+    [t]
   );
 
   return (
