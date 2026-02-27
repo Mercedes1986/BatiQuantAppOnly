@@ -7,6 +7,9 @@ import en from "./locales/en.json";
 
 const SUPPORTED = ["fr", "en"] as const;
 
+export type SupportedLanguage = (typeof SUPPORTED)[number];
+export const SUPPORTED_LANGUAGES: readonly SupportedLanguage[] = SUPPORTED;
+
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)
@@ -33,7 +36,9 @@ const syncHtmlLang = (lng: string) => {
   try {
     const short = String(lng || "fr").split("-")[0];
     document.documentElement.setAttribute("lang", short);
-  } catch {}
+  } catch {
+    // ignore
+  }
 };
 
 syncHtmlLang(i18n.language);

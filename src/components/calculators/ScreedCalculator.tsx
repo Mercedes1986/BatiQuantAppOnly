@@ -26,6 +26,7 @@ interface ScreedZone {
   slopeLen: number; // m
 }
 
+
 interface Props {
   onCalculate: (result: CalculationResult) => void;
 }
@@ -254,8 +255,9 @@ export const ScreedCalculator: React.FC<Props> = ({ onCalculate }) => {
 
     // 3) Reinforcement
     if (reinforceType === "mesh") {
-      const meshDef = (MESH_TYPES || []).find((m: any) => m.id === meshTypeId);
-      const coverM2 = meshDef?.coverM2 ?? 2; // default 2 m² per panel
+    const meshDef = (MESH_TYPES || []).find((m) => m.id === meshTypeId) as
+  | (typeof MESH_TYPES[number] & { coverM2?: number; price?: number })
+  | undefined;      const coverM2 = meshDef?.coverM2 ?? 2; // default 2 m² per panel
       const meshPrice = meshDef?.price ?? prices.meshPanel;
 
       const panels = Math.ceil(totalArea / Math.max(0.5, coverM2));

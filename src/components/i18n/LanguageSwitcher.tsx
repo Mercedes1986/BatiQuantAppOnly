@@ -8,16 +8,21 @@ type Props = {
   label?: boolean;
 };
 
+type Option = {
+  value: SupportedLanguage;
+  label: string;
+};
+
 export function LanguageSwitcher({ className, label = true }: Props) {
   const { t } = useTranslation();
 
-  const current = (i18n.language || "fr").slice(0, 2) as SupportedLanguage;
+  const current = ((i18n.language || "fr").split("-")[0] || "fr") as SupportedLanguage;
 
-  const options = useMemo(
+  const options: Option[] = useMemo(
     () =>
-      SUPPORTED_LANGUAGES.map((lng) => ({
+      SUPPORTED_LANGUAGES.map((lng: SupportedLanguage) => ({
         value: lng,
-        label: t(I18N_KEYS.language[lng])
+        label: t(I18N_KEYS.language[lng]),
       })),
     [t]
   );
@@ -26,7 +31,8 @@ export function LanguageSwitcher({ className, label = true }: Props) {
     const lng = e.target.value as SupportedLanguage;
     await i18n.changeLanguage(lng);
     try {
-      localStorage.setItem("lng", lng);
+      // cohérent avec i18next-browser-languagedetector
+      localStorage.setItem("i18nextLng", lng);
     } catch {
       // ignore
     }
@@ -47,11 +53,11 @@ export function LanguageSwitcher({ className, label = true }: Props) {
           padding: "10px 12px",
           borderRadius: 10,
           border: "1px solid rgba(0,0,0,0.2)",
-          background: "transparent"
+          background: "transparent",
         }}
         aria-label={t(I18N_KEYS.common.language)}
       >
-        {options.map((opt) => (
+        {options.map((opt: Option) => (
           <option key={opt.value} value={opt.value}>
             {opt.label}
           </option>

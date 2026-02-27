@@ -1431,9 +1431,7 @@ export const StructuralCalculator: React.FC<Props> = ({
         </div>
       )}
 
-      // ✅ SUITE À COLLER DANS LE MÊME FICHIER, À LA PLACE DU <div className="p-3 ..."> DANS LE RETURN
-// c.-à-d. remplace le bloc “notice_part2” + garde les accolades/fermantes déjà présentes.
-// Si tu préfères : colle ce gros bloc directement dans le return de StructuralCalculator, après l’affichage des tabs.
+      {/* NOTE: commentaires de génération supprimés (étaient en // dans le JSX) */}
 
       {/* ======================= GROUNDWORK WIZARD ======================= */}
       {mode === "groundwork" && (
@@ -3041,4 +3039,8 @@ export const StructuralCalculator: React.FC<Props> = ({
             </div>
           )}
         </>
-      )}
+      )}      </div>
+    );
+  };
+
+export default StructuralCalculator;
