@@ -1,4 +1,141 @@
 {
+  "app": {
+    "name": "Bati",
+    "name_suffix": "Quant"
+  },
+  "common": {
+    "appName": "BatiQuant",
+    "language": "Langue",
+    "loading": "Chargement…",
+    "back": "Retour",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "close": "Fermer",
+    "continue": "Continuer",
+    "share": "Partager",
+    "unknown": "Inconnu",
+    "attention": "Attention",
+    "yes": "Oui",
+    "no": "Non",
+    "error": "Erreur",
+    "notAvailable": "Indisponible",
+    "back_home": "Retour à l’accueil",
+    "delete": "Supprimer",
+    "edit": "Modifier"
+  },
+  "language": {
+    "fr": "Français",
+    "en": "Anglais"
+  },
+  "cookie": {
+    "title": "Cookies",
+    "text": "Nous utilisons des technologies publicitaires. Vous pouvez accepter la personnalisation (plus pertinent) ou continuer avec des publicités non personnalisées.",
+    "accept": "Accepter",
+    "refuse": "Refuser",
+    "manage": "Gérer"
+  },
+  "errors": {
+    "generic_title": "Une erreur est survenue",
+    "generic_hint": "Cette page n’a pas pu se charger. Actualisez la page. Si le problème persiste, ouvrez la console pour voir l’erreur."
+  },
+  "notfound": {
+    "title": "Page introuvable",
+    "description": "L’URL demandée n’existe pas (ou a été déplacée).",
+    "go_to_app": "Aller à l’application"
+  },
+  "ads": {
+    "label": "Publicité",
+    "dev": {
+      "title": "Emplacement pub",
+      "format": "Format",
+      "only": "Visible uniquement en mode Dev",
+      "mode": "Mode pubs"
+    }
+  },
+  "consent": {
+    "title": "Votre confidentialité",
+    "text": "Nous utilisons des technologies publicitaires. Vous pouvez accepter la personnalisation (plus pertinent) ou continuer avec des publicités non personnalisées.",
+    "customize": "Personnaliser",
+    "refuse": "Refuser",
+    "accept": "Accepter"
+  },
+  "menu": {
+    "title": "Menu de l’app",
+    "subtitle": "Accès rapide aux sections et outils",
+    "open": "Ouvrir",
+    "back_dashboard": "Tableau de bord",
+    "back_dashboard_title": "Retour au tableau de bord",
+    "how": {
+      "title": "Comment ça marche ?",
+      "text": "Utilisez les Calculateurs pour estimer les quantités, puis Projets pour retrouver vos calculs sauvegardés. Pour un suivi complet, créez un Chantier et enregistrez les résultats par étape. Pensez à exporter JSON pour sauvegarder vos données."
+    },
+    "tools": {
+      "title": "Tous les outils (accès direct)",
+      "subtitle": "Cliquez sur un outil pour ouvrir le calculateur directement."
+    },
+    "cards": {
+      "calc": {
+        "title": "Calculateurs",
+        "desc": "Accédez à tous les calculateurs pour estimer quantités et coûts.",
+        "badge": "Outils"
+      },
+      "house": {
+        "title": "Chantier",
+        "desc": "Créez un chantier et sauvegardez les résultats par étape (suivi complet)."
+      },
+      "projects": {
+        "title": "Projets",
+        "desc": "Retrouvez vos calculs sauvegardés (estimations, matériaux, coûts)."
+      },
+      "materials": {
+        "title": "Matériaux & Prix",
+        "desc": "Ajustez les prix, créez des matériaux, main d'œuvre et données."
+      },
+      "settings": {
+        "title": "Réglages",
+        "desc": "Configurez l’app (options, préférences, affichage)."
+      },
+      "backup": {
+        "title": "Sauvegarde JSON",
+        "desc": "Export/import de vos données pour éviter toute perte (recommandé).",
+        "badge": "Recommandé"
+      }
+    }
+  },
+  "dashboard": {
+    "subtitle": "L’outil de référence pour vos projets de construction."
+  },
+  "calculator": {
+    "title_fallback": "Calculateur",
+    "precision": "Calculateur de précision",
+    "missing_config": "Calculateur indisponible.",
+    "in_dev": "Calculateur en développement…",
+    "result_estimated": "Résultat estimé",
+    "materials_estimated": "Matériaux estimés",
+    "click_to_validate_step": "Cliquez pour valider cette étape",
+    "save_result": "Enregistrer le résultat",
+    "open": "Ouvrir le calculateur",
+    "estimated_cost": "Coût estimé",
+    "tech_details": "DÉTAILS TECHNIQUES",
+    "shopping_list": "LISTE D’ACHATS",
+    "generated_by": "Généré par BatiQuant (Hors-ligne)",
+    "share_title": "Calcul",
+    "copied": "Résultat copié !",
+    "tips_prefix": "Conseils pro :",
+    "pro_tips": "Conseils pro",
+    "hide_tips": "Masquer les conseils",
+    "best_practices": "Bonnes pratiques",
+    "project_name": "Nom du projet",
+    "project_placeholder": "Ex: Rénovation salon"
+  },
+  "nav": {
+    "menu": "Menu",
+    "calc": "Calc",
+    "site": "Chantier",
+    "projects": "Projets",
+    "materials": "Mat.",
+    "settings": "Réglages"
+  },
   "house": {
     "my_sites": "Mes Chantiers",
     "new_site": "Nouveau Chantier",
@@ -33,7 +170,12 @@
   },
   "materials": {
     "title": "Matériaux & Prix",
-    "tabs": { "catalog": "Catalogue", "custom": "Mes Matériaux", "labor": "Main d'œuvre", "data": "Données" },
+    "tabs": {
+      "catalog": "Catalogue",
+      "custom": "Mes Matériaux",
+      "labor": "Main d'œuvre",
+      "data": "Données"
+    },
     "tax": { "ht": "HT", "ttc": "TTC" },
     "search": "Rechercher...",
     "favorites": "Favoris",
@@ -92,6 +234,8 @@
   "settings": {
     "title": "Réglages",
     "tabs": { "app": "Application", "company": "Entreprise & Facturation" },
+    "languageTitle": "Langue",
+    "languageHelp": "Choisissez la langue de l’interface.",
     "export_error": "Erreur lors de l’export. Réessayez.",
     "file_too_big": "Fichier trop volumineux (max 5 Mo).",
     "import_confirm": "Attention : L'importation remplacera vos données actuelles. Voulez-vous continuer ?",
@@ -113,9 +257,5 @@
     "app": { "title": "Application", "currency": "Devise", "language": "Langue" },
     "support": { "help": "Aide & FAQ", "privacy": "Politique de confidentialité" },
     "footer": "Aucune donnée n'est collectée."
-  },
-  "common": {
-    "delete": "Supprimer",
-    "edit": "Modifier"
   }
 }
