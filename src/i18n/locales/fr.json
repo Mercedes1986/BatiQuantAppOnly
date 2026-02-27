@@ -1,261 +1,324 @@
 {
-  "app": {
-    "name": "Bati",
-    "name_suffix": "Quant"
-  },
-  "common": {
-    "appName": "BatiQuant",
-    "language": "Langue",
-    "loading": "Chargement…",
-    "back": "Retour",
-    "save": "Enregistrer",
-    "cancel": "Annuler",
-    "close": "Fermer",
-    "continue": "Continuer",
-    "share": "Partager",
-    "unknown": "Inconnu",
-    "attention": "Attention",
-    "yes": "Oui",
-    "no": "Non",
-    "error": "Erreur",
-    "notAvailable": "Indisponible",
-    "back_home": "Retour à l’accueil",
-    "delete": "Supprimer",
-    "edit": "Modifier"
-  },
-  "language": {
-    "fr": "Français",
-    "en": "Anglais"
-  },
-  "cookie": {
-    "title": "Cookies",
-    "text": "Nous utilisons des technologies publicitaires. Vous pouvez accepter la personnalisation (plus pertinent) ou continuer avec des publicités non personnalisées.",
-    "accept": "Accepter",
-    "refuse": "Refuser",
-    "manage": "Gérer"
-  },
-  "errors": {
-    "generic_title": "Une erreur est survenue",
-    "generic_hint": "Cette page n’a pas pu se charger. Actualisez la page. Si le problème persiste, ouvrez la console pour voir l’erreur."
-  },
-  "notfound": {
-    "title": "Page introuvable",
-    "description": "L’URL demandée n’existe pas (ou a été déplacée).",
-    "go_to_app": "Aller à l’application"
-  },
-  "ads": {
-    "label": "Publicité",
-    "dev": {
-      "title": "Emplacement pub",
-      "format": "Format",
-      "only": "Visible uniquement en mode Dev",
-      "mode": "Mode pubs"
-    }
-  },
-  "consent": {
-    "title": "Votre confidentialité",
-    "text": "Nous utilisons des technologies publicitaires. Vous pouvez accepter la personnalisation (plus pertinent) ou continuer avec des publicités non personnalisées.",
-    "customize": "Personnaliser",
-    "refuse": "Refuser",
-    "accept": "Accepter"
-  },
-  "menu": {
-    "title": "Menu de l’app",
-    "subtitle": "Accès rapide aux sections et outils",
-    "open": "Ouvrir",
-    "back_dashboard": "Tableau de bord",
-    "back_dashboard_title": "Retour au tableau de bord",
-    "how": {
-      "title": "Comment ça marche ?",
-      "text": "Utilisez les Calculateurs pour estimer les quantités, puis Projets pour retrouver vos calculs sauvegardés. Pour un suivi complet, créez un Chantier et enregistrez les résultats par étape. Pensez à exporter JSON pour sauvegarder vos données."
-    },
-    "tools": {
-      "title": "Tous les outils (accès direct)",
-      "subtitle": "Cliquez sur un outil pour ouvrir le calculateur directement."
-    },
-    "cards": {
-      "calc": {
-        "title": "Calculateurs",
-        "desc": "Accédez à tous les calculateurs pour estimer quantités et coûts.",
-        "badge": "Outils"
-      },
-      "house": {
-        "title": "Chantier",
-        "desc": "Créez un chantier et sauvegardez les résultats par étape (suivi complet)."
-      },
-      "projects": {
-        "title": "Projets",
-        "desc": "Retrouvez vos calculs sauvegardés (estimations, matériaux, coûts)."
-      },
-      "materials": {
-        "title": "Matériaux & Prix",
-        "desc": "Ajustez les prix, créez des matériaux, main d'œuvre et données."
-      },
-      "settings": {
-        "title": "Réglages",
-        "desc": "Configurez l’app (options, préférences, affichage)."
-      },
-      "backup": {
-        "title": "Sauvegarde JSON",
-        "desc": "Export/import de vos données pour éviter toute perte (recommandé).",
-        "badge": "Recommandé"
-      }
-    }
-  },
-  "dashboard": {
-    "subtitle": "L’outil de référence pour vos projets de construction."
-  },
-  "calculator": {
-    "title_fallback": "Calculateur",
-    "precision": "Calculateur de précision",
-    "missing_config": "Calculateur indisponible.",
-    "in_dev": "Calculateur en développement…",
-    "result_estimated": "Résultat estimé",
-    "materials_estimated": "Matériaux estimés",
-    "click_to_validate_step": "Cliquez pour valider cette étape",
-    "save_result": "Enregistrer le résultat",
-    "open": "Ouvrir le calculateur",
-    "estimated_cost": "Coût estimé",
-    "tech_details": "DÉTAILS TECHNIQUES",
-    "shopping_list": "LISTE D’ACHATS",
-    "generated_by": "Généré par BatiQuant (Hors-ligne)",
-    "share_title": "Calcul",
-    "copied": "Résultat copié !",
-    "tips_prefix": "Conseils pro :",
-    "pro_tips": "Conseils pro",
-    "hide_tips": "Masquer les conseils",
-    "best_practices": "Bonnes pratiques",
-    "project_name": "Nom du projet",
-    "project_placeholder": "Ex: Rénovation salon"
-  },
-  "nav": {
-    "menu": "Menu",
-    "calc": "Calc",
-    "site": "Chantier",
-    "projects": "Projets",
-    "materials": "Mat.",
-    "settings": "Réglages"
-  },
-  "house": {
-    "my_sites": "Mes Chantiers",
-    "new_site": "Nouveau Chantier",
-    "create": "Créer",
-    "create_site": "Créer un chantier",
-    "new_project": "Nouveau projet",
-    "project_name": "Nom du projet",
-    "project_placeholder": "Ex: Maison Lotissement",
-    "surface_living_m2": "Surface Habitable (m²)",
-    "confirm_delete": "Supprimer ce chantier ?",
-    "budget_steps": "Budget étapes",
-    "tabs": { "steps": "Étapes", "quote": "Devis" },
-    "site_data": "Données Chantier",
-    "edit": "Modifier",
-    "edit_data": "Modification Données",
-    "surface": "Surface (m²)",
-    "perimeter": "Périmètre (m)",
-    "ceiling_height": "H. Sous Plafond (m)",
-    "surface_living": "Surface Habitable",
-    "perimeter_label": "Périmètre",
-    "ceiling_height_label": "Hauteur plafond",
-    "levels": "Niveaux",
-    "single_storey": "Plain-pied",
-    "coming_soon": "Bientôt disponible",
-    "official_docs": "Documents Officiels",
-    "generate_quote": "Générer Devis",
-    "quote_status": { "draft": "Brouillon", "invoiced": "Facturé" },
-    "no_official_docs": "Aucun document officiel créé.",
-    "quick_estimator": "Estimateur Rapide",
-    "need_company_profile": "Vous devez d'abord configurer votre profil entreprise dans les réglages. Y aller maintenant ?",
-    "quote_error": "Une erreur est survenue lors de la création du devis."
-  },
-  "materials": {
-    "title": "Matériaux & Prix",
+  "struct": {
     "tabs": {
-      "catalog": "Catalogue",
-      "custom": "Mes Matériaux",
-      "labor": "Main d'œuvre",
-      "data": "Données"
+      "groundwork": "Terrassement",
+      "foundations": "Fondations",
+      "walls": "Murs"
     },
-    "tax": { "ht": "HT", "ttc": "TTC" },
-    "search": "Rechercher...",
-    "favorites": "Favoris",
-    "favorite": "Favori",
-    "reset": "Réinitialiser",
-    "map": "Associer un matériau",
-    "all": "Tout",
-    "none_found": "Aucun matériau trouvé.",
-    "create_custom": "Créer un matériau",
-    "confirm_delete_custom": "Supprimer ?",
-    "none_custom": "Aucun matériau personnalisé.",
-    "labor": {
-      "title": "Paramètres Main d'œuvre",
-      "rate": "Taux Horaire Moyen (€/h)",
-      "info": "Ce taux sera utilisé pour estimer le coût de la main d'œuvre dans les calculateurs si le mode Pro est activé."
+
+    "common": {
+      "thickness": "Ép.",
+      "items": "ouvrages",
+      "bags": "sacs",
+      "bags_count": "{{n}} sacs",
+      "qty": "Qté",
+      "auto": "Auto",
+      "calculated": "Calculé",
+      "unit_prices": "Prix unitaires",
+      "materials": "Matériaux",
+      "materials_services": "Matériaux & prestations",
+      "pro_mode": "Mode Pro",
+      "simple_mode": "Mode Simple",
+      "multiplier": "x{{x}}",
+      "dash": "-",
+
+      "length_m": "Longueur (m)",
+      "width_m": "Largeur (m)",
+      "length_m_short": "Long. (m)",
+      "width_m_short": "Larg. (m)",
+      "height_m_short": "Haut. (m)",
+      "house_length": "Longueur maison",
+      "house_width": "Largeur maison",
+      "width": "Larg",
+      "height": "Haut",
+      "L": "L",
+      "W": "l",
+      "D": "P",
+      "H": "H",
+      "l": "L",
+      "w": "l",
+      "h": "H"
     },
-    "tax_config": "Configuration Fiscale",
-    "vat_rate": "Taux TVA (%)",
-    "backup_restore": "Sauvegarde & Restauration",
-    "export_json": "Exporter JSON",
-    "import_json": "Importer JSON",
-    "backup_hint": "Exportez vos données pour les transférer sur un autre appareil.",
-    "map_title": "Associer un matériau",
-    "map_replace": "Remplace",
-    "map_none": "Aucune association (Défaut)",
-    "map_need_custom": "Créez d'abord des matériaux personnalisés.",
-    "export_error": "Erreur lors de l’export.",
-    "import_ok": "Import réussi !",
-    "import_invalid": "Erreur: Fichier invalide.",
-    "new": "Nouveau",
-    "material": "Matériau",
-    "name": "Nom",
-    "name_placeholder": "Ex: Peinture Luxe",
-    "category": "Catégorie",
-    "category_placeholder": "Ex: Peinture",
-    "unit": "Unité",
-    "unit_price_ht": "Prix Unitaire HT (€)",
-    "misc": "Divers"
-  },
-  "projects": {
-    "title": "Mes Projets (Calculs)",
-    "empty": "Aucun calcul sauvegardé.",
-    "items": "éléments",
-    "confirm_delete": "Supprimer définitivement ce projet ?",
-    "need_company_profile": "Pour créer un devis, vous devez d'abord configurer votre profil entreprise (Nom, SIRET...). Aller aux réglages ?",
-    "quote_error": "Erreur lors de la création du devis.",
-    "quote": "Devis",
-    "print": "Imprimer",
-    "created_on": "Créé le",
-    "materials_list": "Liste des matériaux",
-    "total_estimated": "Total Estimé",
-    "cost_breakdown": "Répartition des coûts",
-    "notes": "Notes & Conseils",
-    "print_footer": "Document généré par BatiQuant - Estimations non contractuelles."
-  },
-  "settings": {
-    "title": "Réglages",
-    "tabs": { "app": "Application", "company": "Entreprise & Facturation" },
-    "languageTitle": "Langue",
-    "languageHelp": "Choisissez la langue de l’interface.",
-    "export_error": "Erreur lors de l’export. Réessayez.",
-    "file_too_big": "Fichier trop volumineux (max 5 Mo).",
-    "import_confirm": "Attention : L'importation remplacera vos données actuelles. Voulez-vous continuer ?",
-    "file_read_error": "Erreur de lecture du fichier.",
-    "invalid_backup": "Erreur: Fichier de sauvegarde invalide.",
-    "restore_ok": "Données restaurées avec succès !",
-    "pro": { "title": "Version Pro", "subtitle": "Licence active • Mode Hors-ligne" },
-    "data": {
-      "title": "Données & Sauvegarde",
-      "backup": "Sauvegarder",
-      "restore": "Restaurer",
-      "export_json": "Exporter JSON",
-      "import_json": "Importer JSON",
-      "importing": "Import en cours…",
-      "importing_short": "Import...",
-      "import_title": "Importer une sauvegarde",
-      "warning": "Important : Vos données sont stockées dans le navigateur. Pensez à faire une sauvegarde régulière."
+
+    "excav": {
+      "trench": "Tranchée",
+      "pit": "Fouille isolée",
+      "mass": "Pleine masse"
     },
-    "app": { "title": "Application", "currency": "Devise", "language": "Langue" },
-    "support": { "help": "Aide & FAQ", "privacy": "Politique de confidentialité" },
-    "footer": "Aucune donnée n'est collectée."
+
+    "opening": {
+      "window": "Fenêtre",
+      "door": "Porte",
+      "bay": "Baie vitrée",
+      "garage": "Garage"
+    },
+
+    "wall": {
+      "segment_default": "Mur {{n}}"
+    },
+
+    "gw": {
+      "steps": {
+        "1": "1. Emprise",
+        "2": "2. Fouilles",
+        "3": "3. Terres",
+        "4": "4. Logist.",
+        "5": "5. Devis"
+      },
+
+      "step1": { "hint": "Définissez l'emprise du chantier et le décapage de la terre végétale." },
+      "step2": { "hint": "Ajoutez les fouilles spécifiques (fondations, réseaux, plateforme)." },
+      "step3": { "hint": "Nature du sol et foisonnement (augmentation du volume)." },
+      "step4": { "hint": "Gestion des terres et moyens matériels." },
+      "step5": { "hint": "Tarification du terrassement." },
+
+      "strip": "Décapage terre végétale",
+      "excav": "Excavation / fouilles",
+      "excav_details": "{{count}} ouvrages - x{{swell}}",
+
+      "margin_m": "Marge travail (m)",
+      "strip_depth_m": "Ép. décapage (m)",
+      "keep_topsoil": "Conserver la terre végétale sur site",
+
+      "slope": "Talus",
+      "slope_0": "Vertical (90°)",
+      "slope_05": "Talus raide (2:1)",
+      "slope_1": "Talus 45° (1:1)",
+
+      "soil_type": "Nature du terrain",
+
+      "topsoil_stored": "Terre végétale stockée",
+      "reused_fill": "Remblai réutilisé",
+
+      "truck_cap": "Capacité benne (m³)",
+      "truck_rotation": "Rotation camion",
+      "truck_rotation_named": "Rotation camion ({{cap}}m³)",
+
+      "dump_fee": "Mise en décharge",
+      "dump_details": "{{vol}}m³",
+
+      "fill_imports": "Apports & remblai",
+      "fill_type": "Type d'apport",
+      "fill_volume": "Volume nécessaire (m³)",
+      "fill_import": "Apport",
+      "fill_import_named": "Apport {{label}}",
+      "fill_gravel": "Grave / tout-venant",
+      "fill_sand": "Sable",
+      "fill_soil": "Terre végétale (apport)",
+      "fill_soil_short": "Terre végétale",
+
+      "means": "Moyens",
+      "digger_days": "Jours mini-pelle",
+      "compactor_days": "Jours compacteur",
+      "difficult_access": "Accès difficile / contraintes",
+
+      "digger_rental": "Location mini-pelle",
+      "compactor_rental": "Location compacteur",
+
+      "strip_area": "Surface décapée",
+      "volume_inplace": "Volume en place",
+      "volume_bulking": "Volume foisonné",
+      "to_evac": "À évacuer",
+
+      "warn_no_compaction": "Réutilisation de terre en remblai sans compactage prévu ?",
+
+      "price_excav": "Excavation (€/m³)",
+      "price_strip": "Décapage (€/m²)",
+      "price_truck": "Rotation camion (€/rot.)",
+      "price_dump": "Décharge (€/t)",
+      "labor_m3": "MO (€/m³)",
+
+      "summary_excavated": "{{m3}}m³ excavés"
+    },
+
+    "fd": {
+      "steps": {
+        "1": "1. Type",
+        "2": "2. Fouilles",
+        "3": "3. Béton",
+        "4": "4. Divers",
+        "5": "5. Devis"
+      },
+
+      "step1": { "hint": "Choisissez le type de fondations et les dimensions globales." },
+      "step2": { "hint": "Calcul automatique des fouilles en fonction des fondations choisies." },
+      "step3": { "hint": "Dimensionnement du béton et des armatures." },
+      "step4": { "hint": "Coffrage et protection." },
+      "step5": { "hint": "Récapitulatif des prix unitaires." },
+
+      "systems": "Systèmes constructifs",
+
+      "strip": "Semelles filantes",
+      "strip_hint": "Sous murs porteurs",
+
+      "pads": "Plots isolés",
+      "pads_hint": "Sous poteaux",
+      "no_pads": "Aucun plot.",
+
+      "raft": "Radier général",
+      "raft_hint": "Dalle porteuse intégrale",
+
+      "count_excav": "Compter le terrassement",
+      "depth": "Prof. hors-gel (m)",
+      "margin": "Marge travail (m)",
+      "soil_type": "Nature du sol",
+      "evac": "Évacuation des terres (foisonné)",
+
+      "conc_strip": "Béton (semelles filantes)",
+      "conc_pads": "Béton (plots)",
+      "conc_raft": "Béton (radier)",
+
+      "rebar": "Armatures",
+      "rebar_s35": "S35 (6 fils)",
+      "rebar_s15": "S15 (4 fils)",
+      "rebar_strip_named": "Armatures semelles ({{type}})",
+      "rebar_ratio": "~1 cage / 6m",
+
+      "mesh": "Treillis soudé",
+      "mesh_named": "Treillis soudé ({{type}})",
+      "mesh_st25": "ST25C (Standard)",
+      "mesh_st10": "ST10 (Léger)",
+      "mesh_st40": "ST40C (Lourd)",
+      "mesh_ratio": "~1 panneau / 14.4m²",
+
+      "clean_concrete": "Béton de propreté (5cm)",
+
+      "excav": "Terrassement / fouilles",
+
+      "formwork": "Coffrage",
+      "formwork_hint": "Si fouilles non-pleine terre",
+      "formwork_panels": "Coffrage (panneaux)",
+
+      "drain": "Drain périphérique",
+      "drain_hint": "Drain + gravier + géo",
+
+      "polyane": "Polyane",
+      "polyane_hint": "Sous radier/dallage",
+
+      "diameter": "Diam",
+
+      "labor_concrete": "Main d'œuvre (béton)",
+
+      "soil": "Sol",
+      "total_concrete": "Béton total",
+
+      "price_concrete": "Béton BPE (€/m³)",
+      "price_rebar": "Ferraillage (€/u)",
+      "price_excav": "Fouilles (€/m³)",
+      "price_formwork": "Coffrage (€/m²)",
+      "price_labor_conc": "MO béton (€/m³)",
+      "price_labor_form": "MO coffrage (€/m²)",
+
+      "summary_concrete": "{{m3}}m³ béton"
+    },
+
+    "w": {
+      "steps": {
+        "1": "1. Plan",
+        "2": "2. Matériau",
+        "3": "3. Ouv.",
+        "4": "4. Struct.",
+        "5": "5. Finition",
+        "6": "6. Devis"
+      },
+
+      "step1": { "hint": "Dimensions des murs." },
+      "step2": { "hint": "Choix du matériau." },
+      "step3": { "hint": "Ouvertures." },
+      "step4": { "hint": "Chaînages et linteaux." },
+      "step5": { "hint": "Finitions." },
+      "step6": { "hint": "Prix unitaires murs." },
+
+      "mode_global": "Global",
+      "mode_segments": "Segments",
+
+      "perimeter_total": "Périmètre total (m)",
+      "height": "Hauteur (m)",
+      "waste_pct": "Pertes (%, casse / chutes)",
+
+      "gables": "Pignons",
+      "gables_hint": "Ajouter surface triangulaire",
+      "gable_h": "Hauteur pignon (m)",
+      "gable_count": "Nombre",
+
+      "seg_name": "Nom",
+
+      "family": {
+        "parpaing": "Parpaing",
+        "brique": "Brique",
+        "cellulaire": "Béton cellulaire",
+        "stepoc": "Bloc à bancher"
+      },
+
+      "block_format": "Format / épaisseur",
+
+      "reveal": "Tab",
+      "reveal_cm": "Tab (cm)",
+      "no_openings": "Aucune ouverture.",
+      "add_opening": "Ajouter ouverture",
+
+      "chain_h": "Chaînage horizontal",
+      "chain_inter": "Chaînage intermédiaire",
+      "vert": "Raidisseurs verticaux",
+      "vert_total": "Nombre total",
+
+      "lintel_type": "Type de linteau",
+      "lintel_precast": "Préfabriqué",
+      "lintel_cast": "Coffré / coulé",
+
+      "coating_ext": "Enduit extérieur",
+      "coating_ext_hint": "Monocouche",
+      "coating_int": "Enduit intérieur",
+      "coating_int_hint": "Plâtre / enduit",
+      "scaffold": "Échafaudage",
+      "scaffold_hint": "Forfait",
+
+      "unit_price_variant": "Prix unité (€/u) — variante sélectionnée",
+      "unit_price_variant_help": "Ce prix est mémorisé pour la variante (famille/épaisseur).",
+
+      "mortar_bag": "Mortier (€/sac)",
+      "glue_bag": "Colle (€/sac)",
+      "lintel_m": "Linteau (€/m)",
+      "coating_ext_bag": "Enduit façade (€/sac)",
+      "scaffold_fixed": "Échafaudage (forfait)",
+      "labor_m2": "MO maçonnerie (€/m²)"
+    },
+
+    "walls": {
+      "stepoc_fill": "Béton remplissage (C25/30)",
+      "stepoc_fill_details": "{{lpm2}} L/m²",
+
+      "glue": "Mortier colle (joint mince)",
+      "glue_ratio": "~1 sac / 10m²",
+
+      "mortar": "Mortier montage",
+      "mortar_ratio": "~1 sac / 3m²",
+
+      "lintels": "Linteaux",
+      "prefab": "préfa",
+      "casted": "coffrés",
+      "lintels_named": "Linteaux {{kind}}",
+
+      "chainage_concrete": "Béton chaînages (horiz.)",
+      "chainage_steel": "Aciers chaînages (horiz.)",
+
+      "vert_concrete": "Béton raidisseurs (vert.)",
+      "vert_steel": "Aciers raidisseurs (vert.)",
+
+      "coating_ext": "Enduit façade (monocouche)",
+      "coating_int": "Enduit intérieur / plâtre",
+
+      "scaffold": "Échafaudage (forfait)",
+      "labor": "Main d'œuvre maçonnerie",
+
+      "gross_area": "Surface brute",
+      "net_area": "Surface nette",
+      "block_selected": "Bloc sélectionné",
+      "consumption": "Consommation",
+      "units": "Blocs/éléments",
+      "binder": "Mortier/colle",
+
+      "summary_units": "{{units}} unités ({{m2}}m²)"
+    }
   }
 }

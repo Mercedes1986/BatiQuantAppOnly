@@ -119,6 +119,9 @@ export const StructuralCalculator: React.FC<Props> = ({
   const { t, i18n } = useTranslation();
   const location = useLocation();
 
+  // Alias simple (et évite les defaultValue partout)
+  const tr = (key: string, options?: Record<string, any>) => t(key, options);
+
   const euro = useMemo(
     () =>
       new Intl.NumberFormat(i18n.language || undefined, {
@@ -159,7 +162,7 @@ export const StructuralCalculator: React.FC<Props> = ({
   const [newExL, setNewExL] = useState<string>("");
   const [newExW, setNewExW] = useState<string>("");
   const [newExD, setNewExD] = useState<string>("");
-  const [newExSlope, setNewExSlope] = useState<number>(0); // ✅ number
+  const [newExSlope, setNewExSlope] = useState<number>(0);
 
   const [gwSoilType, setGwSoilType] = useState<string>("soil");
   const [gwReuseOnSite, setGwReuseOnSite] = useState<number>(0);
@@ -332,9 +335,11 @@ export const StructuralCalculator: React.FC<Props> = ({
     if (W === 0 || D === 0) return;
 
     const label =
-      newExType === "trench" ? t("struct.excav.trench", { defaultValue: "Tranchée" }) :
-      newExType === "pit" ? t("struct.excav.pit", { defaultValue: "Fouille" }) :
-      t("struct.excav.mass", { defaultValue: "Pleine Masse" });
+      newExType === "trench"
+        ? tr("struct.excav.trench")
+        : newExType === "pit"
+        ? tr("struct.excav.pit")
+        : tr("struct.excav.mass");
 
     setGwDetailedExcavs((prev) => [
       ...prev,
@@ -381,10 +386,10 @@ export const StructuralCalculator: React.FC<Props> = ({
     if (w <= 0 || h <= 0) return;
 
     const labels: Record<WallOpening["type"], string> = {
-      window: t("struct.opening.window", { defaultValue: "Fenêtre" }),
-      door: t("struct.opening.door", { defaultValue: "Porte" }),
-      bay: t("struct.opening.bay", { defaultValue: "Baie vitrée" }),
-      garage: t("struct.opening.garage", { defaultValue: "Garage" }),
+      window: tr("struct.opening.window"),
+      door: tr("struct.opening.door"),
+      bay: tr("struct.opening.bay"),
+      garage: tr("struct.opening.garage"),
     };
 
     setWOpenings((prev) => [
@@ -412,7 +417,7 @@ export const StructuralCalculator: React.FC<Props> = ({
       ...prev,
       {
         id: Date.now().toString(),
-        label: newSegLabel || t("struct.wall.segment_default", { defaultValue: `Mur ${prev.length + 1}` }),
+        label: newSegLabel || tr("struct.wall.segment_default", { n: prev.length + 1 }),
         length: l,
         height: h,
       },
@@ -470,9 +475,7 @@ export const StructuralCalculator: React.FC<Props> = ({
       const margin = parseFloat(gwMargin) || 0;
       const stripDepth = parseFloat(gwStripDepth) || 0;
 
-      const stripArea =
-        L > 0 && W > 0 ? (L + 2 * margin) * (W + 2 * margin) : parseFloat(surface) || 0;
-
+      const stripArea = L > 0 && W > 0 ? (L + 2 * margin) * (W + 2 * margin) : parseFloat(surface) || 0;
       const stripVolPlace = stripArea * stripDepth;
 
       const soilProps = SOIL_PROPERTIES.find((s) => s.id === gwSoilType) || SOIL_PROPERTIES[0];
@@ -484,13 +487,13 @@ export const StructuralCalculator: React.FC<Props> = ({
 
       materialsList.push({
         id: "strip",
-        name: t("struct.gw.strip", { defaultValue: "Décapage terre végétale" }),
+        name: tr("struct.gw.strip"),
         quantity: stripArea,
         unit: Unit.M2,
         unitPrice: gwPrices.stripM2,
         totalPrice: costStrip,
         category: CalculatorType.GROUNDWORK,
-        details: `${t("struct.common.thickness", { defaultValue: "Ép." })} ${(stripDepth * 100).toFixed(0)}cm - ${stripVolPlace.toFixed(1)}m³`,
+        details: `${tr("struct.common.thickness")} ${(stripDepth * 100).toFixed(0)}cm - ${stripVolPlace.toFixed(1)}m³`,
       });
 
       // Detailed excavations
@@ -513,13 +516,13 @@ export const StructuralCalculator: React.FC<Props> = ({
       if (excavVolPlace > 0) {
         materialsList.push({
           id: "excav",
-          name: t("struct.gw.excav", { defaultValue: "Excavation / fouilles" }),
+          name: tr("struct.gw.excav"),
           quantity: parseFloat(excavVolPlace.toFixed(1)),
           unit: Unit.M3,
           unitPrice: gwPrices.excavM3,
           totalPrice: costExcav,
           category: CalculatorType.GROUNDWORK,
-          details: `${gwDetailedExcavs.length} ${t("struct.common.items", { defaultValue: "ouvrages" })} - x${swellCoef}`,
+          details: tr("struct.gw.excav_details", { count: gwDetailedExcavs.length, swell: swellCoef }),
         });
       }
 
@@ -528,13 +531,13 @@ export const StructuralCalculator: React.FC<Props> = ({
 
       if (gwKeepTopsoil) {
         totalVolToManage -= stripVolFoison;
-        details.push({ label: t("struct.gw.topsoil_stored", { defaultValue: "Terre végétale stockée" }), value: stripVolFoison.toFixed(1), unit: "m³" });
+        details.push({ label: tr("struct.gw.topsoil_stored"), value: stripVolFoison.toFixed(1), unit: "m³" });
       }
 
       if (gwReuseOnSite > 0) {
         const volToReuse = excavVolFoison * (gwReuseOnSite / 100);
         totalVolToManage -= volToReuse;
-        details.push({ label: t("struct.gw.reused_fill", { defaultValue: "Remblai réutilisé" }), value: volToReuse.toFixed(1), unit: "m³" });
+        details.push({ label: tr("struct.gw.reused_fill"), value: volToReuse.toFixed(1), unit: "m³" });
       }
 
       const volToEvac = Math.max(0, totalVolToManage);
@@ -554,7 +557,7 @@ export const StructuralCalculator: React.FC<Props> = ({
         materialsList.push(
           {
             id: "transp",
-            name: t("struct.gw.truck_rotation", { defaultValue: "Rotation camion" }) + ` (${gwTruckCap}m³)`,
+            name: tr("struct.gw.truck_rotation_named", { cap: gwTruckCap }),
             quantity: rotations,
             unit: Unit.ROTATION,
             unitPrice: gwPrices.truckRotation,
@@ -563,13 +566,13 @@ export const StructuralCalculator: React.FC<Props> = ({
           },
           {
             id: "dump",
-            name: t("struct.gw.dump_fee", { defaultValue: "Mise en décharge" }),
+            name: tr("struct.gw.dump_fee"),
             quantity: parseFloat(tonsToDump.toFixed(1)),
             unit: Unit.TON,
             unitPrice: gwPrices.dumpFeeTon,
             totalPrice: costDump,
             category: CalculatorType.GROUNDWORK,
-            details: `${volToEvac.toFixed(1)}m³`,
+            details: tr("struct.gw.dump_details", { vol: volToEvac.toFixed(1) }),
           }
         );
       }
@@ -578,23 +581,24 @@ export const StructuralCalculator: React.FC<Props> = ({
       const fillVol = parseFloat(gwFillVolume) || 0;
       if (fillVol > 0) {
         let fillPrice = gwPrices.fillGravelM3;
-        let fillLabel = t("struct.gw.fill_gravel", { defaultValue: "Grave / tout-venant" });
+        let fillKey = "struct.gw.fill_gravel";
 
         if (gwFillType === "sand") {
           fillPrice = gwPrices.fillSandM3;
-          fillLabel = t("struct.gw.fill_sand", { defaultValue: "Sable" });
+          fillKey = "struct.gw.fill_sand";
         }
         if (gwFillType === "soil") {
           fillPrice = gwPrices.fillSoilM3;
-          fillLabel = t("struct.gw.fill_soil", { defaultValue: "Terre végétale (apport)" });
+          fillKey = "struct.gw.fill_soil";
         }
 
+        const fillLabel = tr(fillKey);
         const costFill = fillVol * fillPrice;
         totalCost += costFill;
 
         materialsList.push({
           id: "fill",
-          name: t("struct.gw.fill_import", { defaultValue: "Apport" }) + ` ${fillLabel}`,
+          name: tr("struct.gw.fill_import_named", { label: fillLabel }),
           quantity: fillVol,
           unit: Unit.M3,
           unitPrice: fillPrice,
@@ -609,7 +613,7 @@ export const StructuralCalculator: React.FC<Props> = ({
         totalCost += costDigger;
         materialsList.push({
           id: "digger",
-          name: t("struct.gw.digger_rental", { defaultValue: "Location mini-pelle" }),
+          name: tr("struct.gw.digger_rental"),
           quantity: gwDiggerDays,
           unit: Unit.DAY,
           unitPrice: gwPrices.diggerDay,
@@ -623,7 +627,7 @@ export const StructuralCalculator: React.FC<Props> = ({
         totalCost += costComp;
         materialsList.push({
           id: "compactor",
-          name: t("struct.gw.compactor_rental", { defaultValue: "Location compacteur" }),
+          name: tr("struct.gw.compactor_rental"),
           quantity: gwCompactorDays,
           unit: Unit.DAY,
           unitPrice: gwPrices.compactorDay,
@@ -632,19 +636,19 @@ export const StructuralCalculator: React.FC<Props> = ({
         });
       }
 
-      details.push({ label: t("struct.gw.strip_area", { defaultValue: "Surface décapée" }), value: stripArea.toFixed(0), unit: "m²" });
-      details.push({ label: t("struct.gw.volume_inplace", { defaultValue: "Volume en place" }), value: (stripVolPlace + excavVolPlace).toFixed(1), unit: "m³" });
-      details.push({ label: t("struct.gw.volume_bulking", { defaultValue: "Volume foisonné" }), value: (stripVolFoison + excavVolFoison).toFixed(1), unit: "m³" });
-      details.push({ label: t("struct.gw.to_evac", { defaultValue: "À évacuer" }), value: volToEvac.toFixed(1), unit: "m³" });
+      details.push({ label: tr("struct.gw.strip_area"), value: stripArea.toFixed(0), unit: "m²" });
+      details.push({ label: tr("struct.gw.volume_inplace"), value: (stripVolPlace + excavVolPlace).toFixed(1), unit: "m³" });
+      details.push({ label: tr("struct.gw.volume_bulking"), value: (stripVolFoison + excavVolFoison).toFixed(1), unit: "m³" });
+      details.push({ label: tr("struct.gw.to_evac"), value: volToEvac.toFixed(1), unit: "m³" });
 
       if (gwReuseOnSite > 0 && !gwCompactorDays) {
-        warnings.push(t("struct.gw.warn_no_compaction", { defaultValue: "Réutilisation de terre en remblai sans compactage prévu ?" }));
+        warnings.push(tr("struct.gw.warn_no_compaction"));
       }
 
       return {
         totalCost,
         materials: materialsList,
-        summary: `${(stripVolPlace + excavVolPlace).toFixed(1)}m³ ${t("struct.gw.summary_excavated", { defaultValue: "excavés" })}`,
+        summary: tr("struct.gw.summary_excavated", { m3: (stripVolPlace + excavVolPlace).toFixed(1) }),
         details,
         warnings: warnings.length ? warnings : undefined,
       };
@@ -682,7 +686,7 @@ export const StructuralCalculator: React.FC<Props> = ({
 
         materialsList.push({
           id: "fd_strip_conc",
-          name: t("struct.fd.conc_strip", { defaultValue: "Béton (semelles filantes)" }),
+          name: tr("struct.fd.conc_strip"),
           quantity: parseFloat(stripVol.toFixed(2)),
           unit: Unit.M3,
           unitPrice: fdPrices.concrete,
@@ -697,14 +701,14 @@ export const StructuralCalculator: React.FC<Props> = ({
 
         materialsList.push({
           id: "fd_strip_rebar",
-          name: t("struct.fd.rebar_strip", { defaultValue: "Armatures semelles" }) + ` (${fdRebarStripType})`,
+          name: tr("struct.fd.rebar_strip_named", { type: fdRebarStripType }),
           quantity: cages,
           unit: Unit.PIECE,
           unitPrice: fdPrices.rebarCage,
           totalPrice: costRebar,
           category: CalculatorType.FOUNDATIONS,
           systemKey: "REBAR_CAGE_35_15_6M",
-          details: t("struct.fd.rebar_ratio", { defaultValue: "~1 cage / 6m" }),
+          details: tr("struct.fd.rebar_ratio"),
         });
       }
 
@@ -725,7 +729,7 @@ export const StructuralCalculator: React.FC<Props> = ({
 
         materialsList.push({
           id: "fd_pads_conc",
-          name: t("struct.fd.conc_pads", { defaultValue: "Béton (plots)" }),
+          name: tr("struct.fd.conc_pads"),
           quantity: parseFloat(padsVol.toFixed(2)),
           unit: Unit.M3,
           unitPrice: fdPrices.concrete,
@@ -745,7 +749,7 @@ export const StructuralCalculator: React.FC<Props> = ({
 
         materialsList.push({
           id: "fd_raft_conc",
-          name: t("struct.fd.conc_raft", { defaultValue: "Béton (radier)" }),
+          name: tr("struct.fd.conc_raft"),
           quantity: parseFloat(raftVol.toFixed(2)),
           unit: Unit.M3,
           unitPrice: fdPrices.concrete,
@@ -761,14 +765,14 @@ export const StructuralCalculator: React.FC<Props> = ({
 
         materialsList.push({
           id: "fd_mesh",
-          name: t("struct.fd.mesh", { defaultValue: "Treillis soudé" }) + ` (${fdRebarRaftType})`,
+          name: tr("struct.fd.mesh_named", { type: fdRebarRaftType }),
           quantity: meshPanels,
           unit: Unit.PIECE,
           unitPrice: fdPrices.meshPanel,
           totalPrice: costMesh,
           category: CalculatorType.FOUNDATIONS,
           systemKey: "MESH_PANEL_ST25",
-          details: t("struct.fd.mesh_ratio", { defaultValue: "~1 panneau / 14.4m²" }),
+          details: tr("struct.fd.mesh_ratio"),
         });
       }
 
@@ -802,7 +806,7 @@ export const StructuralCalculator: React.FC<Props> = ({
 
         materialsList.push({
           id: "fd_clean",
-          name: t("struct.fd.clean_concrete", { defaultValue: "Béton de propreté (5cm)" }),
+          name: tr("struct.fd.clean_concrete"),
           quantity: parseFloat(cleanVol.toFixed(2)),
           unit: Unit.M3,
           unitPrice: fdPrices.cleanConcrete,
@@ -846,14 +850,14 @@ export const StructuralCalculator: React.FC<Props> = ({
 
         materialsList.push({
           id: "fd_excav",
-          name: t("struct.fd.excav", { defaultValue: "Terrassement / fouilles" }),
+          name: tr("struct.fd.excav"),
           quantity: parseFloat(excavVolPlace.toFixed(2)),
           unit: Unit.M3,
           unitPrice: fdPrices.excavation,
           totalPrice: costExcav,
           category: CalculatorType.FOUNDATIONS,
           systemKey: "EXCAVATION_M3",
-          details: `x${swellCoef}`,
+          details: tr("struct.common.multiplier", { x: swellCoef }),
         });
 
         if (fdEvac) {
@@ -863,7 +867,7 @@ export const StructuralCalculator: React.FC<Props> = ({
 
           materialsList.push({
             id: "fd_evac",
-            name: t("struct.fd.evac", { defaultValue: "Évacuation terres (foisonné)" }),
+            name: tr("struct.fd.evac"),
             quantity: parseFloat(excavFoison.toFixed(2)),
             unit: Unit.M3,
             unitPrice: fdPrices.evacuation,
@@ -882,7 +886,7 @@ export const StructuralCalculator: React.FC<Props> = ({
 
         materialsList.push({
           id: "fd_form",
-          name: t("struct.fd.formwork", { defaultValue: "Coffrage (panneaux)" }),
+          name: tr("struct.fd.formwork_panels"),
           quantity: parseFloat(area.toFixed(1)),
           unit: Unit.M2,
           unitPrice: fdPrices.formwork,
@@ -899,7 +903,7 @@ export const StructuralCalculator: React.FC<Props> = ({
 
         materialsList.push({
           id: "fd_drain",
-          name: t("struct.fd.drain", { defaultValue: "Drain périphérique" }),
+          name: tr("struct.fd.drain"),
           quantity: parseFloat(L.toFixed(1)),
           unit: Unit.METER,
           unitPrice: fdPrices.drainM,
@@ -910,14 +914,16 @@ export const StructuralCalculator: React.FC<Props> = ({
 
       if (fdPolyane) {
         const a =
-          (parseFloat(dimL) || 0) > 0 && (parseFloat(dimW) || 0) > 0 ? (parseFloat(dimL) || 0) * (parseFloat(dimW) || 0) : parseFloat(surface) || 0;
+          (parseFloat(dimL) || 0) > 0 && (parseFloat(dimW) || 0) > 0
+            ? (parseFloat(dimL) || 0) * (parseFloat(dimW) || 0)
+            : parseFloat(surface) || 0;
 
         const costPoly = a * fdPrices.polyaneM2;
         totalCost += costPoly;
 
         materialsList.push({
           id: "fd_poly",
-          name: t("struct.fd.polyane", { defaultValue: "Film polyane" }),
+          name: tr("struct.fd.polyane"),
           quantity: parseFloat(a.toFixed(1)),
           unit: Unit.M2,
           unitPrice: fdPrices.polyaneM2,
@@ -934,7 +940,7 @@ export const StructuralCalculator: React.FC<Props> = ({
 
           materialsList.push({
             id: "fd_mo",
-            name: t("struct.fd.labor_concrete", { defaultValue: "Main d'œuvre (béton)" }),
+            name: tr("struct.fd.labor_concrete"),
             quantity: parseFloat(volConcrete.toFixed(2)),
             unit: Unit.M3,
             unitPrice: fdPrices.laborM3,
@@ -944,13 +950,13 @@ export const StructuralCalculator: React.FC<Props> = ({
         }
       }
 
-      details.push({ label: t("struct.fd.soil", { defaultValue: "Sol" }), value: soilProps.label, unit: "" });
-      details.push({ label: t("struct.fd.total_concrete", { defaultValue: "Béton total" }), value: (stripVol + padsVol + raftVol).toFixed(2), unit: "m³" });
+      details.push({ label: tr("struct.fd.soil"), value: soilProps.label, unit: "" });
+      details.push({ label: tr("struct.fd.total_concrete"), value: (stripVol + padsVol + raftVol).toFixed(2), unit: "m³" });
 
       return {
         totalCost,
         materials: materialsList,
-        summary: `${(stripVol + padsVol + raftVol).toFixed(2)}m³ ${t("struct.fd.summary_concrete", { defaultValue: "béton" })}`,
+        summary: tr("struct.fd.summary_concrete", { m3: (stripVol + padsVol + raftVol).toFixed(2) }),
         details,
         warnings: warnings.length ? warnings : undefined,
       };
@@ -1044,14 +1050,14 @@ export const StructuralCalculator: React.FC<Props> = ({
 
         materialsList.push({
           id: "stepoc_fill",
-          name: t("struct.walls.stepoc_fill", { defaultValue: "Béton remplissage (C25/30)" }),
+          name: tr("struct.walls.stepoc_fill"),
           quantity: parseFloat(volFill.toFixed(2)),
           unit: Unit.M3,
           unitPrice: concreteUnit,
           totalPrice: costFill,
           category: CalculatorType.WALLS,
           systemKey: concreteKey,
-          details: `${(fillM3PerM2 * 1000).toFixed(0)} L/m²`,
+          details: tr("struct.walls.stepoc_fill_details", { lpm2: (fillM3PerM2 * 1000).toFixed(0) }),
         });
       } else {
         if (wallBinderKind === "colle") {
@@ -1064,14 +1070,14 @@ export const StructuralCalculator: React.FC<Props> = ({
 
           materialsList.push({
             id: "wall_glue",
-            name: t("struct.walls.glue", { defaultValue: "Mortier colle (joint mince)" }),
+            name: tr("struct.walls.glue"),
             quantity: bagsGlue,
             unit: Unit.BAG,
             unitPrice: glueUnit,
             totalPrice: costGlue,
             category: CalculatorType.WALLS,
             systemKey: glueKey,
-            details: t("struct.walls.glue_ratio", { defaultValue: "~1 sac / 10m²" }),
+            details: tr("struct.walls.glue_ratio"),
           });
         } else {
           const mortarKey = "MORTAR_BAG_25KG";
@@ -1083,14 +1089,14 @@ export const StructuralCalculator: React.FC<Props> = ({
 
           materialsList.push({
             id: "wall_mortar",
-            name: t("struct.walls.mortar", { defaultValue: "Mortier montage" }),
+            name: tr("struct.walls.mortar"),
             quantity: bagsMortar,
             unit: Unit.BAG,
             unitPrice: mortarUnit,
             totalPrice: costMortar,
             category: CalculatorType.WALLS,
             systemKey: mortarKey,
-            details: t("struct.walls.mortar_ratio", { defaultValue: "~1 sac / 3m²" }),
+            details: tr("struct.walls.mortar_ratio"),
           });
         }
       }
@@ -1104,11 +1110,12 @@ export const StructuralCalculator: React.FC<Props> = ({
         const costLintel = q * lintelUnit;
         totalCost += costLintel;
 
+        const kind =
+          wLintelType === "precast" ? tr("struct.walls.prefab") : tr("struct.walls.casted");
+
         materialsList.push({
           id: "lintels",
-          name:
-            t("struct.walls.lintels", { defaultValue: "Linteaux" }) +
-            ` ${wLintelType === "precast" ? t("struct.walls.prefab", { defaultValue: "préfa" }) : t("struct.walls.casted", { defaultValue: "coffrés" })}`,
+          name: tr("struct.walls.lintels_named", { kind }),
           quantity: q,
           unit: Unit.METER,
           unitPrice: lintelUnit,
@@ -1133,7 +1140,7 @@ export const StructuralCalculator: React.FC<Props> = ({
 
         materialsList.push({
           id: "chain_conc",
-          name: t("struct.walls.chainage_concrete", { defaultValue: "Béton chaînages (horiz.)" }),
+          name: tr("struct.walls.chainage_concrete"),
           quantity: parseFloat(volCh.toFixed(2)),
           unit: Unit.M3,
           unitPrice: concreteUnit,
@@ -1153,7 +1160,7 @@ export const StructuralCalculator: React.FC<Props> = ({
 
         materialsList.push({
           id: "chain_steel",
-          name: t("struct.walls.chainage_steel", { defaultValue: "Aciers chaînages (horiz.)" }),
+          name: tr("struct.walls.chainage_steel"),
           quantity: steelQty,
           unit: Unit.KG,
           unitPrice: steelUnit,
@@ -1178,7 +1185,7 @@ export const StructuralCalculator: React.FC<Props> = ({
 
         materialsList.push({
           id: "vert_conc",
-          name: t("struct.walls.vert_concrete", { defaultValue: "Béton raidisseurs (vert.)" }),
+          name: tr("struct.walls.vert_concrete"),
           quantity: parseFloat(volVert.toFixed(2)),
           unit: Unit.M3,
           unitPrice: concreteUnit,
@@ -1198,7 +1205,7 @@ export const StructuralCalculator: React.FC<Props> = ({
 
         materialsList.push({
           id: "vert_steel",
-          name: t("struct.walls.vert_steel", { defaultValue: "Aciers raidisseurs (vert.)" }),
+          name: tr("struct.walls.vert_steel"),
           quantity: steelVertQty,
           unit: Unit.KG,
           unitPrice: steelUnit,
@@ -1219,7 +1226,7 @@ export const StructuralCalculator: React.FC<Props> = ({
 
         materialsList.push({
           id: "coat_ext",
-          name: t("struct.walls.coating_ext", { defaultValue: "Enduit façade (monocouche)" }),
+          name: tr("struct.walls.coating_ext"),
           quantity: bagsCoat,
           unit: Unit.BAG,
           unitPrice: coatExtUnit,
@@ -1241,7 +1248,7 @@ export const StructuralCalculator: React.FC<Props> = ({
 
         materialsList.push({
           id: "coat_int",
-          name: t("struct.walls.coating_int", { defaultValue: "Enduit intérieur / plâtre" }),
+          name: tr("struct.walls.coating_int"),
           quantity: bagsPlaster,
           unit: Unit.BAG,
           unitPrice: coatIntUnit,
@@ -1258,7 +1265,7 @@ export const StructuralCalculator: React.FC<Props> = ({
 
         materialsList.push({
           id: "scaffold",
-          name: t("struct.walls.scaffold", { defaultValue: "Échafaudage (forfait)" }),
+          name: tr("struct.walls.scaffold"),
           quantity: 1,
           unit: Unit.PACKAGE,
           unitPrice: wPrices.scaffoldFixed,
@@ -1274,7 +1281,7 @@ export const StructuralCalculator: React.FC<Props> = ({
 
         materialsList.push({
           id: "labor_wall",
-          name: t("struct.walls.labor", { defaultValue: "Main d'œuvre maçonnerie" }),
+          name: tr("struct.walls.labor"),
           quantity: parseFloat(masonryArea.toFixed(1)),
           unit: Unit.M2,
           unitPrice: wPrices.laborM2,
@@ -1283,25 +1290,25 @@ export const StructuralCalculator: React.FC<Props> = ({
         });
       }
 
-      details.push({ label: t("struct.walls.gross_area", { defaultValue: "Surface brute" }), value: grossArea.toFixed(1), unit: "m²" });
-      details.push({ label: t("struct.walls.net_area", { defaultValue: "Surface nette" }), value: masonryArea.toFixed(1), unit: "m²" });
-      details.push({ label: t("struct.walls.block_selected", { defaultValue: "Bloc sélectionné" }), value: selectedWallSpec.label, unit: "" });
-      details.push({ label: t("struct.walls.consumption", { defaultValue: "Consommation" }), value: unitsPerM2.toFixed(2), unit: "u/m²" });
-      details.push({ label: t("struct.walls.units", { defaultValue: "Blocs/éléments" }), value: totalUnits, unit: "u" });
+      details.push({ label: tr("struct.walls.gross_area"), value: grossArea.toFixed(1), unit: "m²" });
+      details.push({ label: tr("struct.walls.net_area"), value: masonryArea.toFixed(1), unit: "m²" });
+      details.push({ label: tr("struct.walls.block_selected"), value: selectedWallSpec.label, unit: "" });
+      details.push({ label: tr("struct.walls.consumption"), value: unitsPerM2.toFixed(2), unit: "u/m²" });
+      details.push({ label: tr("struct.walls.units"), value: totalUnits, unit: "u" });
 
       const binderText =
         selectedWallSpec.family === "stepoc"
-          ? "-"
+          ? tr("struct.common.dash")
           : wallBinderKind === "colle"
-          ? `${Math.ceil(masonryArea / 10)} ${t("struct.common.bags", { defaultValue: "sacs" })}`
-          : `${Math.ceil(masonryArea / 3)} ${t("struct.common.bags", { defaultValue: "sacs" })}`;
+          ? tr("struct.common.bags_count", { n: Math.ceil(masonryArea / 10) })
+          : tr("struct.common.bags_count", { n: Math.ceil(masonryArea / 3) });
 
-      details.push({ label: t("struct.walls.binder", { defaultValue: "Mortier/colle" }), value: binderText, unit: "" });
+      details.push({ label: tr("struct.walls.binder"), value: binderText, unit: "" });
 
       return {
         totalCost,
         materials: materialsList,
-        summary: `${totalUnits} ${t("struct.walls.summary_units", { defaultValue: "unités" })} (${masonryArea.toFixed(0)}m²)`,
+        summary: tr("struct.walls.summary_units", { units: totalUnits, m2: masonryArea.toFixed(0) }),
         details,
       };
     }
@@ -1375,7 +1382,7 @@ export const StructuralCalculator: React.FC<Props> = ({
   // Pass results to parent
   useEffect(() => {
     onCalculate({
-      summary: calculationData.summary || t("calculator.title_fallback", { defaultValue: "Résultat" }),
+      summary: calculationData.summary || tr("calculator.title_fallback"),
       details: calculationData.details || [],
       materials: calculationData.materials || [],
       totalCost: parseFloat((calculationData.totalCost || 0).toFixed(2)),
@@ -1400,7 +1407,7 @@ export const StructuralCalculator: React.FC<Props> = ({
               mode === "groundwork" ? "bg-white shadow text-blue-600" : "text-slate-500"
             }`}
           >
-            <Mountain size={16} className="mr-1" /> {t("struct.tabs.groundwork", { defaultValue: "Terrassement" })}
+            <Mountain size={16} className="mr-1" /> {tr("struct.tabs.groundwork")}
           </button>
 
           <button
@@ -1413,7 +1420,7 @@ export const StructuralCalculator: React.FC<Props> = ({
               mode === "foundations" ? "bg-white shadow text-blue-600" : "text-slate-500"
             }`}
           >
-            <Warehouse size={16} className="mr-1" /> {t("struct.tabs.foundations", { defaultValue: "Fondations" })}
+            <Warehouse size={16} className="mr-1" /> {tr("struct.tabs.foundations")}
           </button>
 
           <button
@@ -1426,12 +1433,10 @@ export const StructuralCalculator: React.FC<Props> = ({
               mode === "walls" ? "bg-white shadow text-blue-600" : "text-slate-500"
             }`}
           >
-            <BrickWall size={16} className="mr-1" /> {t("struct.tabs.walls", { defaultValue: "Murs" })}
+            <BrickWall size={16} className="mr-1" /> {tr("struct.tabs.walls")}
           </button>
         </div>
       )}
-
-      {/* NOTE: commentaires de génération supprimés (étaient en // dans le JSX) */}
 
       {/* ======================= GROUNDWORK WIZARD ======================= */}
       {mode === "groundwork" && (
@@ -1446,11 +1451,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                 }`}
                 type="button"
               >
-                {s === 1 && t("struct.gw.steps.1", { defaultValue: "1. Emprise" })}
-                {s === 2 && t("struct.gw.steps.2", { defaultValue: "2. Fouilles" })}
-                {s === 3 && t("struct.gw.steps.3", { defaultValue: "3. Terres" })}
-                {s === 4 && t("struct.gw.steps.4", { defaultValue: "4. Logist." })}
-                {s === 5 && t("struct.gw.steps.5", { defaultValue: "5. Devis" })}
+                {tr(`struct.gw.steps.${s}`)}
               </button>
             ))}
           </div>
@@ -1460,16 +1461,12 @@ export const StructuralCalculator: React.FC<Props> = ({
             <div className="space-y-4">
               <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
                 <Mountain size={16} className="mr-2 shrink-0 mt-0.5" />
-                {t("struct.gw.step1.hint", {
-                  defaultValue: "Définissez l'emprise du chantier et le décapage de la terre végétale.",
-                })}
+                {tr("struct.gw.step1.hint")}
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-slate-500 mb-1">
-                    {t("struct.common.length_m", { defaultValue: "Longueur (m)" })}
-                  </label>
+                  <label className="block text-xs font-bold text-slate-500 mb-1">{tr("struct.common.length_m")}</label>
                   <input
                     type="number"
                     value={dimL}
@@ -1478,9 +1475,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-500 mb-1">
-                    {t("struct.common.width_m", { defaultValue: "Largeur (m)" })}
-                  </label>
+                  <label className="block text-xs font-bold text-slate-500 mb-1">{tr("struct.common.width_m")}</label>
                   <input
                     type="number"
                     value={dimW}
@@ -1490,9 +1485,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-500 mb-1">
-                    {t("struct.gw.margin_m", { defaultValue: "Marge travail (m)" })}
-                  </label>
+                  <label className="block text-xs font-bold text-slate-500 mb-1">{tr("struct.gw.margin_m")}</label>
                   <input
                     type="number"
                     value={gwMargin}
@@ -1501,9 +1494,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-500 mb-1">
-                    {t("struct.gw.strip_depth_m", { defaultValue: "Ép. décapage (m)" })}
-                  </label>
+                  <label className="block text-xs font-bold text-slate-500 mb-1">{tr("struct.gw.strip_depth_m")}</label>
                   <input
                     type="number"
                     value={gwStripDepth}
@@ -1515,9 +1506,7 @@ export const StructuralCalculator: React.FC<Props> = ({
 
               <div className="bg-slate-50 p-3 rounded-lg border border-slate-200">
                 <label className="flex items-center justify-between cursor-pointer mb-2">
-                  <span className="text-sm font-medium">
-                    {t("struct.gw.keep_topsoil", { defaultValue: "Conserver la terre végétale sur site" })}
-                  </span>
+                  <span className="text-sm font-medium">{tr("struct.gw.keep_topsoil")}</span>
                   <input
                     type="checkbox"
                     checked={gwKeepTopsoil}
@@ -1532,7 +1521,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                 onClick={() => setStep(2)}
                 className="w-full py-3 bg-blue-600 text-white rounded-xl font-bold flex justify-center items-center mt-2"
               >
-                {t("common.next", { defaultValue: "Suivant" })} <ArrowRight size={18} className="ml-2" />
+                {tr("common.next")} <ArrowRight size={18} className="ml-2" />
               </button>
             </div>
           )}
@@ -1542,9 +1531,7 @@ export const StructuralCalculator: React.FC<Props> = ({
             <div className="space-y-4">
               <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
                 <Pickaxe size={16} className="mr-2 shrink-0 mt-0.5" />
-                {t("struct.gw.step2.hint", {
-                  defaultValue: "Ajoutez les fouilles spécifiques (fondations, réseaux, plateforme).",
-                })}
+                {tr("struct.gw.step2.hint")}
               </div>
 
               <div className="space-y-2">
@@ -1554,9 +1541,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                       <span className="font-bold text-sm block">{ex.label}</span>
                       <span className="text-xs text-slate-500">
                         {ex.length}×{ex.width}×{ex.depth}m{" "}
-                        {ex.slopeRatio && ex.slopeRatio > 0
-                          ? `(${t("struct.gw.slope", { defaultValue: "Talus" })} ${ex.slopeRatio}:1)`
-                          : ""}
+                        {ex.slopeRatio && ex.slopeRatio > 0 ? `(${tr("struct.gw.slope")} ${ex.slopeRatio}:1)` : ""}
                       </span>
                     </div>
                     <button onClick={() => removeEarthExcav(ex.id)} className="text-red-400" type="button">
@@ -1573,9 +1558,9 @@ export const StructuralCalculator: React.FC<Props> = ({
                     onChange={(e) => setNewExType(e.target.value as any)}
                     className="flex-1 p-2 text-xs border border-slate-300 rounded bg-white text-slate-900"
                   >
-                    <option value="trench">{t("struct.excav.trench", { defaultValue: "Tranchée" })}</option>
-                    <option value="pit">{t("struct.excav.pit", { defaultValue: "Fouille isolée" })}</option>
-                    <option value="mass">{t("struct.excav.mass", { defaultValue: "Pleine masse" })}</option>
+                    <option value="trench">{tr("struct.excav.trench")}</option>
+                    <option value="pit">{tr("struct.excav.pit")}</option>
+                    <option value="mass">{tr("struct.excav.mass")}</option>
                   </select>
 
                   <select
@@ -1583,30 +1568,30 @@ export const StructuralCalculator: React.FC<Props> = ({
                     onChange={(e) => setNewExSlope(Number(e.target.value))}
                     className="flex-1 p-2 text-xs border border-slate-300 rounded bg-white text-slate-900"
                   >
-                    <option value={0}>{t("struct.gw.slope_0", { defaultValue: "Vertical (90°)" })}</option>
-                    <option value={0.5}>{t("struct.gw.slope_05", { defaultValue: "Talus raide (2:1)" })}</option>
-                    <option value={1}>{t("struct.gw.slope_1", { defaultValue: "Talus 45° (1:1)" })}</option>
+                    <option value={0}>{tr("struct.gw.slope_0")}</option>
+                    <option value={0.5}>{tr("struct.gw.slope_05")}</option>
+                    <option value={1}>{tr("struct.gw.slope_1")}</option>
                   </select>
                 </div>
 
                 <div className="grid grid-cols-4 gap-2 mb-2">
                   <input
                     type="number"
-                    placeholder={t("struct.common.L", { defaultValue: "L" })}
+                    placeholder={tr("struct.common.L")}
                     value={newExL}
                     onChange={(e) => setNewExL(e.target.value)}
                     className="p-2 border border-slate-300 rounded text-xs bg-white text-slate-900"
                   />
                   <input
                     type="number"
-                    placeholder={t("struct.common.W", { defaultValue: "l" })}
+                    placeholder={tr("struct.common.W")}
                     value={newExW}
                     onChange={(e) => setNewExW(e.target.value)}
                     className="p-2 border border-slate-300 rounded text-xs bg-white text-slate-900"
                   />
                   <input
                     type="number"
-                    placeholder={t("struct.common.D", { defaultValue: "P" })}
+                    placeholder={tr("struct.common.D")}
                     value={newExD}
                     onChange={(e) => setNewExD(e.target.value)}
                     className="p-2 border border-slate-300 rounded text-xs bg-white text-slate-900"
@@ -1623,14 +1608,14 @@ export const StructuralCalculator: React.FC<Props> = ({
                   className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold"
                   type="button"
                 >
-                  {t("common.back", { defaultValue: "Retour" })}
+                  {tr("common.back")}
                 </button>
                 <button
                   onClick={() => setStep(3)}
                   className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold"
                   type="button"
                 >
-                  {t("common.next", { defaultValue: "Suivant" })}
+                  {tr("common.next")}
                 </button>
               </div>
             </div>
@@ -1641,15 +1626,11 @@ export const StructuralCalculator: React.FC<Props> = ({
             <div className="space-y-4">
               <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
                 <Combine size={16} className="mr-2 shrink-0 mt-0.5" />
-                {t("struct.gw.step3.hint", {
-                  defaultValue: "Nature du sol et foisonnement (augmentation du volume).",
-                })}
+                {tr("struct.gw.step3.hint")}
               </div>
 
               <div className="bg-white p-3 rounded-xl border border-slate-200">
-                <label className="block text-sm font-bold text-slate-700 mb-2">
-                  {t("struct.gw.soil_type", { defaultValue: "Nature du terrain" })}
-                </label>
+                <label className="block text-sm font-bold text-slate-700 mb-2">{tr("struct.gw.soil_type")}</label>
                 <select
                   value={gwSoilType}
                   onChange={(e) => setGwSoilType(e.target.value)}
@@ -1669,14 +1650,14 @@ export const StructuralCalculator: React.FC<Props> = ({
                   className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold"
                   type="button"
                 >
-                  {t("common.back", { defaultValue: "Retour" })}
+                  {tr("common.back")}
                 </button>
                 <button
                   onClick={() => setStep(4)}
                   className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold"
                   type="button"
                 >
-                  {t("common.next", { defaultValue: "Suivant" })}
+                  {tr("common.next")}
                 </button>
               </div>
             </div>
@@ -1687,17 +1668,15 @@ export const StructuralCalculator: React.FC<Props> = ({
             <div className="space-y-4">
               <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
                 <Truck size={16} className="mr-2 shrink-0 mt-0.5" />
-                {t("struct.gw.step4.hint", { defaultValue: "Gestion des terres et moyens matériels." })}
+                {tr("struct.gw.step4.hint")}
               </div>
 
               <div className="bg-white p-3 rounded-xl border border-slate-200">
-                <h4 className="text-xs font-bold text-slate-500 uppercase mb-3">
-                  {t("struct.gw.earth_mgmt", { defaultValue: "Gestion des terres" })}
-                </h4>
+                <h4 className="text-xs font-bold text-slate-500 uppercase mb-3">{tr("struct.gw.earth_mgmt")}</h4>
 
                 <div className="mb-4">
                   <label className="flex justify-between text-sm font-bold text-slate-700 mb-1">
-                    <span>{t("struct.gw.reuse_fill", { defaultValue: "Réutilisation en remblai" })}</span>
+                    <span>{tr("struct.gw.reuse_fill")}</span>
                     <span>{gwReuseOnSite}%</span>
                   </label>
                   <input
@@ -1713,9 +1692,7 @@ export const StructuralCalculator: React.FC<Props> = ({
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-bold text-slate-500 mb-1">
-                      {t("struct.gw.truck_cap", { defaultValue: "Capacité benne (m³)" })}
-                    </label>
+                    <label className="block text-xs font-bold text-slate-500 mb-1">{tr("struct.gw.truck_cap")}</label>
                     <input
                       type="number"
                       value={gwTruckCap}
@@ -1727,30 +1704,24 @@ export const StructuralCalculator: React.FC<Props> = ({
               </div>
 
               <div className="bg-white p-3 rounded-xl border border-slate-200">
-                <h4 className="text-xs font-bold text-slate-500 uppercase mb-3">
-                  {t("struct.gw.fill_imports", { defaultValue: "Apports & remblai" })}
-                </h4>
+                <h4 className="text-xs font-bold text-slate-500 uppercase mb-3">{tr("struct.gw.fill_imports")}</h4>
 
                 <div className="grid grid-cols-2 gap-3 mb-2">
                   <div className="col-span-2">
-                    <label className="block text-xs font-bold text-slate-500 mb-1">
-                      {t("struct.gw.fill_type", { defaultValue: "Type d'apport" })}
-                    </label>
+                    <label className="block text-xs font-bold text-slate-500 mb-1">{tr("struct.gw.fill_type")}</label>
                     <select
                       value={gwFillType}
                       onChange={(e) => setGwFillType(e.target.value as any)}
                       className="w-full p-2 border border-slate-300 rounded bg-white text-slate-900"
                     >
-                      <option value="gravel">{t("struct.gw.fill_gravel", { defaultValue: "Grave / tout-venant" })}</option>
-                      <option value="sand">{t("struct.gw.fill_sand", { defaultValue: "Sable" })}</option>
-                      <option value="soil">{t("struct.gw.fill_soil", { defaultValue: "Terre végétale" })}</option>
+                      <option value="gravel">{tr("struct.gw.fill_gravel")}</option>
+                      <option value="sand">{tr("struct.gw.fill_sand")}</option>
+                      <option value="soil">{tr("struct.gw.fill_soil_short")}</option>
                     </select>
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-slate-500 mb-1">
-                      {t("struct.gw.fill_volume", { defaultValue: "Volume nécessaire (m³)" })}
-                    </label>
+                    <label className="block text-xs font-bold text-slate-500 mb-1">{tr("struct.gw.fill_volume")}</label>
                     <input
                       type="number"
                       value={gwFillVolume}
@@ -1762,13 +1733,11 @@ export const StructuralCalculator: React.FC<Props> = ({
               </div>
 
               <div className="bg-white p-3 rounded-xl border border-slate-200">
-                <h4 className="text-xs font-bold text-slate-500 uppercase mb-3">{t("struct.gw.means", { defaultValue: "Moyens" })}</h4>
+                <h4 className="text-xs font-bold text-slate-500 uppercase mb-3">{tr("struct.gw.means")}</h4>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-bold text-slate-500 mb-1">
-                      {t("struct.gw.digger_days", { defaultValue: "Jours mini-pelle" })}
-                    </label>
+                    <label className="block text-xs font-bold text-slate-500 mb-1">{tr("struct.gw.digger_days")}</label>
                     <input
                       type="number"
                       value={gwDiggerDays}
@@ -1777,9 +1746,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-slate-500 mb-1">
-                      {t("struct.gw.compactor_days", { defaultValue: "Jours compacteur" })}
-                    </label>
+                    <label className="block text-xs font-bold text-slate-500 mb-1">{tr("struct.gw.compactor_days")}</label>
                     <input
                       type="number"
                       value={gwCompactorDays}
@@ -1790,7 +1757,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                 </div>
 
                 <label className="flex items-center justify-between mt-3">
-                  <span className="text-sm">{t("struct.gw.difficult_access", { defaultValue: "Accès difficile / contraintes" })}</span>
+                  <span className="text-sm">{tr("struct.gw.difficult_access")}</span>
                   <input
                     type="checkbox"
                     checked={gwDifficultAccess}
@@ -1806,14 +1773,14 @@ export const StructuralCalculator: React.FC<Props> = ({
                   className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold"
                   type="button"
                 >
-                  {t("common.back", { defaultValue: "Retour" })}
+                  {tr("common.back")}
                 </button>
                 <button
                   onClick={() => setStep(5)}
                   className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold"
                   type="button"
                 >
-                  {t("common.next", { defaultValue: "Suivant" })}
+                  {tr("common.next")}
                 </button>
               </div>
             </div>
@@ -1824,23 +1791,21 @@ export const StructuralCalculator: React.FC<Props> = ({
             <div className="space-y-4">
               <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
                 <Euro size={16} className="mr-2 shrink-0 mt-0.5" />
-                {t("struct.gw.step5.hint", { defaultValue: "Tarification du terrassement." })}
+                {tr("struct.gw.step5.hint")}
               </div>
 
               <div className="bg-white p-3 rounded-xl border border-slate-200">
                 <div className="flex justify-between items-center mb-3">
-                  <h4 className="text-xs font-bold text-slate-500 uppercase">{t("struct.common.unit_prices", { defaultValue: "Prix unitaires" })}</h4>
+                  <h4 className="text-xs font-bold text-slate-500 uppercase">{tr("struct.common.unit_prices")}</h4>
                   <button onClick={() => setProMode(!proMode)} className="text-xs flex items-center text-blue-600" type="button">
                     <Settings size={12} className="mr-1" />{" "}
-                    {proMode ? t("struct.common.pro_mode", { defaultValue: "Mode Pro" }) : t("struct.common.simple_mode", { defaultValue: "Mode Simple" })}
+                    {proMode ? tr("struct.common.pro_mode") : tr("struct.common.simple_mode")}
                   </button>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-[10px] text-slate-500 mb-1">
-                      {t("struct.gw.price_excav", { defaultValue: "Excavation (€/m³)" })}
-                    </label>
+                    <label className="block text-[10px] text-slate-500 mb-1">{tr("struct.gw.price_excav")}</label>
                     <input
                       type="number"
                       value={gwPrices.excavM3}
@@ -1850,9 +1815,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                   </div>
 
                   <div>
-                    <label className="block text-[10px] text-slate-500 mb-1">
-                      {t("struct.gw.price_strip", { defaultValue: "Décapage (€/m²)" })}
-                    </label>
+                    <label className="block text-[10px] text-slate-500 mb-1">{tr("struct.gw.price_strip")}</label>
                     <input
                       type="number"
                       value={gwPrices.stripM2}
@@ -1862,9 +1825,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                   </div>
 
                   <div>
-                    <label className="block text-[10px] text-slate-500 mb-1">
-                      {t("struct.gw.price_truck", { defaultValue: "Rotation camion (€/rot.)" })}
-                    </label>
+                    <label className="block text-[10px] text-slate-500 mb-1">{tr("struct.gw.price_truck")}</label>
                     <input
                       type="number"
                       value={gwPrices.truckRotation}
@@ -1874,9 +1835,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                   </div>
 
                   <div>
-                    <label className="block text-[10px] text-slate-500 mb-1">
-                      {t("struct.gw.price_dump", { defaultValue: "Décharge (€/t)" })}
-                    </label>
+                    <label className="block text-[10px] text-slate-500 mb-1">{tr("struct.gw.price_dump")}</label>
                     <input
                       type="number"
                       value={gwPrices.dumpFeeTon}
@@ -1889,9 +1848,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                 {proMode && (
                   <div className="mt-4 pt-3 border-t border-slate-100 grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-[10px] text-blue-600 font-bold mb-1">
-                        {t("struct.gw.labor_m3", { defaultValue: "MO (€/m³)" })}
-                      </label>
+                      <label className="block text-[10px] text-blue-600 font-bold mb-1">{tr("struct.gw.labor_m3")}</label>
                       <input
                         type="number"
                         value={gwPrices.laborM3}
@@ -1909,14 +1866,14 @@ export const StructuralCalculator: React.FC<Props> = ({
                   className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold"
                   type="button"
                 >
-                  {t("common.back", { defaultValue: "Retour" })}
+                  {tr("common.back")}
                 </button>
                 <button
                   disabled
                   className="flex-1 py-3 bg-emerald-100 text-emerald-700 rounded-xl font-bold flex justify-center items-center"
                   type="button"
                 >
-                  <Check size={18} className="mr-2" /> {t("struct.common.calculated", { defaultValue: "Calculé" })}
+                  <Check size={18} className="mr-2" /> {tr("struct.common.calculated")}
                 </button>
               </div>
             </div>
@@ -1937,11 +1894,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                 }`}
                 type="button"
               >
-                {s === 1 && t("struct.fd.steps.1", { defaultValue: "1. Type" })}
-                {s === 2 && t("struct.fd.steps.2", { defaultValue: "2. Fouilles" })}
-                {s === 3 && t("struct.fd.steps.3", { defaultValue: "3. Béton" })}
-                {s === 4 && t("struct.fd.steps.4", { defaultValue: "4. Divers" })}
-                {s === 5 && t("struct.fd.steps.5", { defaultValue: "5. Devis" })}
+                {tr(`struct.fd.steps.${s}`)}
               </button>
             ))}
           </div>
@@ -1951,12 +1904,12 @@ export const StructuralCalculator: React.FC<Props> = ({
             <div className="space-y-4">
               <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
                 <Warehouse size={16} className="mr-2 shrink-0 mt-0.5" />
-                {t("struct.fd.step1.hint", { defaultValue: "Choisissez le type de fondations et les dimensions globales." })}
+                {tr("struct.fd.step1.hint")}
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-slate-500 mb-1">{t("struct.common.house_length", { defaultValue: "Longueur maison" })}</label>
+                  <label className="block text-xs font-bold text-slate-500 mb-1">{tr("struct.common.house_length")}</label>
                   <input
                     type="number"
                     value={dimL}
@@ -1965,7 +1918,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-500 mb-1">{t("struct.common.house_width", { defaultValue: "Largeur maison" })}</label>
+                  <label className="block text-xs font-bold text-slate-500 mb-1">{tr("struct.common.house_width")}</label>
                   <input
                     type="number"
                     value={dimW}
@@ -1976,15 +1929,13 @@ export const StructuralCalculator: React.FC<Props> = ({
               </div>
 
               <div className="bg-white p-3 rounded-xl border border-slate-200">
-                <h4 className="text-xs font-bold text-slate-500 uppercase mb-3">
-                  {t("struct.fd.systems", { defaultValue: "Systèmes constructifs" })}
-                </h4>
+                <h4 className="text-xs font-bold text-slate-500 uppercase mb-3">{tr("struct.fd.systems")}</h4>
 
                 <div className="space-y-2">
                   <label className="flex items-center justify-between p-2 border rounded hover:bg-slate-50 cursor-pointer">
                     <div>
-                      <span className="font-bold text-sm block">{t("struct.fd.strip", { defaultValue: "Semelles filantes" })}</span>
-                      <span className="text-xs text-slate-400">{t("struct.fd.strip_hint", { defaultValue: "Sous murs porteurs" })}</span>
+                      <span className="font-bold text-sm block">{tr("struct.fd.strip")}</span>
+                      <span className="text-xs text-slate-400">{tr("struct.fd.strip_hint")}</span>
                     </div>
                     <input
                       type="checkbox"
@@ -1996,8 +1947,8 @@ export const StructuralCalculator: React.FC<Props> = ({
 
                   <label className="flex items-center justify-between p-2 border rounded hover:bg-slate-50 cursor-pointer">
                     <div>
-                      <span className="font-bold text-sm block">{t("struct.fd.pads", { defaultValue: "Plots isolés" })}</span>
-                      <span className="text-xs text-slate-400">{t("struct.fd.pads_hint", { defaultValue: "Sous poteaux" })}</span>
+                      <span className="font-bold text-sm block">{tr("struct.fd.pads")}</span>
+                      <span className="text-xs text-slate-400">{tr("struct.fd.pads_hint")}</span>
                     </div>
                     <input
                       type="checkbox"
@@ -2009,8 +1960,8 @@ export const StructuralCalculator: React.FC<Props> = ({
 
                   <label className="flex items-center justify-between p-2 border rounded hover:bg-slate-50 cursor-pointer">
                     <div>
-                      <span className="font-bold text-sm block">{t("struct.fd.raft", { defaultValue: "Radier général" })}</span>
-                      <span className="text-xs text-slate-400">{t("struct.fd.raft_hint", { defaultValue: "Dalle porteuse intégrale" })}</span>
+                      <span className="font-bold text-sm block">{tr("struct.fd.raft")}</span>
+                      <span className="text-xs text-slate-400">{tr("struct.fd.raft_hint")}</span>
                     </div>
                     <input
                       type="checkbox"
@@ -2027,7 +1978,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                 className="w-full py-3 bg-blue-600 text-white rounded-xl font-bold flex justify-center items-center mt-2"
                 type="button"
               >
-                {t("common.next", { defaultValue: "Suivant" })} <ArrowRight size={18} className="ml-2" />
+                {tr("common.next")} <ArrowRight size={18} className="ml-2" />
               </button>
             </div>
           )}
@@ -2037,14 +1988,12 @@ export const StructuralCalculator: React.FC<Props> = ({
             <div className="space-y-4">
               <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
                 <Shovel size={16} className="mr-2 shrink-0 mt-0.5" />
-                {t("struct.fd.step2.hint", { defaultValue: "Calcul automatique des fouilles en fonction des fondations choisies." })}
+                {tr("struct.fd.step2.hint")}
               </div>
 
               <div className="bg-white p-3 rounded-xl border border-slate-200">
                 <label className="flex items-center justify-between mb-4">
-                  <span className="font-bold text-sm text-slate-700">
-                    {t("struct.fd.count_excav", { defaultValue: "Compter le terrassement" })}
-                  </span>
+                  <span className="font-bold text-sm text-slate-700">{tr("struct.fd.count_excav")}</span>
                   <input
                     type="checkbox"
                     checked={fdExcavEnabled}
@@ -2057,9 +2006,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                   <div className="space-y-3 animate-in fade-in">
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <label className="block text-xs font-bold text-slate-500 mb-1">
-                          {t("struct.fd.depth", { defaultValue: "Prof. hors-gel (m)" })}
-                        </label>
+                        <label className="block text-xs font-bold text-slate-500 mb-1">{tr("struct.fd.depth")}</label>
                         <input
                           type="number"
                           value={fdDepth}
@@ -2068,9 +2015,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-bold text-slate-500 mb-1">
-                          {t("struct.fd.margin", { defaultValue: "Marge travail (m)" })}
-                        </label>
+                        <label className="block text-xs font-bold text-slate-500 mb-1">{tr("struct.fd.margin")}</label>
                         <input
                           type="number"
                           value={fdTrenchMargin}
@@ -2081,9 +2026,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                     </div>
 
                     <div>
-                      <label className="block text-xs font-bold text-slate-500 mb-1">
-                        {t("struct.fd.soil_type", { defaultValue: "Nature du sol" })}
-                      </label>
+                      <label className="block text-xs font-bold text-slate-500 mb-1">{tr("struct.fd.soil_type")}</label>
                       <select
                         value={fdSoilId}
                         onChange={(e) => setFdSoilId(e.target.value)}
@@ -2104,9 +2047,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                         onChange={(e) => setFdEvac(e.target.checked)}
                         className="rounded text-blue-600"
                       />
-                      <span className="text-sm text-slate-600">
-                        {t("struct.fd.evac", { defaultValue: "Évacuation des terres (foisonné)" })}
-                      </span>
+                      <span className="text-sm text-slate-600">{tr("struct.fd.evac")}</span>
                     </label>
                   </div>
                 )}
@@ -2118,14 +2059,14 @@ export const StructuralCalculator: React.FC<Props> = ({
                   className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold"
                   type="button"
                 >
-                  {t("common.back", { defaultValue: "Retour" })}
+                  {tr("common.back")}
                 </button>
                 <button
                   onClick={() => setStep(3)}
                   className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold"
                   type="button"
                 >
-                  {t("common.next", { defaultValue: "Suivant" })}
+                  {tr("common.next")}
                 </button>
               </div>
             </div>
@@ -2136,18 +2077,18 @@ export const StructuralCalculator: React.FC<Props> = ({
             <div className="space-y-4">
               <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
                 <Combine size={16} className="mr-2 shrink-0 mt-0.5" />
-                {t("struct.fd.step3.hint", { defaultValue: "Dimensionnement du béton et des armatures." })}
+                {tr("struct.fd.step3.hint")}
               </div>
 
               {fdHasStrip && (
                 <div className="bg-white p-3 rounded-xl border border-slate-200">
                   <h4 className="text-xs font-bold text-slate-500 uppercase mb-3 flex items-center">
-                    <Ruler size={14} className="mr-1" /> {t("struct.fd.strip", { defaultValue: "Semelles filantes" })}
+                    <Ruler size={14} className="mr-1" /> {tr("struct.fd.strip")}
                   </h4>
 
                   <div className="grid grid-cols-3 gap-2 mb-3">
                     <div>
-                      <label className="block text-[10px] text-slate-400">{t("struct.common.length_m_short", { defaultValue: "Long. (m)" })}</label>
+                      <label className="block text-[10px] text-slate-400">{tr("struct.common.length_m_short")}</label>
                       <input
                         type="number"
                         value={fdStripL}
@@ -2156,7 +2097,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                       />
                     </div>
                     <div>
-                      <label className="block text-[10px] text-slate-400">{t("struct.common.width_m_short", { defaultValue: "Larg. (m)" })}</label>
+                      <label className="block text-[10px] text-slate-400">{tr("struct.common.width_m_short")}</label>
                       <input
                         type="number"
                         value={fdStripW}
@@ -2165,7 +2106,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                       />
                     </div>
                     <div>
-                      <label className="block text-[10px] text-slate-400">{t("struct.common.height_m_short", { defaultValue: "Haut. (m)" })}</label>
+                      <label className="block text-[10px] text-slate-400">{tr("struct.common.height_m_short")}</label>
                       <input
                         type="number"
                         value={fdStripH}
@@ -2176,14 +2117,14 @@ export const StructuralCalculator: React.FC<Props> = ({
                   </div>
 
                   <div className="flex justify-between items-center bg-slate-50 p-2 rounded">
-                    <span className="text-xs font-bold text-slate-600">{t("struct.fd.rebar", { defaultValue: "Armatures" })}</span>
+                    <span className="text-xs font-bold text-slate-600">{tr("struct.fd.rebar")}</span>
                     <select
                       value={fdRebarStripType}
                       onChange={(e) => setFdRebarStripType(e.target.value)}
                       className="text-xs p-1 border border-slate-300 rounded bg-white text-slate-900"
                     >
-                      <option value="S35">{t("struct.fd.rebar_s35", { defaultValue: "S35 (6 fils)" })}</option>
-                      <option value="S15">{t("struct.fd.rebar_s15", { defaultValue: "S15 (4 fils)" })}</option>
+                      <option value="S35">{tr("struct.fd.rebar_s35")}</option>
+                      <option value="S15">{tr("struct.fd.rebar_s15")}</option>
                     </select>
                   </div>
                 </div>
@@ -2193,10 +2134,10 @@ export const StructuralCalculator: React.FC<Props> = ({
                 <div className="bg-white p-3 rounded-xl border border-slate-200">
                   <div className="flex justify-between items-center mb-2">
                     <h4 className="text-xs font-bold text-slate-500 uppercase flex items-center">
-                      <BoxSelect size={14} className="mr-1" /> {t("struct.fd.pads", { defaultValue: "Plots isolés" })}
+                      <BoxSelect size={14} className="mr-1" /> {tr("struct.fd.pads")}
                     </h4>
                     <button onClick={addPad} className="text-xs text-blue-600 font-bold" type="button">
-                      + {t("common.add", { defaultValue: "Ajouter" })}
+                      + {tr("common.add")}
                     </button>
                   </div>
 
@@ -2207,7 +2148,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                         value={p.count}
                         onChange={(e) => updatePad(p.id, "count", Number(e.target.value))}
                         className="w-10 p-1 border border-slate-300 rounded text-center bg-white text-slate-900"
-                        title={t("struct.common.qty", { defaultValue: "Qté" })}
+                        title={tr("struct.common.qty")}
                       />
 
                       <select
@@ -2215,8 +2156,8 @@ export const StructuralCalculator: React.FC<Props> = ({
                         onChange={(e) => updatePad(p.id, "type", e.target.value)}
                         className="w-16 p-1 border border-slate-300 rounded bg-white text-slate-900"
                       >
-                        <option value="rect">{t("struct.fd.pad_rect", { defaultValue: "Rect" })}</option>
-                        <option value="cyl">{t("struct.fd.pad_cyl", { defaultValue: "Rond" })}</option>
+                        <option value="rect">{tr("struct.fd.pad_rect")}</option>
+                        <option value="cyl">{tr("struct.fd.pad_cyl")}</option>
                       </select>
 
                       {p.type === "rect" ? (
@@ -2226,7 +2167,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                             value={p.width}
                             onChange={(e) => updatePad(p.id, "width", Number(e.target.value))}
                             className="w-12 p-1 border border-slate-300 rounded bg-white text-slate-900"
-                            placeholder={t("struct.common.w", { defaultValue: "l" })}
+                            placeholder={tr("struct.common.w")}
                           />
                           <span>×</span>
                           <input
@@ -2234,7 +2175,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                             value={p.length}
                             onChange={(e) => updatePad(p.id, "length", Number(e.target.value))}
                             className="w-12 p-1 border border-slate-300 rounded bg-white text-slate-900"
-                            placeholder={t("struct.common.l", { defaultValue: "L" })}
+                            placeholder={tr("struct.common.l")}
                           />
                         </>
                       ) : (
@@ -2243,7 +2184,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                           value={p.diameter || 0}
                           onChange={(e) => updatePad(p.id, "diameter", Number(e.target.value))}
                           className="w-20 p-1 border border-slate-300 rounded bg-white text-slate-900"
-                          placeholder={t("struct.fd.diameter", { defaultValue: "Diam" })}
+                          placeholder={tr("struct.fd.diameter")}
                         />
                       )}
 
@@ -2252,7 +2193,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                         value={p.height}
                         onChange={(e) => updatePad(p.id, "height", Number(e.target.value))}
                         className="w-12 p-1 border border-slate-300 rounded bg-white text-slate-900"
-                        placeholder={t("struct.common.h", { defaultValue: "H" })}
+                        placeholder={tr("struct.common.h")}
                       />
 
                       <button onClick={() => removePad(p.id)} className="text-red-400" type="button">
@@ -2261,21 +2202,19 @@ export const StructuralCalculator: React.FC<Props> = ({
                     </div>
                   ))}
 
-                  {fdPads.length === 0 && (
-                    <p className="text-xs text-slate-400 italic">{t("struct.fd.no_pads", { defaultValue: "Aucun plot." })}</p>
-                  )}
+                  {fdPads.length === 0 && <p className="text-xs text-slate-400 italic">{tr("struct.fd.no_pads")}</p>}
                 </div>
               )}
 
               {fdHasRaft && (
                 <div className="bg-white p-3 rounded-xl border border-slate-200">
                   <h4 className="text-xs font-bold text-slate-500 uppercase mb-3 flex items-center">
-                    <Square size={14} className="mr-1" /> {t("struct.fd.raft", { defaultValue: "Radier" })}
+                    <Square size={14} className="mr-1" /> {tr("struct.fd.raft")}
                   </h4>
 
                   <div className="flex gap-4">
                     <div>
-                      <label className="block text-[10px] text-slate-400">{t("struct.fd.thickness_m", { defaultValue: "Épaisseur (m)" })}</label>
+                      <label className="block text-[10px] text-slate-400">{tr("struct.fd.thickness_m")}</label>
                       <input
                         type="number"
                         value={fdRaftThick}
@@ -2285,15 +2224,15 @@ export const StructuralCalculator: React.FC<Props> = ({
                     </div>
 
                     <div className="flex-1">
-                      <label className="block text-[10px] text-slate-400">{t("struct.fd.mesh", { defaultValue: "Treillis" })}</label>
+                      <label className="block text-[10px] text-slate-400">{tr("struct.fd.mesh")}</label>
                       <select
                         value={fdRebarRaftType}
                         onChange={(e) => setFdRebarRaftType(e.target.value)}
                         className="w-full p-1.5 border border-slate-300 rounded text-sm bg-white text-slate-900"
                       >
-                        <option value="ST25C">{t("struct.fd.mesh_st25", { defaultValue: "ST25C (Standard)" })}</option>
-                        <option value="ST10">{t("struct.fd.mesh_st10", { defaultValue: "ST10 (Léger)" })}</option>
-                        <option value="ST40C">{t("struct.fd.mesh_st40", { defaultValue: "ST40C (Lourd)" })}</option>
+                        <option value="ST25C">{tr("struct.fd.mesh_st25")}</option>
+                        <option value="ST10">{tr("struct.fd.mesh_st10")}</option>
+                        <option value="ST40C">{tr("struct.fd.mesh_st40")}</option>
                       </select>
                     </div>
                   </div>
@@ -2301,7 +2240,7 @@ export const StructuralCalculator: React.FC<Props> = ({
               )}
 
               <div className="bg-slate-50 p-3 rounded-lg flex items-center justify-between border border-slate-200">
-                <span className="text-sm font-medium text-slate-700">{t("struct.fd.clean_concrete", { defaultValue: "Béton de propreté (5cm)" })}</span>
+                <span className="text-sm font-medium text-slate-700">{tr("struct.fd.clean_concrete")}</span>
                 <input
                   type="checkbox"
                   checked={fdCleanConcrete}
@@ -2312,10 +2251,10 @@ export const StructuralCalculator: React.FC<Props> = ({
 
               <div className="flex gap-3">
                 <button onClick={() => setStep(2)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold" type="button">
-                  {t("common.back", { defaultValue: "Retour" })}
+                  {tr("common.back")}
                 </button>
                 <button onClick={() => setStep(4)} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold" type="button">
-                  {t("common.next", { defaultValue: "Suivant" })}
+                  {tr("common.next")}
                 </button>
               </div>
             </div>
@@ -2326,30 +2265,30 @@ export const StructuralCalculator: React.FC<Props> = ({
             <div className="space-y-4">
               <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
                 <Layers size={16} className="mr-2 shrink-0 mt-0.5" />
-                {t("struct.fd.step4.hint", { defaultValue: "Coffrage et protection." })}
+                {tr("struct.fd.step4.hint")}
               </div>
 
               <div className="space-y-2">
                 <label className="flex items-center justify-between p-3 bg-white border rounded-lg cursor-pointer">
                   <div>
-                    <span className="font-bold text-sm block">{t("struct.fd.formwork", { defaultValue: "Coffrage" })}</span>
-                    <span className="text-xs text-slate-400">{t("struct.fd.formwork_hint", { defaultValue: "Si fouilles non-pleine terre" })}</span>
+                    <span className="font-bold text-sm block">{tr("struct.fd.formwork")}</span>
+                    <span className="text-xs text-slate-400">{tr("struct.fd.formwork_hint")}</span>
                   </div>
                   <input type="checkbox" checked={fdFormwork} onChange={(e) => setFdFormwork(e.target.checked)} className="h-5 w-5 text-blue-600 rounded" />
                 </label>
 
                 <label className="flex items-center justify-between p-3 bg-white border rounded-lg cursor-pointer">
                   <div>
-                    <span className="font-bold text-sm block">{t("struct.fd.drain", { defaultValue: "Drain périphérique" })}</span>
-                    <span className="text-xs text-slate-400">{t("struct.fd.drain_hint", { defaultValue: "Drain + gravier + géo" })}</span>
+                    <span className="font-bold text-sm block">{tr("struct.fd.drain")}</span>
+                    <span className="text-xs text-slate-400">{tr("struct.fd.drain_hint")}</span>
                   </div>
                   <input type="checkbox" checked={fdDrain} onChange={(e) => setFdDrain(e.target.checked)} className="h-5 w-5 text-blue-600 rounded" />
                 </label>
 
                 <label className="flex items-center justify-between p-3 bg-white border rounded-lg cursor-pointer">
                   <div>
-                    <span className="font-bold text-sm block">{t("struct.fd.polyane", { defaultValue: "Polyane" })}</span>
-                    <span className="text-xs text-slate-400">{t("struct.fd.polyane_hint", { defaultValue: "Sous radier/dallage" })}</span>
+                    <span className="font-bold text-sm block">{tr("struct.fd.polyane")}</span>
+                    <span className="text-xs text-slate-400">{tr("struct.fd.polyane_hint")}</span>
                   </div>
                   <input type="checkbox" checked={fdPolyane} onChange={(e) => setFdPolyane(e.target.checked)} className="h-5 w-5 text-blue-600 rounded" />
                 </label>
@@ -2357,10 +2296,10 @@ export const StructuralCalculator: React.FC<Props> = ({
 
               <div className="flex gap-3">
                 <button onClick={() => setStep(3)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold" type="button">
-                  {t("common.back", { defaultValue: "Retour" })}
+                  {tr("common.back")}
                 </button>
                 <button onClick={() => setStep(5)} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold" type="button">
-                  {t("common.next", { defaultValue: "Suivant" })}
+                  {tr("common.next")}
                 </button>
               </div>
             </div>
@@ -2371,21 +2310,21 @@ export const StructuralCalculator: React.FC<Props> = ({
             <div className="space-y-4">
               <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
                 <Euro size={16} className="mr-2 shrink-0 mt-0.5" />
-                {t("struct.fd.step5.hint", { defaultValue: "Récapitulatif des prix unitaires." })}
+                {tr("struct.fd.step5.hint")}
               </div>
 
               <div className="bg-white p-3 rounded-xl border border-slate-200">
                 <div className="flex justify-between items-center mb-3">
-                  <h4 className="text-xs font-bold text-slate-500 uppercase">{t("struct.common.materials_services", { defaultValue: "Matériaux & prestations" })}</h4>
+                  <h4 className="text-xs font-bold text-slate-500 uppercase">{tr("struct.common.materials_services")}</h4>
                   <button onClick={() => setProMode(!proMode)} className="text-xs flex items-center text-blue-600" type="button">
                     <Settings size={12} className="mr-1" />{" "}
-                    {proMode ? t("struct.common.pro_mode", { defaultValue: "Mode Pro" }) : t("struct.common.simple_mode", { defaultValue: "Mode Simple" })}
+                    {proMode ? tr("struct.common.pro_mode") : tr("struct.common.simple_mode")}
                   </button>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-[10px] text-slate-500 mb-1">{t("struct.fd.price_concrete", { defaultValue: "Béton BPE (€/m³)" })}</label>
+                    <label className="block text-[10px] text-slate-500 mb-1">{tr("struct.fd.price_concrete")}</label>
                     <input
                       type="number"
                       value={fdPrices.concrete}
@@ -2395,7 +2334,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                   </div>
 
                   <div>
-                    <label className="block text-[10px] text-slate-500 mb-1">{t("struct.fd.price_rebar", { defaultValue: "Ferraillage (€/u)" })}</label>
+                    <label className="block text-[10px] text-slate-500 mb-1">{tr("struct.fd.price_rebar")}</label>
                     <input
                       type="number"
                       value={fdPrices.rebarCage}
@@ -2406,7 +2345,7 @@ export const StructuralCalculator: React.FC<Props> = ({
 
                   {fdExcavEnabled && (
                     <div>
-                      <label className="block text-[10px] text-slate-500 mb-1">{t("struct.fd.price_excav", { defaultValue: "Fouilles (€/m³)" })}</label>
+                      <label className="block text-[10px] text-slate-500 mb-1">{tr("struct.fd.price_excav")}</label>
                       <input
                         type="number"
                         value={fdPrices.excavation}
@@ -2418,7 +2357,7 @@ export const StructuralCalculator: React.FC<Props> = ({
 
                   {fdFormwork && (
                     <div>
-                      <label className="block text-[10px] text-slate-500 mb-1">{t("struct.fd.price_formwork", { defaultValue: "Coffrage (€/m²)" })}</label>
+                      <label className="block text-[10px] text-slate-500 mb-1">{tr("struct.fd.price_formwork")}</label>
                       <input
                         type="number"
                         value={fdPrices.formwork}
@@ -2432,7 +2371,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                 {proMode && (
                   <div className="mt-4 pt-3 border-t border-slate-100 grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-[10px] text-blue-600 font-bold mb-1">{t("struct.fd.price_labor_conc", { defaultValue: "MO béton (€/m³)" })}</label>
+                      <label className="block text-[10px] text-blue-600 font-bold mb-1">{tr("struct.fd.price_labor_conc")}</label>
                       <input
                         type="number"
                         value={fdPrices.laborM3}
@@ -2443,7 +2382,7 @@ export const StructuralCalculator: React.FC<Props> = ({
 
                     {fdFormwork && (
                       <div>
-                        <label className="block text-[10px] text-blue-600 font-bold mb-1">{t("struct.fd.price_labor_form", { defaultValue: "MO coffrage (€/m²)" })}</label>
+                        <label className="block text-[10px] text-blue-600 font-bold mb-1">{tr("struct.fd.price_labor_form")}</label>
                         <input
                           type="number"
                           value={fdPrices.laborForm}
@@ -2458,10 +2397,10 @@ export const StructuralCalculator: React.FC<Props> = ({
 
               <div className="flex gap-3 pt-4">
                 <button onClick={() => setStep(4)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold" type="button">
-                  {t("common.back", { defaultValue: "Retour" })}
+                  {tr("common.back")}
                 </button>
                 <button disabled className="flex-1 py-3 bg-emerald-100 text-emerald-700 rounded-xl font-bold flex justify-center items-center" type="button">
-                  <Check size={18} className="mr-2" /> {t("struct.common.calculated", { defaultValue: "Calculé" })}
+                  <Check size={18} className="mr-2" /> {tr("struct.common.calculated")}
                 </button>
               </div>
             </div>
@@ -2482,12 +2421,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                 }`}
                 type="button"
               >
-                {s === 1 && t("struct.w.steps.1", { defaultValue: "1. Plan" })}
-                {s === 2 && t("struct.w.steps.2", { defaultValue: "2. Matériau" })}
-                {s === 3 && t("struct.w.steps.3", { defaultValue: "3. Ouv." })}
-                {s === 4 && t("struct.w.steps.4", { defaultValue: "4. Struct." })}
-                {s === 5 && t("struct.w.steps.5", { defaultValue: "5. Finition" })}
-                {s === 6 && t("struct.w.steps.6", { defaultValue: "6. Devis" })}
+                {tr(`struct.w.steps.${s}`)}
               </button>
             ))}
           </div>
@@ -2497,7 +2431,7 @@ export const StructuralCalculator: React.FC<Props> = ({
             <div className="space-y-4">
               <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
                 <Ruler size={16} className="mr-2 shrink-0 mt-0.5" />
-                {t("struct.w.step1.hint", { defaultValue: "Dimensions des murs." })}
+                {tr("struct.w.step1.hint")}
               </div>
 
               <div className="flex bg-slate-100 p-1 rounded-lg">
@@ -2506,21 +2440,21 @@ export const StructuralCalculator: React.FC<Props> = ({
                   className={`flex-1 py-1.5 text-xs font-bold rounded ${wInputMode === "global" ? "bg-white shadow" : "text-slate-500"}`}
                   type="button"
                 >
-                  {t("struct.w.mode_global", { defaultValue: "Global" })}
+                  {tr("struct.w.mode_global")}
                 </button>
                 <button
                   onClick={() => setWInputMode("segments")}
                   className={`flex-1 py-1.5 text-xs font-bold rounded ${wInputMode === "segments" ? "bg-white shadow" : "text-slate-500"}`}
                   type="button"
                 >
-                  {t("struct.w.mode_segments", { defaultValue: "Segments" })}
+                  {tr("struct.w.mode_segments")}
                 </button>
               </div>
 
               {wInputMode === "global" ? (
                 <div className="grid grid-cols-2 gap-4">
                   <div className="col-span-2">
-                    <label className="block text-xs font-bold text-slate-500 mb-1">{t("struct.w.perimeter_total", { defaultValue: "Périmètre total (m)" })}</label>
+                    <label className="block text-xs font-bold text-slate-500 mb-1">{tr("struct.w.perimeter_total")}</label>
                     <input
                       type="number"
                       value={wPerimeter}
@@ -2529,7 +2463,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-slate-500 mb-1">{t("struct.w.height", { defaultValue: "Hauteur (m)" })}</label>
+                    <label className="block text-xs font-bold text-slate-500 mb-1">{tr("struct.w.height")}</label>
                     <input
                       type="number"
                       value={wHeight}
@@ -2539,7 +2473,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                   </div>
 
                   <div className="col-span-2">
-                    <label className="block text-xs font-bold text-slate-500 mb-1">{t("struct.w.waste_pct", { defaultValue: "Pertes (%, casse / chutes)" })}</label>
+                    <label className="block text-xs font-bold text-slate-500 mb-1">{tr("struct.w.waste_pct")}</label>
                     <input
                       type="number"
                       value={wWastePct}
@@ -2550,8 +2484,8 @@ export const StructuralCalculator: React.FC<Props> = ({
 
                   <label className="flex items-center justify-between col-span-2 p-3 bg-white border rounded-lg cursor-pointer">
                     <div>
-                      <div className="font-bold text-sm text-slate-700">{t("struct.w.gables", { defaultValue: "Pignons" })}</div>
-                      <div className="text-xs text-slate-400">{t("struct.w.gables_hint", { defaultValue: "Ajouter surface triangulaire" })}</div>
+                      <div className="font-bold text-sm text-slate-700">{tr("struct.w.gables")}</div>
+                      <div className="text-xs text-slate-400">{tr("struct.w.gables_hint")}</div>
                     </div>
                     <input type="checkbox" checked={wGables} onChange={(e) => setWGables(e.target.checked)} className="h-5 w-5 text-blue-600 rounded" />
                   </label>
@@ -2559,7 +2493,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                   {wGables && (
                     <div className="col-span-2 grid grid-cols-2 gap-3">
                       <div>
-                        <label className="block text-xs font-bold text-slate-500 mb-1">{t("struct.w.gable_h", { defaultValue: "Hauteur pignon (m)" })}</label>
+                        <label className="block text-xs font-bold text-slate-500 mb-1">{tr("struct.w.gable_h")}</label>
                         <input
                           type="number"
                           value={wGableHeight}
@@ -2568,7 +2502,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-bold text-slate-500 mb-1">{t("struct.w.gable_count", { defaultValue: "Nombre" })}</label>
+                        <label className="block text-xs font-bold text-slate-500 mb-1">{tr("struct.w.gable_count")}</label>
                         <input
                           type="number"
                           value={wGableCount}
@@ -2599,21 +2533,21 @@ export const StructuralCalculator: React.FC<Props> = ({
                   <div className="bg-slate-50 p-2 rounded border border-blue-100 flex gap-2 items-center">
                     <input
                       type="text"
-                      placeholder={t("struct.w.seg_name", { defaultValue: "Nom" })}
+                      placeholder={tr("struct.w.seg_name")}
                       value={newSegLabel}
                       onChange={(e) => setNewSegLabel(e.target.value)}
                       className="flex-1 p-1.5 text-xs border border-slate-300 rounded bg-white text-slate-900"
                     />
                     <input
                       type="number"
-                      placeholder={t("struct.common.L", { defaultValue: "L" })}
+                      placeholder={tr("struct.common.L")}
                       value={newSegL}
                       onChange={(e) => setNewSegL(e.target.value)}
                       className="w-16 p-1.5 text-xs border border-slate-300 rounded bg-white text-slate-900"
                     />
                     <input
                       type="number"
-                      placeholder={t("struct.common.H", { defaultValue: "H" })}
+                      placeholder={tr("struct.common.H")}
                       value={newSegH}
                       onChange={(e) => setNewSegH(e.target.value)}
                       className="w-16 p-1.5 text-xs border border-slate-300 rounded bg-white text-slate-900"
@@ -2624,7 +2558,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                   </div>
 
                   <div className="bg-white border border-slate-200 rounded-xl p-3">
-                    <label className="block text-xs font-bold text-slate-500 mb-1">{t("struct.w.waste_pct", { defaultValue: "Pertes (%, casse / chutes)" })}</label>
+                    <label className="block text-xs font-bold text-slate-500 mb-1">{tr("struct.w.waste_pct")}</label>
                     <input
                       type="number"
                       value={wWastePct}
@@ -2640,7 +2574,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                 className="w-full py-3 bg-blue-600 text-white rounded-xl font-bold flex justify-center items-center mt-2"
                 type="button"
               >
-                {t("common.next", { defaultValue: "Suivant" })} <ArrowRight size={18} className="ml-2" />
+                {tr("common.next")} <ArrowRight size={18} className="ml-2" />
               </button>
             </div>
           )}
@@ -2650,7 +2584,7 @@ export const StructuralCalculator: React.FC<Props> = ({
             <div className="space-y-4">
               <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
                 <BrickWall size={16} className="mr-2 shrink-0 mt-0.5" />
-                {t("struct.w.step2.hint", { defaultValue: "Choix du matériau." })}
+                {tr("struct.w.step2.hint")}
               </div>
 
               <div className="grid grid-cols-2 gap-2">
@@ -2663,16 +2597,16 @@ export const StructuralCalculator: React.FC<Props> = ({
                       wWallFamily === fam ? "bg-stone-100 border-stone-500 text-stone-800 ring-1 ring-stone-500" : "bg-white text-slate-500"
                     }`}
                   >
-                    {fam === "parpaing" && t("struct.w.family.parpaing", { defaultValue: "Parpaing" })}
-                    {fam === "brique" && t("struct.w.family.brique", { defaultValue: "Brique" })}
-                    {fam === "cellulaire" && t("struct.w.family.cellulaire", { defaultValue: "Béton cellulaire" })}
-                    {fam === "stepoc" && t("struct.w.family.stepoc", { defaultValue: "Bloc à bancher" })}
+                    {fam === "parpaing" && tr("struct.w.family.parpaing")}
+                    {fam === "brique" && tr("struct.w.family.brique")}
+                    {fam === "cellulaire" && tr("struct.w.family.cellulaire")}
+                    {fam === "stepoc" && tr("struct.w.family.stepoc")}
                   </button>
                 ))}
               </div>
 
               <div className="bg-white p-3 rounded border">
-                <label className="block text-xs font-bold text-slate-500 mb-1">{t("struct.w.block_format", { defaultValue: "Format / épaisseur" })}</label>
+                <label className="block text-xs font-bold text-slate-500 mb-1">{tr("struct.w.block_format")}</label>
 
                 <select
                   className="w-full p-3 rounded-lg border border-slate-300 bg-white text-slate-900 font-bold"
@@ -2695,10 +2629,10 @@ export const StructuralCalculator: React.FC<Props> = ({
 
               <div className="flex gap-3">
                 <button onClick={() => setStep(1)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold" type="button">
-                  {t("common.back", { defaultValue: "Retour" })}
+                  {tr("common.back")}
                 </button>
                 <button onClick={() => setStep(3)} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold" type="button">
-                  {t("common.next", { defaultValue: "Suivant" })}
+                  {tr("common.next")}
                 </button>
               </div>
             </div>
@@ -2709,7 +2643,7 @@ export const StructuralCalculator: React.FC<Props> = ({
             <div className="space-y-4">
               <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
                 <LayoutTemplate size={16} className="mr-2 shrink-0 mt-0.5" />
-                {t("struct.w.step3.hint", { defaultValue: "Ouvertures." })}
+                {tr("struct.w.step3.hint")}
               </div>
 
               <div className="space-y-2">
@@ -2718,7 +2652,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                     <div>
                       <span className="font-bold text-sm block">{op.label || op.type}</span>
                       <span className="text-xs text-slate-500">
-                        {op.width}×{op.height}m ({t("struct.w.reveal", { defaultValue: "Tab" })}: {op.revealDepth}cm)
+                        {op.width}×{op.height}m ({tr("struct.w.reveal")}: {op.revealDepth}cm)
                       </span>
                     </div>
                     <button onClick={() => removeWallOpening(op.id)} className="text-red-400 p-2" type="button">
@@ -2728,7 +2662,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                 ))}
 
                 {wOpenings.length === 0 && (
-                  <div className="text-center text-xs text-slate-400 py-4 italic">{t("struct.w.no_openings", { defaultValue: "Aucune ouverture." })}</div>
+                  <div className="text-center text-xs text-slate-400 py-4 italic">{tr("struct.w.no_openings")}</div>
                 )}
               </div>
 
@@ -2739,31 +2673,31 @@ export const StructuralCalculator: React.FC<Props> = ({
                     onChange={(e) => setNewWOpType(e.target.value as any)}
                     className="flex-1 p-1.5 text-xs border border-slate-300 rounded bg-white text-slate-900"
                   >
-                    <option value="window">{t("struct.opening.window", { defaultValue: "Fenêtre" })}</option>
-                    <option value="door">{t("struct.opening.door", { defaultValue: "Porte" })}</option>
-                    <option value="bay">{t("struct.opening.bay", { defaultValue: "Baie vitrée" })}</option>
-                    <option value="garage">{t("struct.opening.garage", { defaultValue: "Garage" })}</option>
+                    <option value="window">{tr("struct.opening.window")}</option>
+                    <option value="door">{tr("struct.opening.door")}</option>
+                    <option value="bay">{tr("struct.opening.bay")}</option>
+                    <option value="garage">{tr("struct.opening.garage")}</option>
                   </select>
                 </div>
 
                 <div className="grid grid-cols-3 gap-2 mb-2">
                   <input
                     type="number"
-                    placeholder={t("struct.common.width", { defaultValue: "Larg" })}
+                    placeholder={tr("struct.common.width")}
                     value={newWOpW}
                     onChange={(e) => setNewWOpW(e.target.value)}
                     className="p-1.5 text-xs border border-slate-300 rounded bg-white text-slate-900"
                   />
                   <input
                     type="number"
-                    placeholder={t("struct.common.height", { defaultValue: "Haut" })}
+                    placeholder={tr("struct.common.height")}
                     value={newWOpH}
                     onChange={(e) => setNewWOpH(e.target.value)}
                     className="p-1.5 text-xs border border-slate-300 rounded bg-white text-slate-900"
                   />
                   <input
                     type="number"
-                    placeholder={t("struct.w.reveal_cm", { defaultValue: "Tab (cm)" })}
+                    placeholder={tr("struct.w.reveal_cm")}
                     value={newWOpReveal}
                     onChange={(e) => setNewWOpReveal(e.target.value)}
                     className="p-1.5 text-xs border border-slate-300 rounded bg-white text-slate-900"
@@ -2775,16 +2709,16 @@ export const StructuralCalculator: React.FC<Props> = ({
                   className="w-full py-2 bg-blue-100 text-blue-700 font-bold rounded text-xs flex justify-center items-center"
                   type="button"
                 >
-                  <Plus size={14} className="mr-1" /> {t("struct.w.add_opening", { defaultValue: "Ajouter ouverture" })}
+                  <Plus size={14} className="mr-1" /> {tr("struct.w.add_opening")}
                 </button>
               </div>
 
               <div className="flex gap-3">
                 <button onClick={() => setStep(2)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold" type="button">
-                  {t("common.back", { defaultValue: "Retour" })}
+                  {tr("common.back")}
                 </button>
                 <button onClick={() => setStep(4)} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold" type="button">
-                  {t("common.next", { defaultValue: "Suivant" })}
+                  {tr("common.next")}
                 </button>
               </div>
             </div>
@@ -2795,36 +2729,36 @@ export const StructuralCalculator: React.FC<Props> = ({
             <div className="space-y-4">
               <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
                 <Combine size={16} className="mr-2 shrink-0 mt-0.5" />
-                {t("struct.w.step4.hint", { defaultValue: "Chaînages et linteaux." })}
+                {tr("struct.w.step4.hint")}
               </div>
 
               <div className="space-y-3 bg-white p-3 rounded-lg border border-slate-200">
                 <label className="flex items-center justify-between cursor-pointer">
-                  <span className="text-sm font-bold text-slate-700">{t("struct.w.chain_h", { defaultValue: "Chaînage horizontal" })}</span>
+                  <span className="text-sm font-bold text-slate-700">{tr("struct.w.chain_h")}</span>
                   <input type="checkbox" checked={wChainageHoriz} onChange={(e) => setWChainageHoriz(e.target.checked)} className="h-5 w-5 text-blue-600 rounded" />
                 </label>
 
                 {wChainageHoriz && (
                   <label className="flex items-center justify-between cursor-pointer pl-4 border-l-2 border-slate-100">
-                    <span className="text-xs text-slate-500">{t("struct.w.chain_inter", { defaultValue: "Chaînage intermédiaire" })}</span>
+                    <span className="text-xs text-slate-500">{tr("struct.w.chain_inter")}</span>
                     <input type="checkbox" checked={wChainageInter} onChange={(e) => setWChainageInter(e.target.checked)} className="h-4 w-4 text-blue-600 rounded" />
                   </label>
                 )}
 
                 <div className="border-t pt-2 mt-2">
                   <div className="flex justify-between items-center mb-2">
-                    <span className="text-sm font-bold text-slate-700">{t("struct.w.vert", { defaultValue: "Raidisseurs verticaux" })}</span>
+                    <span className="text-sm font-bold text-slate-700">{tr("struct.w.vert")}</span>
                     <button
                       onClick={autoCalcReinforcements}
                       className="text-[10px] bg-slate-100 px-2 py-1 rounded text-blue-600 font-bold"
                       type="button"
                     >
-                      {t("struct.common.auto", { defaultValue: "Auto" })}
+                      {tr("struct.common.auto")}
                     </button>
                   </div>
 
                   <div className="flex items-center justify-between">
-                    <span className="text-xs text-slate-500">{t("struct.w.vert_total", { defaultValue: "Nombre total" })}</span>
+                    <span className="text-xs text-slate-500">{tr("struct.w.vert_total")}</span>
                     <input
                       type="number"
                       value={wChainageVert}
@@ -2835,24 +2769,24 @@ export const StructuralCalculator: React.FC<Props> = ({
                 </div>
 
                 <div className="border-t pt-3">
-                  <label className="block text-xs font-bold text-slate-500 mb-1">{t("struct.w.lintel_type", { defaultValue: "Type de linteau" })}</label>
+                  <label className="block text-xs font-bold text-slate-500 mb-1">{tr("struct.w.lintel_type")}</label>
                   <select
                     value={wLintelType}
                     onChange={(e) => setWLintelType(e.target.value as any)}
                     className="w-full p-2 border border-slate-300 rounded bg-white text-slate-900 text-sm"
                   >
-                    <option value="precast">{t("struct.w.lintel_precast", { defaultValue: "Préfabriqué" })}</option>
-                    <option value="cast">{t("struct.w.lintel_cast", { defaultValue: "Coffré / coulé" })}</option>
+                    <option value="precast">{tr("struct.w.lintel_precast")}</option>
+                    <option value="cast">{tr("struct.w.lintel_cast")}</option>
                   </select>
                 </div>
               </div>
 
               <div className="flex gap-3">
                 <button onClick={() => setStep(3)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold" type="button">
-                  {t("common.back", { defaultValue: "Retour" })}
+                  {tr("common.back")}
                 </button>
                 <button onClick={() => setStep(5)} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold" type="button">
-                  {t("common.next", { defaultValue: "Suivant" })}
+                  {tr("common.next")}
                 </button>
               </div>
             </div>
@@ -2863,30 +2797,30 @@ export const StructuralCalculator: React.FC<Props> = ({
             <div className="space-y-4">
               <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
                 <PaintRoller size={16} className="mr-2 shrink-0 mt-0.5" />
-                {t("struct.w.step5.hint", { defaultValue: "Finitions." })}
+                {tr("struct.w.step5.hint")}
               </div>
 
               <div className="space-y-2">
                 <label className="flex items-center justify-between p-3 bg-white border rounded-lg cursor-pointer hover:bg-slate-50">
                   <div>
-                    <span className="text-sm font-bold text-slate-700">{t("struct.w.coating_ext", { defaultValue: "Enduit extérieur" })}</span>
-                    <p className="text-[10px] text-slate-400">{t("struct.w.coating_ext_hint", { defaultValue: "Monocouche" })}</p>
+                    <span className="text-sm font-bold text-slate-700">{tr("struct.w.coating_ext")}</span>
+                    <p className="text-[10px] text-slate-400">{tr("struct.w.coating_ext_hint")}</p>
                   </div>
                   <input type="checkbox" checked={wCoatingExt} onChange={(e) => setWCoatingExt(e.target.checked)} className="h-5 w-5 text-blue-600 rounded" />
                 </label>
 
                 <label className="flex items-center justify-between p-3 bg-white border rounded-lg cursor-pointer hover:bg-slate-50">
                   <div>
-                    <span className="text-sm font-bold text-slate-700">{t("struct.w.coating_int", { defaultValue: "Enduit intérieur" })}</span>
-                    <p className="text-[10px] text-slate-400">{t("struct.w.coating_int_hint", { defaultValue: "Plâtre / enduit" })}</p>
+                    <span className="text-sm font-bold text-slate-700">{tr("struct.w.coating_int")}</span>
+                    <p className="text-[10px] text-slate-400">{tr("struct.w.coating_int_hint")}</p>
                   </div>
                   <input type="checkbox" checked={wCoatingInt} onChange={(e) => setWCoatingInt(e.target.checked)} className="h-5 w-5 text-blue-600 rounded" />
                 </label>
 
                 <label className="flex items-center justify-between p-3 bg-white border rounded-lg cursor-pointer hover:bg-slate-50">
                   <div>
-                    <span className="text-sm font-bold text-slate-700">{t("struct.w.scaffold", { defaultValue: "Échafaudage" })}</span>
-                    <p className="text-[10px] text-slate-400">{t("struct.w.scaffold_hint", { defaultValue: "Forfait" })}</p>
+                    <span className="text-sm font-bold text-slate-700">{tr("struct.w.scaffold")}</span>
+                    <p className="text-[10px] text-slate-400">{tr("struct.w.scaffold_hint")}</p>
                   </div>
                   <input type="checkbox" checked={wScaffold} onChange={(e) => setWScaffold(e.target.checked)} className="h-5 w-5 text-blue-600 rounded" />
                 </label>
@@ -2894,10 +2828,10 @@ export const StructuralCalculator: React.FC<Props> = ({
 
               <div className="flex gap-3">
                 <button onClick={() => setStep(4)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold" type="button">
-                  {t("common.back", { defaultValue: "Retour" })}
+                  {tr("common.back")}
                 </button>
                 <button onClick={() => setStep(6)} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold" type="button">
-                  {t("common.next", { defaultValue: "Suivant" })}
+                  {tr("common.next")}
                 </button>
               </div>
             </div>
@@ -2908,23 +2842,22 @@ export const StructuralCalculator: React.FC<Props> = ({
             <div className="space-y-4">
               <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
                 <Euro size={16} className="mr-2 shrink-0 mt-0.5" />
-                {t("struct.w.step6.hint", { defaultValue: "Prix unitaires murs." })}
+                {tr("struct.w.step6.hint")}
               </div>
 
               <div className="bg-white p-3 rounded-xl border border-slate-200">
                 <div className="flex justify-between items-center mb-3">
-                  <h4 className="text-xs font-bold text-slate-500 uppercase">{t("struct.common.materials", { defaultValue: "Matériaux" })}</h4>
+                  <h4 className="text-xs font-bold text-slate-500 uppercase">{tr("struct.common.materials")}</h4>
                   <button onClick={() => setProMode(!proMode)} className="text-xs flex items-center text-blue-600" type="button">
                     <Settings size={12} className="mr-1" />{" "}
-                    {proMode ? t("struct.common.pro_mode", { defaultValue: "Mode Pro" }) : t("struct.common.simple_mode", { defaultValue: "Mode Simple" })}
+                    {proMode ? tr("struct.common.pro_mode") : tr("struct.common.simple_mode")}
                   </button>
                 </div>
 
-                {/* ✅ Prix unité variante (clé dépend de getWallUnitPriceKey) */}
                 <div className="grid grid-cols-2 gap-3">
                   <div className="col-span-2">
                     <label className="block text-[10px] text-slate-500 mb-1">
-                      {t("struct.w.unit_price_variant", { defaultValue: "Prix unité (€/u) — variante sélectionnée" })} — {selectedWallSpec.label}
+                      {tr("struct.w.unit_price_variant")} — {selectedWallSpec.label}
                     </label>
 
                     {(() => {
@@ -2951,11 +2884,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                             onChange={(e) => setUnitOverride(priceKey, parseFloat(e.target.value) || 0)}
                             className="w-full p-1.5 border border-slate-300 rounded text-sm bg-white text-slate-900"
                           />
-                          <p className="text-[11px] text-slate-400 mt-1">
-                            {t("struct.w.unit_price_variant_help", {
-                              defaultValue: "Ce prix est mémorisé pour la variante (famille/épaisseur).",
-                            })}
-                          </p>
+                          <p className="text-[11px] text-slate-400 mt-1">{tr("struct.w.unit_price_variant_help")}</p>
                         </>
                       );
                     })()}
@@ -2963,9 +2892,7 @@ export const StructuralCalculator: React.FC<Props> = ({
 
                   <div>
                     <label className="block text-[10px] text-slate-500 mb-1">
-                      {wallBinderKind === "mortier"
-                        ? t("struct.w.mortar_bag", { defaultValue: "Mortier (€/sac)" })
-                        : t("struct.w.glue_bag", { defaultValue: "Colle (€/sac)" })}
+                      {wallBinderKind === "mortier" ? tr("struct.w.mortar_bag") : tr("struct.w.glue_bag")}
                     </label>
                     <input
                       type="number"
@@ -2979,7 +2906,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                   </div>
 
                   <div>
-                    <label className="block text-[10px] text-slate-500 mb-1">{t("struct.w.lintel_m", { defaultValue: "Linteau (€/m)" })}</label>
+                    <label className="block text-[10px] text-slate-500 mb-1">{tr("struct.w.lintel_m")}</label>
                     <input
                       type="number"
                       value={wPrices.lintelM}
@@ -2990,7 +2917,7 @@ export const StructuralCalculator: React.FC<Props> = ({
 
                   {wCoatingExt && (
                     <div>
-                      <label className="block text-[10px] text-slate-500 mb-1">{t("struct.w.coating_ext_bag", { defaultValue: "Enduit façade (€/sac)" })}</label>
+                      <label className="block text-[10px] text-slate-500 mb-1">{tr("struct.w.coating_ext_bag")}</label>
                       <input
                         type="number"
                         value={wPrices.coatingExtBag}
@@ -3002,7 +2929,7 @@ export const StructuralCalculator: React.FC<Props> = ({
 
                   {wScaffold && (
                     <div>
-                      <label className="block text-[10px] text-slate-500 mb-1">{t("struct.w.scaffold_fixed", { defaultValue: "Échafaudage (forfait)" })}</label>
+                      <label className="block text-[10px] text-slate-500 mb-1">{tr("struct.w.scaffold_fixed")}</label>
                       <input
                         type="number"
                         value={wPrices.scaffoldFixed}
@@ -3016,7 +2943,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                 {proMode && (
                   <div className="mt-4 pt-3 border-t border-slate-100 grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-[10px] text-blue-600 font-bold mb-1">{t("struct.w.labor_m2", { defaultValue: "MO maçonnerie (€/m²)" })}</label>
+                      <label className="block text-[10px] text-blue-600 font-bold mb-1">{tr("struct.w.labor_m2")}</label>
                       <input
                         type="number"
                         value={wPrices.laborM2}
@@ -3030,17 +2957,18 @@ export const StructuralCalculator: React.FC<Props> = ({
 
               <div className="flex gap-3 pt-4">
                 <button onClick={() => setStep(5)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold" type="button">
-                  {t("common.back", { defaultValue: "Retour" })}
+                  {tr("common.back")}
                 </button>
                 <button disabled className="flex-1 py-3 bg-emerald-100 text-emerald-700 rounded-xl font-bold flex justify-center items-center" type="button">
-                  <Check size={18} className="mr-2" /> {t("struct.common.calculated", { defaultValue: "Calculé" })}
+                  <Check size={18} className="mr-2" /> {tr("struct.common.calculated")}
                 </button>
               </div>
             </div>
           )}
         </>
-      )}      </div>
-    );
-  };
+      )}
+    </div>
+  );
+};
 
 export default StructuralCalculator;
