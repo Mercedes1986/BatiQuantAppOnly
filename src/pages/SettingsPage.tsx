@@ -1,20 +1,53 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { User, Shield, HelpCircle, HardDrive, Download, Upload, AlertTriangle, Languages } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { exportAppData, importAppData } from "../services/materialsService";
 import { CompanyProfileForm } from "../components/documents/CompanyProfileForm";
+import { getSettings, saveSettings } from "../services/storage";
 
 type SettingsTab = "app" | "company";
+type Currency = "EUR" | "USD" | "CAD" | "CHF";
+
+const getAppVersion = () => {
+  try {
+    const v = String((import.meta as any)?.env?.VITE_APP_VERSION || "").trim();
+    if (v) return `BatiQuant v${v}`;
+    return (import.meta as any)?.env?.DEV ? "BatiQuant (dev)" : "BatiQuant";
+  } catch {
+    return "BatiQuant";
+  }
+};
+
+const currencyToSymbol = (c: Currency): string => {
+  if (c === "EUR") return "€";
+  if (c === "USD") return "$";
+  if (c === "CAD") return "$";
+  if (c === "CHF") return "CHF";
+  return "€";
+};
 
 export const SettingsPage: React.FC = () => {
   const { t, i18n } = useTranslation();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [activeTab, setActiveTab] = useState<SettingsTab>("app");
-  const [currency, setCurrency] = useState<"EUR" | "USD" | "CAD" | "CHF">("EUR");
+  const [currency, setCurrency] = useState<Currency>("EUR");
   const [isImporting, setIsImporting] = useState(false);
 
-  const versionLabel = useMemo(() => "BatiQuant v1.2.0", []);
+  const versionLabel = useMemo(() => getAppVersion(), []);
+
+  useEffect(() => {
+    try {
+      const s = getSettings();
+      // ton UserSettings actuel stocke currency comme symbole ("€") => on remappe en code
+      const sym = s.currency || "€";
+      const code: Currency =
+        sym === "€" ? "EUR" : sym === "CHF" ? "CHF" : sym === "$" ? "EUR" : "EUR";
+      setCurrency(code);
+    } catch {
+      // ignore
+    }
+  }, []);
 
   const resetFileInput = () => {
     if (fileInputRef.current) fileInputRef.current.value = "";
@@ -96,8 +129,23 @@ export const SettingsPage: React.FC = () => {
   const changeLanguage = async (lng: string) => {
     try {
       await i18n.changeLanguage(lng);
+      try {
+        localStorage.setItem("i18nextLng", lng);
+      } catch {
+        // ignore
+      }
     } catch (e) {
       console.error(e);
+    }
+  };
+
+  const onCurrencyChange = (c: Currency) => {
+    setCurrency(c);
+    try {
+      const current = getSettings();
+      saveSettings({ ...current, currency: currencyToSymbol(c) });
+    } catch {
+      // ignore
     }
   };
 
@@ -200,7 +248,7 @@ export const SettingsPage: React.FC = () => {
                 <span className="text-sm font-medium">{t("settings.app.currency", { defaultValue: "Devise" })}</span>
                 <select
                   value={currency}
-                  onChange={(e) => setCurrency(e.target.value as any)}
+                  onChange={(e) => onCurrencyChange(e.target.value as Currency)}
                   className="bg-slate-50 border-none rounded text-sm text-slate-600 p-1 focus:ring-0"
                 >
                   <option value="EUR">EUR (€)</option>

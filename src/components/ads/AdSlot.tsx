@@ -52,13 +52,14 @@ function ensureAdSenseScriptLoaded(): Promise<void> {
   if (adsenseLoadPromise) return adsenseLoadPromise;
 
   adsenseLoadPromise = new Promise((resolve, reject) => {
+    // ✅ pas de client => on n’essaie même pas
+    if (!AD_CONFIG.PUBLISHER_ID) return resolve();
+
     const existing = findExistingAdSenseScript();
 
-    // ✅ déjà prêt
     if (isAdSenseProbablyReady()) return resolve();
 
     if (existing) {
-      // si déjà marqué loaded
       if ((existing as any)?.dataset?.loaded === "true") return resolve();
 
       const onLoad = () => {
@@ -72,7 +73,6 @@ function ensureAdSenseScriptLoaded(): Promise<void> {
       existing.addEventListener("load", onLoad, { once: true });
       existing.addEventListener("error", onError, { once: true });
 
-      // micro-check
       setTimeout(() => {
         if (isAdSenseProbablyReady()) resolve();
       }, 0);
@@ -80,7 +80,6 @@ function ensureAdSenseScriptLoaded(): Promise<void> {
       return;
     }
 
-    // Fallback : injecter si absent
     const s = document.createElement("script");
     s.id = "adsense-script";
     s.async = true;
@@ -115,7 +114,6 @@ export const AdSlot: React.FC<AdSlotProps> = ({
   const { t } = useTranslation();
   const location = useLocation();
 
-  // ✅ ref stable, large type (évite HTMLModElement / lib.dom)
   const adRef = useRef<HTMLElement | null>(null);
 
   const [shouldRender, setShouldRender] = useState(false);
@@ -134,20 +132,21 @@ export const AdSlot: React.FC<AdSlotProps> = ({
   useEffect(() => {
     const permission = getAdPermission(location.pathname);
 
+    if (!AD_CONFIG.PUBLISHER_ID && !isDev) return setShouldRender(false);
+
     if (permission === "deny") return setShouldRender(false);
     if (permission === "safe_only" && variant !== "safe") return setShouldRender(false);
 
     setShouldRender(true);
-  }, [location.pathname, variant]);
+  }, [location.pathname, variant, isDev]);
 
-  // 2) Consent => mode pub (personalized vs limited)
+  // 2) Consent => mode pub
   useEffect(() => {
     if (!isBrowser()) return;
 
     const update = () => {
       const mode = getAdsMode();
       setAdsMode(mode);
-      // force remount pour re-push proprement si bascule
       setMountNonce((n) => n + 1);
     };
 
@@ -168,11 +167,11 @@ export const AdSlot: React.FC<AdSlotProps> = ({
     if (isDev) return;
     if (!isBrowser()) return;
     if (!shouldRender) return;
+    if (!AD_CONFIG.PUBLISHER_ID) return;
 
     const el = adRef.current;
     if (!el) return;
 
-    // éviter double push sur même instance
     const ds = (el as any).dataset || {};
     if (ds.bqPushed === "true") return;
     ds.bqPushed = "true";
@@ -180,7 +179,6 @@ export const AdSlot: React.FC<AdSlotProps> = ({
 
     let cancelled = false;
 
-    // ✅ définir NPA AVANT tout push
     try {
       window.adsbygoogle = window.adsbygoogle || [];
       window.adsbygoogle.requestNonPersonalizedAds = adsMode === "personalized" ? 0 : 1;
@@ -214,7 +212,7 @@ export const AdSlot: React.FC<AdSlotProps> = ({
     };
   }, [shouldRender, adsMode, slotKey, isDev]);
 
-  if (!isDev && !shouldRender) return null;
+  if (!isDev && (!shouldRender || !AD_CONFIG.PUBLISHER_ID)) return null;
 
   return (
     <div className={`w-full flex flex-col items-center print:hidden ${safeStyles} ${className}`}>

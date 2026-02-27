@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { Lock, ArrowRight, ShieldCheck, AlertTriangle } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -6,19 +6,21 @@ interface Props {
   onUnlock: () => void;
 }
 
-const ACCESS_KEY = "baticalc_tutorial_access";
-const ACCESS_TS_KEY = "baticalc_tutorial_access_ts";
+const ACCESS_KEY = "batiquant_tutorial_access";
+const ACCESS_TS_KEY = "batiquant_tutorial_access_ts";
 const ACCESS_TTL_DAYS = 7;
 
-const isDev = () => {
+const canUseStorage = () => {
   try {
-    return Boolean((import.meta as any)?.env?.DEV);
+    return typeof window !== "undefined" && !!window.localStorage;
   } catch {
     return false;
   }
 };
 
 const hasValidAccessFlag = (): boolean => {
+  if (!canUseStorage()) return false;
+
   try {
     const ok = localStorage.getItem(ACCESS_KEY) === "true";
     if (!ok) return false;
@@ -30,6 +32,15 @@ const hasValidAccessFlag = (): boolean => {
     return Date.now() - ts <= maxAge;
   } catch {
     return false;
+  }
+};
+
+const getConfiguredCode = (): string => {
+  try {
+    const raw = String((import.meta as any)?.env?.VITE_TUTORIAL_CODE || "").trim();
+    return raw.toUpperCase().trim(); // ✅ pas de fallback en dur
+  } catch {
+    return "";
   }
 };
 
@@ -46,14 +57,9 @@ export const TutorialAuth: React.FC<Props> = ({ onUnlock }) => {
   const isLocked = now < lockedUntil;
   const remainingSec = Math.max(0, Math.ceil((lockedUntil - now) / 1000));
 
-  const VALID_CODE = useMemo(() => {
-    const raw = String((import.meta as any)?.env?.VITE_TUTORIAL_CODE || "").trim();
-    // En dev, fallback pratique (optionnel)
-    const effective = raw || (isDev() ? "PRO2024" : "");
-    return effective.toUpperCase().trim();
-  }, []);
+  const VALID_CODE = useMemo(() => getConfiguredCode(), []);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (hasValidAccessFlag()) onUnlock();
   }, [onUnlock]);
 
@@ -63,7 +69,6 @@ export const TutorialAuth: React.FC<Props> = ({ onUnlock }) => {
 
     const normalized = code.toUpperCase().trim();
 
-    // si pas de code configuré en prod => verrou “désactivé” (ou au contraire tu peux refuser tout accès)
     if (!VALID_CODE) {
       setError(
         t("tutorial_auth.not_configured", {
@@ -75,8 +80,10 @@ export const TutorialAuth: React.FC<Props> = ({ onUnlock }) => {
 
     if (normalized === VALID_CODE) {
       try {
-        localStorage.setItem(ACCESS_KEY, "true");
-        localStorage.setItem(ACCESS_TS_KEY, String(Date.now()));
+        if (canUseStorage()) {
+          localStorage.setItem(ACCESS_KEY, "true");
+          localStorage.setItem(ACCESS_TS_KEY, String(Date.now()));
+        }
       } catch {
         // ignore
       }
