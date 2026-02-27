@@ -6,5 +6,3 @@ Disallow: /app/
 Disallow: /app/print/
 Disallow: /login
 Disallow: /api/
-
-Sitemap: https://www.batiquant.fr/sitemap.xml

@@ -223,132 +223,37 @@ export const CONSTRUCTION_STEPS = [
     id: "group_go",
     label: tr("steps.groups.go", "Gros Œuvre"),
     steps: [
-      {
-        id: ConstructionStepId.GROUNDWORK,
-        label: tr("steps.go.groundwork", "Terrassement"),
-        icon: Mountain,
-        calc: CalculatorType.GROUNDWORK,
-      },
-      {
-        id: ConstructionStepId.FOUNDATIONS,
-        label: tr("steps.go.foundations", "Fondations"),
-        icon: Warehouse,
-        calc: CalculatorType.FOUNDATIONS,
-      },
-      {
-        id: ConstructionStepId.BASEMENT,
-        label: tr("steps.go.substructure", "Soubassement"),
-        icon: Component,
-        calc: CalculatorType.SUBSTRUCTURE,
-      },
-      {
-        id: ConstructionStepId.SLAB_GROUND,
-        label: tr("steps.go.slab", "Dalle RDC"),
-        icon: Layers,
-        calc: CalculatorType.CONCRETE,
-      },
-      {
-        id: ConstructionStepId.WALLS,
-        label: tr("steps.go.walls", "Élévation des murs"),
-        icon: BrickWall,
-        calc: CalculatorType.WALLS,
-      },
-      {
-        id: ConstructionStepId.STAIRS,
-        label: tr("steps.go.stairs", "Escalier Béton"),
-        icon: TrendingUp,
-        calc: CalculatorType.STAIRS,
-      },
-      {
-        id: ConstructionStepId.ROOFING,
-        label: tr("steps.go.roofing", "Toiture / Charpente"),
-        icon: Home,
-        calc: CalculatorType.ROOF,
-      },
-      {
-        id: ConstructionStepId.WINDOWS,
-        label: tr("steps.go.windows", "Menuiseries Ext."),
-        icon: BoxSelect,
-        calc: CalculatorType.JOINERY,
-      },
+      { id: ConstructionStepId.GROUNDWORK, label: tr("steps.go.groundwork", "Terrassement"), icon: Mountain, calc: CalculatorType.GROUNDWORK },
+      { id: ConstructionStepId.FOUNDATIONS, label: tr("steps.go.foundations", "Fondations"), icon: Warehouse, calc: CalculatorType.FOUNDATIONS },
+      { id: ConstructionStepId.BASEMENT, label: tr("steps.go.substructure", "Soubassement"), icon: Component, calc: CalculatorType.SUBSTRUCTURE },
+      { id: ConstructionStepId.SLAB_GROUND, label: tr("steps.go.slab", "Dalle RDC"), icon: Layers, calc: CalculatorType.CONCRETE },
+      { id: ConstructionStepId.WALLS, label: tr("steps.go.walls", "Élévation des murs"), icon: BrickWall, calc: CalculatorType.WALLS },
+      { id: ConstructionStepId.STAIRS, label: tr("steps.go.stairs", "Escalier Béton"), icon: TrendingUp, calc: CalculatorType.STAIRS },
+      { id: ConstructionStepId.ROOFING, label: tr("steps.go.roofing", "Toiture / Charpente"), icon: Home, calc: CalculatorType.ROOF },
+      { id: ConstructionStepId.WINDOWS, label: tr("steps.go.windows", "Menuiseries Ext."), icon: BoxSelect, calc: CalculatorType.JOINERY },
     ],
   },
   {
     id: "group_so",
     label: tr("steps.groups.so", "Second Œuvre"),
     steps: [
-      {
-        id: ConstructionStepId.LINING,
-        label: tr("steps.so.lining", "Doublage (Isolation)"),
-        icon: PanelTop,
-        calc: CalculatorType.PLACO,
-      },
-      {
-        id: ConstructionStepId.PARTITIONS,
-        label: tr("steps.so.partitions", "Cloisons"),
-        icon: ArrowRightLeft,
-        calc: CalculatorType.PLACO,
-      },
-      {
-        id: ConstructionStepId.CEILINGS,
-        label: tr("steps.so.ceilings", "Plafonds"),
-        icon: Spline,
-        calc: CalculatorType.PLACO,
-      },
-      {
-        id: ConstructionStepId.ELECTRICITY,
-        label: tr("steps.so.electricity", "Électricité"),
-        icon: Zap,
-        calc: CalculatorType.ELECTRICITY,
-      },
-      {
-        id: ConstructionStepId.PLUMBING,
-        label: tr("steps.so.plumbing", "Plomberie"),
-        icon: Droplets,
-        calc: CalculatorType.PLUMBING,
-      },
-      {
-        id: ConstructionStepId.HVAC,
-        label: tr("steps.so.hvac", "Chauffage / VMC"),
-        icon: Thermometer,
-        calc: CalculatorType.HVAC,
-      },
-      {
-        id: ConstructionStepId.SCREED,
-        label: tr("steps.so.screed", "Chapes / Ravoirage"),
-        icon: Layers,
-        calc: CalculatorType.SCREED,
-      },
+      { id: ConstructionStepId.LINING, label: tr("steps.so.lining", "Doublage (Isolation)"), icon: PanelTop, calc: CalculatorType.PLACO },
+      { id: ConstructionStepId.PARTITIONS, label: tr("steps.so.partitions", "Cloisons"), icon: ArrowRightLeft, calc: CalculatorType.PLACO },
+      { id: ConstructionStepId.CEILINGS, label: tr("steps.so.ceilings", "Plafonds"), icon: Spline, calc: CalculatorType.PLACO },
+      { id: ConstructionStepId.ELECTRICITY, label: tr("steps.so.electricity", "Électricité"), icon: Zap, calc: CalculatorType.ELECTRICITY },
+      { id: ConstructionStepId.PLUMBING, label: tr("steps.so.plumbing", "Plomberie"), icon: Droplets, calc: CalculatorType.PLUMBING },
+      { id: ConstructionStepId.HVAC, label: tr("steps.so.hvac", "Chauffage / VMC"), icon: Thermometer, calc: CalculatorType.HVAC },
+      { id: ConstructionStepId.SCREED, label: tr("steps.so.screed", "Chapes / Ravoirage"), icon: Layers, calc: CalculatorType.SCREED },
     ],
   },
   {
     id: "group_fin",
     label: tr("steps.groups.fin", "Finitions"),
     steps: [
-      {
-        id: ConstructionStepId.FLOORING,
-        label: tr("steps.fin.flooring", "Sols (Carrelage/Parquet)"),
-        icon: Grid3X3,
-        calc: CalculatorType.TILES,
-      },
-      {
-        id: ConstructionStepId.PAINTING,
-        label: tr("steps.fin.painting", "Peinture"),
-        icon: PaintBucket,
-        calc: CalculatorType.PAINT,
-      },
-      {
-        id: ConstructionStepId.FACADE,
-        label: tr("steps.fin.facade", "Façade"),
-        icon: PaintRoller,
-        calc: CalculatorType.FACADE,
-      },
-      {
-        id: ConstructionStepId.EXTERIOR,
-        label: tr("steps.fin.exterior", "Extérieurs"),
-        icon: Fence,
-        calc: CalculatorType.EXTERIOR,
-      },
+      { id: ConstructionStepId.FLOORING, label: tr("steps.fin.flooring", "Sols (Carrelage/Parquet)"), icon: Grid3X3, calc: CalculatorType.TILES },
+      { id: ConstructionStepId.PAINTING, label: tr("steps.fin.painting", "Peinture"), icon: PaintBucket, calc: CalculatorType.PAINT },
+      { id: ConstructionStepId.FACADE, label: tr("steps.fin.facade", "Façade"), icon: PaintRoller, calc: CalculatorType.FACADE },
+      { id: ConstructionStepId.EXTERIOR, label: tr("steps.fin.exterior", "Extérieurs"), icon: Fence, calc: CalculatorType.EXTERIOR },
     ],
   },
 ];
@@ -395,7 +300,11 @@ export const DEFAULT_PRICES: Record<string, number> = {
   INSULATION_M2: 8.0,
   CORNER_BEAD_3M: 6.0,
 
+  // ✅ Treillis (prix au panneau)
+  MESH_PANEL_ST10: 18,
   MESH_PANEL_ST25: 28,
+  MESH_PANEL_ST40: 38,
+
   REBAR_KG: 1.8,
   CHAINAGE_3M: 12,
   REBAR_CAGE_35_15_6M: 28.0,
@@ -525,8 +434,6 @@ export const MATERIAL_METADATA: Record<string, MaterialMetadata> = {
 
   CEMENT_BAG_35KG: { label: tr("materials.CEMENT_BAG_35KG", "Ciment (Sac 35kg)"), category: tr("categories.masonry", "Maçonnerie"), unit: "€/sac" },
   CEMENT_BAG_25KG: { label: tr("materials.CEMENT_BAG_25KG", "Ciment (Sac 25kg)"), category: tr("categories.masonry", "Maçonnerie"), unit: "€/sac" },
-
-  // (Tu peux continuer à migrer progressivement : cette structure est prête.)
 };
 
 /* -------------------------------------------------------
@@ -583,7 +490,6 @@ export const STATIC_TIPS: Record<string, string[]> = {
     tr("tips.concrete.3", "Surélevez le treillis (cales 3-4cm) pour qu'il soit au cœur du béton, pas au sol."),
     tr("tips.concrete.4", "Prévoyez des joints de dilatation tous les 15-20m² pour éviter la casse."),
   ],
-  // (les autres restent identiques : tu peux les migrer au fur et à mesure)
 };
 
 /* -------------------------------------------------------
@@ -696,10 +602,41 @@ export const OPENING_PRESETS = {
   ],
 } as const;
 
+/**
+ * ✅ Treillis:
+ * - coverM2 = surface couverte par 1 panneau
+ * - priceRef = clé de DEFAULT_PRICES (prix/panneau)
+ *
+ * NB: width/height déjà dans tes objets, donc coverM2 = width*height
+ */
 export const MESH_TYPES: (MeshType & { width: number; height: number })[] = [
-  { id: "ST10", label: tr("mesh.ST10", "ST10 (Léger - Terrasse)"), weightKgM2: 1.23, width: 2.4, height: 3.6 },
-  { id: "ST25C", label: tr("mesh.ST25C", "ST25C (Standard - Dalle)"), weightKgM2: 2.58, width: 2.4, height: 3.6 },
-  { id: "ST40C", label: tr("mesh.ST40C", "ST40C (Lourd - Structure)"), weightKgM2: 3.8, width: 2.4, height: 3.6 },
+  {
+    id: "ST10",
+    label: tr("mesh.ST10", "ST10 (Léger - Terrasse)"),
+    weightKgM2: 1.23,
+    width: 2.4,
+    height: 3.6,
+    coverM2: 2.4 * 3.6,
+    priceRef: "MESH_PANEL_ST10",
+  },
+  {
+    id: "ST25C",
+    label: tr("mesh.ST25C", "ST25C (Standard - Dalle)"),
+    weightKgM2: 2.58,
+    width: 2.4,
+    height: 3.6,
+    coverM2: 2.4 * 3.6,
+    priceRef: "MESH_PANEL_ST25",
+  },
+  {
+    id: "ST40C",
+    label: tr("mesh.ST40C", "ST40C (Lourd - Structure)"),
+    weightKgM2: 3.8,
+    width: 2.4,
+    height: 3.6,
+    coverM2: 2.4 * 3.6,
+    priceRef: "MESH_PANEL_ST40",
+  },
 ];
 
 export const REBAR_WEIGHTS: Record<number, number> = {

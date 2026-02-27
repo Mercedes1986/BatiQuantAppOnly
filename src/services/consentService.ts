@@ -1,18 +1,17 @@
 /**
  * Objectif :
- * - Par défaut (aucun choix) : pubs autorisées en "limité / non personnalisées"
+ * - Par défaut : pubs autorisées en "limité / non personnalisées"
  * - Si l'utilisateur accepte : pubs personnalisées + possibilité analytics
  * - Si l'utilisateur refuse : pubs non personnalisées (mais PAS "zéro pub")
  *
  * IMPORTANT :
  * - AdSense : requestNonPersonalizedAds géré dans AdSlot.
  * - GTM : chargé UNIQUEMENT après consentement "accepted".
- * - Consent Mode : on pousse des signaux dans dataLayer pour cohérence.
+ * - Consent Mode : on pousse des signaux dans dataLayer.
  */
 
 const CONSENT_KEY_NEW = "batiquant_consent";
 const CONSENT_KEY_OLD = "baticalc_consent"; // compat
-const DEFAULT_GTM_ID = "GTM-TGMN8KNB";
 
 export type ConsentChoice = "unknown" | "accepted" | "refused";
 
@@ -133,9 +132,10 @@ function writeStoredState(state: ConsentState) {
 
 const getGtmId = (): string => {
   try {
-    return (import.meta as any)?.env?.VITE_GTM_ID || DEFAULT_GTM_ID;
+    const id = (import.meta as any)?.env?.VITE_GTM_ID as string | undefined;
+    return typeof id === "string" ? id.trim() : "";
   } catch {
-    return DEFAULT_GTM_ID;
+    return "";
   }
 };
 
@@ -167,14 +167,12 @@ export const canServePersonalizedAds = (): boolean => {
   );
 };
 
+// limité = toujours possible (tu gères requestNonPersonalizedAds dans AdSlot)
 export const canServeLimitedAds = (): boolean => true;
 
 export const getAdsMode = (): "personalized" | "limited" =>
   canServePersonalizedAds() ? "personalized" : "limited";
 
-/**
- * ✅ Pousse les signaux dans dataLayer (sans dépendre de gtag)
- */
 function pushConsentToDataLayer(state: ConsentState) {
   if (!isBrowser()) return;
 
@@ -192,14 +190,12 @@ function pushConsentToDataLayer(state: ConsentState) {
   } catch {}
 }
 
-/**
- * ✅ Charge GTM uniquement si accepté
- */
 function loadGtmIfAccepted(state: ConsentState) {
   if (!isBrowser()) return;
   if (state.choice !== "accepted") return;
 
   const gtmId = getGtmId();
+  if (!gtmId) return; // ✅ pas d’ID => pas de GTM
 
   try {
     const loader = (window as any).__bqLoadGTM;
@@ -270,9 +266,6 @@ export const resetConsent = () => {
   } catch {}
 };
 
-/**
- * ✅ Ouvre l’UI de consentement (banner ou page settings)
- */
 export const openConsent = () => {
   if (!isBrowser()) return;
   try {

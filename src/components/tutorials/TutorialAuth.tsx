@@ -6,13 +6,39 @@ interface Props {
   onUnlock: () => void;
 }
 
+const ACCESS_KEY = "baticalc_tutorial_access";
+const ACCESS_TS_KEY = "baticalc_tutorial_access_ts";
+const ACCESS_TTL_DAYS = 7;
+
+const isDev = () => {
+  try {
+    return Boolean((import.meta as any)?.env?.DEV);
+  } catch {
+    return false;
+  }
+};
+
+const hasValidAccessFlag = (): boolean => {
+  try {
+    const ok = localStorage.getItem(ACCESS_KEY) === "true";
+    if (!ok) return false;
+
+    const ts = Number(localStorage.getItem(ACCESS_TS_KEY) || "0");
+    if (!ts) return true; // compat ancienne version sans TTL
+
+    const maxAge = ACCESS_TTL_DAYS * 24 * 60 * 60 * 1000;
+    return Date.now() - ts <= maxAge;
+  } catch {
+    return false;
+  }
+};
+
 export const TutorialAuth: React.FC<Props> = ({ onUnlock }) => {
   const { t } = useTranslation();
 
   const [code, setCode] = useState("");
   const [error, setError] = useState<string | null>(null);
 
-  // Anti brute-force basique
   const [attempts, setAttempts] = useState(0);
   const [lockedUntil, setLockedUntil] = useState<number>(0);
 
@@ -20,19 +46,40 @@ export const TutorialAuth: React.FC<Props> = ({ onUnlock }) => {
   const isLocked = now < lockedUntil;
   const remainingSec = Math.max(0, Math.ceil((lockedUntil - now) / 1000));
 
-  // ⚠️ Toujours contournable côté client. Pour du vrai "Pro", il faut une auth serveur.
-  const VALID_CODE = useMemo(
-    () => String(import.meta.env.VITE_TUTORIAL_CODE || "PRO2024").toUpperCase().trim(),
-    []
-  );
+  const VALID_CODE = useMemo(() => {
+    const raw = String((import.meta as any)?.env?.VITE_TUTORIAL_CODE || "").trim();
+    // En dev, fallback pratique (optionnel)
+    const effective = raw || (isDev() ? "PRO2024" : "");
+    return effective.toUpperCase().trim();
+  }, []);
+
+  React.useEffect(() => {
+    if (hasValidAccessFlag()) onUnlock();
+  }, [onUnlock]);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     if (isLocked) return;
 
     const normalized = code.toUpperCase().trim();
+
+    // si pas de code configuré en prod => verrou “désactivé” (ou au contraire tu peux refuser tout accès)
+    if (!VALID_CODE) {
+      setError(
+        t("tutorial_auth.not_configured", {
+          defaultValue: "Accès non configuré. Contactez le support.",
+        })
+      );
+      return;
+    }
+
     if (normalized === VALID_CODE) {
-      localStorage.setItem("baticalc_tutorial_access", "true");
+      try {
+        localStorage.setItem(ACCESS_KEY, "true");
+        localStorage.setItem(ACCESS_TS_KEY, String(Date.now()));
+      } catch {
+        // ignore
+      }
       onUnlock();
       return;
     }
@@ -40,7 +87,6 @@ export const TutorialAuth: React.FC<Props> = ({ onUnlock }) => {
     const nextAttempts = attempts + 1;
     setAttempts(nextAttempts);
 
-    // Après 5 essais, lock 30s, puis 60s, puis 120s...
     if (nextAttempts >= 5) {
       const penalty = Math.min(120, 30 * Math.pow(2, Math.floor((nextAttempts - 5) / 3)));
       setLockedUntil(Date.now() + penalty * 1000);

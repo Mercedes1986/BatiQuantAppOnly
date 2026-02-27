@@ -11,24 +11,14 @@
     <meta name="referrer" content="strict-origin-when-cross-origin" />
     <meta name="color-scheme" content="light" />
 
-    <!-- ✅ AdSense : association du site au compte (UNIFIÉ) -->
-    <meta name="google-adsense-account" content="ca-pub-2793469545509663" />
-
-    <!-- ✅ AdSense : script en dur dans le HEAD (visible en Ctrl+U) -->
-    <script
-      id="adsense-script"
-      async
-      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2793469545509663"
-      crossorigin="anonymous"
-    ></script>
-
     <title>BatiQuant</title>
     <meta
       name="description"
       content="BatiQuant : calculez vos quantités de matériaux et votre budget chantier (béton, placo, peinture, carrelage, électricité, plomberie, toiture…)."
     />
-    <link rel="canonical" href="https://www.batiquant.fr/" />
 
+    <!-- Canonical / OG / Twitter : ne pas hardcoder un domaine -->
+    <link rel="canonical" href="/" />
     <meta property="og:site_name" content="BatiQuant" />
     <meta property="og:type" content="website" />
     <meta property="og:title" content="BatiQuant" />
@@ -36,11 +26,8 @@
       property="og:description"
       content="Calculez vos quantités et budgets chantier : béton, placo, peinture, carrelage, électricité, plomberie, toiture…"
     />
-    <meta property="og:url" content="https://www.batiquant.fr/" />
-    <meta
-      property="og:image"
-      content="https://www.batiquant.fr/landing/hero-bg.png"
-    />
+    <meta property="og:url" content="/" />
+    <meta property="og:image" content="/landing/hero-bg.png" />
 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="BatiQuant" />
@@ -48,10 +35,7 @@
       name="twitter:description"
       content="Calculez vos quantités et budgets chantier : béton, placo, placo/isolation, toiture…"
     />
-    <meta
-      name="twitter:image"
-      content="https://www.batiquant.fr/landing/hero-bg.png"
-    />
+    <meta name="twitter:image" content="/landing/hero-bg.png" />
 
     <!-- ✅ Favicons / PWA -->
     <link rel="icon" href="/favicon.ico" />
@@ -63,24 +47,31 @@
 
     <meta name="robots" content="index,follow" />
 
-    <!-- ✅ Perf : preconnect -->
+    <!-- ✅ Perf -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="preconnect" href="https://pagead2.googlesyndication.com" />
-    <link rel="preconnect" href="https://tpc.googlesyndication.com" />
-    <link rel="preconnect" href="https://googleads.g.doubleclick.net" />
-    <link rel="preconnect" href="https://www.googletagmanager.com" />
-    <link rel="preconnect" href="https://www.google-analytics.com" />
 
     <!-- ✅ Perf LCP : preload du visuel hero (si utilisé en homepage) -->
-    <link
-      rel="preload"
-      as="image"
-      href="/landing/hero-bg.png"
-      imagesrcset="/landing/hero-bg.png"
-    />
+    <link rel="preload" as="image" href="/landing/hero-bg.png" imagesrcset="/landing/hero-bg.png" />
 
-    <!-- ✅ dataLayer + Consent "par défaut = denied" (ne charge PAS GTM ici) -->
+    <!--
+      ✅ Runtime env (optionnel)
+      Ton hébergeur peut servir /env.js qui définit: window.__BQ_ENV__ = { ADSENSE_CLIENT: "...", GTM_ID: "...", SITE_URL: "..." }
+      - En local, ce fichier peut ne pas exister.
+    -->
+    <script>
+      (function () {
+        var s = document.createElement("script");
+        s.src = "/env.js";
+        s.async = true;
+        s.onerror = function () {
+          // ignore
+        };
+        document.head.appendChild(s);
+      })();
+    </script>
+
+    <!-- ✅ dataLayer + Consent "default denied" + loaders AdSense/GTM conditionnels -->
     <script>
       (function () {
         window.dataLayer = window.dataLayer || [];
@@ -89,7 +80,7 @@
         }
         window.gtag = window.gtag || gtag;
 
-        // Default (opt-in) : tout refusé tant que l'utilisateur n'a pas accepté
+        // Default (opt-in)
         try {
           window.dataLayer.push({
             event: "default_consent",
@@ -100,6 +91,58 @@
           });
         } catch {}
 
+        // Helpers runtime env
+        function getEnv() {
+          return (window.__BQ_ENV__ && typeof window.__BQ_ENV__ === "object")
+            ? window.__BQ_ENV__
+            : {};
+        }
+
+        function getAdsenseClient() {
+          var env = getEnv();
+          return env.ADSENSE_CLIENT || "";
+        }
+
+        function ensureAdsenseLoaded(client) {
+          try {
+            if (!client) return;
+            if (window.__bqAdsenseLoaded) return;
+            window.__bqAdsenseLoaded = true;
+
+            // meta google-adsense-account (optionnel mais utile)
+            var meta = document.querySelector('meta[name="google-adsense-account"]');
+            if (!meta) {
+              meta = document.createElement("meta");
+              meta.setAttribute("name", "google-adsense-account");
+              document.head.appendChild(meta);
+            }
+            meta.setAttribute("content", client);
+
+            // script AdSense
+            var sc = document.createElement("script");
+            sc.id = "adsense-script";
+            sc.async = true;
+            sc.src =
+              "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=" +
+              encodeURIComponent(client);
+            sc.crossOrigin = "anonymous";
+            document.head.appendChild(sc);
+
+            // preconnect utiles si AdSense activé
+            var hosts = [
+              "https://pagead2.googlesyndication.com",
+              "https://tpc.googlesyndication.com",
+              "https://googleads.g.doubleclick.net",
+            ];
+            hosts.forEach(function (href) {
+              var l = document.createElement("link");
+              l.rel = "preconnect";
+              l.href = href;
+              document.head.appendChild(l);
+            });
+          } catch {}
+        }
+
         // Loader GTM (appelé uniquement après consentement "accepted")
         window.__bqLoadGTM =
           window.__bqLoadGTM ||
@@ -109,7 +152,14 @@
               if (window.__bqGtmLoaded) return;
               window.__bqGtmLoaded = true;
 
-              // Standard GTM loader
+              // preconnect GTM/GA si activé
+              ["https://www.googletagmanager.com", "https://www.google-analytics.com"].forEach(function (href) {
+                var l = document.createElement("link");
+                l.rel = "preconnect";
+                l.href = href;
+                document.head.appendChild(l);
+              });
+
               window.dataLayer = window.dataLayer || [];
               window.dataLayer.push({
                 "gtm.start": new Date().getTime(),
@@ -124,7 +174,7 @@
                 encodeURIComponent(gtmId);
               f.parentNode.insertBefore(j, f);
 
-              // Noscript iframe (injection dynamique, uniquement après acceptation)
+              // Noscript iframe (injection dynamique)
               var ns = document.getElementById("gtm-noscript");
               if (ns && !ns.dataset.loaded) {
                 ns.dataset.loaded = "true";
@@ -144,16 +194,19 @@
               } catch {}
             }
           };
+
+        // AdSense: on le charge si env disponible (indépendant du consentement - tu gères la personnalisation via requestNonPersonalizedAds)
+        // Si tu veux le charger seulement après un choix (accepted/refused), déclenche ensureAdsenseLoaded depuis ton code React après initConsent().
+        setTimeout(function () {
+          var client = getAdsenseClient();
+          ensureAdsenseLoaded(client);
+        }, 0);
       })();
     </script>
   </head>
 
-  <body
-    class="bg-slate-50 text-slate-900 font-sans antialiased selection:bg-blue-100 pb-safe"
-  >
-    <!-- ✅ Réceptacle (vide) : l’iframe GTM n’est injectée qu’après consentement -->
+  <body class="bg-slate-50 text-slate-900 font-sans antialiased selection:bg-blue-100 pb-safe">
     <div id="gtm-noscript" aria-hidden="true"></div>
-
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
