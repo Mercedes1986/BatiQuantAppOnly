@@ -15,6 +15,7 @@ import {
   AlignLeft,
   CircleDollarSign,
   PaintBucket,
+  AlertTriangle,
 } from "lucide-react";
 
 interface TileZone {
@@ -36,6 +37,17 @@ const toNum = (v: unknown, fallback = 0) => {
   return Number.isFinite(n) ? n : fallback;
 };
 const round2 = (n: number) => Math.round((n + Number.EPSILON) * 100) / 100;
+const clamp = (n: number, min: number, max: number) => Math.min(max, Math.max(min, n));
+
+/**
+ * ✅ MAJ / FIX
+ * - Évite NaN (prix, boxSize, surfaces)
+ * - Conso colle + primaire + SPEC basées sur surfaces utiles
+ * - Pattern label + fallback si TILE_PATTERNS ne contient pas l’id
+ * - Auto double encollage non destructif (ne repasse pas à false si l’utilisateur a coché)
+ * - Avertissements support (bois/ancien carrelage) + zone humide sans SPEC
+ * - Coûts plus cohérents : carrelage au m², cartons (Unit.BOX) avec prix du carton
+ */
 
 export const TileCalculator: React.FC<Props> = ({ onCalculate }) => {
   const [step, setStep] = useState(1);
@@ -56,7 +68,7 @@ export const TileCalculator: React.FC<Props> = ({ onCalculate }) => {
   const [tileThickness, setTileThickness] = useState(9); // mm
   const [patternId, setPatternId] = useState("straight");
   const [boxSize, setBoxSize] = useState(1.44); // m2 per box
-  const [wastePct, setWastePct] = useState(10); // auto updated by pattern
+  const [wastePct, setWastePct] = useState(10);
 
   // --- 3. Glue & Grout ---
   const [glueType, setGlueType] = useState<"C2" | "Flex" | "Dispersion">("C2");
@@ -71,7 +83,7 @@ export const TileCalculator: React.FC<Props> = ({ onCalculate }) => {
   const [useWaterproofing, setUseWaterproofing] = useState(true);
   const [usePrimer, setUsePrimer] = useState(true);
 
-  // --- 5. Pricing (editable) ---
+  // --- 5. Pricing ---
   const [prices, setPrices] = useState({
     tileM2: getUnitPrice("TILE_M2") || 30,
     glueBag: getUnitPrice("GLUE_BAG_25KG") || 18,
@@ -79,7 +91,7 @@ export const TileCalculator: React.FC<Props> = ({ onCalculate }) => {
     epoxyKit: 60, // 3kg
     primerL: getUnitPrice("PRIMER_LITER") || 10,
     specKit: 75, // kit ~6m2
-    levelingKit: getUnitPrice("SPACERS_BOX") || 12,
+    levelingKit: getUnitPrice("SPACERS_BOX") || 12, // sachet / boîte
     skirtingM: getUnitPrice("SKIRTING_METER") || 8,
     laborM2: 45,
     laborSkirting: 10,
@@ -93,7 +105,7 @@ export const TileCalculator: React.FC<Props> = ({ onCalculate }) => {
   // --- Helpers ---
   const addZone = () => {
     const area = toNum(newZoneArea, 0);
-    if (!area) return;
+    if (!(area > 0)) return;
 
     const perim = toNum(newZonePerim, 0) || Math.sqrt(area) * 4;
 
@@ -102,7 +114,7 @@ export const TileCalculator: React.FC<Props> = ({ onCalculate }) => {
       {
         id: Date.now().toString(),
         type: newZoneType,
-        label: newZoneLabel || (newZoneType === "floor" ? "Sol" : "Mur"),
+        label: (newZoneLabel || (newZoneType === "floor" ? "Sol" : "Mur")).trim(),
         area,
         perimeter: perim,
         isWet: newZoneWet,
@@ -119,23 +131,32 @@ export const TileCalculator: React.FC<Props> = ({ onCalculate }) => {
 
   const removeZone = (id: string) => setZones((prev) => prev.filter((z) => z.id !== id));
 
-  // Waste based on pattern
-  useEffect(() => {
-    const p = TILE_PATTERNS.find((pat) => pat.id === patternId);
-    if (p) setWastePct(p.waste);
+  const patternDef = useMemo(() => {
+    return TILE_PATTERNS.find((p: any) => p.id === patternId) || TILE_PATTERNS[0] || { id: "straight", label: "Pose droite", waste: 10 };
   }, [patternId]);
 
-  // Auto double gluing suggestion (grand format)
+  // Waste based on pattern
   useEffect(() => {
-    if (Math.max(tileLength, tileWidth) >= 45) setDoubleGluing(true);
-    else setDoubleGluing(false);
-  }, [tileLength, tileWidth]);
+    const w = toNum((patternDef as any).waste, 10);
+    setWastePct(clamp(w, 0, 30));
+  }, [patternDef]);
+
+  // Auto double gluing suggestion (grand format) — non destructif
+  const [autoDoubleSuggested, setAutoDoubleSuggested] = useState(false);
+  useEffect(() => {
+    const isLarge = Math.max(tileLength, tileWidth) >= 45;
+    if (isLarge && !doubleGluing) setAutoDoubleSuggested(true);
+    if (!isLarge) setAutoDoubleSuggested(false);
+  }, [tileLength, tileWidth, doubleGluing]);
 
   // --- CALCULATION ENGINE ---
   const calculationData = useMemo(() => {
     let totalArea = 0;
     let totalPerimeter = 0;
     let wetArea = 0;
+
+    let areaOnWood = 0;
+    let areaOnOldTile = 0;
 
     const warnings: string[] = [];
     const materials: any[] = [];
@@ -145,36 +166,54 @@ export const TileCalculator: React.FC<Props> = ({ onCalculate }) => {
       totalArea += z.area;
       if (z.type === "floor") totalPerimeter += z.perimeter;
       if (z.isWet) wetArea += z.area;
+
+      if (z.substrate === "wood") areaOnWood += z.area;
+      if (z.substrate === "tile") areaOnOldTile += z.area;
     });
 
     if (totalArea <= 0) {
-      return { totalArea: 0, totalCost: 0, materials, warnings: ["Ajoutez au moins une zone."] };
+      return {
+  totalArea: 0,
+  totalCost: 0,
+  materials,
+  warnings: ["Ajoutez au moins une zone."],
+  wetArea: 0,
+  totalPerimeter: 0,
+};
     }
 
+    const safeBox = Math.max(0.1, toNum(boxSize, 1.44));
+    const safeWaste = clamp(toNum(wastePct, 10), 0, 30);
+
     // --- Tiles ---
-    const areaWithWaste = totalArea * (1 + wastePct / 100);
-    const boxes = Math.ceil(areaWithWaste / boxSize);
-    const m2Ordered = boxes * boxSize;
+    const areaWithWaste = totalArea * (1 + safeWaste / 100);
+    const boxes = Math.ceil(areaWithWaste / safeBox);
+    const m2Ordered = boxes * safeBox;
 
     const costTiles = m2Ordered * prices.tileM2;
     totalCost += costTiles;
 
+    const tileLabel = `${tileLength}x${tileWidth}cm`;
+    const patLabel = String((patternDef as any).label ?? "Pose");
+
     materials.push({
       id: "tiles",
-      name: `Carrelage ${tileLength}x${tileWidth} (${patternId === "diagonal" ? "Diagonale" : "Droit"})`,
+      name: `Carrelage ${tileLabel} — ${patLabel}`,
       quantity: boxes,
       quantityRaw: areaWithWaste,
       unit: Unit.BOX,
-      unitPrice: round2(prices.tileM2 * boxSize),
+      unitPrice: round2(prices.tileM2 * safeBox), // prix du carton
       totalPrice: round2(costTiles),
       category: CalculatorType.TILES,
-      details: `Couverture: ${m2Ordered.toFixed(2)} m² (+${wastePct}%)`,
+      details: `Commandé: ${m2Ordered.toFixed(2)} m² (pertes ${safeWaste}%)`,
     });
 
     // --- Glue ---
-    let glueConsump = 3.5; // kg/m2 default for 10mm
+    let glueConsump = 3.5; // kg/m2 default for ~10mm
     if (combSize <= 6) glueConsump = 2.5;
-    if (combSize >= 12) glueConsump = 5.0;
+    else if (combSize <= 8) glueConsump = 3.0;
+    else if (combSize >= 12) glueConsump = 5.0;
+
     if (doubleGluing) glueConsump += 2.5;
 
     const glueKg = totalArea * glueConsump * 1.05;
@@ -184,64 +223,74 @@ export const TileCalculator: React.FC<Props> = ({ onCalculate }) => {
 
     materials.push({
       id: "glue",
-      name: `Colle ${glueType} (Peigne ${combSize}mm${doubleGluing ? " + Double" : ""})`,
+      name: `Colle ${glueType} (25kg) — peigne ${combSize}mm${doubleGluing ? " + double encollage" : ""}`,
       quantity: glueBags,
       quantityRaw: glueKg,
       unit: Unit.BAG,
-      unitPrice: prices.glueBag,
+      unitPrice: round2(prices.glueBag),
       totalPrice: round2(costGlue),
       category: CalculatorType.TILES,
-      details: `Conso: ${glueConsump} kg/m² (~${glueKg.toFixed(0)} kg)`,
+      details: `Conso ≈ ${glueConsump.toFixed(1)} kg/m² • total ≈ ${glueKg.toFixed(0)} kg`,
     });
 
     // --- Grout ---
-    const L_mm = tileLength * 10;
-    const W_mm = tileWidth * 10;
-    const groutKgM2 = ((L_mm + W_mm) / (L_mm * W_mm)) * jointWidth * tileThickness * 1.6;
+    const L_mm = Math.max(1, tileLength) * 10;
+    const W_mm = Math.max(1, tileWidth) * 10;
+    const jw = clamp(toNum(jointWidth, 3), 1, 15);
+    const th = clamp(toNum(tileThickness, 9), 4, 30);
+
+    // Approx grout kg/m²
+    const groutKgM2 = ((L_mm + W_mm) / (L_mm * W_mm)) * jw * th * 1.6;
     const totalGroutKg = totalArea * groutKgM2 * 1.1;
 
     if (jointType === "epoxy") {
       const kits = Math.ceil(totalGroutKg / 3);
       const costEpoxy = kits * prices.epoxyKit;
       totalCost += costEpoxy;
+
       materials.push({
         id: "grout_epoxy",
-        name: "Joint Époxy (Kit 3kg)",
+        name: "Joint époxy (kit 3kg)",
         quantity: kits,
         quantityRaw: totalGroutKg,
         unit: Unit.BOX,
-        unitPrice: prices.epoxyKit,
+        unitPrice: round2(prices.epoxyKit),
         totalPrice: round2(costEpoxy),
         category: CalculatorType.TILES,
+        details: `≈ ${totalGroutKg.toFixed(1)} kg`,
       });
     } else {
       const bags = Math.ceil(totalGroutKg / 5);
       const costGrout = bags * prices.groutBag;
       totalCost += costGrout;
+
       materials.push({
         id: "grout_cem",
-        name: `Joint ciment ${jointWidth}mm (Sac 5kg)`,
+        name: `Joint ciment ${jw}mm (sac 5kg)`,
         quantity: bags,
         quantityRaw: totalGroutKg,
         unit: Unit.BAG,
-        unitPrice: prices.groutBag,
+        unitPrice: round2(prices.groutBag),
         totalPrice: round2(costGrout),
         category: CalculatorType.TILES,
+        details: `≈ ${totalGroutKg.toFixed(1)} kg`,
       });
     }
 
     // --- Primer ---
     if (usePrimer) {
-      const liters = Math.ceil(totalArea / 8);
+      // rule of thumb: 8–10 m²/L. Keep 8 to be conservative.
+      const liters = Math.max(1, Math.ceil(totalArea / 8));
       const costPrimer = liters * prices.primerL;
       totalCost += costPrimer;
+
       materials.push({
         id: "primer",
         name: "Primaire d'accrochage",
         quantity: liters,
         quantityRaw: liters,
         unit: Unit.LITER,
-        unitPrice: prices.primerL,
+        unitPrice: round2(prices.primerL),
         totalPrice: round2(costPrimer),
         category: CalculatorType.TILES,
       });
@@ -249,16 +298,17 @@ export const TileCalculator: React.FC<Props> = ({ onCalculate }) => {
 
     // --- Waterproofing (SPEC) ---
     if (wetArea > 0 && useWaterproofing) {
-      const kits = Math.ceil(wetArea / 6);
+      const kits = Math.max(1, Math.ceil(wetArea / 6));
       const costSpec = kits * prices.specKit;
       totalCost += costSpec;
+
       materials.push({
         id: "spec",
         name: "Kit étanchéité (SPEC)",
         quantity: kits,
         quantityRaw: wetArea,
         unit: Unit.BOX,
-        unitPrice: prices.specKit,
+        unitPrice: round2(prices.specKit),
         totalPrice: round2(costSpec),
         category: CalculatorType.TILES,
         details: `Zones humides: ${wetArea.toFixed(1)} m²`,
@@ -272,13 +322,14 @@ export const TileCalculator: React.FC<Props> = ({ onCalculate }) => {
       const lm = Math.ceil(totalPerimeter * 1.05);
       const costSkirt = lm * prices.skirtingM;
       totalCost += costSkirt;
+
       materials.push({
         id: "skirting",
         name: "Plinthes assorties",
         quantity: lm,
         quantityRaw: totalPerimeter,
         unit: Unit.METER,
-        unitPrice: prices.skirtingM,
+        unitPrice: round2(prices.skirtingM),
         totalPrice: round2(costSkirt),
         category: CalculatorType.TILES,
       });
@@ -286,20 +337,23 @@ export const TileCalculator: React.FC<Props> = ({ onCalculate }) => {
 
     // --- Leveling system ---
     if (useLevelingSystem) {
-      const tileArea = (tileLength / 100) * (tileWidth / 100);
-      const clipsCount = Math.ceil((totalArea / tileArea) * 4);
-      const bags = Math.ceil(clipsCount / 250);
+      const tileArea = Math.max(0.01, (tileLength / 100) * (tileWidth / 100));
+      const tilesCount = totalArea / tileArea;
+      const clipsCount = Math.ceil(tilesCount * 4); // ~4 clips/tile (approx)
+      const bags = Math.max(1, Math.ceil(clipsCount / 250)); // 250 clips/box
       const costLev = bags * prices.levelingKit;
       totalCost += costLev;
+
       materials.push({
         id: "leveling",
-        name: "Système de nivellement (sachet)",
+        name: "Système de nivellement (boîte/sachet)",
         quantity: bags,
         quantityRaw: clipsCount,
         unit: Unit.BAG,
-        unitPrice: prices.levelingKit,
+        unitPrice: round2(prices.levelingKit),
         totalPrice: round2(costLev),
         category: CalculatorType.TILES,
+        details: `≈ ${clipsCount} clips`,
       });
     }
 
@@ -308,6 +362,7 @@ export const TileCalculator: React.FC<Props> = ({ onCalculate }) => {
       const labTiling = totalArea * prices.laborM2;
       const labSkirt = (useSkirting ? totalPerimeter : 0) * prices.laborSkirting;
       const labSpec = (useWaterproofing ? wetArea : 0) * prices.laborSpec;
+
       totalCost += labTiling + labSkirt + labSpec;
 
       materials.push({
@@ -315,7 +370,7 @@ export const TileCalculator: React.FC<Props> = ({ onCalculate }) => {
         name: "Main d'œuvre (pose carrelage)",
         quantity: round2(totalArea),
         unit: Unit.M2,
-        unitPrice: prices.laborM2,
+        unitPrice: round2(prices.laborM2),
         totalPrice: round2(labTiling),
         category: CalculatorType.TILES,
       });
@@ -326,7 +381,7 @@ export const TileCalculator: React.FC<Props> = ({ onCalculate }) => {
           name: "Main d'œuvre (plinthes)",
           quantity: round2(totalPerimeter),
           unit: Unit.METER,
-          unitPrice: prices.laborSkirting,
+          unitPrice: round2(prices.laborSkirting),
           totalPrice: round2(labSkirt),
           category: CalculatorType.TILES,
         });
@@ -338,32 +393,33 @@ export const TileCalculator: React.FC<Props> = ({ onCalculate }) => {
           name: "Main d'œuvre (étanchéité)",
           quantity: round2(wetArea),
           unit: Unit.M2,
-          unitPrice: prices.laborSpec,
+          unitPrice: round2(prices.laborSpec),
           totalPrice: round2(labSpec),
           category: CalculatorType.TILES,
         });
       }
     }
 
-    // Warnings
-    if (Math.max(tileLength, tileWidth) >= 60 && !doubleGluing) {
-      warnings.push("Grand format : double encollage recommandé.");
-    }
-    if (patternId === "diagonal" && wastePct < 10) {
-      warnings.push("Pose diagonale : prévoir plutôt 10–15% de pertes.");
-    }
+    // --- Warnings (supports) ---
+    if (areaOnWood > 0) warnings.push("Support bois détecté : primaire + colle flex (C2S1) et/ou désolidarisation recommandés.");
+    if (areaOnOldTile > 0) warnings.push("Pose sur ancien carrelage : dégraissage/ponçage + primaire d’adhérence recommandés.");
+    if (autoDoubleSuggested) warnings.push("Grand format : double encollage recommandé.");
+    if (safeBox <= 0.2) warnings.push("m²/carton très faible : vérifiez la valeur du carton.");
 
     return {
       totalArea,
       totalCost: round2(totalCost),
       materials,
       warnings,
+      wetArea,
+      totalPerimeter,
     };
   }, [
     zones,
     tileLength,
     tileWidth,
     tileThickness,
+    patternDef,
     patternId,
     boxSize,
     wastePct,
@@ -378,6 +434,7 @@ export const TileCalculator: React.FC<Props> = ({ onCalculate }) => {
     usePrimer,
     prices,
     proMode,
+    autoDoubleSuggested,
   ]);
 
   // Pass results
@@ -387,13 +444,14 @@ export const TileCalculator: React.FC<Props> = ({ onCalculate }) => {
       details: [
         { label: "Surface totale", value: calculationData.totalArea.toFixed(1), unit: "m²" },
         { label: "Format", value: `${tileLength}x${tileWidth}`, unit: "cm" },
-        { label: "Pose", value: patternId === "diagonal" ? "Diagonale" : "Droite", unit: "" },
+        { label: "Pose", value: String((patternDef as any)?.label ?? "Pose"), unit: "" },
+        { label: "Zones humides", value: calculationData.wetArea.toFixed(1), unit: "m²" },
       ],
       materials: calculationData.materials,
       totalCost: calculationData.totalCost,
       warnings: calculationData.warnings.length ? calculationData.warnings : undefined,
     });
-  }, [calculationData, onCalculate, tileLength, tileWidth, patternId]);
+  }, [calculationData, onCalculate, tileLength, tileWidth, patternDef]);
 
   return (
     <div className="space-y-6 animate-in fade-in">
@@ -416,6 +474,18 @@ export const TileCalculator: React.FC<Props> = ({ onCalculate }) => {
         ))}
       </div>
 
+      {/* Warnings */}
+      {calculationData.warnings.length > 0 && (
+        <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 flex items-start text-xs text-amber-800">
+          <AlertTriangle size={16} className="mr-2 shrink-0" />
+          <div className="space-y-1">
+            {calculationData.warnings.map((w, i) => (
+              <div key={i}>{w}</div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* STEP 1: ZONES */}
       {step === 1 && (
         <div className="space-y-4">
@@ -426,10 +496,7 @@ export const TileCalculator: React.FC<Props> = ({ onCalculate }) => {
 
           <div className="space-y-2">
             {zones.map((z) => (
-              <div
-                key={z.id}
-                className="bg-white border border-slate-200 rounded-lg p-3 flex justify-between items-center"
-              >
+              <div key={z.id} className="bg-white border border-slate-200 rounded-lg p-3 flex justify-between items-center">
                 <div>
                   <span className="font-bold text-slate-700 flex items-center">
                     {z.type === "floor" ? (
@@ -440,9 +507,10 @@ export const TileCalculator: React.FC<Props> = ({ onCalculate }) => {
                     {z.label}
                   </span>
                   <span className="text-xs text-slate-500">
-                    {z.area} m²{" "}
-                    {z.type === "floor" ? `• P: ${z.perimeter.toFixed(1)}m` : ""}{" "}
-                    {z.isWet ? <span className="text-blue-500 font-bold">• Humide</span> : null} •{" "}
+                    {z.area} m²
+                    {z.type === "floor" ? ` • P: ${z.perimeter.toFixed(1)}m` : ""}
+                    {z.isWet ? <span className="text-blue-600 font-bold"> • Humide</span> : null}
+                    {" • "}
                     {z.substrate}
                   </span>
                 </div>
@@ -451,11 +519,7 @@ export const TileCalculator: React.FC<Props> = ({ onCalculate }) => {
                 </button>
               </div>
             ))}
-            {zones.length === 0 && (
-              <div className="text-center text-sm text-slate-400 py-4 italic">
-                Aucune zone ajoutée.
-              </div>
-            )}
+            {zones.length === 0 && <div className="text-center text-sm text-slate-400 py-4 italic">Aucune zone ajoutée.</div>}
           </div>
 
           <div className="bg-slate-50 p-3 rounded-xl border border-blue-200">
@@ -505,6 +569,7 @@ export const TileCalculator: React.FC<Props> = ({ onCalculate }) => {
                 value={newZonePerim}
                 onChange={(e) => setNewZonePerim(e.target.value)}
                 className="w-full p-2 text-xs border rounded bg-white text-slate-900"
+                disabled={newZoneType !== "floor"}
               />
             </div>
 
@@ -561,7 +626,7 @@ export const TileCalculator: React.FC<Props> = ({ onCalculate }) => {
               <input
                 type="number"
                 value={tileLength}
-                onChange={(e) => setTileLength(Number(e.target.value))}
+                onChange={(e) => setTileLength(clamp(toNum(e.target.value, 60), 1, 200))}
                 className="w-full p-2 border rounded bg-white text-slate-900 font-bold"
               />
             </div>
@@ -570,7 +635,7 @@ export const TileCalculator: React.FC<Props> = ({ onCalculate }) => {
               <input
                 type="number"
                 value={tileWidth}
-                onChange={(e) => setTileWidth(Number(e.target.value))}
+                onChange={(e) => setTileWidth(clamp(toNum(e.target.value, 60), 1, 200))}
                 className="w-full p-2 border rounded bg-white text-slate-900 font-bold"
               />
             </div>
@@ -579,7 +644,7 @@ export const TileCalculator: React.FC<Props> = ({ onCalculate }) => {
               <input
                 type="number"
                 value={tileThickness}
-                onChange={(e) => setTileThickness(Number(e.target.value))}
+                onChange={(e) => setTileThickness(clamp(toNum(e.target.value, 9), 4, 30))}
                 className="w-full p-2 border rounded bg-white text-slate-900"
               />
             </div>
@@ -588,7 +653,7 @@ export const TileCalculator: React.FC<Props> = ({ onCalculate }) => {
               <input
                 type="number"
                 value={boxSize}
-                onChange={(e) => setBoxSize(Number(e.target.value))}
+                onChange={(e) => setBoxSize(clamp(toNum(e.target.value, 1.44), 0.1, 10))}
                 className="w-full p-2 border rounded bg-white text-slate-900"
               />
             </div>
@@ -597,7 +662,7 @@ export const TileCalculator: React.FC<Props> = ({ onCalculate }) => {
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-2">Type de pose</label>
             <div className="grid grid-cols-3 gap-2">
-              {TILE_PATTERNS.map((p) => (
+              {(TILE_PATTERNS || []).map((p: any) => (
                 <button
                   key={p.id}
                   onClick={() => setPatternId(p.id)}
@@ -607,8 +672,8 @@ export const TileCalculator: React.FC<Props> = ({ onCalculate }) => {
                       : "bg-white text-slate-500"
                   }`}
                 >
-                  {p.label.split(" ")[1] ?? p.label}
-                  <span className="block text-[10px] opacity-70">+{p.waste}%</span>
+                  {String(p.label ?? p.id)}
+                  <span className="block text-[10px] opacity-70">+{toNum(p.waste, 10)}%</span>
                 </button>
               ))}
             </div>
@@ -633,6 +698,13 @@ export const TileCalculator: React.FC<Props> = ({ onCalculate }) => {
             Colle, joints et nivellement.
           </div>
 
+          {autoDoubleSuggested && (
+            <div className="flex items-start text-xs text-amber-700 bg-amber-50 p-3 rounded-lg border border-amber-100">
+              <AlertTriangle size={16} className="mr-2 shrink-0" />
+              Grand format détecté : double encollage recommandé.
+            </div>
+          )}
+
           <div className="bg-slate-50 p-3 rounded-lg border border-slate-200 space-y-3">
             <h4 className="text-xs font-bold text-slate-500 uppercase">Encollage</h4>
 
@@ -654,8 +726,8 @@ export const TileCalculator: React.FC<Props> = ({ onCalculate }) => {
                   onChange={(e) => setGlueType(e.target.value as any)}
                   className="w-full p-2 text-sm border rounded bg-white text-slate-900"
                 >
-                  <option value="C2">C2 (Standard)</option>
-                  <option value="Flex">C2S1 (Flex)</option>
+                  <option value="C2">C2 (standard)</option>
+                  <option value="Flex">C2S1 (flex)</option>
                   <option value="Dispersion">Dispersion (murs)</option>
                 </select>
               </div>
@@ -663,7 +735,7 @@ export const TileCalculator: React.FC<Props> = ({ onCalculate }) => {
                 <label className="block text-xs text-slate-500 mb-1">Peigne (mm)</label>
                 <select
                   value={combSize}
-                  onChange={(e) => setCombSize(Number(e.target.value))}
+                  onChange={(e) => setCombSize(clamp(toNum(e.target.value, 10), 4, 14))}
                   className="w-full p-2 text-sm border rounded bg-white text-slate-900"
                 >
                   <option value={6}>6 mm</option>
@@ -684,7 +756,7 @@ export const TileCalculator: React.FC<Props> = ({ onCalculate }) => {
                 <input
                   type="number"
                   value={jointWidth}
-                  onChange={(e) => setJointWidth(Number(e.target.value))}
+                  onChange={(e) => setJointWidth(clamp(toNum(e.target.value, 3), 1, 15))}
                   className="w-full p-2 border rounded bg-white text-sm text-slate-900"
                 />
               </div>
@@ -821,11 +893,20 @@ export const TileCalculator: React.FC<Props> = ({ onCalculate }) => {
                 />
               </div>
               <div>
-                <label className="block text-[10px] text-slate-500 mb-1">Joint (5kg)</label>
+                <label className="block text-[10px] text-slate-500 mb-1">Joint ciment (5kg)</label>
                 <input
                   type="number"
                   value={prices.groutBag}
                   onChange={(e) => updatePrice("groutBag", e.target.value)}
+                  className="w-full p-1.5 border rounded text-sm bg-white text-slate-900"
+                />
+              </div>
+              <div>
+                <label className="block text-[10px] text-slate-500 mb-1">Époxy (kit 3kg)</label>
+                <input
+                  type="number"
+                  value={prices.epoxyKit}
+                  onChange={(e) => updatePrice("epoxyKit", e.target.value)}
                   className="w-full p-1.5 border rounded text-sm bg-white text-slate-900"
                 />
               </div>
@@ -865,6 +946,18 @@ export const TileCalculator: React.FC<Props> = ({ onCalculate }) => {
                   />
                 </div>
               )}
+
+              {useLevelingSystem && (
+                <div>
+                  <label className="block text-[10px] text-slate-500 mb-1">Nivellement (boîte)</label>
+                  <input
+                    type="number"
+                    value={prices.levelingKit}
+                    onChange={(e) => updatePrice("levelingKit", e.target.value)}
+                    className="w-full p-1.5 border rounded text-sm bg-white text-slate-900"
+                  />
+                </div>
+              )}
             </div>
 
             {proMode && (
@@ -884,6 +977,15 @@ export const TileCalculator: React.FC<Props> = ({ onCalculate }) => {
                     type="number"
                     value={prices.laborSkirting}
                     onChange={(e) => updatePrice("laborSkirting", e.target.value)}
+                    className="w-full p-1.5 border border-blue-200 rounded text-sm bg-white text-slate-900"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] text-blue-600 font-bold mb-1">Pose SPEC (€/m²)</label>
+                  <input
+                    type="number"
+                    value={prices.laborSpec}
+                    onChange={(e) => updatePrice("laborSpec", e.target.value)}
                     className="w-full p-1.5 border border-blue-200 rounded text-sm bg-white text-slate-900"
                   />
                 </div>

@@ -1,4 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
+
 import { CalculatorType, CalculationResult, Unit } from "../../../types";
 import { DEFAULT_PRICES } from "../../constants";
 import {
@@ -54,27 +56,9 @@ interface Props {
   onCalculate: (result: CalculationResult) => void;
 }
 
-const labelMapRoom: Record<ElecRoom["type"], string> = {
-  kitchen: "Cuisine",
-  bedroom: "Chambre",
-  living: "Séjour",
-  bathroom: "SDB",
-  wc: "WC",
-  other: "Pièce",
-};
-
-const labelMapPoint: Record<ElecPoint["type"], string> = {
-  socket: "Prise 16A",
-  socket_spec: "Prise spécialisée",
-  light: "Point lumineux",
-  switch: "Interrupteur",
-  shutter: "Volet roulant",
-  heater: "Chauffage",
-  network: "RJ45/TV",
-  other: "Autre",
-};
-
 export const ElectricityCalculator: React.FC<Props> = ({ onCalculate }) => {
+  const { t } = useTranslation();
+
   const [step, setStep] = useState(1);
   const [proMode, setProMode] = useState(false);
 
@@ -109,54 +93,66 @@ export const ElectricityCalculator: React.FC<Props> = ({ onCalculate }) => {
     setPrices((prev) => ({ ...prev, [key]: parseFloat(val) || 0 }));
   };
 
+  // --- Label helpers (i18n) ---
+  const roomTypeLabel = (type: ElecRoom["type"]) =>
+    t(`calc.electricity.rooms.types.${type}`, { defaultValue: type });
+
+  const pointTypeLabel = (type: ElecPoint["type"]) =>
+    t(`calc.electricity.points.types.${type}`, { defaultValue: type });
+
   // --- Helpers ---
   const addRoom = () => {
     setRooms((prev) => {
       const idx = prev.filter((r) => r.type === newRoomType).length + 1;
+
       const newRoom: ElecRoom = {
         id: Date.now().toString(),
         type: newRoomType,
-        label: `${labelMapRoom[newRoomType]} ${idx}`,
+        label: t("calc.electricity.rooms.room_named", {
+          defaultValue: "{{type}} {{n}}",
+          type: roomTypeLabel(newRoomType),
+          n: idx,
+        }),
         points: [],
       };
 
       // presets "confort" (approx)
       if (newRoomType === "kitchen") {
         newRoom.points.push(
-          { id: "p1", type: "light", label: "Point centre", quantity: 1 },
-          { id: "p2", type: "switch", label: "Interrupteur", quantity: 1 },
-          { id: "p3", type: "socket", label: "Prises plan de travail", quantity: 4 },
-          { id: "p4", type: "socket_spec", label: "Prise four", quantity: 1 },
-          { id: "p5", type: "socket_spec", label: "Prise 32A cuisson", quantity: 1 },
-          { id: "p6", type: "socket_spec", label: "Lave-vaisselle", quantity: 1 }
+          { id: "p1", type: "light", label: t("calc.electricity.presets.center_point", { defaultValue: "Point centre" }), quantity: 1 },
+          { id: "p2", type: "switch", label: t("calc.electricity.presets.switch", { defaultValue: "Interrupteur" }), quantity: 1 },
+          { id: "p3", type: "socket", label: t("calc.electricity.presets.counter_sockets", { defaultValue: "Prises plan de travail" }), quantity: 4 },
+          { id: "p4", type: "socket_spec", label: t("calc.electricity.presets.oven_socket", { defaultValue: "Prise four" }), quantity: 1 },
+          { id: "p5", type: "socket_spec", label: t("calc.electricity.presets.hob_socket", { defaultValue: "Prise 32A cuisson" }), quantity: 1 },
+          { id: "p6", type: "socket_spec", label: t("calc.electricity.presets.dishwasher", { defaultValue: "Lave-vaisselle" }), quantity: 1 }
         );
       } else if (newRoomType === "living") {
         newRoom.points.push(
-          { id: "p1", type: "light", label: "Point centre", quantity: 1 },
-          { id: "p2", type: "switch", label: "Interrupteurs", quantity: 2 },
-          { id: "p3", type: "socket", label: "Prises", quantity: 5 },
-          { id: "p4", type: "network", label: "RJ45/TV", quantity: 2 }
+          { id: "p1", type: "light", label: t("calc.electricity.presets.center_point", { defaultValue: "Point centre" }), quantity: 1 },
+          { id: "p2", type: "switch", label: t("calc.electricity.presets.switches", { defaultValue: "Interrupteurs" }), quantity: 2 },
+          { id: "p3", type: "socket", label: t("calc.electricity.presets.sockets", { defaultValue: "Prises" }), quantity: 5 },
+          { id: "p4", type: "network", label: t("calc.electricity.presets.network_tv", { defaultValue: "RJ45/TV" }), quantity: 2 }
         );
       } else if (newRoomType === "bedroom") {
         newRoom.points.push(
-          { id: "p1", type: "light", label: "Point centre", quantity: 1 },
-          { id: "p2", type: "switch", label: "Interrupteur", quantity: 1 },
-          { id: "p3", type: "socket", label: "Prises", quantity: 3 },
-          { id: "p4", type: "network", label: "RJ45", quantity: 1 }
+          { id: "p1", type: "light", label: t("calc.electricity.presets.center_point", { defaultValue: "Point centre" }), quantity: 1 },
+          { id: "p2", type: "switch", label: t("calc.electricity.presets.switch", { defaultValue: "Interrupteur" }), quantity: 1 },
+          { id: "p3", type: "socket", label: t("calc.electricity.presets.sockets", { defaultValue: "Prises" }), quantity: 3 },
+          { id: "p4", type: "network", label: t("calc.electricity.presets.network", { defaultValue: "RJ45" }), quantity: 1 }
         );
       } else if (newRoomType === "bathroom") {
         newRoom.points.push(
-          { id: "p1", type: "light", label: "Éclairage miroir", quantity: 1 },
-          { id: "p2", type: "light", label: "Point centre", quantity: 1 },
-          { id: "p3", type: "switch", label: "Interrupteur", quantity: 1 },
-          { id: "p4", type: "socket", label: "Prises", quantity: 2 },
-          { id: "p5", type: "socket_spec", label: "Lave-linge", quantity: 1 }
+          { id: "p1", type: "light", label: t("calc.electricity.presets.mirror_light", { defaultValue: "Éclairage miroir" }), quantity: 1 },
+          { id: "p2", type: "light", label: t("calc.electricity.presets.center_point", { defaultValue: "Point centre" }), quantity: 1 },
+          { id: "p3", type: "switch", label: t("calc.electricity.presets.switch", { defaultValue: "Interrupteur" }), quantity: 1 },
+          { id: "p4", type: "socket", label: t("calc.electricity.presets.sockets", { defaultValue: "Prises" }), quantity: 2 },
+          { id: "p5", type: "socket_spec", label: t("calc.electricity.presets.washing_machine", { defaultValue: "Lave-linge" }), quantity: 1 }
         );
       } else {
         newRoom.points.push(
-          { id: "p1", type: "light", label: "Point lumineux", quantity: 1 },
-          { id: "p2", type: "switch", label: "Interrupteur", quantity: 1 },
-          { id: "p3", type: "socket", label: "Prise", quantity: 1 }
+          { id: "p1", type: "light", label: t("calc.electricity.presets.light_point", { defaultValue: "Point lumineux" }), quantity: 1 },
+          { id: "p2", type: "switch", label: t("calc.electricity.presets.switch", { defaultValue: "Interrupteur" }), quantity: 1 },
+          { id: "p3", type: "socket", label: t("calc.electricity.presets.socket", { defaultValue: "Prise" }), quantity: 1 }
         );
       }
 
@@ -173,9 +169,7 @@ export const ElectricityCalculator: React.FC<Props> = ({ onCalculate }) => {
       prev.map((r) => {
         if (r.id !== roomId) return r;
         const nextPoints = r.points
-          .map((p) =>
-            p.id === pointId ? { ...p, quantity: Math.max(0, p.quantity + delta) } : p
-          )
+          .map((p) => (p.id === pointId ? { ...p, quantity: Math.max(0, p.quantity + delta) } : p))
           .filter((p) => p.quantity > 0);
         return { ...r, points: nextPoints };
       })
@@ -193,7 +187,7 @@ export const ElectricityCalculator: React.FC<Props> = ({ onCalculate }) => {
             {
               id: Date.now().toString(),
               type,
-              label: labelMapPoint[type] || "Autre",
+              label: pointTypeLabel(type),
               quantity: 1,
             },
           ],
@@ -231,7 +225,7 @@ export const ElectricityCalculator: React.FC<Props> = ({ onCalculate }) => {
     if (nbLightCircuits > 0) {
       circuits.push({
         id: "c_light",
-        label: "Éclairage",
+        label: t("calc.electricity.circuits.lighting", { defaultValue: "Éclairage" }),
         type: "light",
         protection: "10A",
         cableSection: "1.5",
@@ -243,7 +237,7 @@ export const ElectricityCalculator: React.FC<Props> = ({ onCalculate }) => {
     if (nbSocketCircuits > 0) {
       circuits.push({
         id: "c_socket",
-        label: "Prises",
+        label: t("calc.electricity.circuits.sockets", { defaultValue: "Prises" }),
         type: "socket",
         protection: "16A",
         cableSection: "2.5",
@@ -262,7 +256,7 @@ export const ElectricityCalculator: React.FC<Props> = ({ onCalculate }) => {
     if (spec32A > 0) {
       circuits.push({
         id: "c_32a",
-        label: "Plaque cuisson",
+        label: t("calc.electricity.circuits.hob", { defaultValue: "Plaque cuisson" }),
         type: "special",
         protection: "32A",
         cableSection: "6",
@@ -272,7 +266,7 @@ export const ElectricityCalculator: React.FC<Props> = ({ onCalculate }) => {
     if (spec20A > 0) {
       circuits.push({
         id: "c_20a",
-        label: "Circuits spécialisés (LL/LV/Four…)",
+        label: t("calc.electricity.circuits.special", { defaultValue: "Circuits spécialisés (LL/LV/Four…)" }),
         type: "special",
         protection: "20A",
         cableSection: "2.5",
@@ -284,7 +278,7 @@ export const ElectricityCalculator: React.FC<Props> = ({ onCalculate }) => {
     if (nbShutterCircuits > 0) {
       circuits.push({
         id: "c_shutter",
-        label: "Volets roulants",
+        label: t("calc.electricity.circuits.shutters", { defaultValue: "Volets roulants" }),
         type: "shutter",
         protection: "16A",
         cableSection: "1.5",
@@ -296,7 +290,7 @@ export const ElectricityCalculator: React.FC<Props> = ({ onCalculate }) => {
     if (nbHeaterCircuits > 0) {
       circuits.push({
         id: "c_heater",
-        label: "Chauffage",
+        label: t("calc.electricity.circuits.heating", { defaultValue: "Chauffage" }),
         type: "heater",
         protection: "20A",
         cableSection: "2.5",
@@ -317,7 +311,7 @@ export const ElectricityCalculator: React.FC<Props> = ({ onCalculate }) => {
     if (totalSockets > 0)
       add({
         id: "sockets",
-        name: "Prises de courant 16A",
+        name: t("calc.electricity.bom.sockets", { defaultValue: "Prises de courant 16A" }),
         quantity: totalSockets,
         unit: Unit.PIECE,
         unitPrice: prices.socket,
@@ -328,7 +322,7 @@ export const ElectricityCalculator: React.FC<Props> = ({ onCalculate }) => {
     if (totalSwitches > 0)
       add({
         id: "switches",
-        name: "Interrupteurs / Va-et-vient",
+        name: t("calc.electricity.bom.switches", { defaultValue: "Interrupteurs / Va-et-vient" }),
         quantity: totalSwitches,
         unit: Unit.PIECE,
         unitPrice: prices.switch,
@@ -339,7 +333,7 @@ export const ElectricityCalculator: React.FC<Props> = ({ onCalculate }) => {
     if (totalLights > 0)
       add({
         id: "lights",
-        name: "Points lumineux (DCL)",
+        name: t("calc.electricity.bom.lights", { defaultValue: "Points lumineux (DCL)" }),
         quantity: totalLights,
         unit: Unit.PIECE,
         unitPrice: prices.lightPoint,
@@ -350,7 +344,7 @@ export const ElectricityCalculator: React.FC<Props> = ({ onCalculate }) => {
     if (totalSpecial > 0)
       add({
         id: "special",
-        name: "Prises spécialisées (20A/32A)",
+        name: t("calc.electricity.bom.special_sockets", { defaultValue: "Prises spécialisées (20A/32A)" }),
         quantity: totalSpecial,
         unit: Unit.PIECE,
         unitPrice: prices.socketSpec,
@@ -361,7 +355,7 @@ export const ElectricityCalculator: React.FC<Props> = ({ onCalculate }) => {
     if (totalNetwork > 0)
       add({
         id: "network",
-        name: "Prises RJ45 / TV",
+        name: t("calc.electricity.bom.network", { defaultValue: "Prises RJ45 / TV" }),
         quantity: totalNetwork,
         unit: Unit.PIECE,
         unitPrice: prices.socket,
@@ -375,7 +369,7 @@ export const ElectricityCalculator: React.FC<Props> = ({ onCalculate }) => {
     if (totalPoints > 0) {
       add({
         id: "boxes",
-        name: "Boîtes d’encastrement",
+        name: t("calc.electricity.bom.boxes", { defaultValue: "Boîtes d’encastrement" }),
         quantity: totalPoints,
         unit: Unit.PIECE,
         unitPrice: prices.box,
@@ -400,6 +394,8 @@ export const ElectricityCalculator: React.FC<Props> = ({ onCalculate }) => {
     const totalCableLen = len15 + len25 + len6;
 
     const renoCoef = renovation ? 1.15 : 1.0;
+    const renoDetail = renovation ? t("calc.electricity.details.reno_plus15", { defaultValue: "Rénovation: +15% longueur" }) : undefined;
+
     const cost15 = len15 * prices.cable15 * renoCoef;
     const cost25 = len25 * prices.cable25 * renoCoef;
     const cost6 = len6 * prices.cable6 * renoCoef;
@@ -408,49 +404,49 @@ export const ElectricityCalculator: React.FC<Props> = ({ onCalculate }) => {
     if (len15 > 0)
       add({
         id: "cable15",
-        name: "Fil H07VU 1.5mm²",
+        name: t("calc.electricity.bom.cable_15", { defaultValue: "Fil H07VU 1.5mm²" }),
         quantity: Math.ceil(len15),
         unit: Unit.METER,
         unitPrice: prices.cable15,
         totalPrice: parseFloat(cost15.toFixed(2)),
         category: CalculatorType.ELECTRICITY,
-        details: renovation ? "Rénovation: +15% longueur" : undefined,
+        details: renoDetail,
       });
 
     if (len25 > 0)
       add({
         id: "cable25",
-        name: "Fil H07VU 2.5mm²",
+        name: t("calc.electricity.bom.cable_25", { defaultValue: "Fil H07VU 2.5mm²" }),
         quantity: Math.ceil(len25),
         unit: Unit.METER,
         unitPrice: prices.cable25,
         totalPrice: parseFloat(cost25.toFixed(2)),
         category: CalculatorType.ELECTRICITY,
-        details: renovation ? "Rénovation: +15% longueur" : undefined,
+        details: renoDetail,
       });
 
     if (len6 > 0)
       add({
         id: "cable6",
-        name: "Fil H07VU 6mm²",
+        name: t("calc.electricity.bom.cable_6", { defaultValue: "Fil H07VU 6mm²" }),
         quantity: Math.ceil(len6),
         unit: Unit.METER,
         unitPrice: prices.cable6,
         totalPrice: parseFloat(cost6.toFixed(2)),
         category: CalculatorType.ELECTRICITY,
-        details: renovation ? "Rénovation: +15% longueur" : undefined,
+        details: renoDetail,
       });
 
     if (totalCableLen > 0)
       add({
         id: "conduit",
-        name: "Gaine ICTA",
+        name: t("calc.electricity.bom.conduit", { defaultValue: "Gaine ICTA" }),
         quantity: Math.ceil(totalCableLen),
         unit: Unit.METER,
         unitPrice: prices.conduit,
         totalPrice: parseFloat(costConduit.toFixed(2)),
         category: CalculatorType.ELECTRICITY,
-        details: renovation ? "Rénovation: +15% longueur" : undefined,
+        details: renoDetail,
       });
 
     // tableau
@@ -463,7 +459,11 @@ export const ElectricityCalculator: React.FC<Props> = ({ onCalculate }) => {
 
     add({
       id: "panel",
-      name: `Tableau électrique (${rowsNeeded} rangée${rowsNeeded > 1 ? "s" : ""})`,
+      name: t("calc.electricity.bom.panel_named", {
+        defaultValue: "Tableau électrique ({{n}} rangée{{s}})",
+        n: rowsNeeded,
+        s: rowsNeeded > 1 ? "s" : "",
+      }),
       quantity: 1,
       unit: Unit.PIECE,
       unitPrice: costRows,
@@ -474,7 +474,7 @@ export const ElectricityCalculator: React.FC<Props> = ({ onCalculate }) => {
     if (totalBreakers > 0) {
       add({
         id: "breakers",
-        name: "Disjoncteurs (10A/16A/20A/32A)",
+        name: t("calc.electricity.bom.breakers", { defaultValue: "Disjoncteurs (10A/16A/20A/32A)" }),
         quantity: totalBreakers,
         unit: Unit.PIECE,
         unitPrice: prices.breaker,
@@ -485,7 +485,7 @@ export const ElectricityCalculator: React.FC<Props> = ({ onCalculate }) => {
 
     add({
       id: "diffs",
-      name: "Interrupteurs différentiels 30mA",
+      name: t("calc.electricity.bom.diff_switches", { defaultValue: "Interrupteurs différentiels 30mA" }),
       quantity: rowsNeeded,
       unit: Unit.PIECE,
       unitPrice: prices.diffSwitch,
@@ -499,7 +499,7 @@ export const ElectricityCalculator: React.FC<Props> = ({ onCalculate }) => {
       const laborPnl = prices.laborPanel * (rowsNeeded > 2 ? 1.5 : 1);
       add({
         id: "labor_pts",
-        name: "Main d’œuvre (appareillage)",
+        name: t("calc.electricity.bom.labor_points", { defaultValue: "Main d’œuvre (appareillage)" }),
         quantity: totalPoints,
         unit: Unit.PIECE,
         unitPrice: prices.laborPoint,
@@ -508,7 +508,7 @@ export const ElectricityCalculator: React.FC<Props> = ({ onCalculate }) => {
       });
       add({
         id: "labor_pnl",
-        name: "Main d’œuvre (tableau)",
+        name: t("calc.electricity.bom.labor_panel", { defaultValue: "Main d’œuvre (tableau)" }),
         quantity: 1,
         unit: Unit.PACKAGE,
         unitPrice: laborPnl,
@@ -526,20 +526,24 @@ export const ElectricityCalculator: React.FC<Props> = ({ onCalculate }) => {
         panelRows: rowsNeeded,
       },
     };
-  }, [rooms, avgDistPanel, avgDistPoint, renovation, prices, proMode]);
+  }, [rooms, avgDistPanel, avgDistPoint, renovation, prices, proMode, t]);
 
   useEffect(() => {
     onCalculate({
-      summary: `${calculationData.summaryStats.points} Points • ${calculationData.summaryStats.circuits} Circuits`,
+      summary: t("calc.electricity.summary", {
+        defaultValue: "{{p}} Points • {{c}} Circuits",
+        p: calculationData.summaryStats.points,
+        c: calculationData.summaryStats.circuits,
+      }),
       details: [
-        { label: "Points", value: calculationData.summaryStats.points, unit: "u" },
-        { label: "Circuits (disj.)", value: calculationData.summaryStats.circuits, unit: "u" },
-        { label: "Tableau", value: `${calculationData.summaryStats.panelRows} rangée(s)`, unit: "" },
+        { label: t("calc.electricity.kpi.points", { defaultValue: "Points" }), value: calculationData.summaryStats.points, unit: "u" },
+        { label: t("calc.electricity.kpi.circuits", { defaultValue: "Circuits (disj.)" }), value: calculationData.summaryStats.circuits, unit: "u" },
+        { label: t("calc.electricity.kpi.panel", { defaultValue: "Tableau" }), value: t("calc.electricity.kpi.panel_rows", { defaultValue: "{{n}} rangée(s)", n: calculationData.summaryStats.panelRows }), unit: "" },
       ],
       materials: calculationData.materials,
       totalCost: calculationData.totalCost,
     });
-  }, [calculationData, onCalculate]);
+  }, [calculationData, onCalculate, t]);
 
   return (
     <div className="space-y-6 animate-in fade-in">
@@ -554,10 +558,10 @@ export const ElectricityCalculator: React.FC<Props> = ({ onCalculate }) => {
               step === s ? "bg-white shadow text-blue-600" : "text-slate-400"
             }`}
           >
-            {s === 1 && "1. Pièces"}
-            {s === 2 && "2. Config"}
-            {s === 3 && "3. Prix"}
-            {s === 4 && "4. Devis"}
+            {s === 1 && t("calc.electricity.steps.1", { defaultValue: "1. Pièces" })}
+            {s === 2 && t("calc.electricity.steps.2", { defaultValue: "2. Config" })}
+            {s === 3 && t("calc.electricity.steps.3", { defaultValue: "3. Prix" })}
+            {s === 4 && t("calc.electricity.steps.4", { defaultValue: "4. Devis" })}
           </button>
         ))}
       </div>
@@ -567,7 +571,7 @@ export const ElectricityCalculator: React.FC<Props> = ({ onCalculate }) => {
         <div className="space-y-4">
           <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
             <Home size={16} className="mr-2 shrink-0 mt-0.5" />
-            Ajoutez les pièces et ajustez les points électriques.
+            {t("calc.electricity.step1.hint", { defaultValue: "Ajoutez les pièces et ajustez les points électriques." })}
           </div>
 
           <div className="space-y-4">
@@ -605,6 +609,7 @@ export const ElectricityCalculator: React.FC<Props> = ({ onCalculate }) => {
                           type="button"
                           onClick={() => updatePoint(room.id, p.id, -1)}
                           className="w-5 h-5 flex items-center justify-center bg-white rounded border text-slate-500 hover:bg-slate-100"
+                          aria-label={t("calc.electricity.actions.decrease", { defaultValue: "Diminuer" })}
                         >
                           -
                         </button>
@@ -613,6 +618,7 @@ export const ElectricityCalculator: React.FC<Props> = ({ onCalculate }) => {
                           type="button"
                           onClick={() => updatePoint(room.id, p.id, 1)}
                           className="w-5 h-5 flex items-center justify-center bg-white rounded border text-slate-500 hover:bg-slate-100"
+                          aria-label={t("calc.electricity.actions.increase", { defaultValue: "Augmenter" })}
                         >
                           +
                         </button>
@@ -622,22 +628,22 @@ export const ElectricityCalculator: React.FC<Props> = ({ onCalculate }) => {
 
                   <div className="col-span-2 pt-2 flex flex-wrap gap-2 justify-center border-t border-slate-100 mt-1">
                     <button type="button" onClick={() => addPointToRoom(room.id, "socket")} className="px-2 py-1 text-[10px] bg-white border rounded hover:bg-slate-50">
-                      + Prise
+                      + {t("calc.electricity.quick_add.socket", { defaultValue: "Prise" })}
                     </button>
                     <button type="button" onClick={() => addPointToRoom(room.id, "light")} className="px-2 py-1 text-[10px] bg-white border rounded hover:bg-slate-50">
-                      + Lampe
+                      + {t("calc.electricity.quick_add.light", { defaultValue: "Lampe" })}
                     </button>
                     <button type="button" onClick={() => addPointToRoom(room.id, "switch")} className="px-2 py-1 text-[10px] bg-white border rounded hover:bg-slate-50">
-                      + Inter
+                      + {t("calc.electricity.quick_add.switch", { defaultValue: "Inter" })}
                     </button>
                     <button type="button" onClick={() => addPointToRoom(room.id, "shutter")} className="px-2 py-1 text-[10px] bg-white border rounded hover:bg-slate-50">
-                      + Volet
+                      + {t("calc.electricity.quick_add.shutter", { defaultValue: "Volet" })}
                     </button>
                     <button type="button" onClick={() => addPointToRoom(room.id, "heater")} className="px-2 py-1 text-[10px] bg-white border rounded hover:bg-slate-50">
-                      + Chauff.
+                      + {t("calc.electricity.quick_add.heater", { defaultValue: "Chauff." })}
                     </button>
                     <button type="button" onClick={() => addPointToRoom(room.id, "network")} className="px-2 py-1 text-[10px] bg-white border rounded hover:bg-slate-50">
-                      + RJ45
+                      + {t("calc.electricity.quick_add.network", { defaultValue: "RJ45" })}
                     </button>
                   </div>
                 </div>
@@ -651,19 +657,19 @@ export const ElectricityCalculator: React.FC<Props> = ({ onCalculate }) => {
               onChange={(e) => setNewRoomType(e.target.value as any)}
               className="flex-1 text-sm border-slate-300 rounded-lg"
             >
-              <option value="bedroom">Chambre</option>
-              <option value="living">Séjour</option>
-              <option value="kitchen">Cuisine</option>
-              <option value="bathroom">SDB</option>
-              <option value="wc">WC</option>
-              <option value="other">Autre</option>
+              <option value="bedroom">{t("calc.electricity.rooms.types.bedroom", { defaultValue: "Chambre" })}</option>
+              <option value="living">{t("calc.electricity.rooms.types.living", { defaultValue: "Séjour" })}</option>
+              <option value="kitchen">{t("calc.electricity.rooms.types.kitchen", { defaultValue: "Cuisine" })}</option>
+              <option value="bathroom">{t("calc.electricity.rooms.types.bathroom", { defaultValue: "SDB" })}</option>
+              <option value="wc">{t("calc.electricity.rooms.types.wc", { defaultValue: "WC" })}</option>
+              <option value="other">{t("calc.electricity.rooms.types.other", { defaultValue: "Autre" })}</option>
             </select>
             <button
               type="button"
               onClick={addRoom}
               className="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold text-sm shadow-md active:scale-95 transition-transform flex items-center"
             >
-              <Plus size={16} className="mr-1" /> Ajouter
+              <Plus size={16} className="mr-1" /> {t("calc.electricity.actions.add", { defaultValue: "Ajouter" })}
             </button>
           </div>
 
@@ -672,7 +678,7 @@ export const ElectricityCalculator: React.FC<Props> = ({ onCalculate }) => {
             onClick={() => setStep(2)}
             className="w-full py-3 bg-blue-600 text-white rounded-xl font-bold flex justify-center items-center mt-4"
           >
-            Suivant <ArrowRight size={18} className="ml-2" />
+            {t("common.next", { defaultValue: "Suivant" })} <ArrowRight size={18} className="ml-2" />
           </button>
         </div>
       )}
@@ -682,50 +688,35 @@ export const ElectricityCalculator: React.FC<Props> = ({ onCalculate }) => {
         <div className="space-y-4">
           <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
             <Cable size={16} className="mr-2 shrink-0 mt-0.5" />
-            Paramètres de câblage et distances.
+            {t("calc.electricity.step2.hint", { defaultValue: "Paramètres de câblage et distances." })}
           </div>
 
           <div className="bg-white p-3 rounded-xl border border-slate-200 space-y-3">
             <label className="flex items-center justify-between p-2 hover:bg-slate-50 rounded cursor-pointer">
               <div>
-                <span className="text-sm font-medium block">Rénovation</span>
-                <span className="text-xs text-slate-400">Goulottes / saignées (vs encastré)</span>
+                <span className="text-sm font-medium block">{t("calc.electricity.config.renovation", { defaultValue: "Rénovation" })}</span>
+                <span className="text-xs text-slate-400">{t("calc.electricity.config.renovation_help", { defaultValue: "Goulottes / saignées (vs encastré)" })}</span>
               </div>
-              <input
-                type="checkbox"
-                checked={renovation}
-                onChange={(e) => setRenovation(e.target.checked)}
-                className="h-5 w-5 text-blue-600 rounded"
-              />
+              <input type="checkbox" checked={renovation} onChange={(e) => setRenovation(e.target.checked)} className="h-5 w-5 text-blue-600 rounded" />
             </label>
 
             <div>
-              <label className="block text-xs font-bold text-slate-500 mb-1">Distance moyenne tableau (m)</label>
-              <input
-                type="number"
-                value={avgDistPanel}
-                onChange={(e) => setAvgDistPanel(Number(e.target.value))}
-                className="w-full p-2 text-sm border rounded bg-white"
-              />
+              <label className="block text-xs font-bold text-slate-500 mb-1">{t("calc.electricity.config.avg_panel_dist", { defaultValue: "Distance moyenne tableau (m)" })}</label>
+              <input type="number" value={avgDistPanel} onChange={(e) => setAvgDistPanel(Number(e.target.value))} className="w-full p-2 text-sm border rounded bg-white" />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-500 mb-1">Distance moyenne entre points (m)</label>
-              <input
-                type="number"
-                value={avgDistPoint}
-                onChange={(e) => setAvgDistPoint(Number(e.target.value))}
-                className="w-full p-2 text-sm border rounded bg-white"
-              />
+              <label className="block text-xs font-bold text-slate-500 mb-1">{t("calc.electricity.config.avg_point_dist", { defaultValue: "Distance moyenne entre points (m)" })}</label>
+              <input type="number" value={avgDistPoint} onChange={(e) => setAvgDistPoint(Number(e.target.value))} className="w-full p-2 text-sm border rounded bg-white" />
             </div>
           </div>
 
           <div className="flex gap-3">
             <button type="button" onClick={() => setStep(1)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
-              Retour
+              {t("common.back", { defaultValue: "Retour" })}
             </button>
             <button type="button" onClick={() => setStep(3)} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold">
-              Suivant
+              {t("common.next", { defaultValue: "Suivant" })}
             </button>
           </div>
         </div>
@@ -736,32 +727,33 @@ export const ElectricityCalculator: React.FC<Props> = ({ onCalculate }) => {
         <div className="space-y-4">
           <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
             <CircleDollarSign size={16} className="mr-2 shrink-0 mt-0.5" />
-            Ajustez les prix unitaires.
+            {t("calc.electricity.step3.hint", { defaultValue: "Ajustez les prix unitaires." })}
           </div>
 
           <div className="bg-white p-3 rounded-xl border border-slate-200">
             <div className="flex justify-between items-center mb-3">
-              <h4 className="text-xs font-bold text-slate-500 uppercase">Tarifs unitaires</h4>
+              <h4 className="text-xs font-bold text-slate-500 uppercase">{t("calc.electricity.prices.title", { defaultValue: "Tarifs unitaires" })}</h4>
               <button type="button" onClick={() => setProMode(!proMode)} className="text-xs flex items-center text-blue-600">
-                <Settings size={12} className="mr-1" /> {proMode ? "Mode Pro" : "Mode Simple"}
+                <Settings size={12} className="mr-1" />{" "}
+                {proMode ? t("calc.electricity.prices.pro", { defaultValue: "Mode Pro" }) : t("calc.electricity.prices.simple", { defaultValue: "Mode Simple" })}
               </button>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-[10px] text-slate-500 mb-1">Prise 16A (€)</label>
+                <label className="block text-[10px] text-slate-500 mb-1">{t("calc.electricity.prices.socket", { defaultValue: "Prise 16A (€)" })}</label>
                 <input type="number" value={prices.socket} onChange={(e) => updatePrice("socket", e.target.value)} className="w-full p-1.5 border rounded text-sm" />
               </div>
               <div>
-                <label className="block text-[10px] text-slate-500 mb-1">Interrupteur (€)</label>
+                <label className="block text-[10px] text-slate-500 mb-1">{t("calc.electricity.prices.switch", { defaultValue: "Interrupteur (€)" })}</label>
                 <input type="number" value={prices.switch} onChange={(e) => updatePrice("switch", e.target.value)} className="w-full p-1.5 border rounded text-sm" />
               </div>
               <div>
-                <label className="block text-[10px] text-slate-500 mb-1">Disjoncteur (€)</label>
+                <label className="block text-[10px] text-slate-500 mb-1">{t("calc.electricity.prices.breaker", { defaultValue: "Disjoncteur (€)" })}</label>
                 <input type="number" value={prices.breaker} onChange={(e) => updatePrice("breaker", e.target.value)} className="w-full p-1.5 border rounded text-sm" />
               </div>
               <div>
-                <label className="block text-[10px] text-slate-500 mb-1">Fil 2.5mm² (€/m)</label>
+                <label className="block text-[10px] text-slate-500 mb-1">{t("calc.electricity.prices.cable25", { defaultValue: "Fil 2.5mm² (€/m)" })}</label>
                 <input type="number" value={prices.cable25} onChange={(e) => updatePrice("cable25", e.target.value)} className="w-full p-1.5 border rounded text-sm" />
               </div>
             </div>
@@ -769,11 +761,11 @@ export const ElectricityCalculator: React.FC<Props> = ({ onCalculate }) => {
             {proMode && (
               <div className="mt-4 pt-3 border-t border-slate-100 grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[10px] text-blue-600 font-bold mb-1">MO point (€)</label>
+                  <label className="block text-[10px] text-blue-600 font-bold mb-1">{t("calc.electricity.prices.labor_point", { defaultValue: "MO point (€)" })}</label>
                   <input type="number" value={prices.laborPoint} onChange={(e) => updatePrice("laborPoint", e.target.value)} className="w-full p-1.5 border border-blue-200 rounded text-sm" />
                 </div>
                 <div>
-                  <label className="block text-[10px] text-blue-600 font-bold mb-1">Forfait tableau (€)</label>
+                  <label className="block text-[10px] text-blue-600 font-bold mb-1">{t("calc.electricity.prices.labor_panel", { defaultValue: "Forfait tableau (€)" })}</label>
                   <input type="number" value={prices.laborPanel} onChange={(e) => updatePrice("laborPanel", e.target.value)} className="w-full p-1.5 border border-blue-200 rounded text-sm" />
                 </div>
               </div>
@@ -782,10 +774,10 @@ export const ElectricityCalculator: React.FC<Props> = ({ onCalculate }) => {
 
           <div className="flex gap-3 pt-2">
             <button type="button" onClick={() => setStep(2)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
-              Retour
+              {t("common.back", { defaultValue: "Retour" })}
             </button>
             <button type="button" onClick={() => setStep(4)} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold">
-              Suivant
+              {t("common.next", { defaultValue: "Suivant" })}
             </button>
           </div>
         </div>
@@ -796,15 +788,15 @@ export const ElectricityCalculator: React.FC<Props> = ({ onCalculate }) => {
         <div className="space-y-4">
           <div className="p-3 bg-emerald-50 text-emerald-800 text-xs rounded-lg flex items-start">
             <Check size={16} className="mr-2 shrink-0 mt-0.5" />
-            Terminé. Le récapitulatif est envoyé au panneau de résultat.
+            {t("calc.electricity.step4.hint", { defaultValue: "Terminé. Le récapitulatif est envoyé au panneau de résultat." })}
           </div>
 
           <div className="flex gap-3 pt-2">
             <button type="button" onClick={() => setStep(3)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
-              Retour
+              {t("common.back", { defaultValue: "Retour" })}
             </button>
             <button type="button" disabled className="flex-1 py-3 bg-emerald-100 text-emerald-700 rounded-xl font-bold flex justify-center items-center">
-              <Check size={18} className="mr-2" /> Calculé
+              <Check size={18} className="mr-2" /> {t("calc.electricity.calculated", { defaultValue: "Calculé" })}
             </button>
           </div>
         </div>

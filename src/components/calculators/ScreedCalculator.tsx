@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { CalculatorType, CalculationResult, Unit } from "../../../types";
 import { DEFAULT_PRICES, MESH_TYPES } from "../../constants";
+import { getUnitPrice } from "../../services/materialsService";
 import {
   Layers,
   Plus,
@@ -9,11 +10,10 @@ import {
   Settings,
   Check,
   ArrowRight,
-  Info,
+  BoxSelect,
   AlertTriangle,
   Truck,
   CircleDollarSign,
-  BoxSelect,
 } from "lucide-react";
 
 interface ScreedZone {
@@ -25,7 +25,6 @@ interface ScreedZone {
   slopePct: number; // %
   slopeLen: number; // m
 }
-
 
 interface Props {
   onCalculate: (result: CalculationResult) => void;
@@ -46,11 +45,25 @@ const toNum = (v: unknown, fallback = 0) => {
 const round2 = (n: number) => Math.round((n + Number.EPSILON) * 100) / 100;
 const clamp = (n: number, min: number, max: number) => Math.min(max, Math.max(min, n));
 
+/** Prefer catalog price > DEFAULT_PRICES > fallback */
+const priceOr = (catalogKey: string, defaultKey: string | null, fallback: number) => {
+  const c = getUnitPrice(catalogKey);
+  if (typeof c === "number" && Number.isFinite(c) && c !== 0) return c;
+
+  if (defaultKey) {
+    const d = (DEFAULT_PRICES as any)?.[defaultKey];
+    const nd = Number(d);
+    if (d !== undefined && Number.isFinite(nd) && nd !== 0) return nd;
+  }
+
+  return fallback;
+};
+
 export const ScreedCalculator: React.FC<Props> = ({ onCalculate }) => {
   const [step, setStep] = useState(1);
   const [proMode, setProMode] = useState(false);
 
-  // --- 1. Project & Zones ---
+  // --- 1. Zones ---
   const [zones, setZones] = useState<ScreedZone[]>([]);
   const [newZoneLabel, setNewZoneLabel] = useState("Pièce 1");
   const [newZoneArea, setNewZoneArea] = useState("");
@@ -67,7 +80,10 @@ export const ScreedCalculator: React.FC<Props> = ({ onCalculate }) => {
 
   // Reinforcement & joints
   const [reinforceType, setReinforceType] = useState<ReinforceType>("mesh");
-  const [meshTypeId, setMeshTypeId] = useState("ST10");
+  const [meshTypeId, setMeshTypeId] = useState<string>(() => {
+    const first = (MESH_TYPES as any[])?.[0]?.id;
+    return first || "ST10";
+  });
   const [fiberDosage, setFiberDosage] = useState(0.6); // kg/m3
   const [useJoints, setUseJoints] = useState(true);
 
@@ -77,33 +93,38 @@ export const ScreedCalculator: React.FC<Props> = ({ onCalculate }) => {
   const [lightBagVol, setLightBagVol] = useState(15); // L per bag
 
   // --- 3. Pricing ---
-  const [prices, setPrices] = useState({
-    cementBag: (DEFAULT_PRICES as any).CEMENT_BAG_35KG ?? 11.5,
-    sandTon: (DEFAULT_PRICES as any).SAND_TON ?? 45,
-    fiberKg: 15.0,
-    polyaneM2: 1.5,
-    stripM: 0.8,
-    insulM2: 10.0,
-    bpeM3: 160.0,
-    pumpFlat: 300.0,
-    premixBag: 12.0,
-    laborM2: 25.0,
-    jointM: 3.0,
-    primerL: 12.0,
+  const [prices, setPrices] = useState(() => ({
+    cementBag: priceOr("CEMENT_BAG_35KG", "CEMENT_BAG_35KG", 11.5),
+    sandTon: priceOr("SAND_TON", "SAND_TON", 45),
 
-    // mesh: allow dynamic by type
-    meshPanel: 5.0, // default fallback (overridden by mesh type if found)
-  });
+    fiberKg: priceOr("FIBER_KG", null, 15),
+    polyaneM2: priceOr("POLYANE_M2", null, 1.5),
+    stripM: priceOr("PERIPHERAL_BAND_M", null, 0.8),
+    insulM2: priceOr("INSULATION_UNDER_SCREED_M2", null, 10),
+
+    // Fluid
+    bpeM3: priceOr("BPE_M3", null, 160),
+    pumpFlat: priceOr("PUMP_FLAT", null, 300),
+
+    // Light/premix
+    premixBag: priceOr("SCREED_PREMIX_BAG", null, 12),
+
+    // Labor + joints
+    laborM2: priceOr("LABOR_SCREED_M2", null, 25),
+    jointM: priceOr("JOINT_M", null, 3),
+
+    // Mesh fallback if mesh type doesn't provide a price
+    meshPanel: priceOr("MESH_PANEL_UNIT", null, 5),
+  }));
 
   const updatePrice = (key: keyof typeof prices, val: string) => {
     setPrices((prev) => ({ ...prev, [key]: toNum(val, 0) }));
   };
 
-  // Auto: If screed is fluid, reinforcement typically fiber (or none) depending project
+  // Auto: fluid screed often fiber; keep user choice unless empty zones + mesh
   useEffect(() => {
-    if (screedType === "fluid_anh" || screedType === "fluid_cem") {
-      // keep user's choice; but default to fiber if mesh selected and no zones yet
-      if (zones.length === 0 && reinforceType === "mesh") setReinforceType("fiber");
+    if ((screedType === "fluid_anh" || screedType === "fluid_cem") && zones.length === 0 && reinforceType === "mesh") {
+      setReinforceType("fiber");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [screedType]);
@@ -112,13 +133,13 @@ export const ScreedCalculator: React.FC<Props> = ({ onCalculate }) => {
   const addZone = () => {
     const area = toNum(newZoneArea, 0);
     const thick = toNum(newZoneThick, 0);
-    if (area <= 0 || thick <= 0) return;
+    if (!(area > 0) || !(thick > 0)) return;
 
     setZones((prev) => [
       ...prev,
       {
         id: uid(),
-        label: newZoneLabel || `Zone ${prev.length + 1}`,
+        label: (newZoneLabel || `Zone ${prev.length + 1}`).trim(),
         area,
         thickness: thick,
         isSloped: false,
@@ -136,6 +157,20 @@ export const ScreedCalculator: React.FC<Props> = ({ onCalculate }) => {
   };
 
   const removeZone = (id: string) => setZones((prev) => prev.filter((z) => z.id !== id));
+
+  const meshOptions = useMemo(() => {
+    const list = (MESH_TYPES as any[]) || [];
+    return list
+      .map((m) => ({
+        id: String(m.id ?? ""),
+        label: String(m.label ?? m.id ?? "Treillis"),
+        coverM2: Number.isFinite(Number(m.coverM2)) ? Number(m.coverM2) : undefined,
+        price: Number.isFinite(Number(m.price)) ? Number(m.price) : undefined,
+      }))
+      .filter((m) => m.id);
+  }, []);
+
+  const findMesh = (id: string) => meshOptions.find((m) => m.id === id);
 
   // --- CALCULATION ENGINE ---
   const calculationData = useMemo(() => {
@@ -155,12 +190,14 @@ export const ScreedCalculator: React.FC<Props> = ({ onCalculate }) => {
       let avgThickCm = z.thickness;
 
       if (z.isSloped) {
-        const slopePct = clamp(toNum(z.slopePct, 0), 0, 10); // % (for screed slopes)
-        const slopeLen = clamp(toNum(z.slopeLen, 0), 0, 50); // m
-        const hMaxCm = z.thickness + slopePct * slopeLen; // NOTE: 1% over 1m = 1cm
+        const sPct = clamp(toNum(z.slopePct, 0), 0, 10); // %
+        const sLen = clamp(toNum(z.slopeLen, 0), 0, 50); // m
+        const hMaxCm = z.thickness + sPct * sLen; // 1% over 1m = 1cm
         avgThickCm = (z.thickness + hMaxCm) / 2;
 
-        if (hMaxCm > 15) warnings.push(`${z.label}: épaisseur max estimée ${hMaxCm.toFixed(1)} cm (pente forte / longueur élevée).`);
+        if (hMaxCm > 15) {
+          warnings.push(`${z.label}: épaisseur max estimée ${hMaxCm.toFixed(1)} cm (pente/longueur élevées).`);
+        }
       }
 
       totalVolume += z.area * (avgThickCm / 100);
@@ -170,7 +207,6 @@ export const ScreedCalculator: React.FC<Props> = ({ onCalculate }) => {
 
     // 2) Screed material
     if (screedType === "trad" || screedType === "ravoirage") {
-      // For ravoirage: often lighter dosage; we keep same engine but warn and allow user to tweak dosage
       if (screedType === "ravoirage" && cementDosage > 300) {
         warnings.push("Ravoirage : dosage ciment souvent plus faible (≈150–250 kg/m³). Ajuste le dosage si besoin.");
       }
@@ -227,7 +263,6 @@ export const ScreedCalculator: React.FC<Props> = ({ onCalculate }) => {
         details: `≈ ${lightBagVol} L / sac • Vol: ${wasteVol.toFixed(2)} m³`,
       });
     } else {
-      // fluid
       const costBpe = wasteVol * prices.bpeM3;
       totalCost += costBpe;
       materialsList.push({
@@ -241,61 +276,66 @@ export const ScreedCalculator: React.FC<Props> = ({ onCalculate }) => {
         category: CalculatorType.SCREED,
       });
 
-      totalCost += prices.pumpFlat;
-      materialsList.push({
-        id: "pump",
-        name: "Forfait pompage",
-        quantity: 1,
-        unit: Unit.PACKAGE,
-        unitPrice: round2(prices.pumpFlat),
-        totalPrice: round2(prices.pumpFlat),
-        category: CalculatorType.SCREED,
-      });
+      if (prices.pumpFlat > 0) {
+        totalCost += prices.pumpFlat;
+        materialsList.push({
+          id: "pump",
+          name: "Forfait pompage",
+          quantity: 1,
+          unit: Unit.PACKAGE,
+          unitPrice: round2(prices.pumpFlat),
+          totalPrice: round2(prices.pumpFlat),
+          category: CalculatorType.SCREED,
+        });
+      }
     }
 
     // 3) Reinforcement
     if (reinforceType === "mesh") {
-    const meshDef = (MESH_TYPES || []).find((m) => m.id === meshTypeId) as
-  | (typeof MESH_TYPES[number] & { coverM2?: number; price?: number })
-  | undefined;      const coverM2 = meshDef?.coverM2 ?? 2; // default 2 m² per panel
-      const meshPrice = meshDef?.price ?? prices.meshPanel;
+      const mesh = findMesh(meshTypeId);
+      const coverM2 = mesh?.coverM2 ?? 2; // default ~2m² / panneau
+      const meshPrice = mesh?.price ?? prices.meshPanel;
 
-      const panels = Math.ceil(totalArea / Math.max(0.5, coverM2));
+      const panels = totalArea > 0 ? Math.ceil(totalArea / Math.max(0.5, coverM2)) : 0;
       const costMesh = panels * meshPrice;
 
-      totalCost += costMesh;
-      materialsList.push({
-        id: "mesh",
-        name: `Treillis (${meshDef?.label ?? meshTypeId})`,
-        quantity: panels,
-        quantityRaw: totalArea,
-        unit: Unit.PIECE,
-        unitPrice: round2(meshPrice),
-        totalPrice: round2(costMesh),
-        category: CalculatorType.SCREED,
-        details: `≈ ${coverM2} m² / unité`,
-      });
+      if (panels > 0 && meshPrice > 0) {
+        totalCost += costMesh;
+        materialsList.push({
+          id: "mesh",
+          name: `Treillis (${mesh?.label ?? meshTypeId})`,
+          quantity: panels,
+          quantityRaw: totalArea,
+          unit: Unit.PIECE,
+          unitPrice: round2(meshPrice),
+          totalPrice: round2(costMesh),
+          category: CalculatorType.SCREED,
+          details: `≈ ${coverM2} m² / unité`,
+        });
+      }
     } else if (reinforceType === "fiber") {
       const totalFiberKg = wasteVol * fiberDosage;
-      const qtyKg = Math.ceil(totalFiberKg);
+      const qtyKg = Math.ceil(Math.max(0, totalFiberKg));
       const costFiber = qtyKg * prices.fiberKg;
 
-      totalCost += costFiber;
-      materialsList.push({
-        id: "fiber",
-        name: "Fibres (dosage)",
-        quantity: qtyKg,
-        quantityRaw: totalFiberKg,
-        unit: Unit.KG,
-        unitPrice: round2(prices.fiberKg),
-        totalPrice: round2(costFiber),
-        category: CalculatorType.SCREED,
-        details: `${Math.round(fiberDosage * 1000)} g/m³`,
-      });
+      if (qtyKg > 0 && prices.fiberKg > 0) {
+        totalCost += costFiber;
+        materialsList.push({
+          id: "fiber",
+          name: "Fibres (dosage)",
+          quantity: qtyKg,
+          quantityRaw: totalFiberKg,
+          unit: Unit.KG,
+          unitPrice: round2(prices.fiberKg),
+          totalPrice: round2(costFiber),
+          category: CalculatorType.SCREED,
+          details: `${Math.round(fiberDosage * 1000)} g/m³`,
+        });
+      }
     }
 
     // 4) Underlayers
-    if (usePolyane) {
+    if (usePolyane && totalArea > 0) {
       const areaPoly = totalArea * 1.15;
       const costPoly = areaPoly * prices.polyaneM2;
       totalCost += costPoly;
@@ -311,7 +351,7 @@ export const ScreedCalculator: React.FC<Props> = ({ onCalculate }) => {
       });
     }
 
-    if (useStrip) {
+    if (useStrip && totalPerimeter > 0) {
       const len = totalPerimeter * 1.05;
       const costStrip = len * prices.stripM;
       totalCost += costStrip;
@@ -327,7 +367,7 @@ export const ScreedCalculator: React.FC<Props> = ({ onCalculate }) => {
       });
     }
 
-    if (useInsulation) {
+    if (useInsulation && totalArea > 0) {
       const areaIns = totalArea * 1.05;
       const costIns = areaIns * prices.insulM2;
       totalCost += costIns;
@@ -343,7 +383,7 @@ export const ScreedCalculator: React.FC<Props> = ({ onCalculate }) => {
       });
     }
 
-    // 5) Joints (very rough)
+    // 5) Joints (rough)
     if (useJoints && totalArea > 40) {
       const jointLen = Math.max(0, Math.sqrt(totalArea));
       const costJoint = jointLen * prices.jointM;
@@ -361,7 +401,7 @@ export const ScreedCalculator: React.FC<Props> = ({ onCalculate }) => {
     }
 
     // 6) Labor
-    if (proMode) {
+    if (proMode && totalArea > 0) {
       const costLab = totalArea * prices.laborM2;
       totalCost += costLab;
       materialsList.push({
@@ -381,6 +421,9 @@ export const ScreedCalculator: React.FC<Props> = ({ onCalculate }) => {
     // basic warnings
     if (zones.length === 0) warnings.push("Ajoute au moins une zone pour obtenir un calcul.");
     if (avgThicknessCm > 12 && screedType !== "light") warnings.push("Épaisseur moyenne élevée : vérifier charges / temps de séchage.");
+    if ((screedType === "fluid_anh" || screedType === "fluid_cem") && wasteVol > 0 && wasteVol < 1) {
+      warnings.push("Petit volume en chape fluide : vérifier minimum de commande / forfaits.");
+    }
 
     return {
       totalCost: round2(totalCost),
@@ -406,6 +449,7 @@ export const ScreedCalculator: React.FC<Props> = ({ onCalculate }) => {
     useJoints,
     prices,
     proMode,
+    meshOptions,
   ]);
 
   // Pass results
@@ -430,6 +474,7 @@ export const ScreedCalculator: React.FC<Props> = ({ onCalculate }) => {
         {[1, 2, 3, 4].map((s) => (
           <button
             key={s}
+            type="button"
             onClick={() => setStep(s)}
             className={`flex-1 min-w-[80px] py-2 text-xs font-bold rounded transition-all ${
               step === s ? "bg-white shadow text-blue-600" : "text-slate-400"
@@ -443,7 +488,7 @@ export const ScreedCalculator: React.FC<Props> = ({ onCalculate }) => {
         ))}
       </div>
 
-      {/* STEP 1: ZONES & TYPE */}
+      {/* STEP 1 */}
       {step === 1 && (
         <div className="space-y-4">
           <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
@@ -471,7 +516,7 @@ export const ScreedCalculator: React.FC<Props> = ({ onCalculate }) => {
               <div key={z.id} className="bg-white border border-slate-200 rounded-lg p-3">
                 <div className="flex justify-between items-start mb-2">
                   <span className="font-bold text-slate-700">{z.label}</span>
-                  <button onClick={() => removeZone(z.id)} className="text-red-400">
+                  <button type="button" onClick={() => removeZone(z.id)} className="text-red-400">
                     <Trash2 size={16} />
                   </button>
                 </div>
@@ -497,7 +542,7 @@ export const ScreedCalculator: React.FC<Props> = ({ onCalculate }) => {
                       <input
                         type="number"
                         value={z.slopePct}
-                        onChange={(e) => updateZone(z.id, "slopePct", toNum(e.target.value, 0))}
+                        onChange={(e) => updateZone(z.id, "slopePct", clamp(toNum(e.target.value, 0), 0, 10))}
                         className="w-12 p-1 border rounded text-xs bg-white text-slate-900"
                         placeholder="%"
                       />
@@ -505,7 +550,7 @@ export const ScreedCalculator: React.FC<Props> = ({ onCalculate }) => {
                       <input
                         type="number"
                         value={z.slopeLen}
-                        onChange={(e) => updateZone(z.id, "slopeLen", toNum(e.target.value, 0))}
+                        onChange={(e) => updateZone(z.id, "slopeLen", clamp(toNum(e.target.value, 0), 0, 50))}
                         className="w-12 p-1 border rounded text-xs bg-white text-slate-900"
                         placeholder="m"
                       />
@@ -542,6 +587,7 @@ export const ScreedCalculator: React.FC<Props> = ({ onCalculate }) => {
                   className="w-full p-2 border rounded text-sm bg-white text-slate-900"
                 />
                 <button
+                  type="button"
                   onClick={addZone}
                   className="w-full bg-blue-600 text-white rounded font-bold text-sm flex justify-center items-center"
                 >
@@ -552,6 +598,7 @@ export const ScreedCalculator: React.FC<Props> = ({ onCalculate }) => {
           </div>
 
           <button
+            type="button"
             onClick={() => setStep(2)}
             className="w-full py-3 bg-blue-600 text-white rounded-xl font-bold flex justify-center items-center mt-2"
           >
@@ -560,7 +607,7 @@ export const ScreedCalculator: React.FC<Props> = ({ onCalculate }) => {
         </div>
       )}
 
-      {/* STEP 2: UNDERLAYERS */}
+      {/* STEP 2 */}
       {step === 2 && (
         <div className="space-y-4">
           <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
@@ -615,23 +662,17 @@ export const ScreedCalculator: React.FC<Props> = ({ onCalculate }) => {
           </div>
 
           <div className="flex gap-3">
-            <button
-              onClick={() => setStep(1)}
-              className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold"
-            >
+            <button type="button" onClick={() => setStep(1)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
               Retour
             </button>
-            <button
-              onClick={() => setStep(3)}
-              className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold"
-            >
+            <button type="button" onClick={() => setStep(3)} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold">
               Suivant
             </button>
           </div>
         </div>
       )}
 
-      {/* STEP 3: MATERIALS & REINFORCEMENT */}
+      {/* STEP 3 */}
       {step === 3 && (
         <div className="space-y-4">
           <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
@@ -644,31 +685,28 @@ export const ScreedCalculator: React.FC<Props> = ({ onCalculate }) => {
               <label className="block text-sm font-medium text-slate-700 mb-2">Renfort</label>
               <div className="grid grid-cols-3 gap-2">
                 <button
+                  type="button"
                   onClick={() => setReinforceType("none")}
                   className={`p-2 border rounded text-xs font-bold ${
-                    reinforceType === "none"
-                      ? "bg-stone-100 border-stone-500 text-stone-800"
-                      : "bg-white text-slate-500"
+                    reinforceType === "none" ? "bg-stone-100 border-stone-500 text-stone-800 ring-1 ring-stone-500" : "bg-white text-slate-500"
                   }`}
                 >
                   Aucun
                 </button>
                 <button
+                  type="button"
                   onClick={() => setReinforceType("mesh")}
                   className={`p-2 border rounded text-xs font-bold ${
-                    reinforceType === "mesh"
-                      ? "bg-stone-100 border-stone-500 text-stone-800"
-                      : "bg-white text-slate-500"
+                    reinforceType === "mesh" ? "bg-stone-100 border-stone-500 text-stone-800 ring-1 ring-stone-500" : "bg-white text-slate-500"
                   }`}
                 >
                   Treillis
                 </button>
                 <button
+                  type="button"
                   onClick={() => setReinforceType("fiber")}
                   className={`p-2 border rounded text-xs font-bold ${
-                    reinforceType === "fiber"
-                      ? "bg-stone-100 border-stone-500 text-stone-800"
-                      : "bg-white text-slate-500"
+                    reinforceType === "fiber" ? "bg-stone-100 border-stone-500 text-stone-800 ring-1 ring-stone-500" : "bg-white text-slate-500"
                   }`}
                 >
                   Fibres
@@ -683,8 +721,8 @@ export const ScreedCalculator: React.FC<Props> = ({ onCalculate }) => {
                     onChange={(e) => setMeshTypeId(e.target.value)}
                     className="w-full p-2 border rounded bg-white text-slate-900 text-sm"
                   >
-                    {(MESH_TYPES || []).length ? (
-                      (MESH_TYPES as any[]).map((m) => (
+                    {meshOptions.length ? (
+                      meshOptions.map((m) => (
                         <option key={m.id} value={m.id}>
                           {m.label}
                         </option>
@@ -706,7 +744,7 @@ export const ScreedCalculator: React.FC<Props> = ({ onCalculate }) => {
                     type="number"
                     step="0.1"
                     value={fiberDosage}
-                    onChange={(e) => setFiberDosage(toNum(e.target.value, 0.6))}
+                    onChange={(e) => setFiberDosage(Math.max(0, toNum(e.target.value, 0.6)))}
                     className="w-full p-2 border rounded bg-white text-slate-900"
                   />
                 </div>
@@ -714,7 +752,7 @@ export const ScreedCalculator: React.FC<Props> = ({ onCalculate }) => {
             </div>
 
             <div className="bg-slate-50 p-3 rounded-lg border border-slate-200">
-              {screedType === "trad" || screedType === "ravoirage" ? (
+              {(screedType === "trad" || screedType === "ravoirage") && (
                 <>
                   <div className="mb-3">
                     <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Dosage ciment (kg/m³)</label>
@@ -735,7 +773,9 @@ export const ScreedCalculator: React.FC<Props> = ({ onCalculate }) => {
                     />
                   </div>
                 </>
-              ) : screedType === "light" ? (
+              )}
+
+              {screedType === "light" && (
                 <div>
                   <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Volume par sac (L)</label>
                   <input
@@ -746,7 +786,9 @@ export const ScreedCalculator: React.FC<Props> = ({ onCalculate }) => {
                   />
                   <p className="text-[10px] text-slate-400 mt-1">Volume de chape fini par sac (mélange prêt).</p>
                 </div>
-              ) : (
+              )}
+
+              {(screedType === "fluid_anh" || screedType === "fluid_cem") && (
                 <div className="flex items-start text-xs text-slate-500">
                   <Truck size={16} className="mr-2 shrink-0" />
                   Livraison toupie + pompe (forfait) inclus.
@@ -766,23 +808,17 @@ export const ScreedCalculator: React.FC<Props> = ({ onCalculate }) => {
           </div>
 
           <div className="flex gap-3">
-            <button
-              onClick={() => setStep(2)}
-              className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold"
-            >
+            <button type="button" onClick={() => setStep(2)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
               Retour
             </button>
-            <button
-              onClick={() => setStep(4)}
-              className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold"
-            >
+            <button type="button" onClick={() => setStep(4)} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold">
               Suivant
             </button>
           </div>
         </div>
       )}
 
-      {/* STEP 4: PRICING */}
+      {/* STEP 4 */}
       {step === 4 && (
         <div className="space-y-4">
           <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
@@ -793,7 +829,7 @@ export const ScreedCalculator: React.FC<Props> = ({ onCalculate }) => {
           <div className="bg-white p-3 rounded-xl border border-slate-200">
             <div className="flex justify-between items-center mb-3">
               <h4 className="text-xs font-bold text-slate-500 uppercase">Tarifs unitaires</h4>
-              <button onClick={() => setProMode(!proMode)} className="text-xs flex items-center text-blue-600">
+              <button type="button" onClick={() => setProMode(!proMode)} className="text-xs flex items-center text-blue-600">
                 <Settings size={12} className="mr-1" /> {proMode ? "Mode Pro" : "Mode Simple"}
               </button>
             </div>
@@ -803,21 +839,11 @@ export const ScreedCalculator: React.FC<Props> = ({ onCalculate }) => {
                 <>
                   <div>
                     <label className="block text-[10px] text-slate-500 mb-1">Ciment (€/sac 35kg)</label>
-                    <input
-                      type="number"
-                      value={prices.cementBag}
-                      onChange={(e) => updatePrice("cementBag", e.target.value)}
-                      className="w-full p-1.5 border rounded text-sm bg-white text-slate-900"
-                    />
+                    <input type="number" value={prices.cementBag} onChange={(e) => updatePrice("cementBag", e.target.value)} className="w-full p-1.5 border rounded text-sm bg-white text-slate-900" />
                   </div>
                   <div>
                     <label className="block text-[10px] text-slate-500 mb-1">Sable (€/t)</label>
-                    <input
-                      type="number"
-                      value={prices.sandTon}
-                      onChange={(e) => updatePrice("sandTon", e.target.value)}
-                      className="w-full p-1.5 border rounded text-sm bg-white text-slate-900"
-                    />
+                    <input type="number" value={prices.sandTon} onChange={(e) => updatePrice("sandTon", e.target.value)} className="w-full p-1.5 border rounded text-sm bg-white text-slate-900" />
                   </div>
                 </>
               )}
@@ -825,72 +851,56 @@ export const ScreedCalculator: React.FC<Props> = ({ onCalculate }) => {
               {screedType === "light" && (
                 <div>
                   <label className="block text-[10px] text-slate-500 mb-1">Sac allégé (€/u)</label>
-                  <input
-                    type="number"
-                    value={prices.premixBag}
-                    onChange={(e) => updatePrice("premixBag", e.target.value)}
-                    className="w-full p-1.5 border rounded text-sm bg-white text-slate-900"
-                  />
+                  <input type="number" value={prices.premixBag} onChange={(e) => updatePrice("premixBag", e.target.value)} className="w-full p-1.5 border rounded text-sm bg-white text-slate-900" />
                 </div>
               )}
 
               {(screedType === "fluid_anh" || screedType === "fluid_cem") && (
                 <div className="col-span-2">
                   <label className="block text-[10px] text-slate-500 mb-1">Chape fluide (€/m³)</label>
-                  <input
-                    type="number"
-                    value={prices.bpeM3}
-                    onChange={(e) => updatePrice("bpeM3", e.target.value)}
-                    className="w-full p-1.5 border rounded text-sm bg-white text-slate-900"
-                  />
+                  <input type="number" value={prices.bpeM3} onChange={(e) => updatePrice("bpeM3", e.target.value)} className="w-full p-1.5 border rounded text-sm bg-white text-slate-900" />
                 </div>
               )}
 
               {reinforceType === "mesh" && (
                 <div>
-                  <label className="block text-[10px] text-slate-500 mb-1">Treillis (€/u)</label>
-                  <input
-                    type="number"
-                    value={prices.meshPanel}
-                    onChange={(e) => updatePrice("meshPanel", e.target.value)}
-                    className="w-full p-1.5 border rounded text-sm bg-white text-slate-900"
-                  />
+                  <label className="block text-[10px] text-slate-500 mb-1">Treillis (€/u) — fallback</label>
+                  <input type="number" value={prices.meshPanel} onChange={(e) => updatePrice("meshPanel", e.target.value)} className="w-full p-1.5 border rounded text-sm bg-white text-slate-900" />
                 </div>
               )}
 
               {reinforceType === "fiber" && (
                 <div>
                   <label className="block text-[10px] text-slate-500 mb-1">Fibres (€/kg)</label>
-                  <input
-                    type="number"
-                    value={prices.fiberKg}
-                    onChange={(e) => updatePrice("fiberKg", e.target.value)}
-                    className="w-full p-1.5 border rounded text-sm bg-white text-slate-900"
-                  />
+                  <input type="number" value={prices.fiberKg} onChange={(e) => updatePrice("fiberKg", e.target.value)} className="w-full p-1.5 border rounded text-sm bg-white text-slate-900" />
                 </div>
               )}
 
               {usePolyane && (
                 <div>
                   <label className="block text-[10px] text-slate-500 mb-1">Polyane (€/m²)</label>
-                  <input
-                    type="number"
-                    value={prices.polyaneM2}
-                    onChange={(e) => updatePrice("polyaneM2", e.target.value)}
-                    className="w-full p-1.5 border rounded text-sm bg-white text-slate-900"
-                  />
+                  <input type="number" value={prices.polyaneM2} onChange={(e) => updatePrice("polyaneM2", e.target.value)} className="w-full p-1.5 border rounded text-sm bg-white text-slate-900" />
                 </div>
               )}
 
               {useStrip && (
                 <div>
                   <label className="block text-[10px] text-slate-500 mb-1">Bande périph. (€/m)</label>
-                  <input
-                    type="number"
-                    value={prices.stripM}
-                    onChange={(e) => updatePrice("stripM", e.target.value)}
-                    className="w-full p-1.5 border rounded text-sm bg-white text-slate-900"
-                  />
+                  <input type="number" value={prices.stripM} onChange={(e) => updatePrice("stripM", e.target.value)} className="w-full p-1.5 border rounded text-sm bg-white text-slate-900" />
+                </div>
+              )}
+
+              {useInsulation && (
+                <div>
+                  <label className="block text-[10px] text-slate-500 mb-1">Isolant (€/m²)</label>
+                  <input type="number" value={prices.insulM2} onChange={(e) => updatePrice("insulM2", e.target.value)} className="w-full p-1.5 border rounded text-sm bg-white text-slate-900" />
+                </div>
+              )}
+
+              {useJoints && (
+                <div>
+                  <label className="block text-[10px] text-slate-500 mb-1">Joints (€/m)</label>
+                  <input type="number" value={prices.jointM} onChange={(e) => updatePrice("jointM", e.target.value)} className="w-full p-1.5 border rounded text-sm bg-white text-slate-900" />
                 </div>
               )}
             </div>
@@ -899,22 +909,12 @@ export const ScreedCalculator: React.FC<Props> = ({ onCalculate }) => {
               <div className="mt-4 pt-3 border-t border-slate-100 grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-[10px] text-blue-600 font-bold mb-1">MO (€/m²)</label>
-                  <input
-                    type="number"
-                    value={prices.laborM2}
-                    onChange={(e) => updatePrice("laborM2", e.target.value)}
-                    className="w-full p-1.5 border border-blue-200 rounded text-sm bg-white text-slate-900"
-                  />
+                  <input type="number" value={prices.laborM2} onChange={(e) => updatePrice("laborM2", e.target.value)} className="w-full p-1.5 border border-blue-200 rounded text-sm bg-white text-slate-900" />
                 </div>
                 {(screedType === "fluid_anh" || screedType === "fluid_cem") && (
                   <div>
                     <label className="block text-[10px] text-blue-600 font-bold mb-1">Forfait pompe (€)</label>
-                    <input
-                      type="number"
-                      value={prices.pumpFlat}
-                      onChange={(e) => updatePrice("pumpFlat", e.target.value)}
-                      className="w-full p-1.5 border border-blue-200 rounded text-sm bg-white text-slate-900"
-                    />
+                    <input type="number" value={prices.pumpFlat} onChange={(e) => updatePrice("pumpFlat", e.target.value)} className="w-full p-1.5 border border-blue-200 rounded text-sm bg-white text-slate-900" />
                   </div>
                 )}
               </div>
@@ -922,10 +922,10 @@ export const ScreedCalculator: React.FC<Props> = ({ onCalculate }) => {
           </div>
 
           <div className="flex gap-3 pt-2">
-            <button onClick={() => setStep(3)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
+            <button type="button" onClick={() => setStep(3)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
               Retour
             </button>
-            <button className="flex-1 py-3 bg-emerald-100 text-emerald-700 rounded-xl font-bold flex justify-center items-center">
+            <button type="button" className="flex-1 py-3 bg-emerald-100 text-emerald-700 rounded-xl font-bold flex justify-center items-center">
               <Check size={18} className="mr-2" /> Terminé
             </button>
           </div>

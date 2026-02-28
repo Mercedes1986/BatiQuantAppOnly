@@ -24,17 +24,22 @@
 
       "length_m": "Length (m)",
       "width_m": "Width (m)",
+      "height_m": "Height (m)",
       "length_m_short": "Len. (m)",
       "width_m_short": "Wid. (m)",
       "height_m_short": "Ht. (m)",
+
       "house_length": "House length",
       "house_width": "House width",
+
       "width": "W",
       "height": "H",
+
       "L": "L",
       "W": "W",
       "D": "D",
       "H": "H",
+
       "l": "L",
       "w": "W",
       "h": "H"
@@ -74,7 +79,7 @@
 
       "strip": "Topsoil stripping",
       "excav": "Excavation / earthworks",
-      "excav_details": "{{count}} items - x{{swell}}",
+      "excav_details": "{{count}} items · x{{swell}}",
 
       "margin_m": "Working margin (m)",
       "strip_depth_m": "Strip thickness (m)",
@@ -95,7 +100,7 @@
       "truck_rotation_named": "Truck rotation ({{cap}}m³)",
 
       "dump_fee": "Disposal fee",
-      "dump_details": "{{vol}}m³",
+      "dump_details": "{{vol}} m³",
 
       "fill_imports": "Imported fill & backfill",
       "fill_type": "Fill type",
@@ -128,7 +133,7 @@
       "price_dump": "Disposal (€/t)",
       "labor_m3": "Labor (€/m³)",
 
-      "summary_excavated": "{{m3}}m³ excavated"
+      "summary_excavated": "{{m3}} m³ excavated"
     },
 
     "fd": {
@@ -172,16 +177,16 @@
       "rebar_s35": "S35 (6 wires)",
       "rebar_s15": "S15 (4 wires)",
       "rebar_strip_named": "Strip footing rebar ({{type}})",
-      "rebar_ratio": "~1 cage / 6m",
+      "rebar_ratio": "~1 cage / 6 m",
 
       "mesh": "Welded mesh",
       "mesh_named": "Welded mesh ({{type}})",
       "mesh_st25": "ST25C (Standard)",
       "mesh_st10": "ST10 (Light)",
       "mesh_st40": "ST40C (Heavy)",
-      "mesh_ratio": "~1 panel / 14.4m²",
+      "mesh_ratio": "~1 panel / 14.4 m²",
 
-      "clean_concrete": "Blinding concrete (5cm)",
+      "clean_concrete": "Blinding concrete (5 cm)",
 
       "excav": "Excavation / trenching",
 
@@ -209,7 +214,7 @@
       "price_labor_conc": "Labor concrete (€/m³)",
       "price_labor_form": "Labor formwork (€/m²)",
 
-      "summary_concrete": "{{m3}}m³ concrete"
+      "summary_concrete": "{{m3}} m³ concrete"
     },
 
     "w": {
@@ -234,7 +239,7 @@
 
       "perimeter_total": "Total perimeter (m)",
       "height": "Height (m)",
-      "waste_pct": "Waste (%, breakage / offcuts)",
+      "waste_pct": "Waste (% · breakage / offcuts)",
 
       "gables": "Gables",
       "gables_hint": "Add triangular area",
@@ -289,10 +294,10 @@
       "stepoc_fill_details": "{{lpm2}} L/m²",
 
       "glue": "Thin-bed adhesive mortar",
-      "glue_ratio": "~1 bag / 10m²",
+      "glue_ratio": "~1 bag / 10 m²",
 
       "mortar": "Masonry mortar",
-      "mortar_ratio": "~1 bag / 3m²",
+      "mortar_ratio": "~1 bag / 3 m²",
 
       "lintels": "Lintels",
       "prefab": "precast",
@@ -318,7 +323,7 @@
       "units": "Blocks/units",
       "binder": "Mortar/adhesive",
 
-      "summary_units": "{{units}} units ({{m2}}m²)"
+      "summary_units": "{{units}} units ({{m2}} m²)"
     }
   }
 }

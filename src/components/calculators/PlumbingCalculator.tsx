@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { CalculatorType, CalculationResult, Unit } from "../../../types";
 import { DEFAULT_PRICES } from "../../constants";
+import { getUnitPrice } from "../../services/materialsService";
 import {
   Plus,
   Trash2,
@@ -57,6 +58,19 @@ const toNum = (v: unknown, fallback = 0) => {
 const round2 = (n: number) => Math.round((n + Number.EPSILON) * 100) / 100;
 const clamp = (n: number, min: number, max: number) => Math.min(max, Math.max(min, n));
 
+// ✅ helper prix: override catalogue > DEFAULT_PRICES > fallback
+const priceOr = (key: string, fallback: number) => {
+  const v = getUnitPrice(key);
+  if (typeof v === "number" && !Number.isNaN(v) && v !== 0) return v;
+
+  const d = (DEFAULT_PRICES as any)[key];
+  if (d !== undefined) {
+    const nd = Number(d);
+    if (!Number.isNaN(nd) && nd !== 0) return nd;
+  }
+  return fallback;
+};
+
 const inputBase =
   "w-full p-1.5 border rounded text-sm bg-white text-slate-900 placeholder:text-slate-400";
 const selectBase = "w-full p-2 text-sm border rounded bg-white text-slate-900";
@@ -85,40 +99,46 @@ export const PlumbingCalculator: React.FC<Props> = ({ onCalculate }) => {
   });
 
   // --- 4. Pricing ---
-  const [prices, setPrices] = useState({
+  const [prices, setPrices] = useState(() => ({
     // Supply Pipe (€/m)
-    pipePer: (DEFAULT_PRICES as any).PER_PIPE_100M ? (DEFAULT_PRICES as any).PER_PIPE_100M / 100 : 0.6,
-    pipeMulti: 1.2,
-    pipeCopper: 8.0,
+    pipePer:
+      (DEFAULT_PRICES as any).PER_PIPE_100M
+        ? Number((DEFAULT_PRICES as any).PER_PIPE_100M) / 100
+        : priceOr("PER_PIPE_M", 0.6),
+    pipeMulti: priceOr("MULTICOUCHE_PIPE_M", 1.2),
+    pipeCopper: priceOr("COPPER_PIPE_M", 8.0),
 
     // Drain Pipe (€/m)
-    pvc32: 1.5,
-    pvc40: (DEFAULT_PRICES as any).PVC_PIPE_4M ? (DEFAULT_PRICES as any).PVC_PIPE_4M / 4 : 2.0,
-    pvc50: 3.0,
-    pvc100: 5.0,
+    pvc32: priceOr("PVC_32_M", 1.5),
+    pvc40:
+      (DEFAULT_PRICES as any).PVC_PIPE_4M
+        ? Number((DEFAULT_PRICES as any).PVC_PIPE_4M) / 4
+        : priceOr("PVC_40_M", 2.0),
+    pvc50: priceOr("PVC_50_M", 3.0),
+    pvc100: priceOr("PVC_100_M", 5.0),
 
     // Fittings & Accessories
-    manifoldPort: 8.0, // €/départ
-    fittingUnit: 3.5, // €/raccord (moyenne)
-    valve: 12.0,
-    siphon: 8.0,
-    safetyGroup: 25.0,
+    manifoldPort: priceOr("MANIFOLD_PORT_UNIT", 8.0),
+    fittingUnit: priceOr("PLUMB_FITTING_UNIT", 3.5),
+    valve: priceOr("PLUMB_VALVE_UNIT", 12.0),
+    siphon: priceOr("SIPHON_UNIT", 8.0),
+    safetyGroup: priceOr("SAFETY_GROUP_UNIT", 25.0),
 
     // Appliances (Supply)
-    wcPack: 150.0,
-    washbasinPack: 120.0,
-    showerPack: 300.0,
-    bathPack: 400.0,
-    sinkPack: 100.0,
-    tapExt: 35.0,
+    wcPack: priceOr("WC_PACK_UNIT", 150.0),
+    washbasinPack: priceOr("WASHBASIN_PACK_UNIT", 120.0),
+    showerPack: priceOr("SHOWER_PACK_UNIT", 300.0),
+    bathPack: priceOr("BATH_PACK_UNIT", 400.0),
+    sinkPack: priceOr("SINK_PACK_UNIT", 100.0),
+    tapExt: priceOr("TAP_EXT_UNIT", 35.0),
 
     // Water heater base (default 200L)
-    waterHeater200: 350.0,
+    waterHeater200: priceOr("WATER_HEATER_200L_UNIT", 350.0),
 
     // Labor
     laborPoint: 80.0, // €/appareil
     laborNetwork: 15.0, // €/m réseaux
-  });
+  }));
 
   const updatePrice = (key: keyof typeof prices, val: string) => {
     setPrices((prev) => ({ ...prev, [key]: toNum(val, 0) }));
@@ -157,10 +177,12 @@ export const PlumbingCalculator: React.FC<Props> = ({ onCalculate }) => {
       other: "Autre",
     };
 
+    const countSame = rooms.filter((r) => r.type === newRoomType).length;
+
     const newRoom: PlumbRoom = {
       id: uid(),
       type: newRoomType,
-      label: `${labelMap[newRoomType]} ${rooms.filter((r) => r.type === newRoomType).length + 1}`,
+      label: `${labelMap[newRoomType]} ${countSame + 1}`,
       appliances: [],
     };
 
@@ -228,7 +250,7 @@ export const PlumbingCalculator: React.FC<Props> = ({ onCalculate }) => {
         return {
           ...r,
           appliances: r.appliances
-            .map((a) => (a.id === appId ? { ...a, quantity: Math.max(1, a.quantity + delta) } : a))
+            .map((a) => (a.id === appId ? { ...a, quantity: Math.max(1, (a.quantity || 1) + delta) } : a))
             .filter((a) => a.quantity > 0),
         };
       })
@@ -238,8 +260,7 @@ export const PlumbingCalculator: React.FC<Props> = ({ onCalculate }) => {
   const removeRoom = (id: string) => setRooms((prev) => prev.filter((r) => r.id !== id));
 
   const getHeaterBasePrice = (cap: number, type: "electric_tank" | "thermo") => {
-    // simple scaling (can be refined later)
-    const base = prices.waterHeater200 || 0;
+    const base = Number(prices.waterHeater200) || 0;
     const capCoef = cap <= 100 ? 0.75 : cap <= 150 ? 0.9 : cap <= 200 ? 1 : 1.25; // 300L
     const typeCoef = type === "thermo" ? 2.2 : 1;
     return round2(base * capCoef * typeCoef);
@@ -250,7 +271,7 @@ export const PlumbingCalculator: React.FC<Props> = ({ onCalculate }) => {
     let totalColdLines = 0;
     let totalHotLines = 0;
 
-    let lenSupply = 0; // total supply length (includes EF + EC lines)
+    let lenSupply = 0; // includes EF + EC
     let lenDrain32 = 0;
     let lenDrain40 = 0;
     let lenDrain50 = 0;
@@ -262,22 +283,18 @@ export const PlumbingCalculator: React.FC<Props> = ({ onCalculate }) => {
     const warnings: string[] = [];
     const appliancesSummary: Record<string, number> = {};
 
-    // Distribution factor: series uses less pipe than manifold on average
     const distCoef = distributionMode === "series" ? 0.65 : 1;
 
-    // 1) Iterate appliances
     rooms.forEach((r) => {
       r.appliances.forEach((a) => {
         const qty = Math.max(1, a.quantity || 1);
 
-        // Supply lines
         totalColdLines += qty;
         if (a.needsHotWater) totalHotLines += qty;
 
         const linesCount = qty * (a.needsHotWater ? 2 : 1);
         lenSupply += linesCount * avgDistManifold * distCoef;
 
-        // Drain
         if (a.drainDiameter > 0) {
           const len = qty * avgDistDrain;
           if (a.drainDiameter === 32) lenDrain32 += len;
@@ -289,31 +306,28 @@ export const PlumbingCalculator: React.FC<Props> = ({ onCalculate }) => {
           countSiphons += qty;
         }
 
-        // fittings estimate
         countFittings += linesCount * 4;
 
         appliancesSummary[a.type] = (appliancesSummary[a.type] || 0) + qty;
       });
     });
 
-    // 2) Manifolds
     const totalManifoldPorts = totalColdLines + totalHotLines;
     const manifoldsCold = Math.ceil(totalColdLines / 5);
     const manifoldsHot = Math.ceil(totalHotLines / 5);
 
-    // 3) Water heater
+    // Chauffe-eau
     let heaterPackCost = 0;
     if (waterHeater.active) {
       const heaterPrice = getHeaterBasePrice(waterHeater.capacity, waterHeater.type);
       heaterPackCost = heaterPrice + prices.safetyGroup + 20; // misc
-      // small local additions
+
       lenSupply += 2;
       lenDrain32 += 2;
     } else if (totalHotLines > 0) {
       warnings.push("Des appareils nécessitent de l'eau chaude mais le chauffe-eau est désactivé.");
     }
 
-    // 4) Pricing
     const materialsList: any[] = [];
     let totalCost = 0;
 
@@ -321,12 +335,15 @@ export const PlumbingCalculator: React.FC<Props> = ({ onCalculate }) => {
     const pricePipe =
       supplyMaterial === "per" ? prices.pipePer : supplyMaterial === "multiskin" ? prices.pipeMulti : prices.pipeCopper;
     const labelPipe =
-      supplyMaterial === "per" ? "Tube PER (gaine incluse)" : supplyMaterial === "multiskin" ? "Tube Multicouche" : "Tube Cuivre";
-
-    const costSupplyPipe = lenSupply * pricePipe;
-    totalCost += costSupplyPipe;
+      supplyMaterial === "per"
+        ? "Tube PER (gaine incluse)"
+        : supplyMaterial === "multiskin"
+        ? "Tube Multicouche"
+        : "Tube Cuivre";
 
     if (lenSupply > 0) {
+      const costSupplyPipe = lenSupply * pricePipe;
+      totalCost += costSupplyPipe;
       materialsList.push({
         id: "pipe_supply",
         name: labelPipe,
@@ -361,11 +378,10 @@ export const PlumbingCalculator: React.FC<Props> = ({ onCalculate }) => {
     addDrain("pvc50", "Tube PVC Ø50", lenDrain50, prices.pvc50);
     addDrain("pvc100", "Tube PVC Ø100", lenDrain100, prices.pvc100);
 
-    // Manifolds (only if manifold mode)
+    // Manifolds
     if (distributionMode === "manifold" && totalManifoldPorts > 0) {
       const costManifolds = totalManifoldPorts * prices.manifoldPort;
       totalCost += costManifolds;
-
       materialsList.push({
         id: "manifolds",
         name: "Nourrices / Collecteurs",
@@ -380,9 +396,9 @@ export const PlumbingCalculator: React.FC<Props> = ({ onCalculate }) => {
     }
 
     // Fittings (lot)
-    const costFittings = countFittings * prices.fittingUnit;
-    totalCost += costFittings;
     if (countFittings > 0) {
+      const costFittings = countFittings * prices.fittingUnit;
+      totalCost += costFittings;
       materialsList.push({
         id: "fittings",
         name: "Raccords & coudes (lot)",
@@ -411,7 +427,7 @@ export const PlumbingCalculator: React.FC<Props> = ({ onCalculate }) => {
       });
     }
 
-    // Appliances supply packs
+    // Appliances packs
     const addPack = (key: string, label: string, qty: number, unitPrice: number) => {
       if (!qty || qty <= 0 || unitPrice <= 0) return;
       const cost = qty * unitPrice;
@@ -434,7 +450,7 @@ export const PlumbingCalculator: React.FC<Props> = ({ onCalculate }) => {
     addPack("sink", "Évier + robinet", appliancesSummary.sink || 0, prices.sinkPack);
     addPack("tap_ext", "Robinet puisage", appliancesSummary.tap_ext || 0, prices.tapExt);
 
-    // Water heater pack
+    // Chauffe-eau pack
     if (waterHeater.active) {
       const heaterPrice = getHeaterBasePrice(waterHeater.capacity, waterHeater.type);
       totalCost += heaterPackCost;
@@ -474,40 +490,44 @@ export const PlumbingCalculator: React.FC<Props> = ({ onCalculate }) => {
       }
     }
 
-    // Consumables
-    const costConsumables = 50;
-    totalCost += costConsumables;
-    materialsList.push({
-      id: "consumables",
-      name: "Consommables (colle, colliers, joints)",
-      quantity: 1,
-      unit: Unit.PACKAGE,
-      unitPrice: costConsumables,
-      totalPrice: costConsumables,
-      category: CalculatorType.PLUMBING,
-    });
+    // Consumables (only if there is something)
+    const totalApps = Object.values(appliancesSummary).reduce((a, b) => a + b, 0);
+    const hasNetworks = lenSupply + lenDrain32 + lenDrain40 + lenDrain50 + lenDrain100 > 0;
+    if (totalApps > 0 || hasNetworks) {
+      const costConsumables = 50;
+      totalCost += costConsumables;
+      materialsList.push({
+        id: "consumables",
+        name: "Consommables (colle, colliers, joints)",
+        quantity: 1,
+        unit: Unit.PACKAGE,
+        unitPrice: costConsumables,
+        totalPrice: costConsumables,
+        category: CalculatorType.PLUMBING,
+      });
+    }
 
     // Labor
     if (proMode) {
-      const totalPoints = Object.values(appliancesSummary).reduce((a, b) => a + b, 0);
       const pipeTotal = lenSupply + lenDrain32 + lenDrain40 + lenDrain50 + lenDrain100;
-
-      const laborPts = totalPoints * prices.laborPoint;
+      const laborPts = totalApps * prices.laborPoint;
       const laborPipes = pipeTotal * prices.laborNetwork;
 
       totalCost += laborPts + laborPipes;
 
-      materialsList.push(
-        {
+      if (totalApps > 0) {
+        materialsList.push({
           id: "labor_pts",
           name: "Main d'œuvre (pose appareils)",
-          quantity: totalPoints,
+          quantity: totalApps,
           unit: Unit.PIECE,
           unitPrice: round2(prices.laborPoint),
           totalPrice: round2(laborPts),
           category: CalculatorType.PLUMBING,
-        },
-        {
+        });
+      }
+      if (pipeTotal > 0) {
+        materialsList.push({
           id: "labor_pipes",
           name: "Main d'œuvre (réseaux)",
           quantity: round2(pipeTotal),
@@ -515,9 +535,12 @@ export const PlumbingCalculator: React.FC<Props> = ({ onCalculate }) => {
           unitPrice: round2(prices.laborNetwork),
           totalPrice: round2(laborPipes),
           category: CalculatorType.PLUMBING,
-        }
-      );
+        });
+      }
     }
+
+    if (rooms.length === 0) warnings.push("Ajoutez au moins une pièce pour obtenir un calcul.");
+    if (rooms.length > 0 && totalApps === 0) warnings.push("Aucun appareil : ajoutez des équipements dans les pièces.");
 
     return {
       totalCost: round2(totalCost),
@@ -528,6 +551,7 @@ export const PlumbingCalculator: React.FC<Props> = ({ onCalculate }) => {
         totalHotLines,
         totalDrainLen: lenDrain32 + lenDrain40 + lenDrain50 + lenDrain100,
         totalSupplyLen: lenSupply,
+        totalApps,
       },
     };
   }, [
@@ -543,10 +567,8 @@ export const PlumbingCalculator: React.FC<Props> = ({ onCalculate }) => {
 
   // Pass results to parent
   useEffect(() => {
-    const totalApps = rooms.reduce((acc, r) => acc + r.appliances.reduce((a, x) => a + Math.max(1, x.quantity || 1), 0), 0);
-
     onCalculate({
-      summary: `${totalApps} Appareils`,
+      summary: `${calculationData.summaryStats.totalApps} Appareils`,
       details: [
         { label: "Départs EF", value: calculationData.summaryStats.totalColdLines, unit: "u" },
         { label: "Départs EC", value: calculationData.summaryStats.totalHotLines, unit: "u" },
@@ -557,7 +579,7 @@ export const PlumbingCalculator: React.FC<Props> = ({ onCalculate }) => {
       totalCost: calculationData.totalCost,
       warnings: calculationData.warnings.length ? calculationData.warnings : undefined,
     });
-  }, [calculationData, onCalculate, rooms]);
+  }, [calculationData, onCalculate]);
 
   return (
     <div className="space-y-6 animate-in fade-in">
@@ -566,6 +588,7 @@ export const PlumbingCalculator: React.FC<Props> = ({ onCalculate }) => {
         {[1, 2, 3, 4].map((s) => (
           <button
             key={s}
+            type="button"
             onClick={() => setStep(s)}
             className={`flex-1 min-w-[80px] py-2 text-xs font-bold rounded transition-all ${
               step === s ? "bg-white shadow text-blue-600" : "text-slate-400"
@@ -579,7 +602,7 @@ export const PlumbingCalculator: React.FC<Props> = ({ onCalculate }) => {
         ))}
       </div>
 
-      {/* STEP 1: ROOMS */}
+      {/* STEP 1 */}
       {step === 1 && (
         <div className="space-y-4">
           <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
@@ -601,7 +624,7 @@ export const PlumbingCalculator: React.FC<Props> = ({ onCalculate }) => {
                     </div>
                     <span className="font-bold text-slate-700 text-sm">{room.label}</span>
                   </div>
-                  <button onClick={() => removeRoom(room.id)} className="text-slate-300 hover:text-red-400">
+                  <button type="button" onClick={() => removeRoom(room.id)} className="text-slate-300 hover:text-red-400">
                     <Trash2 size={16} />
                   </button>
                 </div>
@@ -627,6 +650,7 @@ export const PlumbingCalculator: React.FC<Props> = ({ onCalculate }) => {
                       <div className="flex items-center gap-2">
                         <div className="flex items-center gap-1">
                           <button
+                            type="button"
                             onClick={() => updateApplianceQty(room.id, app.id, -1)}
                             className="w-6 h-6 flex items-center justify-center bg-white rounded border text-slate-500 hover:bg-slate-100"
                             title="Diminuer"
@@ -635,6 +659,7 @@ export const PlumbingCalculator: React.FC<Props> = ({ onCalculate }) => {
                           </button>
                           <span className="text-xs font-bold w-5 text-center">{app.quantity}</span>
                           <button
+                            type="button"
                             onClick={() => updateApplianceQty(room.id, app.id, +1)}
                             className="w-6 h-6 flex items-center justify-center bg-white rounded border text-slate-500 hover:bg-slate-100"
                             title="Augmenter"
@@ -643,6 +668,7 @@ export const PlumbingCalculator: React.FC<Props> = ({ onCalculate }) => {
                           </button>
                         </div>
                         <button
+                          type="button"
                           onClick={() => removeAppliance(room.id, app.id)}
                           className="text-slate-300 hover:text-red-400"
                           title="Supprimer"
@@ -654,52 +680,28 @@ export const PlumbingCalculator: React.FC<Props> = ({ onCalculate }) => {
                   ))}
 
                   <div className="flex flex-wrap gap-2 pt-2 border-t border-slate-100">
-                    <button
-                      onClick={() => addApplianceToRoom(room.id, "wc")}
-                      className="px-2 py-1 bg-slate-100 rounded text-[10px] hover:bg-slate-200"
-                    >
+                    <button type="button" onClick={() => addApplianceToRoom(room.id, "wc")} className="px-2 py-1 bg-slate-100 rounded text-[10px] hover:bg-slate-200">
                       WC
                     </button>
-                    <button
-                      onClick={() => addApplianceToRoom(room.id, "washbasin")}
-                      className="px-2 py-1 bg-slate-100 rounded text-[10px] hover:bg-slate-200"
-                    >
+                    <button type="button" onClick={() => addApplianceToRoom(room.id, "washbasin")} className="px-2 py-1 bg-slate-100 rounded text-[10px] hover:bg-slate-200">
                       Lavabo
                     </button>
-                    <button
-                      onClick={() => addApplianceToRoom(room.id, "shower")}
-                      className="px-2 py-1 bg-slate-100 rounded text-[10px] hover:bg-slate-200"
-                    >
+                    <button type="button" onClick={() => addApplianceToRoom(room.id, "shower")} className="px-2 py-1 bg-slate-100 rounded text-[10px] hover:bg-slate-200">
                       Douche
                     </button>
-                    <button
-                      onClick={() => addApplianceToRoom(room.id, "bath")}
-                      className="px-2 py-1 bg-slate-100 rounded text-[10px] hover:bg-slate-200"
-                    >
+                    <button type="button" onClick={() => addApplianceToRoom(room.id, "bath")} className="px-2 py-1 bg-slate-100 rounded text-[10px] hover:bg-slate-200">
                       Bain
                     </button>
-                    <button
-                      onClick={() => addApplianceToRoom(room.id, "sink")}
-                      className="px-2 py-1 bg-slate-100 rounded text-[10px] hover:bg-slate-200"
-                    >
+                    <button type="button" onClick={() => addApplianceToRoom(room.id, "sink")} className="px-2 py-1 bg-slate-100 rounded text-[10px] hover:bg-slate-200">
                       Évier
                     </button>
-                    <button
-                      onClick={() => addApplianceToRoom(room.id, "washing_machine")}
-                      className="px-2 py-1 bg-slate-100 rounded text-[10px] hover:bg-slate-200"
-                    >
+                    <button type="button" onClick={() => addApplianceToRoom(room.id, "washing_machine")} className="px-2 py-1 bg-slate-100 rounded text-[10px] hover:bg-slate-200">
                       L.Linge
                     </button>
-                    <button
-                      onClick={() => addApplianceToRoom(room.id, "dishwasher")}
-                      className="px-2 py-1 bg-slate-100 rounded text-[10px] hover:bg-slate-200"
-                    >
+                    <button type="button" onClick={() => addApplianceToRoom(room.id, "dishwasher")} className="px-2 py-1 bg-slate-100 rounded text-[10px] hover:bg-slate-200">
                       L.Vaisselle
                     </button>
-                    <button
-                      onClick={() => addApplianceToRoom(room.id, "tap_ext")}
-                      className="px-2 py-1 bg-slate-100 rounded text-[10px] hover:bg-slate-200"
-                    >
+                    <button type="button" onClick={() => addApplianceToRoom(room.id, "tap_ext")} className="px-2 py-1 bg-slate-100 rounded text-[10px] hover:bg-slate-200">
                       Robinet ext.
                     </button>
                   </div>
@@ -721,6 +723,7 @@ export const PlumbingCalculator: React.FC<Props> = ({ onCalculate }) => {
               <option value="other">Autre</option>
             </select>
             <button
+              type="button"
               onClick={addRoom}
               className="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold text-sm shadow-md active:scale-95 transition-transform flex items-center"
             >
@@ -729,16 +732,21 @@ export const PlumbingCalculator: React.FC<Props> = ({ onCalculate }) => {
           </div>
 
           <button
+            type="button"
             onClick={() => setStep(2)}
-            className="w-full py-3 bg-blue-600 text-white rounded-xl font-bold flex justify-center items-center mt-4"
+            className="w-full py-3 bg-blue-600 text-white rounded-xl font-bold flex justify-center items-center mt-4 disabled:opacity-50"
             disabled={rooms.length === 0}
           >
             Suivant <ArrowRight size={18} className="ml-2" />
           </button>
+
+          {rooms.length === 0 && (
+            <div className="text-xs text-slate-400 text-center">Ajoutez au moins une pièce pour continuer.</div>
+          )}
         </div>
       )}
 
-      {/* STEP 2: NETWORKS */}
+      {/* STEP 2 */}
       {step === 2 && (
         <div className="space-y-4">
           <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
@@ -760,11 +768,7 @@ export const PlumbingCalculator: React.FC<Props> = ({ onCalculate }) => {
               </div>
               <div>
                 <label className="block text-[10px] text-slate-500 mb-1">Distribution</label>
-                <select
-                  value={distributionMode}
-                  onChange={(e) => setDistributionMode(e.target.value as any)}
-                  className={selectBase}
-                >
+                <select value={distributionMode} onChange={(e) => setDistributionMode(e.target.value as any)} className={selectBase}>
                   <option value="manifold">Nourrice (pieuvre)</option>
                   <option value="series">Repiquage (série)</option>
                 </select>
@@ -781,7 +785,7 @@ export const PlumbingCalculator: React.FC<Props> = ({ onCalculate }) => {
               />
               <p className="text-[10px] text-slate-400 mt-1">
                 {distributionMode === "series"
-                  ? "Repiquage : le calcul applique un coefficient de réduction sur la longueur."
+                  ? "Repiquage : coefficient de réduction appliqué sur la longueur."
                   : "Nourrice : longueur par appareil (aller EF + EC si nécessaire)."}
               </p>
             </div>
@@ -801,17 +805,17 @@ export const PlumbingCalculator: React.FC<Props> = ({ onCalculate }) => {
           </div>
 
           <div className="flex gap-3">
-            <button onClick={() => setStep(1)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
+            <button type="button" onClick={() => setStep(1)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
               Retour
             </button>
-            <button onClick={() => setStep(3)} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold">
+            <button type="button" onClick={() => setStep(3)} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold">
               Suivant
             </button>
           </div>
         </div>
       )}
 
-      {/* STEP 3: EQUIPMENT */}
+      {/* STEP 3 */}
       {step === 3 && (
         <div className="space-y-4">
           <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
@@ -861,7 +865,7 @@ export const PlumbingCalculator: React.FC<Props> = ({ onCalculate }) => {
 
                 <div className="flex items-start bg-slate-50 p-2 rounded text-xs text-slate-600">
                   <Check size={14} className="mr-2 mt-0.5 text-emerald-500" />
-                  Groupe de sécurité + raccords comptés automatiquement.
+                  Groupe de sécurité + accessoires comptés automatiquement.
                 </div>
               </div>
             )}
@@ -879,17 +883,17 @@ export const PlumbingCalculator: React.FC<Props> = ({ onCalculate }) => {
           ) : null}
 
           <div className="flex gap-3">
-            <button onClick={() => setStep(2)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
+            <button type="button" onClick={() => setStep(2)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
               Retour
             </button>
-            <button onClick={() => setStep(4)} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold">
+            <button type="button" onClick={() => setStep(4)} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold">
               Suivant
             </button>
           </div>
         </div>
       )}
 
-      {/* STEP 4: DEVIS + PRIX */}
+      {/* STEP 4 */}
       {step === 4 && (
         <div className="space-y-4">
           <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
@@ -900,7 +904,7 @@ export const PlumbingCalculator: React.FC<Props> = ({ onCalculate }) => {
           <div className="bg-white p-3 rounded-xl border border-slate-200">
             <div className="flex justify-between items-center mb-3">
               <h4 className="text-xs font-bold text-slate-500 uppercase">Prix</h4>
-              <button onClick={() => setProMode(!proMode)} className="text-xs flex items-center text-blue-600">
+              <button type="button" onClick={() => setProMode(!proMode)} className="text-xs flex items-center text-blue-600">
                 <Settings size={12} className="mr-1" /> {proMode ? "Mode Pro" : "Mode Simple"}
               </button>
             </div>
@@ -912,9 +916,7 @@ export const PlumbingCalculator: React.FC<Props> = ({ onCalculate }) => {
                 </label>
                 <input
                   type="number"
-                  value={
-                    supplyMaterial === "per" ? prices.pipePer : supplyMaterial === "multiskin" ? prices.pipeMulti : prices.pipeCopper
-                  }
+                  value={supplyMaterial === "per" ? prices.pipePer : supplyMaterial === "multiskin" ? prices.pipeMulti : prices.pipeCopper}
                   onChange={(e) =>
                     updatePrice(
                       supplyMaterial === "per" ? "pipePer" : supplyMaterial === "multiskin" ? "pipeMulti" : "pipeCopper",
@@ -937,13 +939,8 @@ export const PlumbingCalculator: React.FC<Props> = ({ onCalculate }) => {
 
               <div>
                 <label className="block text-[10px] text-slate-500 mb-1">Base chauffe-eau 200L (€)</label>
-                <input
-                  type="number"
-                  value={prices.waterHeater200}
-                  onChange={(e) => updatePrice("waterHeater200", e.target.value)}
-                  className={inputBase}
-                />
-                <p className="text-[10px] text-slate-400 mt-1">La capacité/type applique un coefficient.</p>
+                <input type="number" value={prices.waterHeater200} onChange={(e) => updatePrice("waterHeater200", e.target.value)} className={inputBase} />
+                <p className="text-[10px] text-slate-400 mt-1">Capacité + type appliquent un coefficient.</p>
               </div>
             </div>
 
@@ -962,11 +959,11 @@ export const PlumbingCalculator: React.FC<Props> = ({ onCalculate }) => {
           </div>
 
           <div className="flex gap-3 pt-2">
-            <button onClick={() => setStep(3)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
+            <button type="button" onClick={() => setStep(3)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
               Retour
             </button>
-            <button className="flex-1 py-3 bg-emerald-100 text-emerald-700 rounded-xl font-bold flex justify-center items-center">
-              <Check size={18} className="mr-2" /> Terminé
+            <button type="button" disabled className="flex-1 py-3 bg-emerald-100 text-emerald-700 rounded-xl font-bold flex justify-center items-center">
+              <Check size={18} className="mr-2" /> Calculé
             </button>
           </div>
         </div>

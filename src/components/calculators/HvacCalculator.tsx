@@ -1,6 +1,11 @@
+// src/components/calculators/HvacCalculator.tsx
 import React, { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
+
 import { CalculatorType, CalculationResult, Unit } from "../../../types";
 import { DEFAULT_PRICES } from "../../constants";
+import { getUnitPrice } from "../../services/materialsService";
+
 import {
   Thermometer,
   Wind,
@@ -22,7 +27,7 @@ interface HvacZone {
   type: "living" | "bedroom" | "kitchen" | "bathroom" | "wc" | "other";
   label: string;
   area: number;
-  powerW: number; // Calculated power need
+  powerW: number; // calculated need
 }
 
 interface Props {
@@ -44,82 +49,97 @@ const clamp = (v: number, min: number, max: number) => Math.min(max, Math.max(mi
 const round2 = (n: number) => Math.round((n + Number.EPSILON) * 100) / 100;
 
 export const HvacCalculator: React.FC<Props> = ({ onCalculate }) => {
+  const { t } = useTranslation();
+
   const [step, setStep] = useState(1);
   const [proMode, setProMode] = useState(false);
 
-  // --- 1. Thermal Context ---
+  // --- 1. Thermal context ---
   const [insulationLevel, setInsulationLevel] = useState<InsulationLevel>("renov_good");
   const [ceilingHeight, setCeilingHeight] = useState(2.5);
-  const [targetTemp, setTargetTemp] = useState(20);
-  const [wattsPerM2, setWattsPerM2] = useState(80); // Auto-updated based on insulation
+  const [targetTemp, setTargetTemp] = useState(20); // reserved for later refinement
+  const [wattsPerM2, setWattsPerM2] = useState(80);
 
-  // --- 2. Zones (Inventory) ---
+  // --- 2. Zones ---
   const [zones, setZones] = useState<HvacZone[]>([]);
   const [newZoneType, setNewZoneType] = useState<HvacZone["type"]>("living");
   const [newZoneArea, setNewZoneArea] = useState("");
 
-  // --- 3. Heating System ---
+  // --- 3. Heating system ---
   const [generatorType, setGeneratorType] = useState<GeneratorType>("pac_air_water");
   const [emitterType, setEmitterType] = useState<EmitterType>("radiator_water");
 
   // Floor heating
   const [floorPitch, setFloorPitch] = useState(15); // cm
-  const [floorPipeType, setFloorPipeType] = useState<PipeType>("per"); // per, multicouche
+  const [floorPipeType, setFloorPipeType] = useState<PipeType>("per");
 
   // --- 4. Ventilation ---
   const [vmcType, setVmcType] = useState<VmcType>("simple_hygro");
   const [ductType, setDuctType] = useState<DuctType>("flexible");
   const [useInsulatedDucts, setUseInsulatedDucts] = useState(true);
 
+  // --- Price helper: catalog > DEFAULT_PRICES > fallback ---
+  const priceOr = (key: string, fallback: number) => {
+    const v = getUnitPrice(key);
+    if (typeof v === "number" && !Number.isNaN(v) && v !== 0) return v;
+
+    const d = (DEFAULT_PRICES as any)[key];
+    if (d !== undefined) {
+      const nd = Number(d);
+      if (!Number.isNaN(nd)) return nd;
+    }
+    return fallback;
+  };
+
   // --- 5. Pricing ---
-  const [prices, setPrices] = useState({
+  const [prices, setPrices] = useState(() => ({
     // Generators
-    pacAirWater: 8000,
-    pacAirAirExt: 2500, // Groupe ext base (mono)
-    pacAirAirIndoor: 800, // Unité intérieure add-on (multisplit)
-    boilerGas: 3000,
+    pacAirWater: priceOr("PAC_AIR_WATER_UNIT", 8000),
+    pacAirAirExt: priceOr("PAC_AIR_AIR_EXT_UNIT", 2500),
+    pacAirAirIndoor: priceOr("PAC_AIR_AIR_INDOOR_UNIT", 800),
+    boilerGas: priceOr("BOILER_GAS_UNIT", 3000),
 
     // Emitters
-    radElec: 200, // Avg unit
-    radWater: 300, // Avg unit
-    splitUnit: 600, // Indoor unit if you want to count differently than pacAirAirIndoor
+    radElec: priceOr("RADIATOR_ELEC_UNIT", 200),
+    radWater: priceOr("RADIATOR_WATER_UNIT", 300),
+    splitUnit: priceOr("SPLIT_INDOOR_UNIT", 600),
 
-    // Floor Heating
-    floorPipeM: 1.5, // €/m
-    floorCollector: 300, // Nourrice
-    floorInsulation: 15, // €/m2
+    // Floor heating
+    floorPipeM: priceOr("FLOOR_PIPE_M", 1.5),
+    floorCollector: priceOr("FLOOR_COLLECTOR_UNIT", 300),
+    floorInsulation: priceOr("FLOOR_INSULATION_M2", 15),
 
     // VMC
-    kitVmcSimple: 150,
-    kitVmcHygro: 350,
-    kitVmcDouble: 2000,
-    ductFlexM: 6, // €/m (non isolé / flexible)
-    ductRigidM: 10, // €/m (rigide)
-    ductInsulationExtraM: 2, // €/m (surcoût isolation)
-    ventUnit: 25, // Bouche supplémentaire
-    kitVentsIncluded: 3, // bouches inclues dans un kit
+    kitVmcSimple: priceOr("VMC_SIMPLE_KIT", 150),
+    kitVmcHygro: priceOr("VMC_HYGRO_KIT", 350),
+    kitVmcDouble: priceOr("VMC_DOUBLE_KIT", 2000),
+    ductFlexM: priceOr("VMC_DUCT_FLEX_M", 6),
+    ductRigidM: priceOr("VMC_DUCT_RIGID_M", 10),
+    ductInsulationExtraM: priceOr("VMC_DUCT_INSUL_EXTRA_M", 2),
+    ventUnit: priceOr("VMC_VENT_UNIT", 25),
+    kitVentsIncluded: 3,
 
-    // Network (hydraulic)
-    copperPipeM: 12,
-    perPipeM: 2,
-    multicouchePipeM: 4,
+    // Hydraulic network
+    copperPipeM: priceOr("COPPER_PIPE_M", 12),
+    perPipeM: priceOr("PER_PIPE_M", 2),
+    multicouchePipeM: priceOr("MULTICOUCHE_PIPE_M", 4),
 
-    // Refrigerant lines (air/air)
-    frigoLineM: 25,
+    // Refrigerant
+    frigoLineM: priceOr("FRIGO_LINE_M", 25),
 
     // Labor
-    installGenerator: 1500,
-    installEmitters: 600,
-    installVmc: 300,
-    laborVent: 50, // par bouche
-  });
+    installGenerator: priceOr("HVAC_LABOR_GENERATOR", 1500),
+    installEmitters: priceOr("HVAC_LABOR_EMITTERS", 600),
+    installVmc: priceOr("HVAC_LABOR_VMC", 300),
+    laborVent: priceOr("HVAC_LABOR_VENT_UNIT", 50),
+  }));
 
   type PricesKey = keyof typeof prices;
   const updatePrice = (key: PricesKey, val: string) => {
     setPrices((prev) => ({ ...prev, [key]: toNum(val, 0) }));
   };
 
-  // --- Auto Logic: W/m2 based on Insulation ---
+  // --- Auto: W/m² by insulation ---
   useEffect(() => {
     switch (insulationLevel) {
       case "rt2012":
@@ -137,30 +157,28 @@ export const HvacCalculator: React.FC<Props> = ({ onCalculate }) => {
     }
   }, [insulationLevel]);
 
-  // --- Auto Logic: Emitter consistency ---
+  // --- Auto: emitter consistency ---
   useEffect(() => {
     if (generatorType === "elec_rad") setEmitterType("radiator_elec");
     else if (generatorType === "pac_air_air") setEmitterType("split");
     else {
-      // Hydraulic systems
       if (emitterType === "radiator_elec" || emitterType === "split") setEmitterType("radiator_water");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [generatorType]);
 
-  // Recompute room powers when wattsPerM2 changes (or ceiling height if you choose to scale)
+  // Recompute powers on W/m² or ceiling height change
   useEffect(() => {
     if (!zones.length) return;
     setZones((prev) =>
       prev.map((z) => {
         const coef = z.type === "bathroom" ? 1.2 : 1;
-        // Optional: scale by ceiling height vs 2.5m baseline
         const heightCoef = clamp(toNum(ceilingHeight, 2.5) / 2.5, 0.7, 1.4);
         const power = z.area * wattsPerM2 * coef * heightCoef;
         return { ...z, powerW: Math.ceil(power) };
       })
     );
-  }, [wattsPerM2, ceilingHeight]); // keep targetTemp for later improvements
+  }, [wattsPerM2, ceilingHeight]);
 
   // --- Helpers ---
   const addZone = () => {
@@ -172,12 +190,12 @@ export const HvacCalculator: React.FC<Props> = ({ onCalculate }) => {
     const power = area * wattsPerM2 * coef * heightCoef;
 
     const labelMap: Record<HvacZone["type"], string> = {
-      living: "Séjour / Salon",
-      bedroom: "Chambre",
-      kitchen: "Cuisine",
-      bathroom: "SDB",
-      wc: "WC",
-      other: "Autre",
+      living: t("hvac.zone.living", { defaultValue: "Séjour / Salon" }),
+      bedroom: t("hvac.zone.bedroom", { defaultValue: "Chambre" }),
+      kitchen: t("hvac.zone.kitchen", { defaultValue: "Cuisine" }),
+      bathroom: t("hvac.zone.bathroom", { defaultValue: "SDB" }),
+      wc: t("hvac.zone.wc", { defaultValue: "WC" }),
+      other: t("hvac.zone.other", { defaultValue: "Autre" }),
     };
 
     const sameTypeCount = zones.filter((z) => z.type === newZoneType).length;
@@ -198,7 +216,7 @@ export const HvacCalculator: React.FC<Props> = ({ onCalculate }) => {
 
   const removeZone = (id: string) => setZones((prev) => prev.filter((z) => z.id !== id));
 
-  // --- CALCULATION ENGINE ---
+  // --- CALC ENGINE ---
   const calculationData = useMemo(() => {
     let totalArea = 0;
     let totalPower = 0;
@@ -206,9 +224,8 @@ export const HvacCalculator: React.FC<Props> = ({ onCalculate }) => {
     let totalCost = 0;
     const warnings: string[] = [];
 
-    // Stats
-    let nbWetRooms = 0; // Cuisine, SDB, WC
-    let nbDryRooms = 0; // Salon, Chambre, other
+    let nbWetRooms = 0;
+    let nbDryRooms = 0;
 
     zones.forEach((z) => {
       totalArea += z.area;
@@ -217,25 +234,22 @@ export const HvacCalculator: React.FC<Props> = ({ onCalculate }) => {
       else nbDryRooms++;
     });
 
-    if (totalArea <= 0) warnings.push("Aucune pièce : ajoutez des zones pour estimer le chauffage/VMC.");
+    if (totalArea <= 0) warnings.push(t("hvac.warn.no_zones", { defaultValue: "Ajoutez des zones pour estimer chauffage/VMC." }));
 
-    // --- 1) GENERATOR ---
+    // Generator
     let genCost = 0;
     let genName = "";
 
     if (generatorType === "pac_air_water") {
       genCost = prices.pacAirWater;
-      genName = "PAC Air/Eau";
-    }
-    if (generatorType === "pac_air_air") {
-      // Ext group + indoor units (approx)
-      const indoor = Math.max(1, nbDryRooms); // at least 1
+      genName = t("hvac.gen.pac_aw", { defaultValue: "PAC Air/Eau" });
+    } else if (generatorType === "pac_air_air") {
+      const indoor = Math.max(1, nbDryRooms);
       genCost = prices.pacAirAirExt + Math.max(0, indoor - 1) * prices.pacAirAirIndoor;
-      genName = "PAC Air/Air (Groupe ext.)";
-    }
-    if (generatorType === "boiler_gas") {
+      genName = t("hvac.gen.pac_aa", { defaultValue: "PAC Air/Air (groupe ext.)" });
+    } else if (generatorType === "boiler_gas") {
       genCost = prices.boilerGas;
-      genName = "Chaudière Gaz";
+      genName = t("hvac.gen.boiler_gas", { defaultValue: "Chaudière gaz" });
     }
 
     if (generatorType !== "elec_rad") {
@@ -248,7 +262,7 @@ export const HvacCalculator: React.FC<Props> = ({ onCalculate }) => {
         unitPrice: genCost,
         totalPrice: genCost,
         category: CalculatorType.HVAC,
-        details: `Puissance estimée: ${(totalPower / 1000).toFixed(1)} kW`,
+        details: `${t("hvac.power", { defaultValue: "Puissance estimée" })}: ${(totalPower / 1000).toFixed(1)} kW`,
       });
 
       if (proMode) {
@@ -256,7 +270,7 @@ export const HvacCalculator: React.FC<Props> = ({ onCalculate }) => {
         totalCost += labGen;
         materialsList.push({
           id: "lab_gen",
-          name: "Pose générateur + mise en service",
+          name: t("hvac.labor.gen", { defaultValue: "Pose générateur + mise en service" }),
           quantity: 1,
           unit: Unit.PACKAGE,
           unitPrice: labGen,
@@ -266,25 +280,23 @@ export const HvacCalculator: React.FC<Props> = ({ onCalculate }) => {
       }
     }
 
-    // --- 2) EMITTERS & DISTRIBUTION ---
+    // Emitters & networks
     let emittersCost = 0;
     let networkCost = 0;
 
     if (emitterType === "floor") {
       if (generatorType === "elec_rad" || generatorType === "pac_air_air") {
-        warnings.push("Incohérence: plancher chauffant nécessite un système hydraulique (PAC Air/Eau ou chaudière).");
+        warnings.push(t("hvac.warn.floor_need_hydraulic", { defaultValue: "Plancher chauffant = système hydraulique requis (PAC Air/Eau ou chaudière)." }));
       }
 
-      // Pipe length: ~ area / pitch (m)
       const pitchM = Math.max(0.10, floorPitch / 100);
       const pipeLen = totalArea / pitchM;
 
       const costPipe = pipeLen * prices.floorPipeM;
       const costInsul = totalArea * prices.floorInsulation;
 
-      // Loops: ~1 boucle / 15m² minimum 1
       const loops = Math.max(1, Math.max(zones.length, Math.ceil(totalArea / 15)));
-      const collectors = Math.ceil(loops / 6); // 6 loops/manifold approx
+      const collectors = Math.ceil(loops / 6);
       const costCol = collectors * prices.floorCollector;
 
       emittersCost = costPipe + costInsul + costCol;
@@ -292,7 +304,7 @@ export const HvacCalculator: React.FC<Props> = ({ onCalculate }) => {
       materialsList.push(
         {
           id: "floor_pipe",
-          name: `Tube ${floorPipeType.toUpperCase()} BAO (pas ${floorPitch}cm)`,
+          name: `${t("hvac.floor.pipe", { defaultValue: "Tube" })} ${floorPipeType.toUpperCase()} (${t("hvac.floor.pitch", { defaultValue: "pas" })} ${floorPitch}cm)`,
           quantity: Math.ceil(pipeLen),
           unit: Unit.METER,
           unitPrice: prices.floorPipeM,
@@ -301,7 +313,7 @@ export const HvacCalculator: React.FC<Props> = ({ onCalculate }) => {
         },
         {
           id: "floor_insul",
-          name: "Isolant plancher (panneaux/plots)",
+          name: t("hvac.floor.insul", { defaultValue: "Isolant plancher" }),
           quantity: Math.ceil(totalArea),
           unit: Unit.M2,
           unitPrice: prices.floorInsulation,
@@ -310,24 +322,23 @@ export const HvacCalculator: React.FC<Props> = ({ onCalculate }) => {
         },
         {
           id: "floor_col",
-          name: "Collecteurs / nourrices",
+          name: t("hvac.floor.collector", { defaultValue: "Collecteurs / nourrices" }),
           quantity: collectors,
           unit: Unit.PIECE,
           unitPrice: prices.floorCollector,
           totalPrice: round2(costCol),
           category: CalculatorType.HVAC,
-          details: `${loops} boucles`,
+          details: `${loops} ${t("hvac.floor.loops", { defaultValue: "boucles" })}`,
         }
       );
     } else if (emitterType === "radiator_water") {
       if (generatorType === "elec_rad" || generatorType === "pac_air_air") {
-        warnings.push("Incohérence: radiateurs à eau nécessitent un système hydraulique (PAC Air/Eau ou chaudière).");
+        warnings.push(t("hvac.warn.rads_need_hydraulic", { defaultValue: "Radiateurs à eau = système hydraulique requis (PAC Air/Eau ou chaudière)." }));
       }
 
-      const nbRads = Math.max(0, zones.length); // 1 per room approx
+      const nbRads = Math.max(0, zones.length);
       const costRads = nbRads * prices.radWater;
 
-      // Pipes: approx 15m per radiator (aller+retour)
       const pipeLen = nbRads * 15;
       const unitPipe =
         proMode ? prices.copperPipeM : floorPipeType === "multicouche" ? prices.multicouchePipeM : prices.perPipeM;
@@ -339,7 +350,7 @@ export const HvacCalculator: React.FC<Props> = ({ onCalculate }) => {
       materialsList.push(
         {
           id: "rads_water",
-          name: "Radiateurs eau chaude",
+          name: t("hvac.emit.rad_water", { defaultValue: "Radiateurs eau chaude" }),
           quantity: nbRads,
           unit: Unit.PIECE,
           unitPrice: prices.radWater,
@@ -348,12 +359,13 @@ export const HvacCalculator: React.FC<Props> = ({ onCalculate }) => {
         },
         {
           id: "pipes_water",
-          name: `Distribution (tuyauterie ${proMode ? "cuivre" : floorPipeType})`,
+          name: t("hvac.net.hydraulic", { defaultValue: "Distribution hydraulique" }),
           quantity: Math.ceil(pipeLen),
           unit: Unit.METER,
           unitPrice: unitPipe,
           totalPrice: round2(costPipe),
           category: CalculatorType.HVAC,
+          details: proMode ? "Cuivre" : floorPipeType.toUpperCase(),
         }
       );
     } else if (emitterType === "radiator_elec") {
@@ -363,7 +375,7 @@ export const HvacCalculator: React.FC<Props> = ({ onCalculate }) => {
 
       materialsList.push({
         id: "rads_elec",
-        name: "Radiateurs électriques",
+        name: t("hvac.emit.rad_elec", { defaultValue: "Radiateurs électriques" }),
         quantity: nbRads,
         unit: Unit.PIECE,
         unitPrice: prices.radElec,
@@ -372,13 +384,13 @@ export const HvacCalculator: React.FC<Props> = ({ onCalculate }) => {
       });
     } else if (emitterType === "split") {
       if (generatorType !== "pac_air_air") {
-        warnings.push("Incohérence: splits (air/air) vont généralement avec une PAC Air/Air.");
+        warnings.push(t("hvac.warn.split_need_pac", { defaultValue: "Splits = généralement avec PAC Air/Air." }));
       }
 
       const nbSplits = Math.max(0, zones.length);
       const costSplits = nbSplits * prices.splitUnit;
 
-      const lineLen = nbSplits * 10; // 10m avg
+      const lineLen = nbSplits * 10;
       const costLines = lineLen * prices.frigoLineM;
 
       emittersCost = costSplits;
@@ -387,7 +399,7 @@ export const HvacCalculator: React.FC<Props> = ({ onCalculate }) => {
       materialsList.push(
         {
           id: "splits",
-          name: "Unités intérieures (splits)",
+          name: t("hvac.emit.splits", { defaultValue: "Unités intérieures (splits)" }),
           quantity: nbSplits,
           unit: Unit.PIECE,
           unitPrice: prices.splitUnit,
@@ -396,7 +408,7 @@ export const HvacCalculator: React.FC<Props> = ({ onCalculate }) => {
         },
         {
           id: "frigo_lines",
-          name: "Liaisons frigorifiques",
+          name: t("hvac.net.frigo", { defaultValue: "Liaisons frigorifiques" }),
           quantity: Math.ceil(lineLen),
           unit: Unit.METER,
           unitPrice: prices.frigoLineM,
@@ -413,7 +425,7 @@ export const HvacCalculator: React.FC<Props> = ({ onCalculate }) => {
       totalCost += labEmit;
       materialsList.push({
         id: "lab_emit",
-        name: "Pose émetteurs + distribution",
+        name: t("hvac.labor.emit", { defaultValue: "Pose émetteurs + distribution" }),
         quantity: 1,
         unit: Unit.PACKAGE,
         unitPrice: labEmit,
@@ -422,25 +434,24 @@ export const HvacCalculator: React.FC<Props> = ({ onCalculate }) => {
       });
     }
 
-    // --- 3) VMC ---
+    // VMC
     let kitPrice = prices.kitVmcSimple;
-    let kitName = "Kit VMC Simple Flux";
+    let kitName = t("hvac.vmc.simple", { defaultValue: "Kit VMC simple flux" });
     if (vmcType === "simple_hygro") {
       kitPrice = prices.kitVmcHygro;
-      kitName = "Kit VMC Hygro B";
+      kitName = t("hvac.vmc.hygro", { defaultValue: "Kit VMC Hygro B" });
     }
     if (vmcType === "double_flux") {
       kitPrice = prices.kitVmcDouble;
-      kitName = "Kit VMC Double Flux";
+      kitName = t("hvac.vmc.double", { defaultValue: "Kit VMC double flux" });
     }
 
     let nbExtract = nbWetRooms;
     let nbSupply = vmcType === "double_flux" ? nbDryRooms : 0;
 
-    // If no wet rooms, still assume at least 1 extract (common minimum) and warn
     if (nbWetRooms === 0 && zones.length > 0) {
       nbExtract = 1;
-      warnings.push("Aucune pièce d’eau détectée : 1 extraction minimale comptée (à vérifier).");
+      warnings.push(t("hvac.warn.min_extract", { defaultValue: "Aucune pièce d’eau détectée : 1 extraction minimale comptée (à vérifier)." }));
     }
 
     const totalVents = nbExtract + nbSupply;
@@ -448,7 +459,6 @@ export const HvacCalculator: React.FC<Props> = ({ onCalculate }) => {
     const extraVents = Math.max(0, totalVents - included);
     const costVents = extraVents * prices.ventUnit;
 
-    // Ducts: avg 6m per vent
     const ductLen = totalVents * 6;
     const baseDuct = ductType === "rigid" ? prices.ductRigidM : prices.ductFlexM;
     const ductUnit = baseDuct + (useInsulatedDucts ? prices.ductInsulationExtraM : 0);
@@ -468,7 +478,7 @@ export const HvacCalculator: React.FC<Props> = ({ onCalculate }) => {
       },
       {
         id: "vmc_ducts",
-        name: `Gaines ${ductType === "rigid" ? "rigides" : "flexibles"} ${useInsulatedDucts ? "isolées" : ""}`.trim(),
+        name: `${t("hvac.vmc.ducts", { defaultValue: "Gaines" })} ${ductType === "rigid" ? t("hvac.vmc.rigid", { defaultValue: "rigides" }) : t("hvac.vmc.flex", { defaultValue: "flexibles" })}${useInsulatedDucts ? ` (${t("hvac.vmc.insulated", { defaultValue: "isolées" })})` : ""}`,
         quantity: Math.ceil(ductLen),
         unit: Unit.METER,
         unitPrice: round2(ductUnit),
@@ -477,13 +487,13 @@ export const HvacCalculator: React.FC<Props> = ({ onCalculate }) => {
       },
       {
         id: "vmc_vents",
-        name: "Bouches supplémentaires",
+        name: t("hvac.vmc.extra_vents", { defaultValue: "Bouches supplémentaires" }),
         quantity: extraVents,
         unit: Unit.PIECE,
         unitPrice: prices.ventUnit,
         totalPrice: round2(costVents),
         category: CalculatorType.HVAC,
-        details: `${nbExtract} extraction / ${nbSupply} insufflation`,
+        details: `${nbExtract} ${t("hvac.vmc.extract", { defaultValue: "extraction" })} / ${nbSupply} ${t("hvac.vmc.supply", { defaultValue: "insufflation" })}`,
       }
     );
 
@@ -492,7 +502,7 @@ export const HvacCalculator: React.FC<Props> = ({ onCalculate }) => {
       vmcCost += labVmc;
       materialsList.push({
         id: "lab_vmc",
-        name: "Pose VMC & réseau",
+        name: t("hvac.labor.vmc", { defaultValue: "Pose VMC & réseau" }),
         quantity: 1,
         unit: Unit.PACKAGE,
         unitPrice: round2(labVmc),
@@ -523,109 +533,86 @@ export const HvacCalculator: React.FC<Props> = ({ onCalculate }) => {
     useInsulatedDucts,
     prices,
     proMode,
+    ductType,
+    t,
   ]);
 
-  // Pass results
+  // Pass to parent
   useEffect(() => {
     onCalculate({
-      summary: `${(calculationData.totalPower / 1000).toFixed(1)} kW (Chauffage) + VMC`,
+      summary: `${(calculationData.totalPower / 1000).toFixed(1)} kW`,
       details: [
-        { label: "Surface", value: calculationData.totalArea, unit: "m²" },
-        { label: "Puissance est.", value: (calculationData.totalPower / 1000).toFixed(1), unit: "kW" },
-        { label: "Générateur", value: generatorType, unit: "" },
-        { label: "Ventilation", value: vmcType === "double_flux" ? "Double flux" : "Simple flux", unit: "" },
+        { label: t("struct.common.surface", { defaultValue: "Surface" }), value: calculationData.totalArea, unit: "m²" },
+        { label: t("hvac.power", { defaultValue: "Puissance est." }), value: (calculationData.totalPower / 1000).toFixed(1), unit: "kW" },
+        { label: t("hvac.generator", { defaultValue: "Générateur" }), value: generatorType, unit: "" },
+        { label: t("hvac.ventilation", { defaultValue: "Ventilation" }), value: vmcType, unit: "" },
       ],
       materials: calculationData.materials,
       totalCost: round2(calculationData.totalCost),
       warnings: calculationData.warnings.length ? calculationData.warnings : undefined,
     });
-  }, [calculationData, generatorType, vmcType, onCalculate]);
+  }, [calculationData, generatorType, vmcType, onCalculate, t]);
 
   return (
     <div className="space-y-6 animate-in fade-in">
-      {/* Navigation */}
+      {/* Step Navigation */}
       <div className="flex justify-between items-center mb-6 bg-slate-50 p-1 rounded-lg overflow-x-auto">
         {[1, 2, 3, 4, 5].map((s) => (
           <button
             key={s}
+            type="button"
             onClick={() => setStep(s)}
             className={`flex-1 min-w-[70px] py-2 text-xs font-bold rounded transition-all ${
               step === s ? "bg-white shadow text-blue-600" : "text-slate-400"
             }`}
           >
-            {s === 1 && "1. Isolation"}
-            {s === 2 && "2. Pièces"}
-            {s === 3 && "3. Chauffage"}
-            {s === 4 && "4. VMC"}
-            {s === 5 && "5. Devis"}
+            {s === 1 && t("hvac.steps.1", { defaultValue: "1. Isolation" })}
+            {s === 2 && t("hvac.steps.2", { defaultValue: "2. Pièces" })}
+            {s === 3 && t("hvac.steps.3", { defaultValue: "3. Chauffage" })}
+            {s === 4 && t("hvac.steps.4", { defaultValue: "4. VMC" })}
+            {s === 5 && t("hvac.steps.5", { defaultValue: "5. Devis" })}
           </button>
         ))}
       </div>
 
-      {/* STEP 1 */}
+      {/* STEP 1: Insulation */}
       {step === 1 && (
         <div className="space-y-4">
           <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
             <Activity size={16} className="mr-2 shrink-0 mt-0.5" />
-            Définissez le niveau d’isolation pour estimer les besoins en puissance.
+            {t("hvac.step1.hint", { defaultValue: "Définissez le niveau d’isolation pour estimer la puissance." })}
           </div>
 
           <div className="space-y-3">
-            <label className="block text-sm font-medium text-slate-700">Niveau d’isolation</label>
+            <label className="block text-sm font-medium text-slate-700">
+              {t("hvac.insulation_level", { defaultValue: "Niveau d’isolation" })}
+            </label>
+
             <div className="grid grid-cols-1 gap-2">
-              <button
-                onClick={() => setInsulationLevel("rt2012")}
-                className={`p-3 rounded border text-left text-sm ${
-                  insulationLevel === "rt2012"
-                    ? "bg-emerald-50 border-emerald-500 text-emerald-800 ring-1 ring-emerald-500"
-                    : "bg-white text-slate-600"
-                }`}
-              >
-                <span className="font-bold block">Excellent (RT2012 / RE2020)</span>
-                <span className="text-xs opacity-75">~40 W/m²</span>
-              </button>
-
-              <button
-                onClick={() => setInsulationLevel("renov_good")}
-                className={`p-3 rounded border text-left text-sm ${
-                  insulationLevel === "renov_good"
-                    ? "bg-blue-50 border-blue-500 text-blue-800 ring-1 ring-blue-500"
-                    : "bg-white text-slate-600"
-                }`}
-              >
-                <span className="font-bold block">Bon (rénovation isolée)</span>
-                <span className="text-xs opacity-75">~70 W/m²</span>
-              </button>
-
-              <button
-                onClick={() => setInsulationLevel("renov_avg")}
-                className={`p-3 rounded border text-left text-sm ${
-                  insulationLevel === "renov_avg"
-                    ? "bg-amber-50 border-amber-500 text-amber-800 ring-1 ring-amber-500"
-                    : "bg-white text-slate-600"
-                }`}
-              >
-                <span className="font-bold block">Moyen (isolation ancienne)</span>
-                <span className="text-xs opacity-75">~100 W/m²</span>
-              </button>
-
-              <button
-                onClick={() => setInsulationLevel("poor")}
-                className={`p-3 rounded border text-left text-sm ${
-                  insulationLevel === "poor"
-                    ? "bg-red-50 border-red-500 text-red-800 ring-1 ring-red-500"
-                    : "bg-white text-slate-600"
-                }`}
-              >
-                <span className="font-bold block">Faible (non isolé)</span>
-                <span className="text-xs opacity-75">~140 W/m²</span>
-              </button>
+              {([
+                ["rt2012", "Excellent (RT2012 / RE2020)", "≈ 40 W/m²"],
+                ["renov_good", "Bon (rénovation isolée)", "≈ 70 W/m²"],
+                ["renov_avg", "Moyen (isolation ancienne)", "≈ 100 W/m²"],
+                ["poor", "Faible (non isolé)", "≈ 140 W/m²"],
+              ] as const).map(([id, title, sub]) => (
+                <button
+                  key={id}
+                  type="button"
+                  onClick={() => setInsulationLevel(id)}
+                  className={`p-3 rounded border text-left text-sm ${
+                    insulationLevel === id ? "bg-blue-50 border-blue-500 text-blue-800 ring-1 ring-blue-500" : "bg-white text-slate-600"
+                  }`}
+                >
+                  <span className="font-bold block">{title}</span>
+                  <span className="text-xs opacity-75">{sub}</span>
+                </button>
+              ))}
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-slate-500 mb-1">Hauteur plafond (m)</label>
+              <label className="block text-xs font-bold text-slate-500 mb-1">{t("hvac.ceiling_height", { defaultValue: "Hauteur plafond (m)" })}</label>
               <input
                 type="number"
                 value={ceilingHeight}
@@ -634,7 +621,7 @@ export const HvacCalculator: React.FC<Props> = ({ onCalculate }) => {
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-slate-500 mb-1">Ratio (W/m²)</label>
+              <label className="block text-xs font-bold text-slate-500 mb-1">{t("hvac.w_per_m2", { defaultValue: "Ratio (W/m²)" })}</label>
               <input
                 type="number"
                 value={wattsPerM2}
@@ -645,20 +632,21 @@ export const HvacCalculator: React.FC<Props> = ({ onCalculate }) => {
           </div>
 
           <button
+            type="button"
             onClick={() => setStep(2)}
             className="w-full py-3 bg-blue-600 text-white rounded-xl font-bold flex justify-center items-center mt-2"
           >
-            Suivant <ArrowRight size={18} className="ml-2" />
+            {t("common.next", { defaultValue: "Suivant" })} <ArrowRight size={18} className="ml-2" />
           </button>
         </div>
       )}
 
-      {/* STEP 2 */}
+      {/* STEP 2: Zones */}
       {step === 2 && (
         <div className="space-y-4">
           <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
             <LayoutGrid size={16} className="mr-2 shrink-0 mt-0.5" />
-            Ajoutez les pièces pour calculer puissance et ventilation.
+            {t("hvac.step2.hint", { defaultValue: "Ajoutez les pièces pour calculer puissance et ventilation." })}
           </div>
 
           <div className="space-y-2">
@@ -667,15 +655,19 @@ export const HvacCalculator: React.FC<Props> = ({ onCalculate }) => {
                 <div>
                   <span className="font-bold text-slate-700 block">{zone.label}</span>
                   <span className="text-xs text-slate-500">
-                    {zone.area} m² • Besoin: {zone.powerW} W
+                    {zone.area} m² • {t("hvac.need", { defaultValue: "Besoin" })}: {zone.powerW} W
                   </span>
                 </div>
-                <button onClick={() => removeZone(zone.id)} className="text-red-400 p-2">
+                <button type="button" onClick={() => removeZone(zone.id)} className="text-red-400 p-2">
                   <Trash2 size={16} />
                 </button>
               </div>
             ))}
-            {zones.length === 0 && <div className="text-center text-sm text-slate-400 py-4 italic">Aucune pièce ajoutée.</div>}
+            {zones.length === 0 && (
+              <div className="text-center text-sm text-slate-400 py-4 italic">
+                {t("hvac.no_zones", { defaultValue: "Aucune pièce ajoutée." })}
+              </div>
+            )}
           </div>
 
           <div className="bg-slate-50 p-3 rounded-xl border border-blue-200 flex gap-2">
@@ -684,13 +676,14 @@ export const HvacCalculator: React.FC<Props> = ({ onCalculate }) => {
               onChange={(e) => setNewZoneType(e.target.value as any)}
               className="flex-1 text-sm border-slate-300 rounded-lg"
             >
-              <option value="living">Séjour</option>
-              <option value="bedroom">Chambre</option>
-              <option value="kitchen">Cuisine</option>
-              <option value="bathroom">SDB</option>
-              <option value="wc">WC</option>
-              <option value="other">Autre</option>
+              <option value="living">{t("hvac.zone.living", { defaultValue: "Séjour" })}</option>
+              <option value="bedroom">{t("hvac.zone.bedroom", { defaultValue: "Chambre" })}</option>
+              <option value="kitchen">{t("hvac.zone.kitchen", { defaultValue: "Cuisine" })}</option>
+              <option value="bathroom">{t("hvac.zone.bathroom", { defaultValue: "SDB" })}</option>
+              <option value="wc">{t("hvac.zone.wc", { defaultValue: "WC" })}</option>
+              <option value="other">{t("hvac.zone.other", { defaultValue: "Autre" })}</option>
             </select>
+
             <input
               type="number"
               placeholder="m²"
@@ -698,67 +691,73 @@ export const HvacCalculator: React.FC<Props> = ({ onCalculate }) => {
               onChange={(e) => setNewZoneArea(e.target.value)}
               className="w-20 text-sm border-slate-300 rounded-lg p-2 bg-white"
             />
-            <button onClick={addZone} className="bg-blue-600 text-white px-3 py-2 rounded-lg font-bold text-sm shadow-md active:scale-95">
+
+            <button
+              type="button"
+              onClick={addZone}
+              className="bg-blue-600 text-white px-3 py-2 rounded-lg font-bold text-sm shadow-md active:scale-95 transition-transform"
+              title={t("common.add", { defaultValue: "Ajouter" })}
+            >
               <Plus size={18} />
             </button>
           </div>
 
           <div className="flex gap-3">
-            <button onClick={() => setStep(1)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
-              Retour
+            <button type="button" onClick={() => setStep(1)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
+              {t("common.back", { defaultValue: "Retour" })}
             </button>
-            <button onClick={() => setStep(3)} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold">
-              Suivant
+            <button type="button" onClick={() => setStep(3)} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold">
+              {t("common.next", { defaultValue: "Suivant" })}
             </button>
           </div>
         </div>
       )}
 
-      {/* STEP 3 */}
+      {/* STEP 3: Heating */}
       {step === 3 && (
         <div className="space-y-4">
           <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
             <Flame size={16} className="mr-2 shrink-0 mt-0.5" />
-            Configuration du système de chauffage.
+            {t("hvac.step3.hint", { defaultValue: "Configuration du système de chauffage." })}
           </div>
 
           {zones.length === 0 && (
             <div className="flex items-start text-xs text-amber-700 bg-amber-50 p-3 rounded-lg border border-amber-100">
               <AlertTriangle size={16} className="mr-2 shrink-0" />
-              Ajoutez au moins une pièce à l’étape 2 pour une estimation correcte.
+              {t("hvac.warn.need_zones", { defaultValue: "Ajoutez au moins une pièce à l’étape 2." })}
             </div>
           )}
 
           <div className="space-y-3">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Générateur</label>
+              <label className="block text-sm font-medium text-slate-700 mb-1">{t("hvac.generator", { defaultValue: "Générateur" })}</label>
               <select
                 value={generatorType}
                 onChange={(e) => setGeneratorType(e.target.value as any)}
                 className="w-full p-3 border rounded bg-white text-slate-900"
               >
-                <option value="pac_air_water">PAC Air/Eau</option>
-                <option value="pac_air_air">PAC Air/Air (clim)</option>
-                <option value="boiler_gas">Chaudière Gaz</option>
-                <option value="elec_rad">Tout électrique (radiateurs)</option>
+                <option value="pac_air_water">{t("hvac.gen.pac_aw", { defaultValue: "PAC Air/Eau" })}</option>
+                <option value="pac_air_air">{t("hvac.gen.pac_aa", { defaultValue: "PAC Air/Air (clim)" })}</option>
+                <option value="boiler_gas">{t("hvac.gen.boiler_gas", { defaultValue: "Chaudière Gaz" })}</option>
+                <option value="elec_rad">{t("hvac.gen.elec", { defaultValue: "Tout électrique (radiateurs)" })}</option>
               </select>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Émetteurs</label>
+              <label className="block text-sm font-medium text-slate-700 mb-1">{t("hvac.emitters", { defaultValue: "Émetteurs" })}</label>
               <select
                 value={emitterType}
                 onChange={(e) => setEmitterType(e.target.value as any)}
                 className="w-full p-3 border rounded bg-white text-slate-900"
               >
                 {generatorType === "elec_rad" ? (
-                  <option value="radiator_elec">Radiateurs électriques</option>
+                  <option value="radiator_elec">{t("hvac.emit.rad_elec", { defaultValue: "Radiateurs électriques" })}</option>
                 ) : generatorType === "pac_air_air" ? (
-                  <option value="split">Splits muraux / console</option>
+                  <option value="split">{t("hvac.emit.splits", { defaultValue: "Splits (unités intérieures)" })}</option>
                 ) : (
                   <>
-                    <option value="radiator_water">Radiateurs eau</option>
-                    <option value="floor">Plancher chauffant</option>
+                    <option value="radiator_water">{t("hvac.emit.rad_water", { defaultValue: "Radiateurs eau" })}</option>
+                    <option value="floor">{t("hvac.emit.floor", { defaultValue: "Plancher chauffant" })}</option>
                   </>
                 )}
               </select>
@@ -766,112 +765,95 @@ export const HvacCalculator: React.FC<Props> = ({ onCalculate }) => {
 
             {emitterType === "floor" && (
               <div className="bg-slate-50 p-3 rounded-lg border border-slate-200 animate-in fade-in space-y-2">
-                <label className="block text-xs font-bold text-slate-500">Pas de pose (cm)</label>
+                <label className="block text-xs font-bold text-slate-500">{t("hvac.floor.pitch", { defaultValue: "Pas de pose (cm)" })}</label>
                 <div className="flex gap-2">
                   <button
+                    type="button"
                     onClick={() => setFloorPitch(15)}
-                    className={`flex-1 py-1 text-sm rounded border ${
-                      floorPitch === 15 ? "bg-blue-100 border-blue-300 text-blue-700 font-bold" : "bg-white"
-                    }`}
+                    className={`flex-1 py-1 text-sm rounded border ${floorPitch === 15 ? "bg-blue-100 border-blue-300 text-blue-700 font-bold" : "bg-white"}`}
                   >
                     15 cm
                   </button>
                   <button
+                    type="button"
                     onClick={() => setFloorPitch(20)}
-                    className={`flex-1 py-1 text-sm rounded border ${
-                      floorPitch === 20 ? "bg-blue-100 border-blue-300 text-blue-700 font-bold" : "bg-white"
-                    }`}
+                    className={`flex-1 py-1 text-sm rounded border ${floorPitch === 20 ? "bg-blue-100 border-blue-300 text-blue-700 font-bold" : "bg-white"}`}
                   >
                     20 cm
                   </button>
                 </div>
 
-                <label className="block text-xs font-bold text-slate-500">Type de tube</label>
+                <label className="block text-xs font-bold text-slate-500">{t("hvac.floor.pipe_type", { defaultValue: "Type de tube" })}</label>
                 <select
                   value={floorPipeType}
                   onChange={(e) => setFloorPipeType(e.target.value as any)}
                   className="w-full p-2 border rounded bg-white text-slate-900"
                 >
                   <option value="per">PER</option>
-                  <option value="multicouche">Multicouche</option>
+                  <option value="multicouche">{t("hvac.pipe.multicouche", { defaultValue: "Multicouche" })}</option>
                 </select>
               </div>
             )}
           </div>
 
           <div className="flex gap-3">
-            <button onClick={() => setStep(2)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
-              Retour
+            <button type="button" onClick={() => setStep(2)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
+              {t("common.back", { defaultValue: "Retour" })}
             </button>
-            <button onClick={() => setStep(4)} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold">
-              Suivant
+            <button type="button" onClick={() => setStep(4)} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold">
+              {t("common.next", { defaultValue: "Suivant" })}
             </button>
           </div>
         </div>
       )}
 
-      {/* STEP 4 */}
+      {/* STEP 4: VMC */}
       {step === 4 && (
         <div className="space-y-4">
           <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
             <Fan size={16} className="mr-2 shrink-0 mt-0.5" />
-            Type de VMC et réseaux. Les bouches sont calculées selon les pièces.
+            {t("hvac.step4.hint", { defaultValue: "Type de VMC et réseaux." })}
           </div>
 
           <div className="space-y-3">
-            <label className="block text-sm font-medium text-slate-700 mb-1">Type de VMC</label>
+            <label className="block text-sm font-medium text-slate-700 mb-1">{t("hvac.vmc.type", { defaultValue: "Type de VMC" })}</label>
             <div className="grid grid-cols-1 gap-2">
-              <button
-                onClick={() => setVmcType("simple_auto")}
-                className={`p-3 rounded border text-left text-sm ${
-                  vmcType === "simple_auto" ? "bg-blue-50 border-blue-500 text-blue-800 ring-1 ring-blue-500" : "bg-white text-slate-600"
-                }`}
-              >
-                <span className="font-bold block">Simple flux autoréglable</span>
-                <span className="text-xs opacity-75">Base standard</span>
-              </button>
-
-              <button
-                onClick={() => setVmcType("simple_hygro")}
-                className={`p-3 rounded border text-left text-sm ${
-                  vmcType === "simple_hygro" ? "bg-blue-50 border-blue-500 text-blue-800 ring-1 ring-blue-500" : "bg-white text-slate-600"
-                }`}
-              >
-                <span className="font-bold block">Simple flux Hygro B</span>
-                <span className="text-xs opacity-75">Débit variable</span>
-              </button>
-
-              <button
-                onClick={() => setVmcType("double_flux")}
-                className={`p-3 rounded border text-left text-sm ${
-                  vmcType === "double_flux"
-                    ? "bg-emerald-50 border-emerald-500 text-emerald-800 ring-1 ring-emerald-500"
-                    : "bg-white text-slate-600"
-                }`}
-              >
-                <span className="font-bold block">Double flux</span>
-                <span className="text-xs opacity-75">Récupération de chaleur</span>
-              </button>
+              {([
+                ["simple_auto", t("hvac.vmc.simple_auto", { defaultValue: "Simple flux autoréglable" })],
+                ["simple_hygro", t("hvac.vmc.hygro", { defaultValue: "Simple flux Hygro B" })],
+                ["double_flux", t("hvac.vmc.double", { defaultValue: "Double flux" })],
+              ] as const).map(([id, label]) => (
+                <button
+                  key={id}
+                  type="button"
+                  onClick={() => setVmcType(id)}
+                  className={`p-3 rounded border text-left text-sm ${
+                    vmcType === id ? "bg-blue-50 border-blue-500 text-blue-800 ring-1 ring-blue-500" : "bg-white text-slate-600"
+                  }`}
+                >
+                  <span className="font-bold block">{label}</span>
+                </button>
+              ))}
             </div>
 
             <div className="bg-slate-50 p-3 rounded-lg border border-slate-200 space-y-2">
-              <h4 className="text-xs font-bold text-slate-500 uppercase">Réseau gaines</h4>
+              <h4 className="text-xs font-bold text-slate-500 uppercase">{t("hvac.vmc.network", { defaultValue: "Réseau gaines" })}</h4>
 
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="block text-[10px] text-slate-500 mb-1">Type</label>
+                  <label className="block text-[10px] text-slate-500 mb-1">{t("common.type", { defaultValue: "Type" })}</label>
                   <select
                     value={ductType}
                     onChange={(e) => setDuctType(e.target.value as any)}
                     className="w-full p-2 border rounded bg-white text-slate-900 text-sm"
                   >
-                    <option value="flexible">Flexible</option>
-                    <option value="rigid">Rigide</option>
+                    <option value="flexible">{t("hvac.vmc.flex", { defaultValue: "Flexible" })}</option>
+                    <option value="rigid">{t("hvac.vmc.rigid", { defaultValue: "Rigide" })}</option>
                   </select>
                 </div>
 
                 <label className="flex items-center justify-between mt-5">
-                  <span className="text-sm">Gaines isolées</span>
+                  <span className="text-sm">{t("hvac.vmc.insulated", { defaultValue: "Gaines isolées" })}</span>
                   <input
                     type="checkbox"
                     checked={useInsulatedDucts}
@@ -880,135 +862,73 @@ export const HvacCalculator: React.FC<Props> = ({ onCalculate }) => {
                   />
                 </label>
               </div>
-
-              {zones.length > 0 && calculationData.nbWetRooms === 0 && (
-                <div className="flex items-start text-xs text-amber-600 bg-amber-50 p-2 rounded">
-                  <AlertTriangle size={14} className="mr-2 mt-0.5 shrink-0" />
-                  <span>Aucune pièce d’eau détectée : l’extraction minimale est à vérifier.</span>
-                </div>
-              )}
             </div>
           </div>
 
           <div className="flex gap-3">
-            <button onClick={() => setStep(3)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
-              Retour
+            <button type="button" onClick={() => setStep(3)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
+              {t("common.back", { defaultValue: "Retour" })}
             </button>
-            <button onClick={() => setStep(5)} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold">
-              Suivant
+            <button type="button" onClick={() => setStep(5)} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold">
+              {t("common.next", { defaultValue: "Suivant" })}
             </button>
           </div>
         </div>
       )}
 
-      {/* STEP 5 */}
+      {/* STEP 5: Pricing */}
       {step === 5 && (
         <div className="space-y-4">
           <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
             <CircleDollarSign size={16} className="mr-2 shrink-0 mt-0.5" />
-            Ajustez les prix unitaires pour finaliser le devis.
+            {t("hvac.step5.hint", { defaultValue: "Ajustez les prix unitaires." })}
           </div>
 
           <div className="bg-white p-3 rounded-xl border border-slate-200">
             <div className="flex justify-between items-center mb-3">
-              <h4 className="text-xs font-bold text-slate-500 uppercase">Prix</h4>
-              <button onClick={() => setProMode(!proMode)} className="text-xs flex items-center text-blue-600">
-                <Settings size={12} className="mr-1" /> {proMode ? "Mode Pro" : "Mode Simple"}
+              <h4 className="text-xs font-bold text-slate-500 uppercase">{t("struct.common.unit_prices", { defaultValue: "Prix unitaires" })}</h4>
+              <button type="button" onClick={() => setProMode(!proMode)} className="text-xs flex items-center text-blue-600">
+                <Settings size={12} className="mr-1" /> {proMode ? t("struct.common.pro_mode", { defaultValue: "Mode Pro" }) : t("struct.common.simple_mode", { defaultValue: "Mode Simple" })}
               </button>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              {generatorType === "pac_air_water" && (
-                <div>
-                  <label className="block text-[10px] text-slate-500 mb-1">PAC Air/Eau (€)</label>
-                  <input type="number" value={prices.pacAirWater} onChange={(e) => updatePrice("pacAirWater", e.target.value)} className="w-full p-1.5 border rounded text-sm" />
-                </div>
-              )}
-
-              {generatorType === "pac_air_air" && (
-                <>
-                  <div>
-                    <label className="block text-[10px] text-slate-500 mb-1">PAC Air/Air – Groupe ext. (€)</label>
-                    <input type="number" value={prices.pacAirAirExt} onChange={(e) => updatePrice("pacAirAirExt", e.target.value)} className="w-full p-1.5 border rounded text-sm" />
-                  </div>
-                  <div>
-                    <label className="block text-[10px] text-slate-500 mb-1">Unité intérieure sup. (€)</label>
-                    <input type="number" value={prices.pacAirAirIndoor} onChange={(e) => updatePrice("pacAirAirIndoor", e.target.value)} className="w-full p-1.5 border rounded text-sm" />
-                  </div>
-                </>
-              )}
-
-              {generatorType === "boiler_gas" && (
-                <div>
-                  <label className="block text-[10px] text-slate-500 mb-1">Chaudière gaz (€)</label>
-                  <input type="number" value={prices.boilerGas} onChange={(e) => updatePrice("boilerGas", e.target.value)} className="w-full p-1.5 border rounded text-sm" />
-                </div>
-              )}
-
-              {emitterType === "radiator_water" && (
-                <div>
-                  <label className="block text-[10px] text-slate-500 mb-1">Radiateur eau (€ / u)</label>
-                  <input type="number" value={prices.radWater} onChange={(e) => updatePrice("radWater", e.target.value)} className="w-full p-1.5 border rounded text-sm" />
-                </div>
-              )}
-
-              {emitterType === "radiator_elec" && (
-                <div>
-                  <label className="block text-[10px] text-slate-500 mb-1">Radiateur élec (€ / u)</label>
-                  <input type="number" value={prices.radElec} onChange={(e) => updatePrice("radElec", e.target.value)} className="w-full p-1.5 border rounded text-sm" />
-                </div>
-              )}
-
-              {emitterType === "floor" && (
-                <>
-                  <div>
-                    <label className="block text-[10px] text-slate-500 mb-1">Tube sol (€/m)</label>
-                    <input type="number" value={prices.floorPipeM} onChange={(e) => updatePrice("floorPipeM", e.target.value)} className="w-full p-1.5 border rounded text-sm" />
-                  </div>
-                  <div>
-                    <label className="block text-[10px] text-slate-500 mb-1">Isolant sol (€/m²)</label>
-                    <input type="number" value={prices.floorInsulation} onChange={(e) => updatePrice("floorInsulation", e.target.value)} className="w-full p-1.5 border rounded text-sm" />
-                  </div>
-                </>
-              )}
-
-              {emitterType === "split" && (
-                <>
-                  <div>
-                    <label className="block text-[10px] text-slate-500 mb-1">Split intérieur (€ / u)</label>
-                    <input type="number" value={prices.splitUnit} onChange={(e) => updatePrice("splitUnit", e.target.value)} className="w-full p-1.5 border rounded text-sm" />
-                  </div>
-                  <div>
-                    <label className="block text-[10px] text-slate-500 mb-1">Liaisons frigo (€/m)</label>
-                    <input type="number" value={prices.frigoLineM} onChange={(e) => updatePrice("frigoLineM", e.target.value)} className="w-full p-1.5 border rounded text-sm" />
-                  </div>
-                </>
-              )}
+              <div>
+                <label className="block text-[10px] text-slate-500 mb-1">PAC Air/Eau (€)</label>
+                <input type="number" value={prices.pacAirWater} onChange={(e) => updatePrice("pacAirWater", e.target.value)} className="w-full p-1.5 border rounded text-sm" />
+              </div>
+              <div>
+                <label className="block text-[10px] text-slate-500 mb-1">Chaudière gaz (€)</label>
+                <input type="number" value={prices.boilerGas} onChange={(e) => updatePrice("boilerGas", e.target.value)} className="w-full p-1.5 border rounded text-sm" />
+              </div>
 
               <div>
-                <label className="block text-[10px] text-slate-500 mb-1">Kit VMC (€)</label>
-                <input
-                  type="number"
-                  value={vmcType === "simple_auto" ? prices.kitVmcSimple : vmcType === "simple_hygro" ? prices.kitVmcHygro : prices.kitVmcDouble}
-                  onChange={(e) =>
-                    updatePrice(
-                      vmcType === "simple_auto" ? "kitVmcSimple" : vmcType === "simple_hygro" ? "kitVmcHygro" : "kitVmcDouble",
-                      e.target.value
-                    )
-                  }
-                  className="w-full p-1.5 border rounded text-sm"
-                />
+                <label className="block text-[10px] text-slate-500 mb-1">Radiateur eau (€)</label>
+                <input type="number" value={prices.radWater} onChange={(e) => updatePrice("radWater", e.target.value)} className="w-full p-1.5 border rounded text-sm" />
+              </div>
+              <div>
+                <label className="block text-[10px] text-slate-500 mb-1">Radiateur élec (€)</label>
+                <input type="number" value={prices.radElec} onChange={(e) => updatePrice("radElec", e.target.value)} className="w-full p-1.5 border rounded text-sm" />
+              </div>
+
+              <div>
+                <label className="block text-[10px] text-slate-500 mb-1">Kit VMC Hygro (€)</label>
+                <input type="number" value={prices.kitVmcHygro} onChange={(e) => updatePrice("kitVmcHygro", e.target.value)} className="w-full p-1.5 border rounded text-sm" />
+              </div>
+              <div>
+                <label className="block text-[10px] text-slate-500 mb-1">Gaine flexible (€/m)</label>
+                <input type="number" value={prices.ductFlexM} onChange={(e) => updatePrice("ductFlexM", e.target.value)} className="w-full p-1.5 border rounded text-sm" />
               </div>
             </div>
 
             {proMode && (
               <div className="mt-4 pt-3 border-t border-slate-100 grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[10px] text-blue-600 font-bold mb-1">Pose générateur (€)</label>
+                  <label className="block text-[10px] text-blue-600 font-bold mb-1">{t("hvac.labor.gen", { defaultValue: "Pose générateur" })} (€)</label>
                   <input type="number" value={prices.installGenerator} onChange={(e) => updatePrice("installGenerator", e.target.value)} className="w-full p-1.5 border border-blue-200 rounded text-sm" />
                 </div>
                 <div>
-                  <label className="block text-[10px] text-blue-600 font-bold mb-1">Pose VMC (€)</label>
+                  <label className="block text-[10px] text-blue-600 font-bold mb-1">{t("hvac.labor.vmc", { defaultValue: "Pose VMC" })} (€)</label>
                   <input type="number" value={prices.installVmc} onChange={(e) => updatePrice("installVmc", e.target.value)} className="w-full p-1.5 border border-blue-200 rounded text-sm" />
                 </div>
               </div>
@@ -1026,11 +946,11 @@ export const HvacCalculator: React.FC<Props> = ({ onCalculate }) => {
           )}
 
           <div className="flex gap-3 pt-2">
-            <button onClick={() => setStep(4)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
-              Retour
+            <button type="button" onClick={() => setStep(4)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
+              {t("common.back", { defaultValue: "Retour" })}
             </button>
-            <button className="flex-1 py-3 bg-emerald-100 text-emerald-700 rounded-xl font-bold flex justify-center items-center">
-              <Check size={18} className="mr-2" /> Terminé
+            <button type="button" disabled className="flex-1 py-3 bg-emerald-100 text-emerald-700 rounded-xl font-bold flex justify-center items-center">
+              <Check size={18} className="mr-2" /> {t("struct.common.calculated", { defaultValue: "Calculé" })}
             </button>
           </div>
         </div>

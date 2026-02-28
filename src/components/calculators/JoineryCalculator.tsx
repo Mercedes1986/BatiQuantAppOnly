@@ -1,6 +1,11 @@
+// src/components/calculators/JoineryCalculator.tsx
 import React, { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
+
 import { CalculatorType, CalculationResult, Unit } from "../../../types";
-import { OPENING_PRESETS } from "../../constants";
+import { DEFAULT_PRICES, OPENING_PRESETS } from "../../constants";
+import { getUnitPrice } from "../../services/materialsService";
+
 import {
   BoxSelect,
   Plus,
@@ -9,7 +14,7 @@ import {
   Info,
   Check,
   Hammer,
-  DollarSign,
+  CircleDollarSign,
   Copy,
   Edit2,
   X,
@@ -31,7 +36,7 @@ interface JoineryItem {
   quantity: number;
   material: JoineryMaterial;
   shutter: ShutterType;
-  priceOverride?: number; // User defined supply price per unit
+  priceOverride?: number; // supply €/u
 }
 
 interface Props {
@@ -45,105 +50,138 @@ const toNum = (v: unknown, fallback = 0) => {
 const round2 = (n: number) => Math.round((n + Number.EPSILON) * 100) / 100;
 const clampInt = (n: number, min: number, max: number) => Math.min(max, Math.max(min, Math.trunc(n)));
 
-const typeLabel = (type: JoineryType) => {
-  switch (type) {
+const typeLabel = (t: JoineryType) => {
+  switch (t) {
     case "window":
       return "Fenêtre";
     case "door":
-      return "Porte Entrée";
+      return "Porte d'entrée";
     case "bay":
-      return "Baie Coulissante";
+      return "Baie coulissante";
     case "velux":
-      return "Velux / Toit";
+      return "Velux / toit";
     case "garage":
-      return "Porte Garage";
+      return "Porte garage";
     default:
       return "Menuiserie";
   }
 };
 
 export const JoineryCalculator: React.FC<Props> = ({ onCalculate }) => {
+  const { t } = useTranslation();
+
   const [step, setStep] = useState(1);
   const [proMode, setProMode] = useState(false);
 
-  // --- 1. Inventory ---
+  // --- 1) Inventory ---
   const [items, setItems] = useState<JoineryItem[]>([]);
 
-  // Add/Edit Form State
+  // Add/Edit form
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
 
   const [formType, setFormType] = useState<JoineryType>("window");
-  const [formLabel, setFormLabel] = useState("Fenêtre");
+  const [formLabel, setFormLabel] = useState(typeLabel("window"));
   const [formW, setFormW] = useState("");
   const [formH, setFormH] = useState("");
   const [formQty, setFormQty] = useState(1);
   const [formMat, setFormMat] = useState<JoineryMaterial>("pvc");
   const [formShutter, setFormShutter] = useState<ShutterType>("none");
-  const [formPriceOverride, setFormPriceOverride] = useState<string>(""); // optional supply override
+  const [formPriceOverride, setFormPriceOverride] = useState<string>("");
 
-  // --- 2. Installation & Supplies ---
-  const [installType, setInstallType] = useState<InstallType>("new"); // Applique, Rénovation, Tunnel
+  // --- 2) Install & supplies ---
+  const [installType, setInstallType] = useState<InstallType>("new");
   const [useCompriband, setUseCompriband] = useState(true);
   const [useSilicone, setUseSilicone] = useState(true);
   const [useFoam, setUseFoam] = useState(true);
   const [useFixings, setUseFixings] = useState(true);
   const [wastePct, setWastePct] = useState(10);
 
-  // --- 3. Pricing ---
-  const [prices, setPrices] = useState({
-    // Supply Base Prices (PVC base)
-    window: 250,
-    door: 800,
-    bay: 1200,
-    velux: 400,
-    garage: 1500,
+  // --- Price helper: catalog > DEFAULT_PRICES > fallback ---
+  const priceOr = (key: string, fallback: number) => {
+    const v = getUnitPrice(key);
+    if (typeof v === "number" && !Number.isNaN(v) && v !== 0) return v;
 
-    // Options
-    shutterRolling: 300,
-    shutterSwing: 200,
-
-    materialAlu: 1.4, // coef multiplier
-    materialWood: 1.5,
-
-    // Labor (per unit)
-    installWindow: 150,
-    installDoor: 250,
-    installBay: 350,
-    installVelux: 200,
-    installGarage: 400,
-    renoSurcharge: 50,
-
-    // Supplies
-    compribandM: 2.5, // €/m
-    siliconeCart: 8, // €/u
-    foamCart: 12, // €/u
-    fixingKit: 5, // €/u
-  });
-
-  type PriceKey = keyof typeof prices;
-  const updatePrice = (key: PriceKey, val: string) => {
-    setPrices((prev) => ({ ...prev, [key]: toNum(val, 0) }));
+    const d = (DEFAULT_PRICES as any)[key];
+    if (d !== undefined) {
+      const nd = Number(d);
+      if (!Number.isNaN(nd)) return nd;
+    }
+    return fallback;
   };
 
-  // --- Presets support (safe if constants change shape) ---
+  // --- 3) Pricing ---
+  const [prices, setPrices] = useState(() => ({
+    // Supply base (PVC)
+    window: priceOr("JOINERY_WINDOW_UNIT", 250),
+    door: priceOr("JOINERY_DOOR_UNIT", 800),
+    bay: priceOr("JOINERY_BAY_UNIT", 1200),
+    velux: priceOr("JOINERY_VELUX_UNIT", 400),
+    garage: priceOr("JOINERY_GARAGE_UNIT", 1500),
+
+    // Options
+    shutterRolling: priceOr("JOINERY_SHUTTER_ROLLING_UNIT", 300),
+    shutterSwing: priceOr("JOINERY_SHUTTER_SWING_UNIT", 200),
+
+    // Material coefficients
+    materialAlu: 1.4,
+    materialWood: 1.5,
+
+    // Labor (€/u)
+    installWindow: priceOr("JOINERY_INSTALL_WINDOW_UNIT", 150),
+    installDoor: priceOr("JOINERY_INSTALL_DOOR_UNIT", 250),
+    installBay: priceOr("JOINERY_INSTALL_BAY_UNIT", 350),
+    installVelux: priceOr("JOINERY_INSTALL_VELUX_UNIT", 200),
+    installGarage: priceOr("JOINERY_INSTALL_GARAGE_UNIT", 400),
+    renoSurcharge: priceOr("JOINERY_RENO_SURCHARGE_UNIT", 50),
+
+    // Supplies
+    compribandM: priceOr("JOINERY_COMPRIBAND_M", 2.5),
+    siliconeCart: priceOr("JOINERY_SILICONE_CART", 8),
+    foamCart: priceOr("JOINERY_FOAM_CART", 12),
+    fixingKit: priceOr("JOINERY_FIXING_KIT", 5),
+  }));
+
+  type PriceKey = keyof typeof prices;
+  const updatePrice = (key: PriceKey, val: string) => setPrices((p) => ({ ...p, [key]: toNum(val, 0) }));
+
+  // --- Presets (supports multiple shapes) ---
   const presetOptions = useMemo(() => {
-    const windows = (OPENING_PRESETS as any)?.WINDOWS ?? [];
-    const doors = (OPENING_PRESETS as any)?.DOORS ?? [];
-    const merged = [...windows, ...doors].filter(Boolean);
-    return merged
-      .map((p: any) => ({
-        label: String(p.label ?? ""),
-        width: toNum(p.width, 0),
-        height: toNum(p.height, 0),
-      }))
-      .filter((p: any) => p.label && p.width > 0 && p.height > 0);
-  }, []);
+    const src = OPENING_PRESETS as any;
+
+    // Accept:
+    // - { window: {w,h,reveal}, door: {...} } like in Structural/Facade
+    // - { WINDOWS: [...], DOORS: [...] } legacy
+    const list: any[] = [];
+
+    const add = (label: string, w: any, h: any) => {
+      const W = toNum(w, 0);
+      const H = toNum(h, 0);
+      if (!label || !(W > 0) || !(H > 0)) return;
+      list.push({ label: String(label), width: W, height: H });
+    };
+
+    if (src) {
+      if (Array.isArray(src.WINDOWS)) src.WINDOWS.forEach((p: any) => add(p.label ?? "Fenêtre", p.width, p.height));
+      if (Array.isArray(src.DOORS)) src.DOORS.forEach((p: any) => add(p.label ?? "Porte", p.width, p.height));
+
+      if (src.window) add(t("struct.opening.window", { defaultValue: "Fenêtre" }), src.window.w, src.window.h);
+      if (src.door) add(t("struct.opening.door", { defaultValue: "Porte" }), src.door.w, src.door.h);
+      if (src.bay) add(t("struct.opening.bay", { defaultValue: "Baie vitrée" }), src.bay.w, src.bay.h);
+      if (src.garage) add(t("struct.opening.garage", { defaultValue: "Garage" }), src.garage.w, src.garage.h);
+    }
+
+    // Deduplicate by label
+    const uniq = new Map<string, { label: string; width: number; height: number }>();
+    for (const p of list) uniq.set(p.label, p);
+
+    return Array.from(uniq.values()).sort((a, b) => a.label.localeCompare(b.label));
+  }, [t]);
 
   // --- Form handlers ---
   const resetForm = () => {
     setFormType("window");
-    setFormLabel("Fenêtre");
+    setFormLabel(typeLabel("window"));
     setFormW("");
     setFormH("");
     setFormQty(1);
@@ -208,10 +246,11 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate }) => {
 
     const low = presetLabel.toLowerCase();
     if (low.includes("porte")) setFormType("door");
+    else if (low.includes("baie")) setFormType("bay");
     else setFormType("window");
   };
 
-  // --- Calculations (memo, then pushed via effect) ---
+  // --- Calculation ---
   const calc = useMemo(() => {
     let totalCost = 0;
     let totalArea = 0;
@@ -221,95 +260,83 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate }) => {
 
     const totalUnits = items.reduce((acc, i) => acc + i.quantity, 0);
 
-    // 1) Joinery items (supply + optionally labor)
+    const installUnitPriceFor = (type: JoineryType) => {
+      let u = 0;
+      if (type === "window") u = prices.installWindow;
+      else if (type === "door") u = prices.installDoor;
+      else if (type === "bay") u = prices.installBay;
+      else if (type === "velux") u = prices.installVelux;
+      else if (type === "garage") u = prices.installGarage;
+
+      if (installType === "reno") u += prices.renoSurcharge;
+      return u;
+    };
+
     items.forEach((item) => {
       const area = item.width * item.height * item.quantity;
       const perim = 2 * (item.width + item.height) * item.quantity;
       totalArea += area;
       totalPerimeter += perim;
 
-      // Supply base
-      let baseSupply = (prices as any)[item.type] ?? 250;
+      let baseSupply = (prices as any)[item.type] ?? prices.window;
 
-      // Material multiplier
       if (item.material === "alu") baseSupply *= prices.materialAlu;
       if (item.material === "wood") baseSupply *= prices.materialWood;
 
-      // Shutter option
       if (item.shutter === "rolling") baseSupply += prices.shutterRolling;
       if (item.shutter === "swing") baseSupply += prices.shutterSwing;
 
-      // Override supply price per unit?
       const unitSupply = item.priceOverride ?? baseSupply;
       const supplyCost = unitSupply * item.quantity;
 
-      // Labor per unit
-      let installUnit = 0;
-      if (item.type === "window") installUnit = prices.installWindow;
-      else if (item.type === "door") installUnit = prices.installDoor;
-      else if (item.type === "bay") installUnit = prices.installBay;
-      else if (item.type === "velux") installUnit = prices.installVelux;
-      else if (item.type === "garage") installUnit = prices.installGarage;
-
-      if (installType === "reno") installUnit += prices.renoSurcharge;
-
+      const installUnit = installUnitPriceFor(item.type);
       const laborCost = installUnit * item.quantity;
 
-      // Total cost logic:
-      // - en mode simple: on met fourniture + pose dans la même ligne (comme ton script d’origine),
-      //   mais on garde un détail lisible.
-      // - en mode pro: on sépare fourniture et pose en 2 lignes.
+      totalCost += supplyCost + laborCost;
+
       if (!proMode) {
-        totalCost += supplyCost + laborCost;
         materialsList.push({
           id: item.id,
-          name: `${item.label} ${item.material.toUpperCase()} ${item.width}x${item.height}m`,
+          name: `${item.label} ${item.material.toUpperCase()} ${item.width}×${item.height}m`,
           quantity: item.quantity,
-          quantityRaw: item.quantity,
           unit: Unit.PIECE,
           unitPrice: round2(unitSupply + installUnit),
           totalPrice: round2(supplyCost + laborCost),
           category: CalculatorType.JOINERY,
-          details:
-            `Fourniture: ${round2(unitSupply)}€/u • Pose: ${round2(installUnit)}€/u` +
-            (item.shutter !== "none" ? " • Volet inclus" : ""),
+          details: `Fourniture: ${round2(unitSupply)}€/u • Pose: ${round2(installUnit)}€/u`,
         });
       } else {
-        totalCost += supplyCost + laborCost;
-
-        materialsList.push({
-          id: `${item.id}_supply`,
-          name: `${item.label} (fourniture) ${item.material.toUpperCase()} ${item.width}x${item.height}m`,
-          quantity: item.quantity,
-          quantityRaw: item.quantity,
-          unit: Unit.PIECE,
-          unitPrice: round2(unitSupply),
-          totalPrice: round2(supplyCost),
-          category: CalculatorType.JOINERY,
-          details: item.shutter !== "none" ? `Volet: ${item.shutter === "rolling" ? "roulant" : "battant"}` : undefined,
-        });
-
-        materialsList.push({
-          id: `${item.id}_install`,
-          name: `Pose ${item.label}`,
-          quantity: item.quantity,
-          quantityRaw: item.quantity,
-          unit: Unit.PIECE,
-          unitPrice: round2(installUnit),
-          totalPrice: round2(laborCost),
-          category: CalculatorType.JOINERY,
-          details: `Type pose: ${installType === "new" ? "Neuf (applique)" : installType === "reno" ? "Rénovation" : "Tunnel"}`,
-        });
+        materialsList.push(
+          {
+            id: `${item.id}_supply`,
+            name: `${item.label} (fourniture) ${item.material.toUpperCase()} ${item.width}×${item.height}m`,
+            quantity: item.quantity,
+            unit: Unit.PIECE,
+            unitPrice: round2(unitSupply),
+            totalPrice: round2(supplyCost),
+            category: CalculatorType.JOINERY,
+            details: item.shutter !== "none" ? `Volet: ${item.shutter === "rolling" ? "roulant" : "battant"}` : undefined,
+          },
+          {
+            id: `${item.id}_install`,
+            name: `Pose ${item.label}`,
+            quantity: item.quantity,
+            unit: Unit.PIECE,
+            unitPrice: round2(installUnit),
+            totalPrice: round2(laborCost),
+            category: CalculatorType.JOINERY,
+            details: `Type pose: ${installType === "new" ? "Neuf (applique)" : installType === "reno" ? "Rénovation" : "Tunnel"}`,
+          }
+        );
       }
 
       if (item.priceOverride !== undefined && item.priceOverride < 50) {
-        warnings.push(`Prix forcé très bas détecté sur "${item.label}" (${item.priceOverride}€/u).`);
+        warnings.push(t("joinery.warn.low_override", { defaultValue: `Prix forcé très bas sur "${item.label}".` }));
       }
     });
 
-    // 2) Supplies (consumables)
-    const wasteCoef = 1 + wastePct / 100;
-
+    // Consumables
+    const wasteCoef = 1 + (toNum(wastePct, 0) / 100);
     if (totalUnits > 0) {
       if (useCompriband) {
         const len = totalPerimeter * wasteCoef;
@@ -317,45 +344,41 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate }) => {
         totalCost += cost;
         materialsList.push({
           id: "compriband",
-          name: "Compribande (étanchéité)",
+          name: t("joinery.supplies.compriband", { defaultValue: "Compribande (étanchéité)" }),
           quantity: Math.ceil(len),
-          quantityRaw: len,
           unit: Unit.METER,
           unitPrice: prices.compribandM,
           totalPrice: round2(cost),
           category: CalculatorType.JOINERY,
+          details: `+${toNum(wastePct, 0)}%`,
         });
       }
 
       if (useSilicone) {
-        // approx 15m / cartouche
         const len = totalPerimeter * wasteCoef;
         const carts = Math.ceil(len / 15);
         const cost = carts * prices.siliconeCart;
         totalCost += cost;
         materialsList.push({
           id: "silicone",
-          name: "Mastic silicone",
+          name: t("joinery.supplies.silicone", { defaultValue: "Mastic silicone" }),
           quantity: carts,
-          quantityRaw: carts,
           unit: Unit.PIECE,
           unitPrice: prices.siliconeCart,
           totalPrice: round2(cost),
           category: CalculatorType.JOINERY,
-          details: `≈ ${(len / 15).toFixed(1)} cart. théoriques`,
+          details: `≈ 15m/cart.`,
         });
       }
 
       if (useFoam) {
-        // approx 1 cartouche / 3 unités
         const carts = Math.ceil(totalUnits / 3);
         const cost = carts * prices.foamCart;
         totalCost += cost;
         materialsList.push({
           id: "foam",
-          name: "Mousse expansive PU",
+          name: t("joinery.supplies.foam", { defaultValue: "Mousse expansive PU" }),
           quantity: carts,
-          quantityRaw: carts,
           unit: Unit.PIECE,
           unitPrice: prices.foamCart,
           totalPrice: round2(cost),
@@ -368,20 +391,19 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate }) => {
         totalCost += cost;
         materialsList.push({
           id: "fixings",
-          name: "Kit fixations (vis/pattes/cales)",
+          name: t("joinery.supplies.fixings", { defaultValue: "Kit fixations (vis/pattes/cales)" }),
           quantity: totalUnits,
-          quantityRaw: totalUnits,
           unit: Unit.PACKAGE,
           unitPrice: prices.fixingKit,
           totalPrice: round2(cost),
           category: CalculatorType.JOINERY,
         });
       }
+    } else {
+      warnings.push(t("joinery.warn.no_items", { defaultValue: "Aucune menuiserie ajoutée." }));
     }
 
-    if (items.length === 0) {
-      warnings.push("Aucune menuiserie ajoutée.");
-    }
+    if (toNum(wastePct, 0) > 30) warnings.push(t("joinery.warn.high_waste", { defaultValue: "Marge pertes élevée." }));
 
     return {
       totalCost: round2(totalCost),
@@ -391,20 +413,29 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate }) => {
       materials: materialsList,
       warnings,
     };
-  }, [items, installType, useCompriband, useSilicone, useFoam, useFixings, wastePct, prices, proMode]);
+  }, [
+    items,
+    installType,
+    useCompriband,
+    useSilicone,
+    useFoam,
+    useFixings,
+    wastePct,
+    prices,
+    proMode,
+    t,
+  ]);
 
   // Push to parent
   useEffect(() => {
-    if (!items.length) return;
-
     onCalculate({
-      summary: `${calc.totalUnits} Menuiseries`,
+      summary: `${calc.totalUnits} ${t("joinery.summary.units", { defaultValue: "menuiseries" })}`,
       details: [
-        { label: "Surface totale", value: calc.totalArea.toFixed(1), unit: "m²" },
-        { label: "Périmètre total", value: calc.totalPerimeter.toFixed(1), unit: "m" },
+        { label: t("joinery.stats.area", { defaultValue: "Surface totale" }), value: calc.totalArea.toFixed(1), unit: "m²" },
+        { label: t("joinery.stats.perimeter", { defaultValue: "Périmètre total" }), value: calc.totalPerimeter.toFixed(1), unit: "m" },
         {
-          label: "Type de pose",
-          value: installType === "new" ? "Neuf (Applique)" : installType === "reno" ? "Rénovation" : "Tunnel",
+          label: t("joinery.stats.install", { defaultValue: "Type de pose" }),
+          value: installType === "new" ? t("joinery.install.new", { defaultValue: "Neuf (Applique)" }) : installType === "reno" ? t("joinery.install.reno", { defaultValue: "Rénovation" }) : t("joinery.install.tunnel", { defaultValue: "Tunnel" }),
           unit: "",
         },
       ],
@@ -412,90 +443,74 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate }) => {
       totalCost: calc.totalCost,
       warnings: calc.warnings.length ? calc.warnings : undefined,
     });
-  }, [calc, installType, items.length, onCalculate]);
+  }, [calc, installType, onCalculate, t]);
 
   return (
     <div className="space-y-6 animate-in fade-in">
-      {/* Step Navigation */}
+      {/* Steps */}
       <div className="flex justify-between items-center mb-6 bg-slate-50 p-1 rounded-lg">
         {[1, 2, 3].map((s) => (
           <button
             key={s}
+            type="button"
             onClick={() => setStep(s)}
-            className={`flex-1 py-2 text-xs font-bold rounded transition-all ${
-              step === s ? "bg-white shadow text-blue-600" : "text-slate-400"
-            }`}
+            className={`flex-1 py-2 text-xs font-bold rounded transition-all ${step === s ? "bg-white shadow text-blue-600" : "text-slate-400"}`}
           >
-            {s === 1 && "1. Liste"}
-            {s === 2 && "2. Pose"}
-            {s === 3 && "3. Prix"}
+            {s === 1 && t("joinery.steps.1", { defaultValue: "1. Liste" })}
+            {s === 2 && t("joinery.steps.2", { defaultValue: "2. Pose" })}
+            {s === 3 && t("joinery.steps.3", { defaultValue: "3. Prix" })}
           </button>
         ))}
       </div>
 
-      {/* STEP 1: INVENTORY LIST */}
+      {/* STEP 1 */}
       {step === 1 && (
         <div className="space-y-4">
           <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
             <Info size={16} className="mr-2 shrink-0 mt-0.5" />
-            Créez la liste de vos menuiseries.
+            {t("joinery.step1.hint", { defaultValue: "Créez la liste de vos menuiseries." })}
           </div>
 
           {items.length === 0 ? (
             <div className="text-center py-8 text-slate-400 border-2 border-dashed border-slate-200 rounded-xl">
               <BoxSelect size={32} className="mx-auto mb-2 opacity-50" />
-              <p className="text-sm">Aucune menuiserie ajoutée.</p>
+              <p className="text-sm">{t("joinery.empty", { defaultValue: "Aucune menuiserie ajoutée." })}</p>
             </div>
           ) : (
             <div className="space-y-3">
               {items.map((item) => (
-                <div
-                  key={item.id}
-                  className="bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex flex-col relative"
-                >
+                <div key={item.id} className="bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
                   <div className="flex justify-between items-start mb-1">
-                    <div>
-                      <span className="font-bold text-slate-800">
-                        {item.quantity}x {item.label}
+                    <div className="min-w-0">
+                      <span className="font-bold text-slate-800 block truncate">
+                        {item.quantity}× {item.label}
                       </span>
-                      <span className="text-xs text-slate-500 ml-2 uppercase bg-slate-100 px-1 rounded">
-                        {item.material}
-                      </span>
-                      {item.priceOverride !== undefined && (
-                        <span className="text-[10px] ml-2 font-bold text-amber-700 bg-amber-50 px-1 rounded">
-                          prix forcé
-                        </span>
-                      )}
+                      <div className="text-xs text-slate-500 mt-0.5">
+                        {item.width}×{item.height}m • {item.material.toUpperCase()}
+                        {item.shutter !== "none" && (
+                          <span className="ml-2 text-blue-600 font-medium">
+                            + {t("joinery.shutter", { defaultValue: "Volet" })} {item.shutter === "rolling" ? t("joinery.shutter.rolling", { defaultValue: "roulant" }) : t("joinery.shutter.swing", { defaultValue: "battant" })}
+                          </span>
+                        )}
+                        {item.priceOverride !== undefined && (
+                          <span className="ml-2 text-[10px] font-bold text-amber-700 bg-amber-50 px-1 rounded">
+                            {t("joinery.price_override", { defaultValue: "prix forcé" })}
+                          </span>
+                        )}
+                      </div>
                     </div>
+
                     <div className="flex space-x-1">
-                      <button
-                        onClick={() => handleDuplicateItem(item)}
-                        className="p-1.5 text-slate-400 hover:text-blue-500 hover:bg-blue-50 rounded"
-                      >
+                      <button type="button" onClick={() => handleDuplicateItem(item)} className="p-1.5 text-slate-400 hover:text-blue-500 hover:bg-blue-50 rounded" title={t("common.duplicate", { defaultValue: "Dupliquer" })}>
                         <Copy size={14} />
                       </button>
-                      <button
-                        onClick={() => handleEditItem(item)}
-                        className="p-1.5 text-slate-400 hover:text-amber-500 hover:bg-amber-50 rounded"
-                      >
+                      <button type="button" onClick={() => handleEditItem(item)} className="p-1.5 text-slate-400 hover:text-amber-500 hover:bg-amber-50 rounded" title={t("common.edit", { defaultValue: "Modifier" })}>
                         <Edit2 size={14} />
                       </button>
-                      <button
-                        onClick={() => handleDeleteItem(item.id)}
-                        className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded"
-                      >
+                      <button type="button" onClick={() => handleDeleteItem(item.id)} className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded" title={t("common.delete", { defaultValue: "Supprimer" })}>
                         <Trash2 size={14} />
                       </button>
                     </div>
-                  </div>
-
-                  <div className="text-sm text-slate-600">
-                    {item.width} x {item.height} m
-                    {item.shutter !== "none" && (
-                      <span className="ml-2 text-xs text-blue-600 font-medium">
-                        + Volet {item.shutter === "rolling" ? "Roulant" : "Battant"}
-                      </span>
-                    )}
                   </div>
                 </div>
               ))}
@@ -503,62 +518,59 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate }) => {
           )}
 
           <button
+            type="button"
             onClick={handleAddItem}
             className="w-full py-3 bg-blue-600 text-white rounded-xl font-bold flex justify-center items-center shadow-md active:scale-95 transition-transform"
           >
-            <Plus size={20} className="mr-2" /> Ajouter une menuiserie
+            <Plus size={20} className="mr-2" /> {t("joinery.add", { defaultValue: "Ajouter une menuiserie" })}
           </button>
 
-          {items.length > 0 && (
-            <button
-              onClick={() => setStep(2)}
-              className="w-full py-3 bg-white border border-slate-200 text-slate-700 rounded-xl font-bold flex justify-center items-center"
-            >
-              Suivant <ArrowRight size={18} className="ml-2" />
-            </button>
-          )}
+          <button
+            type="button"
+            onClick={() => setStep(2)}
+            className="w-full py-3 bg-white border border-slate-200 text-slate-700 rounded-xl font-bold flex justify-center items-center"
+            disabled={items.length === 0}
+          >
+            {t("common.next", { defaultValue: "Suivant" })} <ArrowRight size={18} className="ml-2" />
+          </button>
 
-          {/* Add/Edit Modal */}
+          {/* Modal */}
           {showForm && (
             <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
               <div className="bg-white rounded-2xl w-full max-w-sm max-h-[90vh] overflow-y-auto">
                 <div className="p-4 border-b border-slate-100 flex justify-between items-center sticky top-0 bg-white z-10">
-                  <h3 className="font-bold text-slate-800">{editingId ? "Modifier" : "Ajouter"} Menuiserie</h3>
-                  <button onClick={() => setShowForm(false)}>
+                  <h3 className="font-bold text-slate-800">{editingId ? t("common.edit", { defaultValue: "Modifier" }) : t("common.add", { defaultValue: "Ajouter" })}</h3>
+                  <button type="button" onClick={() => setShowForm(false)} aria-label="Close">
                     <X size={20} className="text-slate-400" />
                   </button>
                 </div>
 
                 <div className="p-4 space-y-4">
                   <div>
-                    <label className="block text-xs font-bold text-slate-500 mb-1">Type</label>
+                    <label className="block text-xs font-bold text-slate-500 mb-1">{t("common.type", { defaultValue: "Type" })}</label>
                     <select
                       value={formType}
                       onChange={(e) => {
-                        const t = e.target.value as JoineryType;
-                        setFormType(t);
-                        setFormLabel(typeLabel(t));
-                        if (t === "door" || t === "garage" || t === "velux") setFormShutter("none");
+                        const tt = e.target.value as JoineryType;
+                        setFormType(tt);
+                        setFormLabel(typeLabel(tt));
+                        if (tt === "door" || tt === "garage" || tt === "velux") setFormShutter("none");
                       }}
                       className="w-full p-2 border rounded bg-white text-slate-900"
                     >
-                      <option value="window">Fenêtre</option>
-                      <option value="door">Porte Entrée</option>
-                      <option value="bay">Baie Coulissante</option>
-                      <option value="velux">Velux / Toit</option>
-                      <option value="garage">Porte Garage</option>
+                      <option value="window">{t("struct.opening.window", { defaultValue: "Fenêtre" })}</option>
+                      <option value="door">{t("struct.opening.door", { defaultValue: "Porte" })}</option>
+                      <option value="bay">{t("struct.opening.bay", { defaultValue: "Baie vitrée" })}</option>
+                      <option value="velux">{t("joinery.type.velux", { defaultValue: "Velux / toit" })}</option>
+                      <option value="garage">{t("struct.opening.garage", { defaultValue: "Garage" })}</option>
                     </select>
                   </div>
 
                   {!editingId && presetOptions.length > 0 && (
                     <div>
-                      <label className="block text-xs font-bold text-slate-500 mb-1">Presets</label>
-                      <select
-                        onChange={(e) => applyPreset(e.target.value)}
-                        className="w-full p-2 border rounded bg-white text-sm text-slate-900"
-                        defaultValue=""
-                      >
-                        <option value="">-- Choisir standard --</option>
+                      <label className="block text-xs font-bold text-slate-500 mb-1">{t("common.preset", { defaultValue: "Preset" })}</label>
+                      <select onChange={(e) => applyPreset(e.target.value)} className="w-full p-2 border rounded bg-white text-sm text-slate-900" defaultValue="">
+                        <option value="">{t("common.choose", { defaultValue: "-- Choisir --" })}</option>
                         {presetOptions.map((p) => (
                           <option key={p.label} value={p.label}>
                             {p.label}
@@ -570,105 +582,73 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate }) => {
 
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-xs font-bold text-slate-500 mb-1">Largeur (m)</label>
-                      <input
-                        type="number"
-                        value={formW}
-                        onChange={(e) => setFormW(e.target.value)}
-                        className="w-full p-2 border rounded bg-white text-slate-900"
-                      />
+                      <label className="block text-xs font-bold text-slate-500 mb-1">{t("struct.common.width_m", { defaultValue: "Largeur (m)" })}</label>
+                      <input type="number" value={formW} onChange={(e) => setFormW(e.target.value)} className="w-full p-2 border rounded bg-white text-slate-900" />
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-slate-500 mb-1">Hauteur (m)</label>
-                      <input
-                        type="number"
-                        value={formH}
-                        onChange={(e) => setFormH(e.target.value)}
-                        className="w-full p-2 border rounded bg-white text-slate-900"
-                      />
+                      <label className="block text-xs font-bold text-slate-500 mb-1">{t("struct.common.height_m", { defaultValue: "Hauteur (m)" })}</label>
+                      <input type="number" value={formH} onChange={(e) => setFormH(e.target.value)} className="w-full p-2 border rounded bg-white text-slate-900" />
                     </div>
                   </div>
 
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-xs font-bold text-slate-500 mb-1">Quantité</label>
-                      <input
-                        type="number"
-                        value={formQty}
-                        onChange={(e) => setFormQty(toNum(e.target.value, 1))}
-                        className="w-full p-2 border rounded bg-white text-slate-900"
-                      />
+                      <label className="block text-xs font-bold text-slate-500 mb-1">{t("struct.common.qty", { defaultValue: "Qté" })}</label>
+                      <input type="number" value={formQty} onChange={(e) => setFormQty(clampInt(toNum(e.target.value, 1), 1, 999))} className="w-full p-2 border rounded bg-white text-slate-900" />
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-slate-500 mb-1">Matériau</label>
-                      <select
-                        value={formMat}
-                        onChange={(e) => setFormMat(e.target.value as JoineryMaterial)}
-                        className="w-full p-2 border rounded bg-white text-slate-900"
-                      >
+                      <label className="block text-xs font-bold text-slate-500 mb-1">{t("joinery.material", { defaultValue: "Matériau" })}</label>
+                      <select value={formMat} onChange={(e) => setFormMat(e.target.value as JoineryMaterial)} className="w-full p-2 border rounded bg-white text-slate-900">
                         <option value="pvc">PVC</option>
-                        <option value="alu">Alu</option>
-                        <option value="wood">Bois</option>
+                        <option value="alu">ALU</option>
+                        <option value="wood">{t("joinery.material.wood", { defaultValue: "Bois" })}</option>
                       </select>
                     </div>
                   </div>
 
                   {(formType === "window" || formType === "bay") && (
                     <div>
-                      <label className="block text-xs font-bold text-slate-500 mb-1">Volet</label>
+                      <label className="block text-xs font-bold text-slate-500 mb-1">{t("joinery.shutter", { defaultValue: "Volet" })}</label>
                       <div className="flex bg-slate-100 p-1 rounded">
-                        <button
-                          onClick={() => setFormShutter("none")}
-                          className={`flex-1 py-1 text-xs rounded ${formShutter === "none" ? "bg-white shadow" : ""}`}
-                        >
-                          Aucun
+                        <button type="button" onClick={() => setFormShutter("none")} className={`flex-1 py-1 text-xs rounded ${formShutter === "none" ? "bg-white shadow" : ""}`}>
+                          {t("common.none", { defaultValue: "Aucun" })}
                         </button>
-                        <button
-                          onClick={() => setFormShutter("rolling")}
-                          className={`flex-1 py-1 text-xs rounded ${formShutter === "rolling" ? "bg-white shadow" : ""}`}
-                        >
-                          Roulant
+                        <button type="button" onClick={() => setFormShutter("rolling")} className={`flex-1 py-1 text-xs rounded ${formShutter === "rolling" ? "bg-white shadow" : ""}`}>
+                          {t("joinery.shutter.rolling", { defaultValue: "Roulant" })}
                         </button>
-                        <button
-                          onClick={() => setFormShutter("swing")}
-                          className={`flex-1 py-1 text-xs rounded ${formShutter === "swing" ? "bg-white shadow" : ""}`}
-                        >
-                          Battant
+                        <button type="button" onClick={() => setFormShutter("swing")} className={`flex-1 py-1 text-xs rounded ${formShutter === "swing" ? "bg-white shadow" : ""}`}>
+                          {t("joinery.shutter.swing", { defaultValue: "Battant" })}
                         </button>
                       </div>
                     </div>
                   )}
 
                   <div>
-                    <label className="block text-xs font-bold text-slate-500 mb-1">Nom / Label</label>
-                    <input
-                      type="text"
-                      value={formLabel}
-                      onChange={(e) => setFormLabel(e.target.value)}
-                      className="w-full p-2 border rounded bg-white text-slate-900"
-                    />
+                    <label className="block text-xs font-bold text-slate-500 mb-1">{t("common.label", { defaultValue: "Label" })}</label>
+                    <input type="text" value={formLabel} onChange={(e) => setFormLabel(e.target.value)} className="w-full p-2 border rounded bg-white text-slate-900" />
                   </div>
 
                   <div>
                     <label className="block text-xs font-bold text-slate-500 mb-1">
-                      Prix fourniture forcé (€/u) <span className="text-[10px] font-normal text-slate-400">(optionnel)</span>
+                      {t("joinery.override_supply", { defaultValue: "Prix fourniture forcé (€/u)" })}{" "}
+                      <span className="text-[10px] font-normal text-slate-400">{t("common.optional", { defaultValue: "(optionnel)" })}</span>
                     </label>
                     <input
                       type="number"
                       value={formPriceOverride}
                       onChange={(e) => setFormPriceOverride(e.target.value)}
                       className="w-full p-2 border rounded bg-white text-slate-900"
-                      placeholder="Laisser vide pour calcul auto"
+                      placeholder={t("joinery.override_placeholder", { defaultValue: "Laisser vide pour auto" })}
                     />
                   </div>
                 </div>
 
                 <div className="p-4 border-t border-slate-100 flex gap-3 sticky bottom-0 bg-white">
-                  <button onClick={() => setShowForm(false)} className="flex-1 py-3 text-slate-500 font-bold">
-                    Annuler
+                  <button type="button" onClick={() => setShowForm(false)} className="flex-1 py-3 text-slate-500 font-bold">
+                    {t("common.cancel", { defaultValue: "Annuler" })}
                   </button>
-                  <button onClick={handleSaveItem} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold">
-                    Valider
+                  <button type="button" onClick={handleSaveItem} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold">
+                    {t("common.save", { defaultValue: "Valider" })}
                   </button>
                 </div>
               </div>
@@ -682,114 +662,68 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate }) => {
         <div className="space-y-4">
           <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
             <Hammer size={16} className="mr-2 shrink-0 mt-0.5" />
-            Définissez le type de pose et les consommables nécessaires.
+            {t("joinery.step2.hint", { defaultValue: "Type de pose + consommables." })}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">Type de pose</label>
+            <label className="block text-sm font-medium text-slate-700 mb-2">{t("joinery.install_type", { defaultValue: "Type de pose" })}</label>
             <div className="grid grid-cols-3 gap-2">
-              <button
-                onClick={() => setInstallType("new")}
-                className={`p-2 rounded border text-xs font-bold ${
-                  installType === "new"
-                    ? "bg-stone-100 border-stone-500 text-stone-800 ring-1 ring-stone-500"
-                    : "bg-white text-slate-500"
-                }`}
-              >
-                Neuf
+              <button type="button" onClick={() => setInstallType("new")} className={`p-2 rounded border text-xs font-bold ${installType === "new" ? "bg-stone-100 border-stone-500 text-stone-800 ring-1 ring-stone-500" : "bg-white text-slate-500"}`}>
+                {t("joinery.install.new", { defaultValue: "Neuf" })}
               </button>
-              <button
-                onClick={() => setInstallType("reno")}
-                className={`p-2 rounded border text-xs font-bold ${
-                  installType === "reno"
-                    ? "bg-stone-100 border-stone-500 text-stone-800 ring-1 ring-stone-500"
-                    : "bg-white text-slate-500"
-                }`}
-              >
-                Rénov.
+              <button type="button" onClick={() => setInstallType("reno")} className={`p-2 rounded border text-xs font-bold ${installType === "reno" ? "bg-stone-100 border-stone-500 text-stone-800 ring-1 ring-stone-500" : "bg-white text-slate-500"}`}>
+                {t("joinery.install.reno", { defaultValue: "Rénov." })}
               </button>
-              <button
-                onClick={() => setInstallType("tunnel")}
-                className={`p-2 rounded border text-xs font-bold ${
-                  installType === "tunnel"
-                    ? "bg-stone-100 border-stone-500 text-stone-800 ring-1 ring-stone-500"
-                    : "bg-white text-slate-500"
-                }`}
-              >
-                Tunnel
+              <button type="button" onClick={() => setInstallType("tunnel")} className={`p-2 rounded border text-xs font-bold ${installType === "tunnel" ? "bg-stone-100 border-stone-500 text-stone-800 ring-1 ring-stone-500" : "bg-white text-slate-500"}`}>
+                {t("joinery.install.tunnel", { defaultValue: "Tunnel" })}
               </button>
             </div>
           </div>
 
           <div className="bg-white p-3 rounded-xl border border-slate-200">
-            <h4 className="text-xs font-bold text-slate-500 uppercase mb-3">Fournitures de pose</h4>
+            <h4 className="text-xs font-bold text-slate-500 uppercase mb-3">{t("joinery.supplies", { defaultValue: "Fournitures de pose" })}</h4>
 
             <div className="space-y-2">
               <label className="flex items-center justify-between p-2 border rounded hover:bg-slate-50 cursor-pointer">
-                <span className="text-sm">Compribande (étanchéité)</span>
-                <input
-                  type="checkbox"
-                  checked={useCompriband}
-                  onChange={(e) => setUseCompriband(e.target.checked)}
-                  className="h-5 w-5 text-blue-600 rounded"
-                />
+                <span className="text-sm">{t("joinery.supplies.compriband", { defaultValue: "Compribande" })}</span>
+                <input type="checkbox" checked={useCompriband} onChange={(e) => setUseCompriband(e.target.checked)} className="h-5 w-5 text-blue-600 rounded" />
               </label>
 
               <label className="flex items-center justify-between p-2 border rounded hover:bg-slate-50 cursor-pointer">
-                <span className="text-sm">Silicone (joints finition)</span>
-                <input
-                  type="checkbox"
-                  checked={useSilicone}
-                  onChange={(e) => setUseSilicone(e.target.checked)}
-                  className="h-5 w-5 text-blue-600 rounded"
-                />
+                <span className="text-sm">{t("joinery.supplies.silicone", { defaultValue: "Silicone" })}</span>
+                <input type="checkbox" checked={useSilicone} onChange={(e) => setUseSilicone(e.target.checked)} className="h-5 w-5 text-blue-600 rounded" />
               </label>
 
               <label className="flex items-center justify-between p-2 border rounded hover:bg-slate-50 cursor-pointer">
-                <span className="text-sm">Mousse PU (calfeutrement)</span>
-                <input
-                  type="checkbox"
-                  checked={useFoam}
-                  onChange={(e) => setUseFoam(e.target.checked)}
-                  className="h-5 w-5 text-blue-600 rounded"
-                />
+                <span className="text-sm">{t("joinery.supplies.foam", { defaultValue: "Mousse PU" })}</span>
+                <input type="checkbox" checked={useFoam} onChange={(e) => setUseFoam(e.target.checked)} className="h-5 w-5 text-blue-600 rounded" />
               </label>
 
               <label className="flex items-center justify-between p-2 border rounded hover:bg-slate-50 cursor-pointer">
-                <span className="text-sm">Kit fixations (vis/pattes)</span>
-                <input
-                  type="checkbox"
-                  checked={useFixings}
-                  onChange={(e) => setUseFixings(e.target.checked)}
-                  className="h-5 w-5 text-blue-600 rounded"
-                />
+                <span className="text-sm">{t("joinery.supplies.fixings", { defaultValue: "Fixations" })}</span>
+                <input type="checkbox" checked={useFixings} onChange={(e) => setUseFixings(e.target.checked)} className="h-5 w-5 text-blue-600 rounded" />
               </label>
             </div>
 
             <div className="mt-3 flex items-center justify-end space-x-2">
-              <span className="text-xs text-slate-500">Marge pertes (%)</span>
-              <input
-                type="number"
-                value={wastePct}
-                onChange={(e) => setWastePct(toNum(e.target.value, 0))}
-                className="w-16 p-1 text-sm border rounded text-right bg-white text-slate-900"
-              />
+              <span className="text-xs text-slate-500">{t("struct.common.waste", { defaultValue: "Pertes" })} (%)</span>
+              <input type="number" value={wastePct} onChange={(e) => setWastePct(toNum(e.target.value, 0))} className="w-16 p-1 text-sm border rounded text-right bg-white text-slate-900" />
             </div>
 
-            {wastePct > 30 && (
+            {toNum(wastePct, 0) > 30 && (
               <div className="mt-2 flex items-start text-xs text-amber-700 bg-amber-50 p-2 rounded border border-amber-100">
                 <AlertTriangle size={14} className="mr-2 mt-0.5 shrink-0" />
-                Marge pertes élevée : vérifiez si c’est volontaire.
+                {t("joinery.warn.high_waste", { defaultValue: "Marge pertes élevée." })}
               </div>
             )}
           </div>
 
           <div className="flex gap-3">
-            <button onClick={() => setStep(1)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
-              Retour
+            <button type="button" onClick={() => setStep(1)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
+              {t("common.back", { defaultValue: "Retour" })}
             </button>
-            <button onClick={() => setStep(3)} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold">
-              Suivant
+            <button type="button" onClick={() => setStep(3)} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold">
+              {t("common.next", { defaultValue: "Suivant" })}
             </button>
           </div>
         </div>
@@ -799,101 +733,44 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate }) => {
       {step === 3 && (
         <div className="space-y-4">
           <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
-            <DollarSign size={16} className="mr-2 shrink-0 mt-0.5" />
-            Ajustez les prix de base. Les options (volets, matériaux) sont appliquées automatiquement.
+            <CircleDollarSign size={16} className="mr-2 shrink-0 mt-0.5" />
+            {t("joinery.step3.hint", { defaultValue: "Ajustez les prix unitaires." })}
           </div>
 
           <div className="bg-white p-3 rounded-xl border border-slate-200">
             <div className="flex justify-between items-center mb-3">
-              <h4 className="text-xs font-bold text-slate-500 uppercase">Prix</h4>
-              <button onClick={() => setProMode(!proMode)} className="text-xs text-blue-600 flex items-center">
-                <Settings size={12} className="mr-1" /> {proMode ? "Mode Pro" : "Mode Simple"}
+              <h4 className="text-xs font-bold text-slate-500 uppercase">{t("struct.common.unit_prices", { defaultValue: "Prix unitaires" })}</h4>
+              <button type="button" onClick={() => setProMode(!proMode)} className="text-xs text-blue-600 flex items-center">
+                <Settings size={12} className="mr-1" /> {proMode ? t("struct.common.pro_mode", { defaultValue: "Mode Pro" }) : t("struct.common.simple_mode", { defaultValue: "Mode Simple" })}
               </button>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-[10px] text-slate-500 mb-1">Fenêtre (€/u)</label>
-                <input
-                  type="number"
-                  value={prices.window}
-                  onChange={(e) => updatePrice("window", e.target.value)}
-                  className="w-full p-2 border rounded text-sm bg-white text-slate-900"
-                />
-              </div>
-              <div>
-                <label className="block text-[10px] text-slate-500 mb-1">Porte (€/u)</label>
-                <input
-                  type="number"
-                  value={prices.door}
-                  onChange={(e) => updatePrice("door", e.target.value)}
-                  className="w-full p-2 border rounded text-sm bg-white text-slate-900"
-                />
-              </div>
-              <div>
-                <label className="block text-[10px] text-slate-500 mb-1">Baie (€/u)</label>
-                <input
-                  type="number"
-                  value={prices.bay}
-                  onChange={(e) => updatePrice("bay", e.target.value)}
-                  className="w-full p-2 border rounded text-sm bg-white text-slate-900"
-                />
-              </div>
-              <div>
-                <label className="block text-[10px] text-slate-500 mb-1">Velux (€/u)</label>
-                <input
-                  type="number"
-                  value={prices.velux}
-                  onChange={(e) => updatePrice("velux", e.target.value)}
-                  className="w-full p-2 border rounded text-sm bg-white text-slate-900"
-                />
-              </div>
-              <div>
-                <label className="block text-[10px] text-slate-500 mb-1">Garage (€/u)</label>
-                <input
-                  type="number"
-                  value={prices.garage}
-                  onChange={(e) => updatePrice("garage", e.target.value)}
-                  className="w-full p-2 border rounded text-sm bg-white text-slate-900"
-                />
-              </div>
+              {(["window", "door", "bay", "velux", "garage"] as const).map((k) => (
+                <div key={k}>
+                  <label className="block text-[10px] text-slate-500 mb-1">
+                    {typeLabel(k as any)} (€/u)
+                  </label>
+                  <input type="number" value={(prices as any)[k]} onChange={(e) => updatePrice(k as any, e.target.value)} className="w-full p-2 border rounded text-sm bg-white text-slate-900" />
+                </div>
+              ))}
 
               <div>
-                <label className="block text-[10px] text-slate-500 mb-1">Volet roulant (+€/u)</label>
-                <input
-                  type="number"
-                  value={prices.shutterRolling}
-                  onChange={(e) => updatePrice("shutterRolling", e.target.value)}
-                  className="w-full p-2 border rounded text-sm bg-white text-slate-900"
-                />
+                <label className="block text-[10px] text-slate-500 mb-1">{t("joinery.shutter.rolling", { defaultValue: "Volet roulant" })} (+€/u)</label>
+                <input type="number" value={prices.shutterRolling} onChange={(e) => updatePrice("shutterRolling", e.target.value)} className="w-full p-2 border rounded text-sm bg-white text-slate-900" />
               </div>
               <div>
-                <label className="block text-[10px] text-slate-500 mb-1">Volet battant (+€/u)</label>
-                <input
-                  type="number"
-                  value={prices.shutterSwing}
-                  onChange={(e) => updatePrice("shutterSwing", e.target.value)}
-                  className="w-full p-2 border rounded text-sm bg-white text-slate-900"
-                />
+                <label className="block text-[10px] text-slate-500 mb-1">{t("joinery.shutter.swing", { defaultValue: "Volet battant" })} (+€/u)</label>
+                <input type="number" value={prices.shutterSwing} onChange={(e) => updatePrice("shutterSwing", e.target.value)} className="w-full p-2 border rounded text-sm bg-white text-slate-900" />
               </div>
 
               <div>
                 <label className="block text-[10px] text-slate-500 mb-1">Coef ALU (x)</label>
-                <input
-                  type="number"
-                  value={prices.materialAlu}
-                  onChange={(e) => updatePrice("materialAlu", e.target.value)}
-                  className="w-full p-2 border rounded text-sm bg-white text-slate-900"
-                />
+                <input type="number" value={prices.materialAlu} onChange={(e) => updatePrice("materialAlu", e.target.value)} className="w-full p-2 border rounded text-sm bg-white text-slate-900" />
               </div>
               <div>
                 <label className="block text-[10px] text-slate-500 mb-1">Coef BOIS (x)</label>
-                <input
-                  type="number"
-                  value={prices.materialWood}
-                  onChange={(e) => updatePrice("materialWood", e.target.value)}
-                  className="w-full p-2 border rounded text-sm bg-white text-slate-900"
-                />
+                <input type="number" value={prices.materialWood} onChange={(e) => updatePrice("materialWood", e.target.value)} className="w-full p-2 border rounded text-sm bg-white text-slate-900" />
               </div>
             </div>
 
@@ -901,57 +778,27 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate }) => {
               <div className="mt-4 pt-3 border-t border-slate-100 grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-[10px] text-blue-600 font-bold mb-1">Pose fenêtre (€/u)</label>
-                  <input
-                    type="number"
-                    value={prices.installWindow}
-                    onChange={(e) => updatePrice("installWindow", e.target.value)}
-                    className="w-full p-1.5 border border-blue-200 rounded text-sm bg-white text-slate-900"
-                  />
+                  <input type="number" value={prices.installWindow} onChange={(e) => updatePrice("installWindow", e.target.value)} className="w-full p-1.5 border border-blue-200 rounded text-sm bg-white text-slate-900" />
                 </div>
                 <div>
                   <label className="block text-[10px] text-blue-600 font-bold mb-1">Pose porte (€/u)</label>
-                  <input
-                    type="number"
-                    value={prices.installDoor}
-                    onChange={(e) => updatePrice("installDoor", e.target.value)}
-                    className="w-full p-1.5 border border-blue-200 rounded text-sm bg-white text-slate-900"
-                  />
+                  <input type="number" value={prices.installDoor} onChange={(e) => updatePrice("installDoor", e.target.value)} className="w-full p-1.5 border border-blue-200 rounded text-sm bg-white text-slate-900" />
                 </div>
                 <div>
                   <label className="block text-[10px] text-blue-600 font-bold mb-1">Pose baie (€/u)</label>
-                  <input
-                    type="number"
-                    value={prices.installBay}
-                    onChange={(e) => updatePrice("installBay", e.target.value)}
-                    className="w-full p-1.5 border border-blue-200 rounded text-sm bg-white text-slate-900"
-                  />
+                  <input type="number" value={prices.installBay} onChange={(e) => updatePrice("installBay", e.target.value)} className="w-full p-1.5 border border-blue-200 rounded text-sm bg-white text-slate-900" />
                 </div>
                 <div>
                   <label className="block text-[10px] text-blue-600 font-bold mb-1">Pose velux (€/u)</label>
-                  <input
-                    type="number"
-                    value={prices.installVelux}
-                    onChange={(e) => updatePrice("installVelux", e.target.value)}
-                    className="w-full p-1.5 border border-blue-200 rounded text-sm bg-white text-slate-900"
-                  />
+                  <input type="number" value={prices.installVelux} onChange={(e) => updatePrice("installVelux", e.target.value)} className="w-full p-1.5 border border-blue-200 rounded text-sm bg-white text-slate-900" />
                 </div>
                 <div>
                   <label className="block text-[10px] text-blue-600 font-bold mb-1">Pose garage (€/u)</label>
-                  <input
-                    type="number"
-                    value={prices.installGarage}
-                    onChange={(e) => updatePrice("installGarage", e.target.value)}
-                    className="w-full p-1.5 border border-blue-200 rounded text-sm bg-white text-slate-900"
-                  />
+                  <input type="number" value={prices.installGarage} onChange={(e) => updatePrice("installGarage", e.target.value)} className="w-full p-1.5 border border-blue-200 rounded text-sm bg-white text-slate-900" />
                 </div>
                 <div>
                   <label className="block text-[10px] text-blue-600 font-bold mb-1">Surcoût rénovation (€/u)</label>
-                  <input
-                    type="number"
-                    value={prices.renoSurcharge}
-                    onChange={(e) => updatePrice("renoSurcharge", e.target.value)}
-                    className="w-full p-1.5 border border-blue-200 rounded text-sm bg-white text-slate-900"
-                  />
+                  <input type="number" value={prices.renoSurcharge} onChange={(e) => updatePrice("renoSurcharge", e.target.value)} className="w-full p-1.5 border border-blue-200 rounded text-sm bg-white text-slate-900" />
                 </div>
               </div>
             )}
@@ -959,39 +806,19 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate }) => {
             <div className="mt-4 pt-3 border-t border-slate-100 grid grid-cols-2 gap-3">
               <div>
                 <label className="block text-[10px] text-slate-500 mb-1">Compribande (€/m)</label>
-                <input
-                  type="number"
-                  value={prices.compribandM}
-                  onChange={(e) => updatePrice("compribandM", e.target.value)}
-                  className="w-full p-2 border rounded text-sm bg-white text-slate-900"
-                />
+                <input type="number" value={prices.compribandM} onChange={(e) => updatePrice("compribandM", e.target.value)} className="w-full p-2 border rounded text-sm bg-white text-slate-900" />
               </div>
               <div>
                 <label className="block text-[10px] text-slate-500 mb-1">Silicone (€/cart.)</label>
-                <input
-                  type="number"
-                  value={prices.siliconeCart}
-                  onChange={(e) => updatePrice("siliconeCart", e.target.value)}
-                  className="w-full p-2 border rounded text-sm bg-white text-slate-900"
-                />
+                <input type="number" value={prices.siliconeCart} onChange={(e) => updatePrice("siliconeCart", e.target.value)} className="w-full p-2 border rounded text-sm bg-white text-slate-900" />
               </div>
               <div>
                 <label className="block text-[10px] text-slate-500 mb-1">Mousse PU (€/cart.)</label>
-                <input
-                  type="number"
-                  value={prices.foamCart}
-                  onChange={(e) => updatePrice("foamCart", e.target.value)}
-                  className="w-full p-2 border rounded text-sm bg-white text-slate-900"
-                />
+                <input type="number" value={prices.foamCart} onChange={(e) => updatePrice("foamCart", e.target.value)} className="w-full p-2 border rounded text-sm bg-white text-slate-900" />
               </div>
               <div>
                 <label className="block text-[10px] text-slate-500 mb-1">Kit fixations (€/u)</label>
-                <input
-                  type="number"
-                  value={prices.fixingKit}
-                  onChange={(e) => updatePrice("fixingKit", e.target.value)}
-                  className="w-full p-2 border rounded text-sm bg-white text-slate-900"
-                />
+                <input type="number" value={prices.fixingKit} onChange={(e) => updatePrice("fixingKit", e.target.value)} className="w-full p-2 border rounded text-sm bg-white text-slate-900" />
               </div>
             </div>
           </div>
@@ -1007,14 +834,11 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate }) => {
           )}
 
           <div className="flex gap-3 pt-2">
-            <button onClick={() => setStep(2)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
-              Retour
+            <button type="button" onClick={() => setStep(2)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
+              {t("common.back", { defaultValue: "Retour" })}
             </button>
-            <button
-              disabled
-              className="flex-1 py-3 bg-emerald-100 text-emerald-700 rounded-xl font-bold flex justify-center items-center"
-            >
-              <Check size={18} className="mr-2" /> Calculé
+            <button type="button" disabled className="flex-1 py-3 bg-emerald-100 text-emerald-700 rounded-xl font-bold flex justify-center items-center">
+              <Check size={18} className="mr-2" /> {t("struct.common.calculated", { defaultValue: "Calculé" })}
             </button>
           </div>
         </div>

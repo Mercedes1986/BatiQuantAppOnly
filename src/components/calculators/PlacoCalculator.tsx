@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { CalculatorType, CalculationResult, Unit } from "../../../types";
-import { PLACO_BOARD_TYPES, PLACO_INSULATION_TYPES } from "../../constants";
+import { DEFAULT_PRICES, PLACO_BOARD_TYPES, PLACO_INSULATION_TYPES } from "../../constants";
 import { getUnitPrice } from "../../services/materialsService";
 import {
   ArrowRightLeft,
@@ -40,17 +40,22 @@ const toNum = (v: unknown, fallback = 0) => {
 const round2 = (n: number) => Math.round((n + Number.EPSILON) * 100) / 100;
 const clamp = (n: number, min: number, max: number) => Math.min(max, Math.max(min, n));
 
+const getOptionalNumber = (obj: unknown, key: string): number | undefined => {
+  if (!obj || typeof obj !== "object") return undefined;
+  const v = (obj as Record<string, unknown>)[key];
+  return typeof v === "number" && Number.isFinite(v) ? v : undefined;
+};
+
 /**
- * ✅ Updates / fixes:
- * - Removes unused imports (DEFAULT_PRICES, OPENING_PRESETS, icons, etc.)
- * - Prevents NaN in prices when getUnitPrice returns undefined
- * - Makes board price consistent with selected boardId (BA13/HYDRO/FIRE)
- * - Fixes rails naming: "Rail R48" etc. derives from frameType correctly
- * - Improves studs count and opening reinforcement (doors/windows)
- * - Fixes ceiling grid math (furring spacing configurable, hangers spacing)
- * - Adds membrane material when enabled
- * - Adds warnings when dims invalid / negative net surfaces
- * - Keeps your 5-step UX + same onCalculate payload structure
+ * ✅ MAJ:
+ * - prix: catalogue > DEFAULT_PRICES > fallback (évite NaN/0)
+ * - prix plaque dépend vraiment du boardId (BA13/HYDRO/FIRE)
+ * - ossature: rails/ montants + renforts ouvertures
+ * - plafond: fourrures + suspentes avec entraxes configurables
+ * - ajoute membrane si activée
+ * - warnings dimensions / ouvertures / épaisseurs incohérentes
+ * - ✅ FIX TS: PLACO_INSULATION_TYPES peut ne pas avoir minThick/maxThick → lecture "safe"
+ * - ✅ FIX TS: PLACO_BOARD_TYPES peut ne pas avoir area → lecture "safe"
  */
 export const PlacoCalculator: React.FC<Props> = ({
   onCalculate,
@@ -81,8 +86,8 @@ export const PlacoCalculator: React.FC<Props> = ({
   const [wastePct, setWastePct] = useState(10); // %
 
   // Ceiling grid (only if ceiling)
-  const [ceilingFurringSpacing, setCeilingFurringSpacing] = useState(50); // cm between furring lines
-  const [hangerSpacing, setHangerSpacing] = useState(1.2); // m along each furring line
+  const [ceilingFurringSpacing, setCeilingFurringSpacing] = useState(50); // cm
+  const [hangerSpacing, setHangerSpacing] = useState(1.2); // m
 
   // --- 3. Insulation & Membrane ---
   const [useInsulation, setUseInsulation] = useState(true);
@@ -90,23 +95,45 @@ export const PlacoCalculator: React.FC<Props> = ({
   const [insulThick, setInsulThick] = useState("45"); // mm
   const [useMembrane, setUseMembrane] = useState(false);
 
+  // ✅ helper prix: catalogue > DEFAULT_PRICES > fallback
+  const priceOr = (key: string, fallback: number) => {
+    const v = getUnitPrice(key);
+    if (typeof v === "number" && Number.isFinite(v) && v !== 0) return v;
+
+    const d = (DEFAULT_PRICES as Record<string, unknown>)[key];
+    if (d !== undefined) {
+      const nd = Number(d);
+      if (Number.isFinite(nd) && nd !== 0) return nd;
+    }
+    return fallback;
+  };
+
   // --- 5. Pricing ---
-  const [prices, setPrices] = useState({
-    board_BA13: getUnitPrice("PLACO_PLATE_BA13") || 10,
-    board_HYDRO: getUnitPrice("PLACO_PLATE_HYDRO") || 14,
-    board_FIRE: getUnitPrice("PLACO_PLATE_FIRE") || 16,
-    rail3m: getUnitPrice("RAIL_3M") || 6.5,
-    stud3m: getUnitPrice("MONTANT_3M") || 7.5,
-    furring3m: getUnitPrice("FURRING_3M") || 5.5,
-    cornerBead3m: getUnitPrice("CORNER_BEAD_3M") || 6,
-    hangerUnit: (getUnitPrice("HANGER_BOX_50") || 25) / 50, // unit
-    insulationM2: getUnitPrice("INSULATION_M2") || 6,
-    membraneM2: 2.5,
-    tapeRoll150: getUnitPrice("JOINT_TAPE_ROLL") || 6.5, // roll 150m
-    compoundBag25: getUnitPrice("COMPOUND_BAG_25KG") || 18,
-    screwBox1000: getUnitPrice("SCREWS_BOX_1000") || 25,
+  const [prices, setPrices] = useState(() => ({
+    board_BA13: priceOr("PLACO_PLATE_BA13", 10),
+    board_HYDRO: priceOr("PLACO_PLATE_HYDRO", 14),
+    board_FIRE: priceOr("PLACO_PLATE_FIRE", 16),
+
+    rail3m: priceOr("RAIL_3M", 6.5),
+    stud3m: priceOr("MONTANT_3M", 7.5),
+
+    furring3m: priceOr("FURRING_3M", 5.5),
+    cornerBead3m: priceOr("CORNER_BEAD_3M", 6),
+    hangerUnit: (() => {
+      const box = priceOr("HANGER_BOX_50", 25);
+      const u = box / 50;
+      return Number.isFinite(u) && u > 0 ? u : 0.5;
+    })(),
+
+    insulationM2: priceOr("INSULATION_M2", 6),
+    membraneM2: priceOr("VAPOR_BARRIER_M2", 2.5),
+
+    tapeRoll150: priceOr("JOINT_TAPE_ROLL_150M", priceOr("JOINT_TAPE_ROLL", 6.5)),
+    compoundBag25: priceOr("COMPOUND_BAG_25KG", 18),
+    screwBox1000: priceOr("SCREWS_BOX_1000", 25),
+
     laborM2: 35.0,
-  });
+  }));
 
   const updatePrice = (key: keyof typeof prices, val: string) => {
     setPrices((prev) => ({ ...prev, [key]: toNum(val, 0) }));
@@ -146,24 +173,20 @@ export const PlacoCalculator: React.FC<Props> = ({
     const materialsList: any[] = [];
     let totalCost = 0;
 
-    const hasValidDims =
-      mode === "ceiling" ? L > 0 && W > 0 : L > 0 && H > 0;
-
-    if (!hasValidDims) {
-      warnings.push("Dimensions invalides : vérifiez Longueur et Hauteur/Largeur.");
-    }
+    const hasValidDims = mode === "ceiling" ? L > 0 && W > 0 : L > 0 && H > 0;
+    if (!hasValidDims) warnings.push("Dimensions invalides : vérifiez Longueur et Hauteur/Largeur.");
 
     // --- Surfaces ---
-    let surfaceBrute = 0;
-    if (mode === "ceiling") surfaceBrute = L * W;
-    else surfaceBrute = L * H;
+    const surfaceBrute = mode === "ceiling" ? L * W : L * H;
 
-    // Openings deductions only for partition/lining
+    // Openings (partition/lining only)
     let openingArea = 0;
+    let openingCount = 0;
     if (mode !== "ceiling") {
-      openings.forEach((op) => {
+      for (const op of openings) {
         openingArea += op.width * op.height * op.quantity;
-      });
+        openingCount += op.quantity;
+      }
     }
 
     const surfaceNette = Math.max(0, surfaceBrute - openingArea);
@@ -172,29 +195,24 @@ export const PlacoCalculator: React.FC<Props> = ({
     }
 
     // --- Boards ---
-    const boardDef = PLACO_BOARD_TYPES.find((b: any) => b.id === boardId) || PLACO_BOARD_TYPES[0];
+    const boardDef = PLACO_BOARD_TYPES.find((b: any) => b.id === boardId) ?? PLACO_BOARD_TYPES[0];
     let layers = doubleSkin ? 2 : 1;
     if (mode === "partition") layers *= 2; // 2 faces
 
     const boardAreaNeeded = surfaceNette * layers * (1 + wastePct / 100);
-    const boardAreaPerPlate = boardDef.area || 3; // fallback ~ 1.2x2.5
-
-    const nbBoards = boardAreaNeeded > 0 ? Math.ceil(boardAreaNeeded / boardAreaPerPlate) : 0;
+    const boardAreaPerPlate = getOptionalNumber(boardDef, "area") ?? 3; // fallback 3m²
+    const nbBoards =
+      boardAreaNeeded > 0 ? Math.ceil(boardAreaNeeded / Math.max(0.1, boardAreaPerPlate)) : 0;
 
     const unitBoardPrice =
-      boardId === "HYDRO"
-        ? prices.board_HYDRO
-        : boardId === "FIRE"
-        ? prices.board_FIRE
-        : prices.board_BA13;
-
-    const costBoards = nbBoards * unitBoardPrice;
-    totalCost += costBoards;
+      boardId === "HYDRO" ? prices.board_HYDRO : boardId === "FIRE" ? prices.board_FIRE : prices.board_BA13;
 
     if (nbBoards > 0) {
+      const costBoards = nbBoards * unitBoardPrice;
+      totalCost += costBoards;
       materialsList.push({
         id: "boards",
-        name: `Plaques ${boardDef.label || boardId}`,
+        name: `Plaques ${String((boardDef as any)?.label ?? boardId)}`,
         quantity: nbBoards,
         unit: Unit.PIECE,
         unitPrice: round2(unitBoardPrice),
@@ -223,14 +241,10 @@ export const PlacoCalculator: React.FC<Props> = ({
           category: CalculatorType.PLACO,
         });
 
-        // Studs:
-        // - base studs every spacing + 1
-        // - + reinforcement for openings: 2 jambs each opening + 1 lintel "stud" equivalent per opening
-        const nbStudsRaw = Math.ceil((L * 100) / studSpacing) + 1;
-
-        const openCount = openings.reduce((acc, o) => acc + o.quantity, 0);
-        const studsForOpenings = openCount * 3; // jamb left + jamb right + reinforcement/lintel
-        const totalStuds = nbStudsRaw + studsForOpenings;
+        // Studs: base spacing + ends + reinforcement for openings
+        const baseStuds = Math.ceil((L * 100) / Math.max(20, studSpacing)) + 1;
+        const studsForOpenings = openingCount * 3; // 2 jambs + linteau
+        const totalStuds = baseStuds + studsForOpenings;
 
         const costStuds = totalStuds * prices.stud3m;
         totalCost += costStuds;
@@ -243,11 +257,11 @@ export const PlacoCalculator: React.FC<Props> = ({
           unitPrice: round2(prices.stud3m),
           totalPrice: round2(costStuds),
           category: CalculatorType.PLACO,
-          details: `Entraxe ${studSpacing} cm`,
+          details: `Entraxe ${studSpacing} cm${openingCount ? ` • renforts: +${studsForOpenings}` : ""}`,
         });
       } else {
-        // Ceiling grid: furring lines + perimeter angles + hangers
-        const furringLines = Math.ceil((W * 100) / ceilingFurringSpacing) + 1;
+        // Ceiling: furring lines + perimeter angles + hangers
+        const furringLines = Math.ceil((W * 100) / Math.max(30, ceilingFurringSpacing)) + 1;
         const totalFurringLen = furringLines * L * (1 + wastePct / 100);
         const nbFurring = Math.ceil(totalFurringLen / 3);
 
@@ -280,7 +294,7 @@ export const PlacoCalculator: React.FC<Props> = ({
           category: CalculatorType.PLACO,
         });
 
-        const hangersPerLine = Math.ceil(L / hangerSpacing) + 1;
+        const hangersPerLine = Math.ceil(L / Math.max(0.6, hangerSpacing)) + 1;
         const totalHangers = furringLines * hangersPerLine;
         const costHangers = totalHangers * prices.hangerUnit;
         totalCost += costHangers;
@@ -313,11 +327,21 @@ export const PlacoCalculator: React.FC<Props> = ({
         totalPrice: round2(costInsul),
         category: CalculatorType.PLACO,
       });
+
+      // ✅ FIX TS: minThick peut ne pas exister selon ton constant
+      const insMeta = (PLACO_INSULATION_TYPES as unknown as Array<Record<string, unknown>>).find(
+        (x) => String(x.id) === insulType
+      );
+
+      const minThick = insMeta ? toNum(insMeta.minThick, NaN) : NaN;
+      if (Number.isFinite(minThick) && toNum(insulThick, 0) < minThick) {
+        warnings.push(`Isolant ${insulType}: épaisseur ${insulThick}mm inférieure au minimum conseillé (${minThick}mm).`);
+      }
     }
 
-    // Membrane (pare-vapeur)
+    // --- Membrane ---
     if (useMembrane && surfaceBrute > 0) {
-      const memArea = surfaceBrute * 1.1; // recouvrements
+      const memArea = surfaceBrute * 1.1;
       const costMem = memArea * prices.membraneM2;
       totalCost += costMem;
 
@@ -329,12 +353,12 @@ export const PlacoCalculator: React.FC<Props> = ({
         unitPrice: round2(prices.membraneM2),
         totalPrice: round2(costMem),
         category: CalculatorType.PLACO,
+        details: "+10% recouvrements",
       });
     }
 
     // --- Consumables ---
     if (surfaceNette > 0) {
-      // Screws: ~15/m²/layer
       const totalScrews = surfaceNette * layers * 15;
       const boxesScrews = Math.ceil(totalScrews / 1000);
       const costScrews = boxesScrews * prices.screwBox1000;
@@ -350,7 +374,6 @@ export const PlacoCalculator: React.FC<Props> = ({
         category: CalculatorType.PLACO,
       });
 
-      // Joint tape: ~1.5m per m² per layer (approx)
       const tapeLen = surfaceNette * layers * 1.5;
       const rollsTape = Math.ceil(tapeLen / 150);
       const costTape = rollsTape * prices.tapeRoll150;
@@ -366,7 +389,6 @@ export const PlacoCalculator: React.FC<Props> = ({
         category: CalculatorType.PLACO,
       });
 
-      // Compound: ~0.5kg/m²/layer
       const compoundKg = surfaceNette * layers * 0.5;
       const bagsCompound = Math.ceil(compoundKg / 25);
       const costCompound = bagsCompound * prices.compoundBag25;
@@ -398,6 +420,9 @@ export const PlacoCalculator: React.FC<Props> = ({
         category: CalculatorType.PLACO,
       });
     }
+
+    if (surfaceBrute <= 0) warnings.push("Surface = 0 : renseignez les dimensions.");
+    if (mode !== "ceiling" && openings.length && surfaceNette === 0) warnings.push("Surface nette nulle : vérifiez les ouvertures.");
 
     return {
       totalCost: round2(totalCost),
@@ -433,7 +458,11 @@ export const PlacoCalculator: React.FC<Props> = ({
         mode === "partition" ? "cloison" : mode === "lining" ? "doublage" : "plafond"
       }`,
       details: [
-        { label: "Mode", value: mode === "partition" ? "Cloison" : mode === "lining" ? "Doublage" : "Plafond", unit: "" },
+        {
+          label: "Mode",
+          value: mode === "partition" ? "Cloison" : mode === "lining" ? "Doublage" : "Plafond",
+          unit: "",
+        },
         { label: "Surface nette", value: calculationData.surfaceNette.toFixed(1), unit: "m²" },
         { label: "Ossature", value: mode === "ceiling" ? "F530" : frameType, unit: "" },
       ],
@@ -449,6 +478,7 @@ export const PlacoCalculator: React.FC<Props> = ({
       {!hideTabs && (
         <div className="flex bg-slate-100 p-1 rounded-lg mb-4">
           <button
+            type="button"
             onClick={() => setMode("partition")}
             className={`flex-1 py-2 text-xs font-bold rounded flex items-center justify-center ${
               mode === "partition" ? "bg-white shadow text-indigo-600" : "text-slate-500"
@@ -457,6 +487,7 @@ export const PlacoCalculator: React.FC<Props> = ({
             <ArrowRightLeft size={16} className="mr-1" /> Cloison
           </button>
           <button
+            type="button"
             onClick={() => setMode("lining")}
             className={`flex-1 py-2 text-xs font-bold rounded flex items-center justify-center ${
               mode === "lining" ? "bg-white shadow text-indigo-600" : "text-slate-500"
@@ -465,6 +496,7 @@ export const PlacoCalculator: React.FC<Props> = ({
             <PanelTop size={16} className="mr-1" /> Doublage
           </button>
           <button
+            type="button"
             onClick={() => setMode("ceiling")}
             className={`flex-1 py-2 text-xs font-bold rounded flex items-center justify-center ${
               mode === "ceiling" ? "bg-white shadow text-indigo-600" : "text-slate-500"
@@ -480,6 +512,7 @@ export const PlacoCalculator: React.FC<Props> = ({
         {[1, 2, 3, 4, 5].map((s) => (
           <button
             key={s}
+            type="button"
             onClick={() => setStep(s)}
             className={`flex-1 min-w-[70px] py-2 text-xs font-bold rounded transition-all ${
               step === s ? "bg-white shadow text-blue-600" : "text-slate-400"
@@ -494,7 +527,7 @@ export const PlacoCalculator: React.FC<Props> = ({
         ))}
       </div>
 
-      {/* Warnings (small) */}
+      {/* Warnings */}
       {calculationData.warnings?.length ? (
         <div className="bg-amber-50 p-3 rounded-lg border border-amber-100 text-xs text-amber-800">
           {calculationData.warnings.map((w, i) => (
@@ -552,6 +585,7 @@ export const PlacoCalculator: React.FC<Props> = ({
               <div className="flex justify-between items-center mb-2">
                 <span className="text-xs font-bold text-slate-500 uppercase">Ouvertures</span>
                 <button
+                  type="button"
                   onClick={() => setShowAddOpening(!showAddOpening)}
                   className="text-blue-600 text-xs font-bold flex items-center"
                 >
@@ -586,6 +620,7 @@ export const PlacoCalculator: React.FC<Props> = ({
                     />
                   </div>
                   <button
+                    type="button"
                     onClick={addOpening}
                     className="w-full bg-blue-100 text-blue-700 py-1 rounded text-xs font-bold"
                   >
@@ -601,6 +636,7 @@ export const PlacoCalculator: React.FC<Props> = ({
                       {op.type === "door" ? "Porte" : "Fenêtre"} {op.width}×{op.height} m{" "}
                       <span className="text-slate-400">•</span>{" "}
                       <button
+                        type="button"
                         onClick={() => updateOpeningQty(op.id, -1)}
                         className="px-2 py-0.5 border rounded text-slate-500"
                       >
@@ -608,13 +644,14 @@ export const PlacoCalculator: React.FC<Props> = ({
                       </button>{" "}
                       <span className="font-bold">{op.quantity}</span>{" "}
                       <button
+                        type="button"
                         onClick={() => updateOpeningQty(op.id, +1)}
                         className="px-2 py-0.5 border rounded text-slate-500"
                       >
                         +
                       </button>
                     </div>
-                    <button onClick={() => removeOpening(op.id)} className="text-red-400">
+                    <button type="button" onClick={() => removeOpening(op.id)} className="text-red-400">
                       <Trash2 size={14} />
                     </button>
                   </div>
@@ -657,6 +694,7 @@ export const PlacoCalculator: React.FC<Props> = ({
           )}
 
           <button
+            type="button"
             onClick={() => setStep(2)}
             className="w-full py-3 bg-blue-600 text-white rounded-xl font-bold flex justify-center items-center mt-2"
           >
@@ -680,6 +718,7 @@ export const PlacoCalculator: React.FC<Props> = ({
                 {PLACO_BOARD_TYPES.map((b: any) => (
                   <button
                     key={b.id}
+                    type="button"
                     onClick={() => setBoardId(b.id)}
                     className={`p-3 rounded border text-left text-sm ${
                       boardId === b.id
@@ -745,12 +784,14 @@ export const PlacoCalculator: React.FC<Props> = ({
 
           <div className="flex gap-3">
             <button
+              type="button"
               onClick={() => setStep(1)}
               className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold"
             >
               Retour
             </button>
             <button
+              type="button"
               onClick={() => setStep(3)}
               className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold"
             >
@@ -820,12 +861,14 @@ export const PlacoCalculator: React.FC<Props> = ({
 
           <div className="flex gap-3">
             <button
+              type="button"
               onClick={() => setStep(2)}
               className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold"
             >
               Retour
             </button>
             <button
+              type="button"
               onClick={() => setStep(4)}
               className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold"
             >
@@ -841,7 +884,7 @@ export const PlacoCalculator: React.FC<Props> = ({
           <Check size={48} className="mx-auto text-emerald-500 mb-4" />
           <h3 className="text-xl font-bold text-slate-800">Calcul prêt</h3>
           <p className="text-slate-500 mb-6">Vous pouvez ajuster les prix si besoin.</p>
-          <button onClick={() => setStep(5)} className="text-blue-600 font-bold underline">
+          <button type="button" onClick={() => setStep(5)} className="text-blue-600 font-bold underline">
             Modifier les prix
           </button>
         </div>
@@ -858,7 +901,11 @@ export const PlacoCalculator: React.FC<Props> = ({
           <div className="bg-white p-3 rounded-xl border border-slate-200">
             <div className="flex justify-between items-center mb-3">
               <h4 className="text-xs font-bold text-slate-500 uppercase">Tarifs</h4>
-              <button onClick={() => setProMode(!proMode)} className="text-xs flex items-center text-blue-600">
+              <button
+                type="button"
+                onClick={() => setProMode(!proMode)}
+                className="text-xs flex items-center text-blue-600"
+              >
                 <Settings size={12} className="mr-1" /> {proMode ? "Mode Pro" : "Mode Simple"}
               </button>
             </div>
@@ -920,6 +967,29 @@ export const PlacoCalculator: React.FC<Props> = ({
                 />
               </div>
 
+              {mode === "ceiling" && (
+                <>
+                  <div>
+                    <label className="block text-[10px] text-slate-500 mb-1">Fourrure 3m (€/u)</label>
+                    <input
+                      type="number"
+                      value={prices.furring3m}
+                      onChange={(e) => updatePrice("furring3m", e.target.value)}
+                      className="w-full p-1.5 border rounded text-sm bg-white text-slate-900"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] text-slate-500 mb-1">Suspente (€/u)</label>
+                    <input
+                      type="number"
+                      value={prices.hangerUnit}
+                      onChange={(e) => updatePrice("hangerUnit", e.target.value)}
+                      className="w-full p-1.5 border rounded text-sm bg-white text-slate-900"
+                    />
+                  </div>
+                </>
+              )}
+
               <div>
                 <label className="block text-[10px] text-slate-500 mb-1">Bande joints 150m (€/rlx)</label>
                 <input
@@ -970,27 +1040,24 @@ export const PlacoCalculator: React.FC<Props> = ({
                     className="w-full p-1.5 border border-blue-200 rounded text-sm bg-white text-slate-900"
                   />
                 </div>
-                {mode === "ceiling" && (
-                  <div>
-                    <label className="block text-[10px] text-blue-600 font-bold mb-1">Fourrure 3m (€/u)</label>
-                    <input
-                      type="number"
-                      value={prices.furring3m}
-                      onChange={(e) => updatePrice("furring3m", e.target.value)}
-                      className="w-full p-1.5 border border-blue-200 rounded text-sm bg-white text-slate-900"
-                    />
-                  </div>
-                )}
               </div>
             )}
           </div>
 
           <div className="flex gap-3 pt-2">
-            <button onClick={() => setStep(4)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
+            <button
+              type="button"
+              onClick={() => setStep(4)}
+              className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold"
+            >
               Retour
             </button>
-            <button className="flex-1 py-3 bg-emerald-100 text-emerald-700 rounded-xl font-bold flex justify-center items-center">
-              <Check size={18} className="mr-2" /> Terminé
+            <button
+              type="button"
+              disabled
+              className="flex-1 py-3 bg-emerald-100 text-emerald-700 rounded-xl font-bold flex justify-center items-center"
+            >
+              <Check size={18} className="mr-2" /> Calculé
             </button>
           </div>
         </div>

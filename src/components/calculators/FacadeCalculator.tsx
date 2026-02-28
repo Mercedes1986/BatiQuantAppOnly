@@ -1,9 +1,13 @@
+// src/components/calculators/FacadeCalculator.tsx
 import React, { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
+
 import { CalculatorType, CalculationResult, Unit } from "../../../types";
 import { DEFAULT_PRICES, OPENING_PRESETS } from "../../constants";
+import { getUnitPrice } from "../../services/materialsService";
+
 import {
   PaintRoller,
-  Ruler,
   LayoutTemplate,
   Layers,
   Hammer,
@@ -35,10 +39,11 @@ interface Props {
 }
 
 const n2 = (v: number) => (Number.isFinite(v) ? Number(v.toFixed(2)) : 0);
-
 const clamp = (v: number, min: number, max: number) => Math.min(max, Math.max(min, v));
 
 export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
+  const { t } = useTranslation();
+
   const [step, setStep] = useState(1);
   const [proMode, setProMode] = useState(false);
 
@@ -88,31 +93,48 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
   // Access
   const [scaffold, setScaffold] = useState(false);
 
+  // -------- Pricing helpers (catalog > default > fallback) ----------
+  const priceOr = (key: string, fallback: number) => {
+    const v = getUnitPrice(key);
+    if (typeof v === "number" && !Number.isNaN(v) && v !== 0) return v;
+
+    const d = (DEFAULT_PRICES as any)[key];
+    if (d !== undefined) {
+      const nd = Number(d);
+      if (!Number.isNaN(nd)) return nd;
+    }
+    return fallback;
+  };
+
   // --- 5. Pricing ---
-  const [prices, setPrices] = useState({
-    cleanM2: 5.0, // Lavage
-    mossM2: 8.0, // Démoussage
-    stripM2: 14.0, // Décapage chimique
-    repairMl: 15.0, // Fissures
-    coatingBag: Number(DEFAULT_PRICES.FACADE_COATING_BAG), // Enduit
-    angleBar: 5.0, // Cornière 3m
+  const [prices, setPrices] = useState(() => ({
+    cleanM2: 5.0,
+    mossM2: 8.0,
+    stripM2: 14.0,
+    repairMl: 15.0,
+    coatingBag: priceOr("FACADE_COATING_BAG", Number(DEFAULT_PRICES.FACADE_COATING_BAG ?? 18)),
+    angleBar: 5.0, // 3m
     paintL: 15.0,
-    iteM2: 60.0, // Matériel ITE complet
-    iteRail: 15.0, // Rail 2.5m
+    iteM2: 60.0,
+    iteRail: 15.0, // 2.5m
     claddingM2: 45.0,
-    battenMl: 2.0, // Tasseaux
-    scaffoldFixed: 1000.0, // Forfait montage/démontage
+    battenMl: 2.0,
+    scaffoldFixed: 1000.0,
     laborM2: 45.0,
-    laborScaffold: 15.0, // €/m2 échafaudage (pro)
-  });
+    laborScaffold: 15.0,
+  }));
 
   const updatePrice = (key: keyof typeof prices, val: string) => {
     setPrices((prev) => ({ ...prev, [key]: parseFloat(val) || 0 }));
   };
 
   // --- Helpers ---
-  const makeOpeningLabel = (t: FacadeOpening["type"]) =>
-    t === "window" ? "Fenêtre" : t === "door" ? "Porte" : t === "bay" ? "Baie" : "Garage";
+  const makeOpeningLabel = (type: FacadeOpening["type"]) => {
+    if (type === "window") return t("facade.opening.window", { defaultValue: "Fenêtre" });
+    if (type === "door") return t("facade.opening.door", { defaultValue: "Porte" });
+    if (type === "bay") return t("facade.opening.bay", { defaultValue: "Baie" });
+    return t("facade.opening.garage", { defaultValue: "Garage" });
+  };
 
   const applyPreset = (type: FacadeOpening["type"]) => {
     const preset =
@@ -154,20 +176,21 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
 
   const updateOpeningQty = (id: string, delta: number) => {
     setOpenings((prev) =>
-      prev
-        .map((o) => (o.id === id ? { ...o, quantity: Math.max(1, o.quantity + delta) } : o))
-        .filter((o) => o.quantity > 0)
+      prev.map((o) => (o.id === id ? { ...o, quantity: Math.max(1, o.quantity + delta) } : o))
     );
   };
+
+  const safeLiterUnit = ((Unit as any).LITER ?? Unit.PIECE) as Unit;
+  const safeBarUnit = ((Unit as any).BAR ?? Unit.PIECE) as Unit;
 
   // --- CALCULATION ENGINE ---
   const calculationData = useMemo(() => {
     let grossArea = 0;
     let totalPerimeter = 0;
 
-    // 1. Geometry
     const h = parseFloat(dimH) || 0;
 
+    // 1) Geometry
     if (geoMode === "rect") {
       const L = parseFloat(dimL) || 0;
       const W = parseFloat(dimW) || 0;
@@ -184,7 +207,7 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
       grossArea = totalPerimeter * h;
     }
 
-    // 2. Deductions & Reveals (Tableaux)
+    // 2) Deductions + reveals
     let openingsArea = 0;
     let revealsArea = 0;
     let revealsLinear = 0;
@@ -202,7 +225,7 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
     const netArea = Math.max(0, grossArea - openingsArea);
     const treatableArea = netArea + revealsArea;
 
-    // 3. Materials & Works
+    // 3) Works
     const materialsList: any[] = [];
     let totalCost = 0;
     const warnings: string[] = [];
@@ -210,19 +233,29 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
     const add = (row: any) => materialsList.push(row);
 
     if (h <= 0 || totalPerimeter <= 0 || grossArea <= 0) {
-      warnings.push("Dimensions insuffisantes : renseignez la géométrie (hauteur + périmètre).");
+      warnings.push(
+        t("facade.warn_geometry", {
+          defaultValue: "Dimensions insuffisantes : renseignez la géométrie (hauteur + périmètre).",
+        })
+      );
     }
 
-    // A. Cleaning
+    // A) Cleaning
     if (doCleaning && treatableArea > 0) {
       const unitPrice =
         cleanType === "moss" ? prices.mossM2 : cleanType === "strip" ? prices.stripM2 : prices.cleanM2;
+
       const cost = treatableArea * unitPrice;
       totalCost += cost;
 
       add({
         id: "clean",
-        name: cleanType === "moss" ? "Nettoyage + Démoussage" : cleanType === "strip" ? "Décapage façade" : "Lavage HP",
+        name:
+          cleanType === "moss"
+            ? t("facade.clean.moss", { defaultValue: "Nettoyage + Démoussage" })
+            : cleanType === "strip"
+            ? t("facade.clean.strip", { defaultValue: "Décapage façade" })
+            : t("facade.clean.wash", { defaultValue: "Lavage HP" }),
         quantity: Math.ceil(treatableArea),
         quantityRaw: treatableArea,
         unit: Unit.M2,
@@ -232,7 +265,7 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
       });
     }
 
-    // B. Repair
+    // B) Repair
     if (doRepair) {
       const cracks = parseFloat(crackLen) || 0;
       if (cracks > 0) {
@@ -241,24 +274,26 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
 
         add({
           id: "repair",
-          name: "Traitement fissures",
+          name: t("facade.repair.title", { defaultValue: "Traitement fissures" }),
           quantity: n2(cracks),
           unit: Unit.METER,
           unitPrice: prices.repairMl,
           totalPrice: n2(cost),
           category: CalculatorType.FACADE,
-          details: "Ouverture + mastic / mortier",
+          details: t("facade.repair.details", { defaultValue: "Ouverture + mastic / mortier" }),
         });
       } else {
-        warnings.push("Réparations activées mais longueur de fissures = 0.");
+        warnings.push(
+          t("facade.warn_repair_zero", { defaultValue: "Réparations activées mais longueur de fissures = 0." })
+        );
       }
     }
 
-    // C. Coating (Enduit)
+    // C) Coating
     if (doCoating && treatableArea > 0) {
       const thick = Number(coatingThick) || 15;
       const kgPerM2 = coatingType === "rpe" ? 3 : 1.5 * thick; // approx
-      const totalKg = treatableArea * kgPerM2 * 1.05; // +5% pertes
+      const totalKg = treatableArea * kgPerM2 * 1.05; // +5%
       const bags = Math.ceil(totalKg / 25);
 
       const costCoat = bags * prices.coatingBag;
@@ -266,7 +301,10 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
 
       add({
         id: "coating",
-        name: coatingType === "rpe" ? "RPE (revêtement plastique épais)" : `Enduit monocouche (${thick}mm)`,
+        name:
+          coatingType === "rpe"
+            ? t("facade.coating.rpe", { defaultValue: "RPE (revêtement plastique épais)" })
+            : t("facade.coating.mono", { defaultValue: "Enduit monocouche" }) + ` (${thick}mm)`,
         quantity: bags,
         quantityRaw: totalKg,
         unit: Unit.BAG,
@@ -275,10 +313,7 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
         category: CalculatorType.FACADE,
       });
 
-      // Angles/cornières
-      // Base: 4 angles (4 barres de 3m) + tableaux (linéaire/3m)
-      // (On conserve le “simple” de ton script, mais sans surmultiplier par périmètre)
-      const anglesBase = 4; // maison standard
+      const anglesBase = 4;
       const revealAngles = Math.ceil(revealsLinear / 3);
       const totalAngles = anglesBase + revealAngles;
 
@@ -287,19 +322,19 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
 
       add({
         id: "angles",
-        name: "Cornières d'angle (3m)",
+        name: t("facade.coating.angles", { defaultValue: "Cornières d'angle (3m)" }),
         quantity: totalAngles,
-        unit: Unit.BAR,
+        unit: safeBarUnit,
         unitPrice: prices.angleBar,
         totalPrice: n2(costAngles),
         category: CalculatorType.FACADE,
-        details: "Angles + tableaux",
+        details: t("facade.coating.angles_details", { defaultValue: "Angles + tableaux" }),
       });
     }
 
-    // D. Painting
+    // D) Paint
     if (doPaint && treatableArea > 0) {
-      const coverage = 6; // m²/L/couche
+      const coverage = 6; // m²/L/layer
       const layers = Math.max(1, paintLayers || 1);
       const totalL = (treatableArea * layers) / coverage;
 
@@ -308,41 +343,41 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
 
       add({
         id: "paint",
-        name: `Peinture façade (${paintType.toUpperCase()})`,
+        name: t("facade.paint.title", { defaultValue: "Peinture façade" }) + ` (${paintType.toUpperCase()})`,
         quantity: Math.ceil(totalL),
         quantityRaw: totalL,
-        unit: Unit.LITER,
+        unit: safeLiterUnit,
         unitPrice: prices.paintL,
         totalPrice: n2(costPaint),
         category: CalculatorType.FACADE,
-        details: `${layers} couche(s)`,
+        details: t("facade.paint.layers", { defaultValue: "Couches" }) + `: ${layers}`,
       });
     }
 
-    // E. ITE
+    // E) ITE
     if (doITE && netArea > 0) {
       const costIte = netArea * prices.iteM2;
       totalCost += costIte;
 
       add({
         id: "ite",
-        name: `Système ITE (${iteThick}mm ${iteType.toUpperCase()})`,
+        name: t("facade.ite.title", { defaultValue: "Système ITE" }) + ` (${iteThick}mm ${iteType.toUpperCase()})`,
         quantity: Math.ceil(netArea),
         quantityRaw: netArea,
         unit: Unit.M2,
         unitPrice: prices.iteM2,
         totalPrice: n2(costIte),
         category: CalculatorType.FACADE,
-        details: "Isolant + colle + treillis + enduit",
+        details: t("facade.ite.details", { defaultValue: "Isolant + colle + treillis + enduit" }),
       });
 
-      const rails = Math.ceil(totalPerimeter / 2.5); // rails 2.5m
+      const rails = Math.ceil(totalPerimeter / 2.5);
       const costRails = rails * prices.iteRail;
       totalCost += costRails;
 
       add({
         id: "ite_rail",
-        name: "Rails de départ (2.5m)",
+        name: t("facade.ite.rail", { defaultValue: "Rails de départ (2.5m)" }),
         quantity: rails,
         unit: Unit.PIECE,
         unitPrice: prices.iteRail,
@@ -351,14 +386,16 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
       });
     }
 
-    // F. Cladding
+    // F) Cladding
     if (doCladding && netArea > 0) {
       const costClad = netArea * prices.claddingM2;
       totalCost += costClad;
 
       add({
         id: "cladding",
-        name: `Bardage (${claddingType === "wood" ? "Bois" : "Composite"})`,
+        name:
+          t("facade.cladding.title", { defaultValue: "Bardage" }) +
+          ` (${claddingType === "wood" ? t("facade.cladding.wood", { defaultValue: "Bois" }) : t("facade.cladding.composite", { defaultValue: "Composite" })})`,
         quantity: Math.ceil(netArea),
         quantityRaw: netArea,
         unit: Unit.M2,
@@ -373,7 +410,7 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
 
       add({
         id: "battens",
-        name: "Tasseaux ossature",
+        name: t("facade.cladding.battens", { defaultValue: "Tasseaux ossature" }),
         quantity: battens,
         unit: Unit.METER,
         unitPrice: prices.battenMl,
@@ -382,7 +419,7 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
       });
     }
 
-    // G. Scaffold
+    // G) Scaffold
     const shouldScaffold = scaffold || h > 3;
     if (shouldScaffold && grossArea > 0) {
       const scafArea = grossArea;
@@ -391,26 +428,28 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
 
       add({
         id: "scaffold",
-        name: "Échafaudage (Forfait)",
+        name: t("facade.scaffold.title", { defaultValue: "Échafaudage (Forfait)" }),
         quantity: 1,
         unit: Unit.PACKAGE,
         unitPrice: n2(costScaf),
         totalPrice: n2(costScaf),
         category: CalculatorType.FACADE,
-        details: h > 6 ? "Grande hauteur" : "Standard",
+        details: h > 6 ? t("facade.scaffold.tall", { defaultValue: "Grande hauteur" }) : t("facade.scaffold.std", { defaultValue: "Standard" }),
       });
 
-      if (h > 3 && !scaffold) warnings.push("Hauteur > 3m : échafaudage ajouté automatiquement.");
+      if (h > 3 && !scaffold) {
+        warnings.push(t("facade.warn_scaffold_auto", { defaultValue: "Hauteur > 3m : échafaudage ajouté automatiquement." }));
+      }
     }
 
-    // H. Labor (General)
+    // H) Labor (General)
     if (proMode && netArea > 0) {
       const costLab = netArea * prices.laborM2;
       totalCost += costLab;
 
       add({
         id: "labor_main",
-        name: "Main d'œuvre (façadier)",
+        name: t("facade.labor.title", { defaultValue: "Main d'œuvre (façadier)" }),
         quantity: n2(netArea),
         unit: Unit.M2,
         unitPrice: prices.laborM2,
@@ -420,10 +459,10 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
     }
 
     if (openings.length === 0 && (doCoating || doPaint || doITE || doCladding)) {
-      warnings.push("Aucune ouverture déduite : surface potentiellement surestimée.");
+      warnings.push(t("facade.warn_no_openings", { defaultValue: "Aucune ouverture déduite : surface potentiellement surestimée." }));
     }
     if (doCoating && doPaint) {
-      warnings.push("Enduit + peinture : attention au système (primaire/compatibilité).");
+      warnings.push(t("facade.warn_coat_paint", { defaultValue: "Enduit + peinture : attention au système (primaire/compatibilité)." }));
     }
 
     return {
@@ -462,19 +501,25 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
     scaffold,
     prices,
     proMode,
+    t,
   ]);
 
-  // Pass results
   useEffect(() => {
     onCalculate({
-      summary: `${calculationData.netArea.toFixed(1)} m² de façade`,
+      summary: `${calculationData.netArea.toFixed(1)} m²`,
       details: [
-        { label: "Surface Brute", value: calculationData.grossArea.toFixed(1), unit: "m²" },
-        { label: "Surface Nette", value: calculationData.netArea.toFixed(1), unit: "m²" },
-        { label: "Surface traitée", value: calculationData.treatableArea.toFixed(1), unit: "m²" },
+        { label: t("facade.details.gross", { defaultValue: "Surface brute" }), value: calculationData.grossArea.toFixed(1), unit: "m²" },
+        { label: t("facade.details.net", { defaultValue: "Surface nette" }), value: calculationData.netArea.toFixed(1), unit: "m²" },
+        { label: t("facade.details.treatable", { defaultValue: "Surface traitée" }), value: calculationData.treatableArea.toFixed(1), unit: "m²" },
         {
-          label: "Travaux",
-          value: [doCleaning ? "Nettoyage" : "", doCoating ? "Enduit" : "", doPaint ? "Peinture" : "", doITE ? "ITE" : "", doCladding ? "Bardage" : ""]
+          label: t("facade.details.works", { defaultValue: "Travaux" }),
+          value: [
+            doCleaning ? t("facade.work.cleaning", { defaultValue: "Nettoyage" }) : "",
+            doCoating ? t("facade.work.coating", { defaultValue: "Enduit" }) : "",
+            doPaint ? t("facade.work.paint", { defaultValue: "Peinture" }) : "",
+            doITE ? t("facade.work.ite", { defaultValue: "ITE" }) : "",
+            doCladding ? t("facade.work.cladding", { defaultValue: "Bardage" }) : "",
+          ]
             .filter(Boolean)
             .join(", "),
           unit: "",
@@ -484,7 +529,7 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
       totalCost: calculationData.totalCost,
       warnings: calculationData.warnings.length ? calculationData.warnings : undefined,
     });
-  }, [calculationData, onCalculate, doCleaning, doCoating, doPaint, doITE, doCladding]);
+  }, [calculationData, onCalculate, doCleaning, doCoating, doPaint, doITE, doCladding, t]);
 
   return (
     <div className="space-y-6 animate-in fade-in">
@@ -499,21 +544,21 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
               step === s ? "bg-white shadow text-blue-600" : "text-slate-400"
             }`}
           >
-            {s === 1 && "1. Murs"}
-            {s === 2 && "2. Ouver."}
-            {s === 3 && "3. Travaux"}
-            {s === 4 && "4. Détails"}
-            {s === 5 && "5. Devis"}
+            {s === 1 && t("facade.steps.1", { defaultValue: "1. Murs" })}
+            {s === 2 && t("facade.steps.2", { defaultValue: "2. Ouver." })}
+            {s === 3 && t("facade.steps.3", { defaultValue: "3. Travaux" })}
+            {s === 4 && t("facade.steps.4", { defaultValue: "4. Détails" })}
+            {s === 5 && t("facade.steps.5", { defaultValue: "5. Devis" })}
           </button>
         ))}
       </div>
 
-      {/* STEP 1: GEOMETRY */}
+      {/* STEP 1 */}
       {step === 1 && (
         <div className="space-y-4">
           <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
             <Home size={16} className="mr-2 shrink-0 mt-0.5" />
-            Définissez la géométrie de la maison.
+            {t("facade.step1.hint", { defaultValue: "Définissez la géométrie de la maison." })}
           </div>
 
           <div className="flex bg-slate-100 p-1 rounded-lg">
@@ -524,7 +569,7 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
                 geoMode === "rect" ? "bg-white shadow text-indigo-600" : "text-slate-500"
               }`}
             >
-              Maison (L x l)
+              {t("facade.geo.rect", { defaultValue: "Maison (L x l)" })}
             </button>
             <button
               type="button"
@@ -533,7 +578,7 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
                 geoMode === "simple" ? "bg-white shadow text-indigo-600" : "text-slate-500"
               }`}
             >
-              Périmètre
+              {t("facade.geo.perimeter", { defaultValue: "Périmètre" })}
             </button>
           </div>
 
@@ -541,7 +586,7 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
             {geoMode === "rect" ? (
               <>
                 <div>
-                  <label className="block text-xs font-bold text-slate-500 mb-1">Longueur (m)</label>
+                  <label className="block text-xs font-bold text-slate-500 mb-1">{t("facade.geo.length", { defaultValue: "Longueur (m)" })}</label>
                   <input
                     type="number"
                     value={dimL}
@@ -550,7 +595,7 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-500 mb-1">Largeur (m)</label>
+                  <label className="block text-xs font-bold text-slate-500 mb-1">{t("facade.geo.width", { defaultValue: "Largeur (m)" })}</label>
                   <input
                     type="number"
                     value={dimW}
@@ -561,7 +606,7 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
               </>
             ) : (
               <div className="col-span-2">
-                <label className="block text-xs font-bold text-slate-500 mb-1">Périmètre total (m)</label>
+                <label className="block text-xs font-bold text-slate-500 mb-1">{t("facade.geo.perimeter_total", { defaultValue: "Périmètre total (m)" })}</label>
                 <input
                   type="number"
                   value={perimeter}
@@ -572,7 +617,7 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
             )}
 
             <div className="col-span-2">
-              <label className="block text-xs font-bold text-slate-500 mb-1">Hauteur sous gouttière (m)</label>
+              <label className="block text-xs font-bold text-slate-500 mb-1">{t("facade.geo.height", { defaultValue: "Hauteur sous gouttière (m)" })}</label>
               <input
                 type="number"
                 value={dimH}
@@ -591,13 +636,13 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
                   onChange={(e) => setHasGables(e.target.checked)}
                   className="rounded text-blue-600"
                 />
-                <span className="text-sm font-bold text-slate-700">Ajouter pignons</span>
+                <span className="text-sm font-bold text-slate-700">{t("facade.geo.gables", { defaultValue: "Ajouter pignons" })}</span>
               </label>
 
               {hasGables && (
                 <div className="grid grid-cols-2 gap-3 pl-6 animate-in slide-in-from-top-2">
                   <div>
-                    <label className="block text-[10px] text-slate-500 mb-1">Hauteur pignon (m)</label>
+                    <label className="block text-[10px] text-slate-500 mb-1">{t("facade.geo.gable_height", { defaultValue: "Hauteur pignon (m)" })}</label>
                     <input
                       type="number"
                       value={gableHeight}
@@ -606,16 +651,17 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
                     />
                   </div>
                   <div>
-                    <label className="block text-[10px] text-slate-500 mb-1">Nombre</label>
+                    <label className="block text-[10px] text-slate-500 mb-1">{t("facade.geo.gable_count", { defaultValue: "Nombre" })}</label>
                     <select
                       value={numGables}
                       onChange={(e) => setNumGables(Number(e.target.value))}
                       className="w-full p-1.5 text-sm border rounded bg-white text-slate-900"
                     >
-                      <option value={1}>1</option>
-                      <option value={2}>2</option>
-                      <option value={3}>3</option>
-                      <option value={4}>4</option>
+                      {[1, 2, 3, 4].map((v) => (
+                        <option key={v} value={v}>
+                          {v}
+                        </option>
+                      ))}
                     </select>
                   </div>
                 </div>
@@ -628,17 +674,19 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
             onClick={() => setStep(2)}
             className="w-full py-3 bg-blue-600 text-white rounded-xl font-bold flex justify-center items-center mt-2"
           >
-            Suivant <ArrowRight size={18} className="ml-2" />
+            {t("common.next", { defaultValue: "Suivant" })} <ArrowRight size={18} className="ml-2" />
           </button>
         </div>
       )}
 
-      {/* STEP 2: OPENINGS */}
+      {/* STEP 2 */}
       {step === 2 && (
         <div className="space-y-4">
           <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
             <LayoutTemplate size={16} className="mr-2 shrink-0 mt-0.5" />
-            Ajoutez les ouvertures. Elles seront déduites de la surface, mais les tableaux seront comptés.
+            {t("facade.step2.hint", {
+              defaultValue: "Ajoutez les ouvertures. Elles seront déduites de la surface, mais les tableaux seront comptés.",
+            })}
           </div>
 
           <div className="space-y-2">
@@ -649,7 +697,7 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
                     {op.label} ×{op.quantity}
                   </span>
                   <span className="text-xs text-slate-500">
-                    {op.width}×{op.height}m • Tableau: {op.revealDepth}cm
+                    {op.width}×{op.height}m • {t("facade.opening.reveal", { defaultValue: "Tableau" })}: {op.revealDepth}cm
                   </span>
                 </div>
 
@@ -658,7 +706,7 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
                     type="button"
                     onClick={() => updateOpeningQty(op.id, -1)}
                     className="w-7 h-7 flex items-center justify-center bg-slate-50 rounded border text-slate-600 hover:bg-slate-100"
-                    title="Diminuer"
+                    title={t("common.minus", { defaultValue: "Diminuer" })}
                   >
                     -
                   </button>
@@ -666,11 +714,16 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
                     type="button"
                     onClick={() => updateOpeningQty(op.id, 1)}
                     className="w-7 h-7 flex items-center justify-center bg-slate-50 rounded border text-slate-600 hover:bg-slate-100"
-                    title="Augmenter"
+                    title={t("common.plus", { defaultValue: "Augmenter" })}
                   >
                     +
                   </button>
-                  <button type="button" onClick={() => removeOpening(op.id)} className="text-red-400 p-2" title="Supprimer">
+                  <button
+                    type="button"
+                    onClick={() => removeOpening(op.id)}
+                    className="text-red-400 p-2"
+                    title={t("common.delete", { defaultValue: "Supprimer" })}
+                  >
                     <Trash2 size={16} />
                   </button>
                 </div>
@@ -678,7 +731,9 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
             ))}
 
             {openings.length === 0 && (
-              <div className="text-center text-xs text-slate-400 py-4 italic">Aucune ouverture.</div>
+              <div className="text-center text-xs text-slate-400 py-4 italic">
+                {t("facade.opening.none", { defaultValue: "Aucune ouverture." })}
+              </div>
             )}
           </div>
 
@@ -687,45 +742,45 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
               <select
                 value={newOpType}
                 onChange={(e) => {
-                  const t = e.target.value as FacadeOpening["type"];
-                  setNewOpType(t);
-                  applyPreset(t);
+                  const next = e.target.value as FacadeOpening["type"];
+                  setNewOpType(next);
+                  applyPreset(next);
                 }}
                 className="flex-1 p-1.5 text-xs border rounded bg-white text-slate-900"
               >
-                <option value="window">Fenêtre</option>
-                <option value="door">Porte</option>
-                <option value="bay">Baie vitrée</option>
-                <option value="garage">Garage</option>
+                <option value="window">{t("facade.opening.window", { defaultValue: "Fenêtre" })}</option>
+                <option value="door">{t("facade.opening.door", { defaultValue: "Porte" })}</option>
+                <option value="bay">{t("facade.opening.bay", { defaultValue: "Baie vitrée" })}</option>
+                <option value="garage">{t("facade.opening.garage", { defaultValue: "Garage" })}</option>
               </select>
 
               <button type="button" className="text-xs text-blue-600 underline" onClick={() => applyPreset(newOpType)}>
-                Preset
+                {t("common.preset", { defaultValue: "Preset" })}
               </button>
             </div>
 
             <div className="grid grid-cols-3 gap-2 mb-2">
               <input
                 type="number"
-                placeholder="Larg"
+                placeholder={t("facade.opening.width", { defaultValue: "Larg" })}
                 value={newOpW}
                 onChange={(e) => setNewOpW(e.target.value)}
                 className="p-1.5 text-xs border rounded bg-white text-slate-900"
               />
               <input
                 type="number"
-                placeholder="Haut"
+                placeholder={t("facade.opening.height", { defaultValue: "Haut" })}
                 value={newOpH}
                 onChange={(e) => setNewOpH(e.target.value)}
                 className="p-1.5 text-xs border rounded bg-white text-slate-900"
               />
               <input
                 type="number"
-                placeholder="Tab (cm)"
+                placeholder={t("facade.opening.reveal_cm", { defaultValue: "Tab (cm)" })}
                 value={newOpReveal}
                 onChange={(e) => setNewOpReveal(e.target.value)}
                 className="p-1.5 text-xs border rounded bg-white text-slate-900"
-                title="Profondeur tableau"
+                title={t("facade.opening.reveal_title", { defaultValue: "Profondeur tableau" })}
               />
             </div>
 
@@ -734,162 +789,116 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
               onClick={addOpening}
               className="w-full py-2 bg-blue-100 text-blue-700 font-bold rounded text-xs flex justify-center items-center"
             >
-              <Plus size={14} className="mr-1" /> Ajouter ouverture
+              <Plus size={14} className="mr-1" /> {t("facade.opening.add", { defaultValue: "Ajouter ouverture" })}
             </button>
           </div>
 
           <div className="flex gap-3">
-            <button
-              type="button"
-              onClick={() => setStep(1)}
-              className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold"
-            >
-              Retour
+            <button type="button" onClick={() => setStep(1)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
+              {t("common.back", { defaultValue: "Retour" })}
             </button>
             <button type="button" onClick={() => setStep(3)} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold">
-              Suivant
+              {t("common.next", { defaultValue: "Suivant" })}
             </button>
           </div>
         </div>
       )}
 
-      {/* STEP 3: WORKS SELECTION */}
+      {/* STEP 3 */}
       {step === 3 && (
         <div className="space-y-4">
           <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
             <Check size={16} className="mr-2 shrink-0 mt-0.5" />
-            Sélectionnez les travaux à réaliser.
+            {t("facade.step3.hint", { defaultValue: "Sélectionnez les travaux à réaliser." })}
           </div>
 
           <div className="grid grid-cols-2 gap-3">
-            <label
-              className={`p-3 border rounded-xl flex flex-col items-center justify-center cursor-pointer transition-all ${
-                doCleaning ? "bg-blue-50 border-blue-500 text-blue-700" : "bg-white text-slate-500"
-              }`}
-            >
+            <label className={`p-3 border rounded-xl flex flex-col items-center justify-center cursor-pointer transition-all ${doCleaning ? "bg-blue-50 border-blue-500 text-blue-700" : "bg-white text-slate-500"}`}>
               <Eraser size={24} className="mb-2" />
-              <span className="font-bold text-sm">Nettoyage</span>
+              <span className="font-bold text-sm">{t("facade.work.cleaning", { defaultValue: "Nettoyage" })}</span>
               <input type="checkbox" checked={doCleaning} onChange={(e) => setDoCleaning(e.target.checked)} className="hidden" />
             </label>
 
-            <label
-              className={`p-3 border rounded-xl flex flex-col items-center justify-center cursor-pointer transition-all ${
-                doRepair ? "bg-blue-50 border-blue-500 text-blue-700" : "bg-white text-slate-500"
-              }`}
-            >
+            <label className={`p-3 border rounded-xl flex flex-col items-center justify-center cursor-pointer transition-all ${doRepair ? "bg-blue-50 border-blue-500 text-blue-700" : "bg-white text-slate-500"}`}>
               <Hammer size={24} className="mb-2" />
-              <span className="font-bold text-sm">Réparations</span>
+              <span className="font-bold text-sm">{t("facade.work.repair", { defaultValue: "Réparations" })}</span>
               <input type="checkbox" checked={doRepair} onChange={(e) => setDoRepair(e.target.checked)} className="hidden" />
             </label>
 
-            <label
-              className={`p-3 border rounded-xl flex flex-col items-center justify-center cursor-pointer transition-all ${
-                doCoating ? "bg-blue-50 border-blue-500 text-blue-700" : "bg-white text-slate-500"
-              }`}
-            >
+            <label className={`p-3 border rounded-xl flex flex-col items-center justify-center cursor-pointer transition-all ${doCoating ? "bg-blue-50 border-blue-500 text-blue-700" : "bg-white text-slate-500"}`}>
               <BrickWall size={24} className="mb-2" />
-              <span className="font-bold text-sm">Enduit</span>
+              <span className="font-bold text-sm">{t("facade.work.coating", { defaultValue: "Enduit" })}</span>
               <input type="checkbox" checked={doCoating} onChange={(e) => setDoCoating(e.target.checked)} className="hidden" />
             </label>
 
-            <label
-              className={`p-3 border rounded-xl flex flex-col items-center justify-center cursor-pointer transition-all ${
-                doPaint ? "bg-blue-50 border-blue-500 text-blue-700" : "bg-white text-slate-500"
-              }`}
-            >
+            <label className={`p-3 border rounded-xl flex flex-col items-center justify-center cursor-pointer transition-all ${doPaint ? "bg-blue-50 border-blue-500 text-blue-700" : "bg-white text-slate-500"}`}>
               <PaintRoller size={24} className="mb-2" />
-              <span className="font-bold text-sm">Peinture</span>
+              <span className="font-bold text-sm">{t("facade.work.paint", { defaultValue: "Peinture" })}</span>
               <input type="checkbox" checked={doPaint} onChange={(e) => setDoPaint(e.target.checked)} className="hidden" />
             </label>
 
-            <label
-              className={`p-3 border rounded-xl flex flex-col items-center justify-center cursor-pointer transition-all ${
-                doITE ? "bg-blue-50 border-blue-500 text-blue-700" : "bg-white text-slate-500"
-              }`}
-            >
+            <label className={`p-3 border rounded-xl flex flex-col items-center justify-center cursor-pointer transition-all ${doITE ? "bg-blue-50 border-blue-500 text-blue-700" : "bg-white text-slate-500"}`}>
               <Layers size={24} className="mb-2" />
-              <span className="font-bold text-sm">Isolation ITE</span>
+              <span className="font-bold text-sm">{t("facade.work.ite", { defaultValue: "Isolation ITE" })}</span>
               <input type="checkbox" checked={doITE} onChange={(e) => setDoITE(e.target.checked)} className="hidden" />
             </label>
 
-            <label
-              className={`p-3 border rounded-xl flex flex-col items-center justify-center cursor-pointer transition-all ${
-                doCladding ? "bg-blue-50 border-blue-500 text-blue-700" : "bg-white text-slate-500"
-              }`}
-            >
+            <label className={`p-3 border rounded-xl flex flex-col items-center justify-center cursor-pointer transition-all ${doCladding ? "bg-blue-50 border-blue-500 text-blue-700" : "bg-white text-slate-500"}`}>
               <Box size={24} className="mb-2" />
-              <span className="font-bold text-sm">Bardage</span>
+              <span className="font-bold text-sm">{t("facade.work.cladding", { defaultValue: "Bardage" })}</span>
               <input type="checkbox" checked={doCladding} onChange={(e) => setDoCladding(e.target.checked)} className="hidden" />
             </label>
           </div>
 
           <div className="flex gap-3">
             <button type="button" onClick={() => setStep(2)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
-              Retour
+              {t("common.back", { defaultValue: "Retour" })}
             </button>
             <button type="button" onClick={() => setStep(4)} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold">
-              Suivant
+              {t("common.next", { defaultValue: "Suivant" })}
             </button>
           </div>
         </div>
       )}
 
-      {/* STEP 4: SPECS */}
+      {/* STEP 4 */}
       {step === 4 && (
         <div className="space-y-4">
           <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
             <Settings size={16} className="mr-2 shrink-0 mt-0.5" />
-            Configurez les détails des travaux sélectionnés.
+            {t("facade.step4.hint", { defaultValue: "Configurez les détails des travaux sélectionnés." })}
           </div>
 
           {doCleaning && (
             <div className="bg-white p-3 rounded-lg border border-slate-200">
-              <h4 className="text-xs font-bold text-slate-500 uppercase mb-2">Nettoyage</h4>
-              <select
-                value={cleanType}
-                onChange={(e) => setCleanType(e.target.value as any)}
-                className="w-full p-2 text-sm border rounded bg-white text-slate-900"
-              >
-                <option value="moss">Démoussage (traitement)</option>
-                <option value="wash">Lavage haute pression</option>
-                <option value="strip">Décapage chimique</option>
+              <h4 className="text-xs font-bold text-slate-500 uppercase mb-2">{t("facade.clean.title", { defaultValue: "Nettoyage" })}</h4>
+              <select value={cleanType} onChange={(e) => setCleanType(e.target.value as any)} className="w-full p-2 text-sm border rounded bg-white text-slate-900">
+                <option value="moss">{t("facade.clean.moss_opt", { defaultValue: "Démoussage (traitement)" })}</option>
+                <option value="wash">{t("facade.clean.wash_opt", { defaultValue: "Lavage haute pression" })}</option>
+                <option value="strip">{t("facade.clean.strip_opt", { defaultValue: "Décapage chimique" })}</option>
               </select>
             </div>
           )}
 
           {doRepair && (
             <div className="bg-white p-3 rounded-lg border border-slate-200">
-              <h4 className="text-xs font-bold text-slate-500 uppercase mb-2">Réparations</h4>
-              <label className="block text-xs mb-1">Longueur fissures (ml)</label>
-              <input
-                type="number"
-                value={crackLen}
-                onChange={(e) => setCrackLen(e.target.value)}
-                className="w-full p-2 text-sm border rounded bg-white text-slate-900"
-              />
+              <h4 className="text-xs font-bold text-slate-500 uppercase mb-2">{t("facade.repair.title", { defaultValue: "Réparations" })}</h4>
+              <label className="block text-xs mb-1">{t("facade.repair.cracks_ml", { defaultValue: "Longueur fissures (ml)" })}</label>
+              <input type="number" value={crackLen} onChange={(e) => setCrackLen(e.target.value)} className="w-full p-2 text-sm border rounded bg-white text-slate-900" />
             </div>
           )}
 
           {doCoating && (
             <div className="bg-white p-3 rounded-lg border border-slate-200">
-              <h4 className="text-xs font-bold text-slate-500 uppercase mb-2">Enduit</h4>
+              <h4 className="text-xs font-bold text-slate-500 uppercase mb-2">{t("facade.coating.title", { defaultValue: "Enduit" })}</h4>
               <div className="grid grid-cols-2 gap-3">
-                <select
-                  value={coatingType}
-                  onChange={(e) => setCoatingType(e.target.value as any)}
-                  className="p-2 text-sm border rounded bg-white text-slate-900"
-                >
-                  <option value="mono">Monocouche</option>
-                  <option value="rpe">RPE</option>
+                <select value={coatingType} onChange={(e) => setCoatingType(e.target.value as any)} className="p-2 text-sm border rounded bg-white text-slate-900">
+                  <option value="mono">{t("facade.coating.mono_opt", { defaultValue: "Monocouche" })}</option>
+                  <option value="rpe">{t("facade.coating.rpe_opt", { defaultValue: "RPE" })}</option>
                 </select>
 
                 <div className="flex items-center">
-                  <input
-                    type="number"
-                    value={coatingThick}
-                    onChange={(e) => setCoatingThick(Number(e.target.value))}
-                    className="w-16 p-2 text-sm border rounded bg-white text-slate-900"
-                  />
+                  <input type="number" value={coatingThick} onChange={(e) => setCoatingThick(Number(e.target.value))} className="w-16 p-2 text-sm border rounded bg-white text-slate-900" />
                   <span className="ml-2 text-xs">mm</span>
                 </div>
               </div>
@@ -898,26 +907,20 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
 
           {doPaint && (
             <div className="bg-white p-3 rounded-lg border border-slate-200">
-              <h4 className="text-xs font-bold text-slate-500 uppercase mb-2">Peinture</h4>
+              <h4 className="text-xs font-bold text-slate-500 uppercase mb-2">{t("facade.paint.title", { defaultValue: "Peinture" })}</h4>
               <div className="grid grid-cols-2 gap-3">
-                <select
-                  value={paintType}
-                  onChange={(e) => setPaintType(e.target.value as any)}
-                  className="p-2 text-sm border rounded bg-white text-slate-900"
-                >
-                  <option value="acry">Acrylique</option>
-                  <option value="plio">Pliolite</option>
-                  <option value="silo">Siloxane</option>
+                <select value={paintType} onChange={(e) => setPaintType(e.target.value as any)} className="p-2 text-sm border rounded bg-white text-slate-900">
+                  <option value="acry">{t("facade.paint.acry", { defaultValue: "Acrylique" })}</option>
+                  <option value="plio">{t("facade.paint.plio", { defaultValue: "Pliolite" })}</option>
+                  <option value="silo">{t("facade.paint.silo", { defaultValue: "Siloxane" })}</option>
                 </select>
 
-                <select
-                  value={paintLayers}
-                  onChange={(e) => setPaintLayers(Number(e.target.value))}
-                  className="p-2 text-sm border rounded bg-white text-slate-900"
-                >
-                  <option value={1}>1 couche</option>
-                  <option value={2}>2 couches</option>
-                  <option value={3}>3 couches</option>
+                <select value={paintLayers} onChange={(e) => setPaintLayers(Number(e.target.value))} className="p-2 text-sm border rounded bg-white text-slate-900">
+                  {[1, 2, 3].map((v) => (
+                    <option key={v} value={v}>
+                      {t("facade.paint.layers_n", { defaultValue: "{{n}} couche(s)", n: v })}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>
@@ -925,20 +928,15 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
 
           {doITE && (
             <div className="bg-white p-3 rounded-lg border border-slate-200">
-              <h4 className="text-xs font-bold text-slate-500 uppercase mb-2">Isolation (ITE)</h4>
+              <h4 className="text-xs font-bold text-slate-500 uppercase mb-2">{t("facade.ite.title", { defaultValue: "Isolation (ITE)" })}</h4>
               <div className="grid grid-cols-2 gap-3">
                 <select value={iteType} onChange={(e) => setIteType(e.target.value)} className="p-2 text-sm border rounded bg-white text-slate-900">
-                  <option value="pse">Polystyrène (PSE)</option>
-                  <option value="rock">Laine de roche</option>
+                  <option value="pse">{t("facade.ite.pse", { defaultValue: "Polystyrène (PSE)" })}</option>
+                  <option value="rock">{t("facade.ite.rock", { defaultValue: "Laine de roche" })}</option>
                 </select>
 
                 <div className="flex items-center">
-                  <input
-                    type="number"
-                    value={iteThick}
-                    onChange={(e) => setIteThick(Number(e.target.value))}
-                    className="w-16 p-2 text-sm border rounded bg-white text-slate-900"
-                  />
+                  <input type="number" value={iteThick} onChange={(e) => setIteThick(Number(e.target.value))} className="w-16 p-2 text-sm border rounded bg-white text-slate-900" />
                   <span className="ml-2 text-xs">mm</span>
                 </div>
               </div>
@@ -947,49 +945,45 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
 
           {doCladding && (
             <div className="bg-white p-3 rounded-lg border border-slate-200">
-              <h4 className="text-xs font-bold text-slate-500 uppercase mb-2">Bardage</h4>
-              <select
-                value={claddingType}
-                onChange={(e) => setCladdingType(e.target.value as any)}
-                className="w-full p-2 text-sm border rounded bg-white text-slate-900"
-              >
-                <option value="wood">Bois</option>
-                <option value="composite">Composite</option>
+              <h4 className="text-xs font-bold text-slate-500 uppercase mb-2">{t("facade.cladding.title", { defaultValue: "Bardage" })}</h4>
+              <select value={claddingType} onChange={(e) => setCladdingType(e.target.value as any)} className="w-full p-2 text-sm border rounded bg-white text-slate-900">
+                <option value="wood">{t("facade.cladding.wood", { defaultValue: "Bois" })}</option>
+                <option value="composite">{t("facade.cladding.composite", { defaultValue: "Composite" })}</option>
               </select>
             </div>
           )}
 
           <div className="bg-slate-50 p-3 rounded-lg border border-slate-200 mt-2">
             <label className="flex items-center justify-between cursor-pointer">
-              <span className="text-sm font-bold text-slate-700">Échafaudage</span>
+              <span className="text-sm font-bold text-slate-700">{t("facade.scaffold.toggle", { defaultValue: "Échafaudage" })}</span>
               <input type="checkbox" checked={scaffold} onChange={(e) => setScaffold(e.target.checked)} className="h-5 w-5 text-blue-600 rounded" />
             </label>
           </div>
 
           <div className="flex gap-3">
             <button type="button" onClick={() => setStep(3)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
-              Retour
+              {t("common.back", { defaultValue: "Retour" })}
             </button>
             <button type="button" onClick={() => setStep(5)} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold">
-              Suivant
+              {t("common.next", { defaultValue: "Suivant" })}
             </button>
           </div>
         </div>
       )}
 
-      {/* STEP 5: PRICING */}
+      {/* STEP 5 */}
       {step === 5 && (
         <div className="space-y-4">
           <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
             <CircleDollarSign size={16} className="mr-2 shrink-0 mt-0.5" />
-            Ajustez les prix unitaires pour finaliser le devis.
+            {t("facade.step5.hint", { defaultValue: "Ajustez les prix unitaires pour finaliser le devis." })}
           </div>
 
           <div className="bg-white p-3 rounded-xl border border-slate-200">
             <div className="flex justify-between items-center mb-3">
-              <h4 className="text-xs font-bold text-slate-500 uppercase">Tarifs unitaires</h4>
+              <h4 className="text-xs font-bold text-slate-500 uppercase">{t("facade.prices.title", { defaultValue: "Tarifs unitaires" })}</h4>
               <button type="button" onClick={() => setProMode(!proMode)} className="text-xs flex items-center text-blue-600">
-                <Settings size={12} className="mr-1" /> {proMode ? "Mode Pro" : "Mode Simple"}
+                <Settings size={12} className="mr-1" /> {proMode ? t("struct.common.pro_mode", { defaultValue: "Mode Pro" }) : t("struct.common.simple_mode", { defaultValue: "Mode Simple" })}
               </button>
             </div>
 
@@ -997,7 +991,11 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
               {doCleaning && (
                 <div>
                   <label className="block text-[10px] text-slate-500 mb-1">
-                    {cleanType === "moss" ? "Démoussage (€/m²)" : cleanType === "strip" ? "Décapage (€/m²)" : "Lavage (€/m²)"}
+                    {cleanType === "moss"
+                      ? t("facade.prices.moss", { defaultValue: "Démoussage (€/m²)" })
+                      : cleanType === "strip"
+                      ? t("facade.prices.strip", { defaultValue: "Décapage (€/m²)" })
+                      : t("facade.prices.wash", { defaultValue: "Lavage (€/m²)" })}
                   </label>
                   <input
                     type="number"
@@ -1016,70 +1014,40 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
 
               {doRepair && (
                 <div>
-                  <label className="block text-[10px] text-slate-500 mb-1">Réparations fissures (€/ml)</label>
-                  <input
-                    type="number"
-                    value={prices.repairMl}
-                    onChange={(e) => updatePrice("repairMl", e.target.value)}
-                    className="w-full p-1.5 border rounded text-sm bg-white text-slate-900"
-                  />
+                  <label className="block text-[10px] text-slate-500 mb-1">{t("facade.prices.repair", { defaultValue: "Réparations fissures (€/ml)" })}</label>
+                  <input type="number" value={prices.repairMl} onChange={(e) => updatePrice("repairMl", e.target.value)} className="w-full p-1.5 border rounded text-sm bg-white text-slate-900" />
                 </div>
               )}
 
               {doCoating && (
                 <>
                   <div>
-                    <label className="block text-[10px] text-slate-500 mb-1">Sac enduit (€/u)</label>
-                    <input
-                      type="number"
-                      value={prices.coatingBag}
-                      onChange={(e) => updatePrice("coatingBag", e.target.value)}
-                      className="w-full p-1.5 border rounded text-sm bg-white text-slate-900"
-                    />
+                    <label className="block text-[10px] text-slate-500 mb-1">{t("facade.prices.coating_bag", { defaultValue: "Sac enduit (€/u)" })}</label>
+                    <input type="number" value={prices.coatingBag} onChange={(e) => updatePrice("coatingBag", e.target.value)} className="w-full p-1.5 border rounded text-sm bg-white text-slate-900" />
                   </div>
                   <div>
-                    <label className="block text-[10px] text-slate-500 mb-1">Cornière 3m (€/u)</label>
-                    <input
-                      type="number"
-                      value={prices.angleBar}
-                      onChange={(e) => updatePrice("angleBar", e.target.value)}
-                      className="w-full p-1.5 border rounded text-sm bg-white text-slate-900"
-                    />
+                    <label className="block text-[10px] text-slate-500 mb-1">{t("facade.prices.angle", { defaultValue: "Cornière 3m (€/u)" })}</label>
+                    <input type="number" value={prices.angleBar} onChange={(e) => updatePrice("angleBar", e.target.value)} className="w-full p-1.5 border rounded text-sm bg-white text-slate-900" />
                   </div>
                 </>
               )}
 
               {doPaint && (
                 <div>
-                  <label className="block text-[10px] text-slate-500 mb-1">Peinture (€/L)</label>
-                  <input
-                    type="number"
-                    value={prices.paintL}
-                    onChange={(e) => updatePrice("paintL", e.target.value)}
-                    className="w-full p-1.5 border rounded text-sm bg-white text-slate-900"
-                  />
+                  <label className="block text-[10px] text-slate-500 mb-1">{t("facade.prices.paint", { defaultValue: "Peinture (€/L)" })}</label>
+                  <input type="number" value={prices.paintL} onChange={(e) => updatePrice("paintL", e.target.value)} className="w-full p-1.5 border rounded text-sm bg-white text-slate-900" />
                 </div>
               )}
 
               {doITE && (
                 <>
                   <div>
-                    <label className="block text-[10px] text-slate-500 mb-1">ITE complet (€/m²)</label>
-                    <input
-                      type="number"
-                      value={prices.iteM2}
-                      onChange={(e) => updatePrice("iteM2", e.target.value)}
-                      className="w-full p-1.5 border rounded text-sm bg-white text-slate-900"
-                    />
+                    <label className="block text-[10px] text-slate-500 mb-1">{t("facade.prices.ite_m2", { defaultValue: "ITE complet (€/m²)" })}</label>
+                    <input type="number" value={prices.iteM2} onChange={(e) => updatePrice("iteM2", e.target.value)} className="w-full p-1.5 border rounded text-sm bg-white text-slate-900" />
                   </div>
                   <div>
-                    <label className="block text-[10px] text-slate-500 mb-1">Rail départ 2.5m (€/u)</label>
-                    <input
-                      type="number"
-                      value={prices.iteRail}
-                      onChange={(e) => updatePrice("iteRail", e.target.value)}
-                      className="w-full p-1.5 border rounded text-sm bg-white text-slate-900"
-                    />
+                    <label className="block text-[10px] text-slate-500 mb-1">{t("facade.prices.ite_rail", { defaultValue: "Rail départ 2.5m (€/u)" })}</label>
+                    <input type="number" value={prices.iteRail} onChange={(e) => updatePrice("iteRail", e.target.value)} className="w-full p-1.5 border rounded text-sm bg-white text-slate-900" />
                   </div>
                 </>
               )}
@@ -1087,35 +1055,20 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
               {doCladding && (
                 <>
                   <div>
-                    <label className="block text-[10px] text-slate-500 mb-1">Bardage (€/m²)</label>
-                    <input
-                      type="number"
-                      value={prices.claddingM2}
-                      onChange={(e) => updatePrice("claddingM2", e.target.value)}
-                      className="w-full p-1.5 border rounded text-sm bg-white text-slate-900"
-                    />
+                    <label className="block text-[10px] text-slate-500 mb-1">{t("facade.prices.cladding_m2", { defaultValue: "Bardage (€/m²)" })}</label>
+                    <input type="number" value={prices.claddingM2} onChange={(e) => updatePrice("claddingM2", e.target.value)} className="w-full p-1.5 border rounded text-sm bg-white text-slate-900" />
                   </div>
                   <div>
-                    <label className="block text-[10px] text-slate-500 mb-1">Tasseaux (€/ml)</label>
-                    <input
-                      type="number"
-                      value={prices.battenMl}
-                      onChange={(e) => updatePrice("battenMl", e.target.value)}
-                      className="w-full p-1.5 border rounded text-sm bg-white text-slate-900"
-                    />
+                    <label className="block text-[10px] text-slate-500 mb-1">{t("facade.prices.batten_ml", { defaultValue: "Tasseaux (€/ml)" })}</label>
+                    <input type="number" value={prices.battenMl} onChange={(e) => updatePrice("battenMl", e.target.value)} className="w-full p-1.5 border rounded text-sm bg-white text-slate-900" />
                   </div>
                 </>
               )}
 
               {(scaffold || parseFloat(dimH) > 3) && (
                 <div>
-                  <label className="block text-[10px] text-slate-500 mb-1">Échafaudage (forfait)</label>
-                  <input
-                    type="number"
-                    value={prices.scaffoldFixed}
-                    onChange={(e) => updatePrice("scaffoldFixed", e.target.value)}
-                    className="w-full p-1.5 border rounded text-sm bg-white text-slate-900"
-                  />
+                  <label className="block text-[10px] text-slate-500 mb-1">{t("facade.prices.scaffold", { defaultValue: "Échafaudage (forfait)" })}</label>
+                  <input type="number" value={prices.scaffoldFixed} onChange={(e) => updatePrice("scaffoldFixed", e.target.value)} className="w-full p-1.5 border rounded text-sm bg-white text-slate-900" />
                 </div>
               )}
             </div>
@@ -1123,22 +1076,12 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
             {proMode && (
               <div className="mt-4 pt-3 border-t border-slate-100 grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[10px] text-blue-600 font-bold mb-1">MO façade (€/m²)</label>
-                  <input
-                    type="number"
-                    value={prices.laborM2}
-                    onChange={(e) => updatePrice("laborM2", e.target.value)}
-                    className="w-full p-1.5 border border-blue-200 rounded text-sm bg-white text-slate-900"
-                  />
+                  <label className="block text-[10px] text-blue-600 font-bold mb-1">{t("facade.prices.labor_m2", { defaultValue: "MO façade (€/m²)" })}</label>
+                  <input type="number" value={prices.laborM2} onChange={(e) => updatePrice("laborM2", e.target.value)} className="w-full p-1.5 border border-blue-200 rounded text-sm bg-white text-slate-900" />
                 </div>
                 <div>
-                  <label className="block text-[10px] text-blue-600 font-bold mb-1">MO échafaudage (€/m²)</label>
-                  <input
-                    type="number"
-                    value={prices.laborScaffold}
-                    onChange={(e) => updatePrice("laborScaffold", e.target.value)}
-                    className="w-full p-1.5 border border-blue-200 rounded text-sm bg-white text-slate-900"
-                  />
+                  <label className="block text-[10px] text-blue-600 font-bold mb-1">{t("facade.prices.labor_scaffold", { defaultValue: "MO échafaudage (€/m²)" })}</label>
+                  <input type="number" value={prices.laborScaffold} onChange={(e) => updatePrice("laborScaffold", e.target.value)} className="w-full p-1.5 border border-blue-200 rounded text-sm bg-white text-slate-900" />
                 </div>
               </div>
             )}
@@ -1156,10 +1099,10 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
 
           <div className="flex gap-3 pt-2">
             <button type="button" onClick={() => setStep(4)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
-              Retour
+              {t("common.back", { defaultValue: "Retour" })}
             </button>
             <button disabled className="flex-1 py-3 bg-emerald-100 text-emerald-700 rounded-xl font-bold flex justify-center items-center">
-              <Check size={18} className="mr-2" /> Calculé
+              <Check size={18} className="mr-2" /> {t("struct.common.calculated", { defaultValue: "Calculé" })}
             </button>
           </div>
         </div>
