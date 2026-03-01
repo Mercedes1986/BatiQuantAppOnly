@@ -1,3 +1,4 @@
+// src/App.tsx
 import React, { useEffect, useMemo, useState, Suspense } from "react";
 import {
   BrowserRouter,
@@ -40,13 +41,12 @@ import type { HouseProject } from "@/types";
 
 import { ArrowLeft, Save, Loader2, AlertTriangle } from "lucide-react";
 
-// --- helper: garde le typage des props pour React.lazy ---
+// --- helper: keep prop typing for React.lazy ---
 const lazyNamed = <T extends React.ComponentType<any>>(factory: () => Promise<{ default: T }>) =>
   React.lazy(factory);
 
 // -------------------------
-// ErrorBoundary anti "page blanche"
-// (class => utilise i18next.t directement)
+// ErrorBoundary (class => uses i18next.t directly)
 // -------------------------
 class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean }> {
   state = { hasError: false };
@@ -64,10 +64,16 @@ class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { has
       return (
         <div className="min-h-screen flex items-center justify-center bg-slate-50 p-6">
           <div className="max-w-xl w-full bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-            <h1 className="text-xl font-extrabold text-slate-900">{i18next.t("errors.generic_title")}</h1>
-            <p className="mt-2 text-slate-600">{i18next.t("errors.generic_hint")}</p>
+            <h1 className="text-xl font-extrabold text-slate-900">
+              {i18next.t("errors.generic_title", { defaultValue: "Something went wrong" })}
+            </h1>
+            <p className="mt-2 text-slate-600">
+              {i18next.t("errors.generic_hint", {
+                defaultValue: "Please refresh the page or go back to the home screen.",
+              })}
+            </p>
             <Link to="/" className="inline-flex mt-4 px-4 py-2 rounded-lg bg-blue-600 text-white font-bold">
-              {i18next.t("common.back_home")}
+              {i18next.t("common.back_home", { defaultValue: "Back to home" })}
             </Link>
           </div>
         </div>
@@ -136,7 +142,7 @@ const PageLoader: React.FC = () => {
   return (
     <div className="flex flex-col items-center justify-center h-64 text-slate-400">
       <Loader2 size={32} className="animate-spin mb-2" />
-      <span className="text-sm">{t("common.loading")}</span>
+      <span className="text-sm">{t("common.loading", { defaultValue: "Loading…" })}</span>
     </div>
   );
 };
@@ -204,6 +210,8 @@ const ProjectCalculatorWrapper: React.FC = () => {
     else navigate("/app/house");
   };
 
+  const normalize = (s: unknown) => String(s ?? "").trim().toLowerCase();
+
   const handleSave = () => {
     if (!project || !result || !stepId) return;
 
@@ -226,11 +234,41 @@ const ProjectCalculatorWrapper: React.FC = () => {
       ConstructionStepId.WALLS,
     ];
 
+    // ✅ avoid depending on translated labels only (supports key if present + FR/EN matching)
     if (structuralSteps.includes(stepId) && Array.isArray(result.details)) {
+      const areaNeedles = [
+        "area",
+        "surface",
+        "m²",
+        normalize(t("struct.common.surface", { defaultValue: "Area" })),
+      ];
+      const perimNeedles = [
+        "perimeter",
+        "périmètre",
+        "perimetre",
+        normalize(t("joinery.stats.perimeter", { defaultValue: "Total perimeter" })),
+      ];
+
+      const isMatch = (label: unknown, needles: string[]) => {
+        const L = normalize(label);
+        return needles.some((n) => n && L.includes(normalize(n)));
+      };
+
       const surfaceDetail = result.details.find(
-        (d: any) => String(d.label).toLowerCase().includes("surface") || String(d.label).toLowerCase().includes("m²")
+        (d: any) =>
+          d?.key === "area" ||
+          d?.id === "area" ||
+          isMatch(d?.label, areaNeedles) ||
+          isMatch(d?.unit, ["m²", "sqm"])
       );
-      const perimDetail = result.details.find((d: any) => String(d.label).toLowerCase().includes("périmètre"));
+
+      const perimDetail = result.details.find(
+        (d: any) =>
+          d?.key === "perimeter" ||
+          d?.id === "perimeter" ||
+          isMatch(d?.label, perimNeedles) ||
+          isMatch(d?.unit, ["m"])
+      );
 
       if (surfaceDetail?.value) {
         const val = parseFloat(surfaceDetail.value);
@@ -312,11 +350,11 @@ const ProjectCalculatorWrapper: React.FC = () => {
       case CalculatorType.STAIRS:
         return <StairCalculator {...props} />;
       default:
-        return <div>{t("common.unknown")}</div>;
+        return <div>{t("common.unknown", { defaultValue: "Unknown" })}</div>;
     }
   };
 
-  // ✅ Si calc inconnu => retour propre
+  // ✅ If calc unknown => clean redirect
   useEffect(() => {
     if (searchParams.get("calc") && !calcType) {
       navigate("/app/calculator", { replace: true });
@@ -330,10 +368,10 @@ const ProjectCalculatorWrapper: React.FC = () => {
       <div className="bg-white text-slate-800 p-4 flex justify-between items-center shadow-sm border-b border-slate-200">
         <button onClick={handleBack} className="flex items-center text-sm font-medium text-slate-500 hover:text-blue-600">
           <ArrowLeft size={18} className="mr-1" />
-          {t("common.back")}
+          {t("common.back", { defaultValue: "Back" })}
         </button>
 
-        <h1 className="font-bold text-slate-900">{project?.name || t("calculator.title_fallback")}</h1>
+        <h1 className="font-bold text-slate-900">{project?.name || t("calculator.title_fallback", { defaultValue: "Calculator" })}</h1>
 
         <button
           onClick={handleSave}
@@ -344,7 +382,7 @@ const ProjectCalculatorWrapper: React.FC = () => {
           ].join(" ")}
         >
           <Save size={16} className="mr-1" />
-          {t("common.save")}
+          {t("common.save", { defaultValue: "Save" })}
         </button>
       </div>
 
@@ -357,7 +395,7 @@ const ProjectCalculatorWrapper: React.FC = () => {
           <div className="mt-4 space-y-4 animate-in slide-in-from-bottom-2">
             <div className="bg-white p-6 rounded-2xl shadow-md border-l-4 border-blue-600">
               <h2 className="text-sm uppercase tracking-wider text-slate-500 mb-1">
-                {t("calculator.result_estimated")}
+                {t("calculator.result_estimated", { defaultValue: "Estimated result" })}
               </h2>
               <p className="text-3xl font-bold text-slate-900 mb-4">{result.summary}</p>
 
@@ -377,7 +415,7 @@ const ProjectCalculatorWrapper: React.FC = () => {
                 <div className="mt-4 bg-red-50 border border-red-200 p-3 rounded-lg text-sm text-red-700">
                   <div className="flex items-center mb-1 font-extrabold">
                     <AlertTriangle size={16} className="mr-2" />
-                    {t("common.attention")}
+                    {t("common.attention", { defaultValue: "Attention" })}
                   </div>
                   <ul className="list-disc pl-4 space-y-1">
                     {result.warnings.map((w: string, i: number) => (
@@ -390,7 +428,9 @@ const ProjectCalculatorWrapper: React.FC = () => {
 
             <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
               <div className="flex justify-between items-center mb-4">
-                <h3 className="font-extrabold text-slate-800">{t("calculator.materials_estimated")}</h3>
+                <h3 className="font-extrabold text-slate-800">
+                  {t("calculator.materials_estimated", { defaultValue: "Estimated materials" })}
+                </h3>
                 <span className="text-emerald-600 font-extrabold text-lg">
                   ~ {euro.format(Number(result.totalCost || 0))}
                 </span>
@@ -407,9 +447,7 @@ const ProjectCalculatorWrapper: React.FC = () => {
                         </span>
                       </div>
                       {m.details && (
-                        <p className="text-xs text-slate-500 mt-1 italic pl-2 border-l-2 border-slate-200">
-                          {m.details}
-                        </p>
+                        <p className="text-xs text-slate-500 mt-1 italic pl-2 border-l-2 border-slate-200">{m.details}</p>
                       )}
                     </li>
                   ))}
@@ -417,13 +455,15 @@ const ProjectCalculatorWrapper: React.FC = () => {
             </div>
 
             <div className="p-4 bg-blue-50 rounded-xl border border-blue-100 flex justify-between items-center">
-              <span className="text-sm text-blue-800">{t("calculator.click_to_validate_step")}</span>
+              <span className="text-sm text-blue-800">
+                {t("calculator.click_to_validate_step", { defaultValue: "Click to validate this step" })}
+              </span>
               <button
                 onClick={handleSave}
                 className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg font-extrabold text-sm shadow-md hover:bg-blue-700 transition-colors"
               >
                 <Save size={16} className="mr-2" />
-                {t("calculator.save_result")}
+                {t("calculator.save_result", { defaultValue: "Save result" })}
               </button>
             </div>
           </div>
@@ -442,16 +482,14 @@ const AppLayout = () => {
   const currentTab = location.pathname.startsWith("/app/menu")
     ? "menu"
     : location.pathname.includes("settings")
-    ? "settings"
-    : location.pathname.includes("house") ||
-      location.pathname.includes("quotes") ||
-      location.pathname.includes("invoices")
-    ? "house"
-    : location.pathname.includes("projects")
-    ? "projects"
-    : location.pathname.includes("materials")
-    ? "materials"
-    : "home";
+      ? "settings"
+      : location.pathname.includes("house") || location.pathname.includes("quotes") || location.pathname.includes("invoices")
+        ? "house"
+        : location.pathname.includes("projects")
+          ? "projects"
+          : location.pathname.includes("materials")
+            ? "materials"
+            : "home";
 
   const handleNavChange = (tab: string) => {
     setCurrentCalc(null);
@@ -464,7 +502,7 @@ const AppLayout = () => {
     if (tab === "settings") navigate("/app/settings");
   };
 
-  // ✅ /app?calc=... -> ouvre le calculateur (sans crash si inconnu)
+  // ✅ /app?calc=... -> opens calculator (safe)
   useEffect(() => {
     if (location.pathname !== "/app") return;
     const sp = new URLSearchParams(location.search);
@@ -506,10 +544,14 @@ const NotFoundPage: React.FC = () => {
   const { t } = useTranslation();
   return (
     <div className="max-w-3xl mx-auto px-4 py-16">
-      <h1 className="text-3xl font-extrabold text-slate-900">{t("notfound.title")}</h1>
-      <p className="mt-3 text-slate-600">{t("notfound.description")}</p>
+      <h1 className="text-3xl font-extrabold text-slate-900">
+        {t("notfound.title", { defaultValue: "Page not found" })}
+      </h1>
+      <p className="mt-3 text-slate-600">
+        {t("notfound.description", { defaultValue: "This page doesn’t exist." })}
+      </p>
       <Link to="/app" className="inline-flex mt-6 px-4 py-2 rounded-lg bg-blue-600 text-white font-bold">
-        {t("notfound.go_to_app")}
+        {t("notfound.go_to_app", { defaultValue: "Go to app" })}
       </Link>
     </div>
   );
@@ -525,7 +567,7 @@ const App: React.FC = () => {
           {/* Root -> Application */}
           <Route path="/" element={<Navigate to="/app" replace />} />
 
-          {/* App (zone appli) */}
+          {/* App zone */}
           <Route path="/app" element={<AppLayout />}>
             <Route index element={<DashboardOutlet />} />
             <Route path="menu" element={<AppMenuPage />} />
@@ -553,7 +595,7 @@ const App: React.FC = () => {
   );
 };
 
-// ✅ DashboardOutlet : lit ?calc= et ouvre le calculateur via context
+// ✅ DashboardOutlet: reads ?calc= and opens calculator via context
 const DashboardOutlet = () => {
   const { setCurrentCalc } = useOutletContext<{ setCurrentCalc: (t: CalculatorType) => void }>();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -564,7 +606,7 @@ const DashboardOutlet = () => {
 
     setCurrentCalc(resolved);
 
-    // nettoyer l’URL après ouverture
+    // clean URL after opening
     const next = new URLSearchParams(searchParams);
     next.delete("calc");
     setSearchParams(next, { replace: true });

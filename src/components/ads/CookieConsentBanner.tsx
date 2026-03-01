@@ -1,3 +1,4 @@
+// src/components/ads/CookieConsentBanner.tsx
 import React, { useEffect, useRef, useState } from "react";
 import { getConsent, setConsentChoice, openConsent } from "../../services/consentService";
 import { ShieldCheck, SlidersHorizontal } from "lucide-react";
@@ -17,7 +18,7 @@ export const CookieConsentBanner: React.FC = () => {
       if (c.choice === "unknown") setIsVisible(true);
     };
 
-    timerRef.current = window.setTimeout(() => openIfNeeded(), 800);
+    timerRef.current = window.setTimeout(openIfNeeded, 800);
 
     const onOpen = () => setIsVisible(true);
     window.addEventListener("consent-open", onOpen as EventListener);
@@ -39,11 +40,13 @@ export const CookieConsentBanner: React.FC = () => {
   };
 
   const handleCustomize = () => {
-    // ✅ app-only : on ouvre Settings
+    // ✅ app-only : open Settings
     setIsVisible(false);
     try {
-      openConsent(); // notifie l’app qu’on veut afficher un écran de préférences
-    } catch {}
+      openConsent();
+    } catch {
+      // ignore
+    }
     navigate("/app/settings");
   };
 
@@ -56,14 +59,14 @@ export const CookieConsentBanner: React.FC = () => {
           <div className="flex items-center mb-2">
             <ShieldCheck className="text-blue-600 mr-2" size={20} />
             <h3 className="font-extrabold text-slate-800">
-              {t("consent.title", { defaultValue: "Votre vie privée" })}
+              {t("consent.title", { defaultValue: "Your privacy" })}
             </h3>
           </div>
 
           <p className="text-sm text-slate-600 leading-snug">
             {t("consent.text", {
               defaultValue:
-                "Nous utilisons des technologies publicitaires. Vous pouvez accepter la personnalisation (meilleure pertinence) ou continuer avec des annonces non personnalisées.",
+                "We use advertising technologies. You can accept personalization (more relevant ads) or continue with non-personalized ads.",
             })}
           </p>
         </div>
@@ -75,7 +78,7 @@ export const CookieConsentBanner: React.FC = () => {
             type="button"
           >
             <SlidersHorizontal size={16} className="mr-2" />
-            {t("consent.customize", { defaultValue: "Personnaliser" })}
+            {t("consent.customize", { defaultValue: "Customize" })}
           </button>
 
           <button
@@ -83,7 +86,7 @@ export const CookieConsentBanner: React.FC = () => {
             className="px-4 py-2.5 text-sm font-extrabold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors"
             type="button"
           >
-            {t("consent.refuse", { defaultValue: "Refuser" })}
+            {t("consent.refuse", { defaultValue: "Decline" })}
           </button>
 
           <button
@@ -91,7 +94,7 @@ export const CookieConsentBanner: React.FC = () => {
             className="px-6 py-2.5 text-sm font-extrabold text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow-md transition-colors"
             type="button"
           >
-            {t("consent.accept", { defaultValue: "Accepter" })}
+            {t("consent.accept", { defaultValue: "Accept" })}
           </button>
         </div>
       </div>

@@ -39,11 +39,10 @@ import {
 
 /**
  * i18n helper:
- * - fallback FR immédiat (defaultValue)
- * - si tu ajoutes des clés dans fr.json / en.json => traduction auto
+ * - defaultValue MUST be EN to avoid French showing in English when keys are missing
+ * - adding keys to fr.json / en.json will override these defaults
  */
-const tr = (key: string, fallback: string) =>
-  i18next.t(key, { defaultValue: fallback });
+const tr = (key: string, fallbackEn: string) => i18next.t(key, { defaultValue: fallbackEn });
 
 /* -------------------------------------------------------
    CALCULATORS
@@ -52,165 +51,165 @@ const tr = (key: string, fallback: string) =>
 export const CALCULATORS: CalculatorConfig[] = [
   {
     id: CalculatorType.GROUNDWORK,
-    name: tr("calculators.groundwork.name", "Terrassement"),
+    name: tr("calculators.groundwork.name", "Groundworks"),
     icon: "Mountain",
     color: "bg-stone-600",
-    description: tr("calculators.groundwork.desc", "Décaissement, tranchées, remblais"),
+    description: tr("calculators.groundwork.desc", "Excavation, trenches, backfill"),
     imageSrc: "/images/calculators/terrassement.png",
-    imageAlt: tr("calculators.groundwork.alt", "Terrassement : décaissement, tranchées et remblais"),
+    imageAlt: tr("calculators.groundwork.alt", "Groundworks: excavation, trenches and backfill"),
   },
   {
     id: CalculatorType.FOUNDATIONS,
-    name: tr("calculators.foundations.name", "Fondations"),
+    name: tr("calculators.foundations.name", "Foundations"),
     icon: "Warehouse",
     color: "bg-stone-700",
-    description: tr("calculators.foundations.desc", "Semelles, radier, béton, ferraillage"),
+    description: tr("calculators.foundations.desc", "Footings, raft, concrete, rebar"),
     imageSrc: "/images/calculators/fondations.png",
-    imageAlt: tr("calculators.foundations.alt", "Fondations : semelles, radier, béton et ferraillage"),
+    imageAlt: tr("calculators.foundations.alt", "Foundations: footings, raft, concrete and rebar"),
   },
   {
     id: CalculatorType.SUBSTRUCTURE,
-    name: tr("calculators.substructure.name", "Soubassement"),
+    name: tr("calculators.substructure.name", "Substructure"),
     icon: "Component",
     color: "bg-stone-600",
-    description: tr("calculators.substructure.desc", "Vide sanitaire, murs enterrés, drainage"),
+    description: tr("calculators.substructure.desc", "Crawl space, retaining walls, drainage"),
     imageSrc: "/images/calculators/soubassement.png",
-    imageAlt: tr("calculators.substructure.alt", "Soubassement : vide sanitaire, murs enterrés, drainage"),
+    imageAlt: tr("calculators.substructure.alt", "Substructure: crawl space, retaining walls, drainage"),
   },
   {
     id: CalculatorType.CONCRETE,
-    name: tr("calculators.concrete.name", "Béton / Dalle"),
+    name: tr("calculators.concrete.name", "Concrete / Slab"),
     icon: "Layers",
     color: "bg-gray-500",
-    description: tr("calculators.concrete.desc", "Dalles, planchers, dosages"),
+    description: tr("calculators.concrete.desc", "Slabs, floors, mix ratios"),
     imageSrc: "/images/calculators/beton-dalle.png",
-    imageAlt: tr("calculators.concrete.alt", "Béton et dalle : dalles, planchers et dosages"),
+    imageAlt: tr("calculators.concrete.alt", "Concrete and slab: slabs, floors and mix ratios"),
   },
   {
     id: CalculatorType.WALLS,
-    name: tr("calculators.walls.name", "Murs"),
+    name: tr("calculators.walls.name", "Walls"),
     icon: "BrickWall",
     color: "bg-stone-500",
-    description: tr("calculators.walls.desc", "Parpaings, briques, linteaux"),
+    description: tr("calculators.walls.desc", "Blocks, bricks, lintels"),
     imageSrc: "/images/calculators/murs.png",
-    imageAlt: tr("calculators.walls.alt", "Murs : parpaings, briques et linteaux"),
+    imageAlt: tr("calculators.walls.alt", "Walls: blocks, bricks and lintels"),
   },
   {
     id: CalculatorType.STAIRS,
-    name: tr("calculators.stairs.name", "Escalier Béton"),
+    name: tr("calculators.stairs.name", "Concrete stairs"),
     icon: "TrendingUp",
     color: "bg-stone-400",
-    description: tr("calculators.stairs.desc", "Marches, paillasse, coffrage"),
+    description: tr("calculators.stairs.desc", "Steps, slab, formwork"),
     imageSrc: "/images/calculators/escalier-beton.png",
-    imageAlt: tr("calculators.stairs.alt", "Escalier béton : marches, paillasse et coffrage"),
+    imageAlt: tr("calculators.stairs.alt", "Concrete stairs: steps, slab and formwork"),
   },
   {
     id: CalculatorType.ROOF,
-    name: tr("calculators.roof.name", "Toiture"),
+    name: tr("calculators.roof.name", "Roof"),
     icon: "Home",
     color: "bg-orange-600",
-    description: tr("calculators.roof.desc", "Charpente, tuiles, gouttières"),
+    description: tr("calculators.roof.desc", "Framing, tiles, gutters"),
     imageSrc: "/images/calculators/toiture.png",
-    imageAlt: tr("calculators.roof.alt", "Toiture : charpente, tuiles et gouttières"),
+    imageAlt: tr("calculators.roof.alt", "Roof: framing, tiles and gutters"),
   },
   {
     id: CalculatorType.JOINERY,
-    name: tr("calculators.joinery.name", "Menuiseries"),
+    name: tr("calculators.joinery.name", "Joinery"),
     icon: "BoxSelect",
     color: "bg-sky-600",
-    description: tr("calculators.joinery.desc", "Fenêtres, portes, volets"),
+    description: tr("calculators.joinery.desc", "Windows, doors, shutters"),
     imageSrc: "/images/calculators/menuiseries.png",
-    imageAlt: tr("calculators.joinery.alt", "Menuiseries : fenêtres, portes et volets"),
+    imageAlt: tr("calculators.joinery.alt", "Joinery: windows, doors and shutters"),
   },
   {
     id: CalculatorType.PLACO,
-    name: tr("calculators.placo.name", "Placo / Isolation"),
+    name: tr("calculators.placo.name", "Drywall / Insulation"),
     icon: "Square",
     color: "bg-indigo-500",
-    description: tr("calculators.placo.desc", "Cloisons, doublages, plafonds"),
+    description: tr("calculators.placo.desc", "Partitions, linings, ceilings"),
     imageSrc: "/images/calculators/placo-isolation.png",
-    imageAlt: tr("calculators.placo.alt", "Placo et isolation : cloisons, doublages et plafonds"),
+    imageAlt: tr("calculators.placo.alt", "Drywall and insulation: partitions, linings and ceilings"),
   },
   {
     id: CalculatorType.ELECTRICITY,
-    name: tr("calculators.electricity.name", "Électricité"),
+    name: tr("calculators.electricity.name", "Electrical"),
     icon: "Zap",
     color: "bg-yellow-500",
-    description: tr("calculators.electricity.desc", "Câbles, gaines, appareillage"),
+    description: tr("calculators.electricity.desc", "Cables, conduits, devices"),
     imageSrc: "/images/calculators/electricite.png",
-    imageAlt: tr("calculators.electricity.alt", "Électricité : câbles, gaines et appareillage"),
+    imageAlt: tr("calculators.electricity.alt", "Electrical: cables, conduits and devices"),
   },
   {
     id: CalculatorType.PLUMBING,
-    name: tr("calculators.plumbing.name", "Plomberie"),
+    name: tr("calculators.plumbing.name", "Plumbing"),
     icon: "Droplets",
     color: "bg-cyan-500",
-    description: tr("calculators.plumbing.desc", "PER, évacuations, raccords"),
+    description: tr("calculators.plumbing.desc", "Pipes, drains, fittings"),
     imageSrc: "/images/calculators/plomberie.png",
-    imageAlt: tr("calculators.plumbing.alt", "Plomberie : PER, évacuations et raccords"),
+    imageAlt: tr("calculators.plumbing.alt", "Plumbing: pipes, drains and fittings"),
   },
   {
     id: CalculatorType.HVAC,
-    name: tr("calculators.hvac.name", "Chauffage / VMC"),
+    name: tr("calculators.hvac.name", "Heating / Ventilation"),
     icon: "Thermometer",
     color: "bg-red-500",
-    description: tr("calculators.hvac.desc", "VMC, radiateurs, PAC"),
+    description: tr("calculators.hvac.desc", "Ventilation, radiators, heat pumps"),
     imageSrc: "/images/calculators/chauffage-vmc.png",
-    imageAlt: tr("calculators.hvac.alt", "Chauffage et VMC : radiateurs, PAC et ventilation"),
+    imageAlt: tr("calculators.hvac.alt", "Heating and ventilation: radiators, heat pumps and ventilation"),
   },
   {
     id: CalculatorType.SCREED,
-    name: tr("calculators.screed.name", "Chapes"),
+    name: tr("calculators.screed.name", "Screeds"),
     icon: "Layers",
     color: "bg-stone-400",
-    description: tr("calculators.screed.desc", "Chape liquide, traditionnelle"),
+    description: tr("calculators.screed.desc", "Liquid screed, traditional screed"),
     imageSrc: "/images/calculators/chapes.png",
-    imageAlt: tr("calculators.screed.alt", "Chapes : chape liquide et traditionnelle"),
+    imageAlt: tr("calculators.screed.alt", "Screeds: liquid screed and traditional screed"),
   },
   {
     id: CalculatorType.TILES,
-    name: tr("calculators.tiles.name", "Carrelage"),
+    name: tr("calculators.tiles.name", "Tiling"),
     icon: "Grid3X3",
     color: "bg-teal-500",
-    description: tr("calculators.tiles.desc", "Sol, faïence, colle"),
+    description: tr("calculators.tiles.desc", "Floor tiles, wall tiles, adhesive"),
     imageSrc: "/images/calculators/carrelage.png",
-    imageAlt: tr("calculators.tiles.alt", "Carrelage : sol, faïence et colle"),
+    imageAlt: tr("calculators.tiles.alt", "Tiling: floor tiles, wall tiles and adhesive"),
   },
   {
     id: CalculatorType.RAGREAGE,
-    name: tr("calculators.leveling.name", "Ragréage"),
+    name: tr("calculators.leveling.name", "Leveling"),
     icon: "Layers",
     color: "bg-amber-600",
-    description: tr("calculators.leveling.desc", "Mise à niveau sols (Rénovation)"),
+    description: tr("calculators.leveling.desc", "Floor leveling (renovation)"),
     imageSrc: "/images/calculators/ragreage.png",
-    imageAlt: tr("calculators.leveling.alt", "Ragréage : mise à niveau des sols en rénovation"),
+    imageAlt: tr("calculators.leveling.alt", "Leveling: floor leveling in renovation"),
   },
   {
     id: CalculatorType.PAINT,
-    name: tr("calculators.paint.name", "Peinture"),
+    name: tr("calculators.paint.name", "Painting"),
     icon: "PaintBucket",
     color: "bg-blue-500",
-    description: tr("calculators.paint.desc", "Murs, plafonds"),
+    description: tr("calculators.paint.desc", "Walls, ceilings"),
     imageSrc: "/images/calculators/peinture.png",
-    imageAlt: tr("calculators.paint.alt", "Peinture : murs et plafonds"),
+    imageAlt: tr("calculators.paint.alt", "Painting: walls and ceilings"),
   },
   {
     id: CalculatorType.FACADE,
-    name: tr("calculators.facade.name", "Façade"),
+    name: tr("calculators.facade.name", "Facade"),
     icon: "PaintRoller",
     color: "bg-orange-300",
-    description: tr("calculators.facade.desc", "Enduit, bardage"),
+    description: tr("calculators.facade.desc", "Render, cladding"),
     imageSrc: "/images/calculators/facade.png",
-    imageAlt: tr("calculators.facade.alt", "Façade : enduit et bardage"),
+    imageAlt: tr("calculators.facade.alt", "Facade: render and cladding"),
   },
   {
     id: CalculatorType.EXTERIOR,
-    name: tr("calculators.exterior.name", "Extérieurs"),
+    name: tr("calculators.exterior.name", "Exteriors"),
     icon: "Fence",
     color: "bg-green-600",
-    description: tr("calculators.exterior.desc", "Terrasse, clôture, allées"),
+    description: tr("calculators.exterior.desc", "Terrace, fencing, paths"),
     imageSrc: "/images/calculators/exterieurs.png",
-    imageAlt: tr("calculators.exterior.alt", "Extérieurs : terrasse, clôture et allées"),
+    imageAlt: tr("calculators.exterior.alt", "Exteriors: terrace, fencing and paths"),
   },
 ];
 
@@ -221,45 +220,46 @@ export const CALCULATORS: CalculatorConfig[] = [
 export const CONSTRUCTION_STEPS = [
   {
     id: "group_go",
-    label: tr("steps.groups.go", "Gros Œuvre"),
+    label: tr("steps.groups.go", "Structural work"),
     steps: [
-      { id: ConstructionStepId.GROUNDWORK, label: tr("steps.go.groundwork", "Terrassement"), icon: Mountain, calc: CalculatorType.GROUNDWORK },
-      { id: ConstructionStepId.FOUNDATIONS, label: tr("steps.go.foundations", "Fondations"), icon: Warehouse, calc: CalculatorType.FOUNDATIONS },
-      { id: ConstructionStepId.BASEMENT, label: tr("steps.go.substructure", "Soubassement"), icon: Component, calc: CalculatorType.SUBSTRUCTURE },
-      { id: ConstructionStepId.SLAB_GROUND, label: tr("steps.go.slab", "Dalle RDC"), icon: Layers, calc: CalculatorType.CONCRETE },
-      { id: ConstructionStepId.WALLS, label: tr("steps.go.walls", "Élévation des murs"), icon: BrickWall, calc: CalculatorType.WALLS },
-      { id: ConstructionStepId.STAIRS, label: tr("steps.go.stairs", "Escalier Béton"), icon: TrendingUp, calc: CalculatorType.STAIRS },
-      { id: ConstructionStepId.ROOFING, label: tr("steps.go.roofing", "Toiture / Charpente"), icon: Home, calc: CalculatorType.ROOF },
-      { id: ConstructionStepId.WINDOWS, label: tr("steps.go.windows", "Menuiseries Ext."), icon: BoxSelect, calc: CalculatorType.JOINERY },
+      { id: ConstructionStepId.GROUNDWORK, label: tr("steps.go.groundwork", "Groundworks"), icon: Mountain, calc: CalculatorType.GROUNDWORK },
+      { id: ConstructionStepId.FOUNDATIONS, label: tr("steps.go.foundations", "Foundations"), icon: Warehouse, calc: CalculatorType.FOUNDATIONS },
+      { id: ConstructionStepId.BASEMENT, label: tr("steps.go.substructure", "Substructure"), icon: Component, calc: CalculatorType.SUBSTRUCTURE },
+      { id: ConstructionStepId.SLAB_GROUND, label: tr("steps.go.slab", "Ground floor slab"), icon: Layers, calc: CalculatorType.CONCRETE },
+      { id: ConstructionStepId.WALLS, label: tr("steps.go.walls", "Wall construction"), icon: BrickWall, calc: CalculatorType.WALLS },
+      { id: ConstructionStepId.STAIRS, label: tr("steps.go.stairs", "Concrete stairs"), icon: TrendingUp, calc: CalculatorType.STAIRS },
+      { id: ConstructionStepId.ROOFING, label: tr("steps.go.roofing", "Roof / framing"), icon: Home, calc: CalculatorType.ROOF },
+      { id: ConstructionStepId.WINDOWS, label: tr("steps.go.windows", "External joinery"), icon: BoxSelect, calc: CalculatorType.JOINERY },
     ],
   },
   {
     id: "group_so",
-    label: tr("steps.groups.so", "Second Œuvre"),
+    label: tr("steps.groups.so", "Second fix"),
     steps: [
-      { id: ConstructionStepId.LINING, label: tr("steps.so.lining", "Doublage (Isolation)"), icon: PanelTop, calc: CalculatorType.PLACO },
-      { id: ConstructionStepId.PARTITIONS, label: tr("steps.so.partitions", "Cloisons"), icon: ArrowRightLeft, calc: CalculatorType.PLACO },
-      { id: ConstructionStepId.CEILINGS, label: tr("steps.so.ceilings", "Plafonds"), icon: Spline, calc: CalculatorType.PLACO },
-      { id: ConstructionStepId.ELECTRICITY, label: tr("steps.so.electricity", "Électricité"), icon: Zap, calc: CalculatorType.ELECTRICITY },
-      { id: ConstructionStepId.PLUMBING, label: tr("steps.so.plumbing", "Plomberie"), icon: Droplets, calc: CalculatorType.PLUMBING },
-      { id: ConstructionStepId.HVAC, label: tr("steps.so.hvac", "Chauffage / VMC"), icon: Thermometer, calc: CalculatorType.HVAC },
-      { id: ConstructionStepId.SCREED, label: tr("steps.so.screed", "Chapes / Ravoirage"), icon: Layers, calc: CalculatorType.SCREED },
+      { id: ConstructionStepId.LINING, label: tr("steps.so.lining", "Wall lining (insulation)"), icon: PanelTop, calc: CalculatorType.PLACO },
+      { id: ConstructionStepId.PARTITIONS, label: tr("steps.so.partitions", "Partitions"), icon: ArrowRightLeft, calc: CalculatorType.PLACO },
+      { id: ConstructionStepId.CEILINGS, label: tr("steps.so.ceilings", "Ceilings"), icon: Spline, calc: CalculatorType.PLACO },
+      { id: ConstructionStepId.ELECTRICITY, label: tr("steps.so.electricity", "Electrical"), icon: Zap, calc: CalculatorType.ELECTRICITY },
+      { id: ConstructionStepId.PLUMBING, label: tr("steps.so.plumbing", "Plumbing"), icon: Droplets, calc: CalculatorType.PLUMBING },
+      { id: ConstructionStepId.HVAC, label: tr("steps.so.hvac", "Heating / ventilation"), icon: Thermometer, calc: CalculatorType.HVAC },
+      { id: ConstructionStepId.SCREED, label: tr("steps.so.screed", "Screed / levelling"), icon: Layers, calc: CalculatorType.SCREED },
     ],
   },
   {
     id: "group_fin",
-    label: tr("steps.groups.fin", "Finitions"),
+    label: tr("steps.groups.fin", "Finishes"),
     steps: [
-      { id: ConstructionStepId.FLOORING, label: tr("steps.fin.flooring", "Sols (Carrelage/Parquet)"), icon: Grid3X3, calc: CalculatorType.TILES },
-      { id: ConstructionStepId.PAINTING, label: tr("steps.fin.painting", "Peinture"), icon: PaintBucket, calc: CalculatorType.PAINT },
-      { id: ConstructionStepId.FACADE, label: tr("steps.fin.facade", "Façade"), icon: PaintRoller, calc: CalculatorType.FACADE },
-      { id: ConstructionStepId.EXTERIOR, label: tr("steps.fin.exterior", "Extérieurs"), icon: Fence, calc: CalculatorType.EXTERIOR },
+      { id: ConstructionStepId.FLOORING, label: tr("steps.fin.flooring", "Flooring (tiles/wood)"), icon: Grid3X3, calc: CalculatorType.TILES },
+      { id: ConstructionStepId.PAINTING, label: tr("steps.fin.painting", "Painting"), icon: PaintBucket, calc: CalculatorType.PAINT },
+      { id: ConstructionStepId.FACADE, label: tr("steps.fin.facade", "Facade"), icon: PaintRoller, calc: CalculatorType.FACADE },
+      { id: ConstructionStepId.EXTERIOR, label: tr("steps.fin.exterior", "Exteriors"), icon: Fence, calc: CalculatorType.EXTERIOR },
     ],
   },
 ];
 
 /* -------------------------------------------------------
    DEFAULT PRICES
+   (NO i18n here)
 ------------------------------------------------------- */
 
 export const DEFAULT_PRICES: Record<string, number> = {
@@ -300,7 +300,7 @@ export const DEFAULT_PRICES: Record<string, number> = {
   INSULATION_M2: 8.0,
   CORNER_BEAD_3M: 6.0,
 
-  // ✅ Treillis (prix au panneau)
+  // Mesh panels (price per panel)
   MESH_PANEL_ST10: 18,
   MESH_PANEL_ST25: 28,
   MESH_PANEL_ST40: 38,
@@ -429,15 +429,15 @@ export const DEFAULT_PRICES: Record<string, number> = {
 ------------------------------------------------------- */
 
 export const MATERIAL_METADATA: Record<string, MaterialMetadata> = {
-  PAINT_LITER: { label: tr("materials.PAINT_LITER", "Peinture Murale"), category: tr("categories.paint", "Peinture"), unit: "€/L" },
-  PRIMER_LITER: { label: tr("materials.PRIMER_LITER", "Sous-couche Universelle"), category: tr("categories.paint", "Peinture"), unit: "€/L" },
+  PAINT_LITER: { label: tr("materials.PAINT_LITER", "Wall paint"), category: tr("categories.paint", "Painting"), unit: "€/L" },
+  PRIMER_LITER: { label: tr("materials.PRIMER_LITER", "Universal primer"), category: tr("categories.paint", "Painting"), unit: "€/L" },
 
-  CEMENT_BAG_35KG: { label: tr("materials.CEMENT_BAG_35KG", "Ciment (Sac 35kg)"), category: tr("categories.masonry", "Maçonnerie"), unit: "€/sac" },
-  CEMENT_BAG_25KG: { label: tr("materials.CEMENT_BAG_25KG", "Ciment (Sac 25kg)"), category: tr("categories.masonry", "Maçonnerie"), unit: "€/sac" },
+  CEMENT_BAG_35KG: { label: tr("materials.CEMENT_BAG_35KG", "Cement (35kg bag)"), category: tr("categories.masonry", "Masonry"), unit: "€/bag" },
+  CEMENT_BAG_25KG: { label: tr("materials.CEMENT_BAG_25KG", "Cement (25kg bag)"), category: tr("categories.masonry", "Masonry"), unit: "€/bag" },
 };
 
 /* -------------------------------------------------------
-   Helper: map bloc spec -> price key (SAFE)
+   Helper: map block spec -> price key (SAFE)
 ------------------------------------------------------- */
 
 export type WallFamily = "parpaing" | "brique" | "cellulaire" | "stepoc";
@@ -480,15 +480,15 @@ export function getWallUnitPriceKey(spec: WallBlockSpecLite): string {
 
 export const STATIC_TIPS: Record<string, string[]> = {
   [CalculatorType.PAINT]: [
-    tr("tips.paint.1", "Toujours appliquer une sous-couche sur un fond brut (placo, plâtre) pour bloquer l'absorption."),
-    tr("tips.paint.2", "Croisez les passes (horizontal puis vertical) pour éviter les traces."),
-    tr("tips.paint.3", "Ne peignez pas si la température est > 25°C (séchage trop rapide) ou < 10°C."),
+    tr("tips.paint.1", "Always apply a primer on bare surfaces (drywall, plaster) to reduce absorption."),
+    tr("tips.paint.2", "Cross-coat (horizontal then vertical) to avoid streaks."),
+    tr("tips.paint.3", "Avoid painting above 25°C (too fast drying) or below 10°C."),
   ],
   [CalculatorType.CONCRETE]: [
-    tr("tips.concrete.1", "Respectez le dosage en eau : trop d'eau fragilise le béton (retrait, fissures)."),
-    tr("tips.concrete.2", "Pour une dalle carrossable (voiture), visez 12-15cm d’épaisseur + treillis ST25C."),
-    tr("tips.concrete.3", "Surélevez le treillis (cales 3-4cm) pour qu'il soit au cœur du béton, pas au sol."),
-    tr("tips.concrete.4", "Prévoyez des joints de dilatation tous les 15-20m² pour éviter la casse."),
+    tr("tips.concrete.1", "Respect water dosage: too much water weakens concrete (shrinkage, cracks)."),
+    tr("tips.concrete.2", "For a driveable slab, aim for 12–15cm thickness + ST25C mesh."),
+    tr("tips.concrete.3", "Lift the mesh with spacers so it sits in the concrete, not on the ground."),
+    tr("tips.concrete.4", "Plan expansion joints every 15–20m² to prevent cracking."),
   ],
 };
 
@@ -497,30 +497,30 @@ export const STATIC_TIPS: Record<string, string[]> = {
 ------------------------------------------------------- */
 
 export const PAINT_SUBSTRATES: SubstrateDef[] = [
-  { id: "smooth", label: tr("paint.substrates.smooth", "Lisse / Ancienne peinture"), absorptionFactor: 1.0 },
-  { id: "placo", label: tr("paint.substrates.placo", "Placo (standard)"), absorptionFactor: 1.1 },
-  { id: "plaster", label: tr("paint.substrates.plaster", "Plâtre / Enduit"), absorptionFactor: 1.25 },
-  { id: "concrete", label: tr("paint.substrates.concrete", "Béton brut"), absorptionFactor: 1.15 },
-  { id: "wood", label: tr("paint.substrates.wood", "Bois"), absorptionFactor: 1.2 },
+  { id: "smooth", label: tr("paint.substrates.smooth", "Smooth / previously painted"), absorptionFactor: 1.0 },
+  { id: "placo", label: tr("paint.substrates.placo", "Drywall (standard)"), absorptionFactor: 1.1 },
+  { id: "plaster", label: tr("paint.substrates.plaster", "Plaster / skim coat"), absorptionFactor: 1.25 },
+  { id: "concrete", label: tr("paint.substrates.concrete", "Raw concrete"), absorptionFactor: 1.15 },
+  { id: "wood", label: tr("paint.substrates.wood", "Wood"), absorptionFactor: 1.2 },
 ];
 
 export const PAINT_PACKAGING: PackagingDef[] = [
-  { size: 10, unit: Unit.LITER, label: tr("packaging.paint.10l", "Pot 10L") },
-  { size: 5, unit: Unit.LITER, label: tr("packaging.paint.5l", "Pot 5L") },
-  { size: 2.5, unit: Unit.LITER, label: tr("packaging.paint.2_5l", "Pot 2.5L") },
-  { size: 1, unit: Unit.LITER, label: tr("packaging.paint.1l", "Pot 1L") },
+  { size: 10, unit: Unit.LITER, label: tr("packaging.paint.10l", "10L can") },
+  { size: 5, unit: Unit.LITER, label: tr("packaging.paint.5l", "5L can") },
+  { size: 2.5, unit: Unit.LITER, label: tr("packaging.paint.2_5l", "2.5L can") },
+  { size: 1, unit: Unit.LITER, label: tr("packaging.paint.1l", "1L can") },
 ];
 
 export const CONCRETE_PACKAGING: PackagingDef[] = [
-  { size: 25, unit: Unit.KG, label: tr("packaging.concrete.25kg", "Sac 25kg") },
-  { size: 35, unit: Unit.KG, label: tr("packaging.concrete.35kg", "Sac 35kg") },
-  { size: 1000, unit: Unit.KG, label: tr("packaging.concrete.1t", "BigBag 1T") },
+  { size: 25, unit: Unit.KG, label: tr("packaging.concrete.25kg", "25kg bag") },
+  { size: 35, unit: Unit.KG, label: tr("packaging.concrete.35kg", "35kg bag") },
+  { size: 1000, unit: Unit.KG, label: tr("packaging.concrete.1t", "1T big bag") },
 ];
 
 export const TILE_PATTERNS = [
-  { id: "straight", label: tr("tiles.patterns.straight", "Pose Droite"), waste: 7 },
-  { id: "staggered", label: tr("tiles.patterns.staggered", "Pose Décalée (1/2, 1/3)"), waste: 11 },
-  { id: "diagonal", label: tr("tiles.patterns.diagonal", "Pose Diagonale"), waste: 16 },
+  { id: "straight", label: tr("tiles.patterns.straight", "Straight lay"), waste: 7 },
+  { id: "staggered", label: tr("tiles.patterns.staggered", "Staggered lay (1/2, 1/3)"), waste: 11 },
+  { id: "diagonal", label: tr("tiles.patterns.diagonal", "Diagonal lay"), waste: 16 },
 ];
 
 export const GLUE_COMB_SPECS = [
@@ -530,89 +530,87 @@ export const GLUE_COMB_SPECS = [
 ];
 
 export const LEVELING_SUBSTRATES = [
-  { id: "concrete", label: tr("leveling.substrates.concrete", "Béton / Chape Ciment"), primerRequired: true, primerConsumption: 0.15 },
+  { id: "concrete", label: tr("leveling.substrates.concrete", "Concrete / cement screed"), primerRequired: true, primerConsumption: 0.15 },
   {
     id: "tile",
-    label: tr("leveling.substrates.tile", "Ancien Carrelage (Fermé)"),
+    label: tr("leveling.substrates.tile", "Existing tiles (non-porous)"),
     primerRequired: true,
     primerConsumption: 0.1,
-    warning: tr("leveling.warnings.tile", "Primaire d'accrochage spécifique obligatoire"),
+    warning: tr("leveling.warnings.tile", "A dedicated bonding primer is required"),
   },
   {
     id: "wood",
-    label: tr("leveling.substrates.wood", "Bois / OSB / Parquet"),
+    label: tr("leveling.substrates.wood", "Wood / OSB / parquet"),
     primerRequired: true,
     primerConsumption: 0.2,
     recommendFibre: true,
-    warning: tr("leveling.warnings.wood", "Ragréage fibré obligatoire sur bois"),
+    warning: tr("leveling.warnings.wood", "Fibre-reinforced leveling compound is required on wood"),
   },
   {
     id: "anhydrite",
-    label: tr("leveling.substrates.anhydrite", "Chape Anhydrite"),
+    label: tr("leveling.substrates.anhydrite", "Anhydrite screed"),
     primerRequired: true,
     primerConsumption: 0.15,
-    warning: tr("leveling.warnings.anhydrite", "Ponçage + Primaire spécifique obligatoire"),
+    warning: tr("leveling.warnings.anhydrite", "Sanding + specific primer required"),
   },
 ];
 
 export const LEVELING_PRODUCTS = [
-  { id: "standard", label: tr("leveling.products.standard", "Autolissant Standard (P3)"), density: 1.6, minThick: 3, maxThick: 10, priceRef: "RAGREAGE_BAG_25KG" },
-  { id: "fibre", label: tr("leveling.products.fibre", "Fibré (Rénovation/Bois)"), density: 1.7, minThick: 3, maxThick: 30, priceRef: "RAGREAGE_FIBRE_25KG" },
-  { id: "thicks", label: tr("leveling.products.thicks", "Forte Épaisseur / Rattrapage"), density: 1.8, minThick: 10, maxThick: 50, priceRef: "RAGREAGE_BAG_25KG" },
-  { id: "exterior", label: tr("leveling.products.exterior", "Extérieur"), density: 1.8, minThick: 3, maxThick: 20, priceRef: "RAGREAGE_BAG_25KG" },
+  { id: "standard", label: tr("leveling.products.standard", "Standard self-levelling (P3)"), density: 1.6, minThick: 3, maxThick: 10, priceRef: "RAGREAGE_BAG_25KG" },
+  { id: "fibre", label: tr("leveling.products.fibre", "Fibre-reinforced (renovation/wood)"), density: 1.7, minThick: 3, maxThick: 30, priceRef: "RAGREAGE_FIBRE_25KG" },
+  { id: "thicks", label: tr("leveling.products.thicks", "High-build / patching"), density: 1.8, minThick: 10, maxThick: 50, priceRef: "RAGREAGE_BAG_25KG" },
+  { id: "exterior", label: tr("leveling.products.exterior", "Exterior"), density: 1.8, minThick: 3, maxThick: 20, priceRef: "RAGREAGE_BAG_25KG" },
 ];
 
 export const PLACO_BOARD_TYPES = [
-  { id: "BA13", label: tr("placo.boards.ba13", "BA13 Standard"), width: 1.2, height: 2.5, area: 3.0, priceRef: "PLACO_PLATE_BA13" },
-  { id: "HYDRO", label: tr("placo.boards.hydro", "Hydrofuge (H1)"), width: 1.2, height: 2.5, area: 3.0, priceRef: "PLACO_PLATE_HYDRO" },
-  { id: "FIRE", label: tr("placo.boards.fire", "Feu / Phonique"), width: 1.2, height: 2.5, area: 3.0, priceRef: "PLACO_PLATE_FIRE" },
+  { id: "BA13", label: tr("placo.boards.ba13", "BA13 standard"), width: 1.2, height: 2.5, area: 3.0, priceRef: "PLACO_PLATE_BA13" },
+  { id: "HYDRO", label: tr("placo.boards.hydro", "Moisture resistant (H1)"), width: 1.2, height: 2.5, area: 3.0, priceRef: "PLACO_PLATE_HYDRO" },
+  { id: "FIRE", label: tr("placo.boards.fire", "Fire-rated / acoustic"), width: 1.2, height: 2.5, area: 3.0, priceRef: "PLACO_PLATE_FIRE" },
 ];
 
 export const PLACO_PROFILES = [
-  { id: "M48", label: tr("placo.profiles.m48", "Montant M48 / Rail R48 (Standard)") },
-  { id: "M70", label: tr("placo.profiles.m70", "Montant M70 / Rail R70 (Isolation +)") },
-  { id: "M90", label: tr("placo.profiles.m90", "Montant M90 (Grands volumes)") },
+  { id: "M48", label: tr("placo.profiles.m48", "Stud M48 / Track R48 (standard)") },
+  { id: "M70", label: tr("placo.profiles.m70", "Stud M70 / Track R70 (enhanced insulation)") },
+  { id: "M90", label: tr("placo.profiles.m90", "Stud M90 (large volumes)") },
 ];
 
 export const PLACO_INSULATION_TYPES = [
-  { id: "GR32", label: tr("placo.insulation.gr32", "Laine de verre (GR32) - Rouleau") },
-  { id: "ROCK", label: tr("placo.insulation.rock", "Laine de roche - Panneau") },
-  { id: "PSE", label: tr("placo.insulation.pse", "Polystyrène Expansé (PSE)") },
-  { id: "XPS", label: tr("placo.insulation.xps", "Polystyrène Extrudé (XPS)") },
-  { id: "WOOD", label: tr("placo.insulation.wood", "Fibre de bois") },
-  { id: "BIO", label: tr("placo.insulation.bio", "Chanvre / Coton recyclé") },
+  { id: "GR32", label: tr("placo.insulation.gr32", "Glass wool (GR32) - roll") },
+  { id: "ROCK", label: tr("placo.insulation.rock", "Rock wool - panel") },
+  { id: "PSE", label: tr("placo.insulation.pse", "Expanded polystyrene (EPS)") },
+  { id: "XPS", label: tr("placo.insulation.xps", "Extruded polystyrene (XPS)") },
+  { id: "WOOD", label: tr("placo.insulation.wood", "Wood fiber") },
+  { id: "BIO", label: tr("placo.insulation.bio", "Hemp / recycled cotton") },
 ];
 
 export const OPENING_PRESETS = {
   DOORS: [
-    { label: tr("openings.doors.63", "Porte 63 cm"), width: 0.63, height: 2.04 },
-    { label: tr("openings.doors.73", "Porte 73 cm (Standard)"), width: 0.73, height: 2.04 },
-    { label: tr("openings.doors.83", "Porte 83 cm (PMR)"), width: 0.83, height: 2.04 },
-    { label: tr("openings.doors.93", "Porte 93 cm"), width: 0.93, height: 2.04 },
-    { label: tr("openings.doors.140", "Double 140 cm"), width: 1.4, height: 2.04 },
+    { label: tr("openings.doors.63", "Door 63 cm"), width: 0.63, height: 2.04 },
+    { label: tr("openings.doors.73", "Door 73 cm (standard)"), width: 0.73, height: 2.04 },
+    { label: tr("openings.doors.83", "Door 83 cm (accessible)"), width: 0.83, height: 2.04 },
+    { label: tr("openings.doors.93", "Door 93 cm"), width: 0.93, height: 2.04 },
+    { label: tr("openings.doors.140", "Double door 140 cm"), width: 1.4, height: 2.04 },
   ],
   WINDOWS: [
-    { label: tr("openings.windows.60x60", "Fenêtre 60x60"), width: 0.6, height: 0.6 },
-    { label: tr("openings.windows.75x60", "Fenêtre 75x60"), width: 0.75, height: 0.6 },
-    { label: tr("openings.windows.100x115", "Fenêtre 100x115"), width: 1.0, height: 1.15 },
-    { label: tr("openings.windows.120x115", "Fenêtre 120x115"), width: 1.2, height: 1.15 },
-    { label: tr("openings.windows.120x125", "Fenêtre 120x125"), width: 1.2, height: 1.25 },
-    { label: tr("openings.windows.120x215", "Porte-fenêtre 120x215"), width: 1.2, height: 2.15 },
-    { label: tr("openings.windows.215x240", "Baie vitrée 215x240"), width: 2.4, height: 2.15 },
+    { label: tr("openings.windows.60x60", "Window 60×60"), width: 0.6, height: 0.6 },
+    { label: tr("openings.windows.75x60", "Window 75×60"), width: 0.75, height: 0.6 },
+    { label: tr("openings.windows.100x115", "Window 100×115"), width: 1.0, height: 1.15 },
+    { label: tr("openings.windows.120x115", "Window 120×115"), width: 1.2, height: 1.15 },
+    { label: tr("openings.windows.120x125", "Window 120×125"), width: 1.2, height: 1.25 },
+    { label: tr("openings.windows.120x215", "French door 120×215"), width: 1.2, height: 2.15 },
+    { label: tr("openings.windows.215x240", "Sliding bay 215×240"), width: 2.4, height: 2.15 },
   ],
 } as const;
 
 /**
- * ✅ Treillis:
- * - coverM2 = surface couverte par 1 panneau
- * - priceRef = clé de DEFAULT_PRICES (prix/panneau)
- *
- * NB: width/height déjà dans tes objets, donc coverM2 = width*height
+ * Mesh:
+ * - coverM2 = covered area by 1 panel
+ * - priceRef = DEFAULT_PRICES key (price per panel)
  */
 export const MESH_TYPES: (MeshType & { width: number; height: number })[] = [
   {
     id: "ST10",
-    label: tr("mesh.ST10", "ST10 (Léger - Terrasse)"),
+    label: tr("mesh.ST10", "ST10 (light - terrace)"),
     weightKgM2: 1.23,
     width: 2.4,
     height: 3.6,
@@ -621,7 +619,7 @@ export const MESH_TYPES: (MeshType & { width: number; height: number })[] = [
   },
   {
     id: "ST25C",
-    label: tr("mesh.ST25C", "ST25C (Standard - Dalle)"),
+    label: tr("mesh.ST25C", "ST25C (standard - slab)"),
     weightKgM2: 2.58,
     width: 2.4,
     height: 3.6,
@@ -630,7 +628,7 @@ export const MESH_TYPES: (MeshType & { width: number; height: number })[] = [
   },
   {
     id: "ST40C",
-    label: tr("mesh.ST40C", "ST40C (Lourd - Structure)"),
+    label: tr("mesh.ST40C", "ST40C (heavy - structural)"),
     weightKgM2: 3.8,
     width: 2.4,
     height: 3.6,
@@ -656,34 +654,34 @@ export const CONCRETE_MIX_RATIOS: Record<number, { sand: number; gravel: number;
 };
 
 export const SOIL_PROPERTIES: SoilDef[] = [
-  { id: "soil", label: tr("soil.soil", "Terre végétale"), bulkingFactor: 1.25, density: 1.4 },
-  { id: "clay", label: tr("soil.clay", "Argile / Limon"), bulkingFactor: 1.3, density: 1.7 },
-  { id: "sand", label: tr("soil.sand", "Sable"), bulkingFactor: 1.15, density: 1.6 },
-  { id: "gravel", label: tr("soil.gravel", "Gravier / Cailloux"), bulkingFactor: 1.1, density: 1.7 },
-  { id: "rock", label: tr("soil.rock", "Roche fracturée"), bulkingFactor: 1.5, density: 2.0 },
-  { id: "mixed", label: tr("soil.mixed", "Tout-venant (Mélange)"), bulkingFactor: 1.3, density: 1.8 },
+  { id: "soil", label: tr("soil.soil", "Topsoil"), bulkingFactor: 1.25, density: 1.4 },
+  { id: "clay", label: tr("soil.clay", "Clay / silt"), bulkingFactor: 1.3, density: 1.7 },
+  { id: "sand", label: tr("soil.sand", "Sand"), bulkingFactor: 1.15, density: 1.6 },
+  { id: "gravel", label: tr("soil.gravel", "Gravel / stones"), bulkingFactor: 1.1, density: 1.7 },
+  { id: "rock", label: tr("soil.rock", "Broken rock"), bulkingFactor: 1.5, density: 2.0 },
+  { id: "mixed", label: tr("soil.mixed", "All-in (mixed)"), bulkingFactor: 1.3, density: 1.8 },
 ];
 
 export const GROUNDWORK_PROJECT_TYPES = [
-  { id: "house", label: tr("groundwork.project.house", "Maison Individuelle") },
+  { id: "house", label: tr("groundwork.project.house", "Single-family house") },
   { id: "extension", label: tr("groundwork.project.extension", "Extension") },
   { id: "garage", label: tr("groundwork.project.garage", "Garage") },
-  { id: "terrace", label: tr("groundwork.project.terrace", "Terrasse") },
-  { id: "pool", label: tr("groundwork.project.pool", "Piscine") },
-  { id: "other", label: tr("groundwork.project.other", "Autre") },
+  { id: "terrace", label: tr("groundwork.project.terrace", "Terrace") },
+  { id: "pool", label: tr("groundwork.project.pool", "Swimming pool") },
+  { id: "other", label: tr("groundwork.project.other", "Other") },
 ];
 
 export const FOUNDATION_TYPES: FoundationDef[] = [
-  { id: "strip", label: tr("foundations.strip", "Semelles Filantes"), defaultWidth: 0.5, defaultDepth: 0.35 },
-  { id: "raft", label: tr("foundations.raft", "Radier (Dalle Portée)"), defaultWidth: 0, defaultDepth: 0.25 },
-  { id: "pads", label: tr("foundations.pads", "Plots Isolés"), defaultWidth: 0.6, defaultDepth: 0.6 },
+  { id: "strip", label: tr("foundations.strip", "Strip footings"), defaultWidth: 0.5, defaultDepth: 0.35 },
+  { id: "raft", label: tr("foundations.raft", "Raft foundation (load-bearing slab)"), defaultWidth: 0, defaultDepth: 0.25 },
+  { id: "pads", label: tr("foundations.pads", "Pad footings"), defaultWidth: 0.6, defaultDepth: 0.6 },
 ];
 
 export const REINFORCEMENT_TYPES: ReinforcementDef[] = [
-  { id: "S35", label: tr("reinforcement.S35", "Semelle S35 (15x35) - 6 Fils"), type: "cage", unit: Unit.PIECE },
-  { id: "S15", label: tr("reinforcement.S15", "Semelle S15 (15x15) - 4 Fils"), type: "cage", unit: Unit.PIECE },
-  { id: "L20", label: tr("reinforcement.L20", "Longrine 20x20 - 4 Fils"), type: "cage", unit: Unit.PIECE },
-  { id: "ST25C", label: tr("reinforcement.ST25C", "Treillis ST25C (Radier)"), type: "mesh", unit: Unit.PANEL },
-  { id: "HA10", label: tr("reinforcement.HA10", "Fers HA10 (Renforts)"), type: "bar", unit: Unit.BAR },
-  { id: "HA12", label: tr("reinforcement.HA12", "Fers HA12 (Renforts)"), type: "bar", unit: Unit.BAR },
+  { id: "S35", label: tr("reinforcement.S35", "Footing cage S35 (15×35) - 6 bars"), type: "cage", unit: Unit.PIECE },
+  { id: "S15", label: tr("reinforcement.S15", "Footing cage S15 (15×15) - 4 bars"), type: "cage", unit: Unit.PIECE },
+  { id: "L20", label: tr("reinforcement.L20", "Longrine cage 20×20 - 4 bars"), type: "cage", unit: Unit.PIECE },
+  { id: "ST25C", label: tr("reinforcement.ST25C", "ST25C mesh (raft)"), type: "mesh", unit: Unit.PANEL },
+  { id: "HA10", label: tr("reinforcement.HA10", "Rebar HA10 (reinforcement)"), type: "bar", unit: Unit.BAR },
+  { id: "HA12", label: tr("reinforcement.HA12", "Rebar HA12 (reinforcement)"), type: "bar", unit: Unit.BAR },
 ];
