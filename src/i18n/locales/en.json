@@ -5,7 +5,6 @@
       "foundations": "Foundations",
       "walls": "Walls"
     },
-
     "common": {
       "thickness": "Thk.",
       "items": "items",
@@ -21,48 +20,38 @@
       "simple_mode": "Simple mode",
       "multiplier": "x{{x}}",
       "dash": "-",
-
       "length_m": "Length (m)",
       "width_m": "Width (m)",
       "height_m": "Height (m)",
-
       "length_m_short": "Len. (m)",
       "width_m_short": "Wid. (m)",
       "height_m_short": "Ht. (m)",
-
       "house_length": "House length",
       "house_width": "House width",
-
       "width": "W",
       "height": "H",
-
       "L": "L",
       "W": "W",
       "D": "D",
       "H": "H",
-
       "l": "L",
       "w": "W",
       "h": "H"
     },
-
     "excav": {
       "trench": "Trench",
       "pit": "Isolated excavation",
       "mass": "Bulk excavation"
     },
-
     "opening": {
       "window": "Window",
       "door": "Door",
       "bay": "Sliding bay",
       "garage": "Garage door"
     },
-
     "wall": {
       "segment_default": "Wall {{n}}"
     },
-
     "gw": {
       "steps": {
         "1": "1. Site area",
@@ -71,38 +60,29 @@
         "4": "4. Logistics",
         "5": "5. Pricing"
       },
-
       "step1": { "hint": "Define the site footprint and topsoil stripping." },
       "step2": { "hint": "Add specific excavations (foundations, utilities, platform)." },
       "step3": { "hint": "Soil type and bulking (volume increase)." },
       "step4": { "hint": "Spoil management and equipment." },
       "step5": { "hint": "Groundworks pricing." },
-
       "strip": "Topsoil stripping",
       "excav": "Excavation / earthworks",
       "excav_details": "{{count}} items · ×{{swell}}",
-
       "margin_m": "Working margin (m)",
       "strip_depth_m": "Stripping thickness (m)",
       "keep_topsoil": "Keep topsoil on site",
-
       "slope": "Side slope",
       "slope_0": "Vertical (90°)",
       "slope_05": "Steep slope (2:1)",
       "slope_1": "45° slope (1:1)",
-
       "soil_type": "Soil type",
-
       "topsoil_stored": "Topsoil stored",
       "reused_fill": "Reused backfill",
-
       "truck_cap": "Truck capacity (m³)",
       "truck_rotation": "Truck trips",
       "truck_rotation_named": "Truck trips ({{cap}} m³)",
-
       "dump_fee": "Disposal",
       "dump_details": "{{vol}} m³",
-
       "fill_imports": "Imported fill & backfill",
       "fill_type": "Fill type",
       "fill_volume": "Required volume (m³)",
@@ -112,31 +92,24 @@
       "fill_sand": "Sand",
       "fill_soil": "Topsoil (imported)",
       "fill_soil_short": "Topsoil",
-
       "means": "Equipment",
       "digger_days": "Mini excavator days",
       "compactor_days": "Compactor days",
       "difficult_access": "Difficult access / constraints",
-
       "digger_rental": "Mini excavator rental",
       "compactor_rental": "Compactor rental",
-
       "strip_area": "Stripped area",
       "volume_inplace": "In-situ volume",
       "volume_bulking": "Bulking volume",
       "to_evac": "To dispose",
-
       "warn_no_compaction": "Reusing soil as backfill without planned compaction?",
-
       "price_excav": "Excavation (€/m³)",
       "price_strip": "Stripping (€/m²)",
       "price_truck": "Truck trip (€/trip)",
       "price_dump": "Disposal (€/t)",
       "labor_m3": "Labor (€/m³)",
-
       "summary_excavated": "{{m3}} m³ excavated"
     },
-
     "fd": {
       "steps": {
         "1": "1. Type",
@@ -145,79 +118,59 @@
         "4": "4. Options",
         "5": "5. Pricing"
       },
-
       "step1": { "hint": "Choose the foundation type and overall dimensions." },
       "step2": { "hint": "Automatic excavation calculation based on chosen foundations." },
       "step3": { "hint": "Concrete and reinforcement sizing." },
       "step4": { "hint": "Formwork and protection." },
       "step5": { "hint": "Unit price summary." },
-
       "systems": "Construction systems",
-
       "strip": "Strip footings",
       "strip_hint": "Under load-bearing walls",
-
       "pads": "Pad footings",
       "pads_hint": "Under columns",
       "no_pads": "No pads.",
-
       "raft": "Raft foundation",
       "raft_hint": "Full load-bearing slab",
-
       "count_excav": "Include excavation",
       "depth": "Frost depth (m)",
       "margin": "Working margin (m)",
       "soil_type": "Soil type",
       "evac": "Spoil disposal (bulked)",
-
       "conc_strip": "Concrete (strip footings)",
       "conc_pads": "Concrete (pads)",
       "conc_raft": "Concrete (raft)",
-
       "rebar": "Reinforcement",
       "rebar_s35": "S35 (6 wires)",
       "rebar_s15": "S15 (4 wires)",
       "rebar_strip_named": "Strip footing reinforcement ({{type}})",
       "rebar_ratio": "~1 cage / 6 m",
-
       "mesh": "Welded mesh",
       "mesh_named": "Welded mesh ({{type}})",
       "mesh_st25": "ST25C (Standard)",
       "mesh_st10": "ST10 (Light)",
       "mesh_st40": "ST40C (Heavy)",
       "mesh_ratio": "~1 sheet / 14.4 m²",
-
       "clean_concrete": "Blinding concrete (5 cm)",
-
       "excav": "Excavation",
-
       "formwork": "Formwork",
       "formwork_hint": "If excavation is not in undisturbed soil",
       "formwork_panels": "Formwork (panels)",
-
       "drain": "Perimeter drain",
       "drain_hint": "Drain + gravel + geotextile",
-
       "polyane": "Polythene sheet",
       "polyane_hint": "Under raft/slab",
-
       "diameter": "Dia",
-
       "labor_concrete": "Labor (concrete)",
-
       "soil": "Soil",
       "total_concrete": "Total concrete",
-
       "price_concrete": "Ready-mix concrete (€/m³)",
       "price_rebar": "Reinforcement (€/unit)",
       "price_excav": "Excavation (€/m³)",
       "price_formwork": "Formwork (€/m²)",
       "price_labor_conc": "Labor concrete (€/m³)",
       "price_labor_form": "Labor formwork (€/m²)",
-
       "summary_concrete": "{{m3}} m³ concrete"
     },
-
     "w": {
       "steps": {
         "1": "1. Plan",
@@ -227,63 +180,48 @@
         "5": "5. Finishes",
         "6": "6. Pricing"
       },
-
       "step1": { "hint": "Wall dimensions." },
       "step2": { "hint": "Material selection." },
       "step3": { "hint": "Openings." },
       "step4": { "hint": "Ring beams and lintels." },
       "step5": { "hint": "Finishes." },
       "step6": { "hint": "Wall unit prices." },
-
       "mode_global": "Global",
       "mode_segments": "Segments",
-
       "perimeter_total": "Total perimeter (m)",
       "height": "Height (m)",
       "waste_pct": "Waste (% · breakage / offcuts)",
-
       "gables": "Gables",
       "gables_hint": "Add triangular area",
       "gable_h": "Gable height (m)",
       "gable_count": "Count",
-
       "seg_name": "Name",
-
       "family": {
         "parpaing": "Concrete block",
         "brique": "Brick",
         "cellulaire": "AAC block",
         "stepoc": "Shuttering block"
       },
-
       "block_format": "Format / thickness",
-
       "reveal": "Reveal",
       "reveal_cm": "Reveal (cm)",
-
       "no_openings": "No openings.",
       "add_opening": "Add opening",
-
       "chain_h": "Horizontal ring beam",
       "chain_inter": "Intermediate ring beam",
       "vert": "Vertical stiffeners",
       "vert_total": "Total count",
-
       "lintel_type": "Lintel type",
       "lintel_precast": "Precast",
       "lintel_cast": "Cast-in-place",
-
       "coating_ext": "Exterior render",
       "coating_ext_hint": "Monocouche",
       "coating_int": "Interior plaster/render",
       "coating_int_hint": "Plaster / render",
-
       "scaffold": "Scaffolding",
       "scaffold_hint": "Fixed price",
-
       "unit_price_variant": "Unit price (€/unit) — selected variant",
       "unit_price_variant_help": "This price is stored for the selected variant (family/thickness).",
-
       "mortar_bag": "Mortar (€/bag)",
       "glue_bag": "Adhesive (€/bag)",
       "lintel_m": "Lintel (€/m)",
@@ -291,41 +229,31 @@
       "scaffold_fixed": "Scaffolding (fixed)",
       "labor_m2": "Masonry labor (€/m²)"
     },
-
     "walls": {
       "stepoc_fill": "Concrete infill (C25/30)",
       "stepoc_fill_details": "{{lpm2}} L/m²",
-
       "glue": "Thin-bed adhesive mortar",
       "glue_ratio": "~1 bag / 10 m²",
-
       "mortar": "Masonry mortar",
       "mortar_ratio": "~1 bag / 3 m²",
-
       "lintels": "Lintels",
       "prefab": "precast",
       "casted": "cast-in-place",
       "lintels_named": "Lintels ({{kind}})",
-
       "chainage_concrete": "Concrete ring beams (horiz.)",
       "chainage_steel": "Steel for ring beams (horiz.)",
-
       "vert_concrete": "Concrete stiffeners (vert.)",
       "vert_steel": "Steel for stiffeners (vert.)",
-
       "coating_ext": "Facade render (monocouche)",
       "coating_int": "Interior plaster/render",
-
       "scaffold": "Scaffolding (fixed)",
       "labor": "Masonry labor",
-
       "gross_area": "Gross area",
       "net_area": "Net area",
       "block_selected": "Selected block",
       "consumption": "Consumption",
       "units": "Blocks/units",
       "binder": "Mortar/adhesive",
-
       "summary_units": "{{units}} units ({{m2}} m²)"
     }
   }
