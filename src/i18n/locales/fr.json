@@ -68,12 +68,41 @@
     "materials": "Matériaux",
     "settings": "Réglages"
   },
+  "categories": {
+  "paint": "Peinture",
+  "masonry": "Maçonnerie",
+  "aggregates": "Agrégats",
+  "tiling": "Carrelage",
+  "leveling": "Ragréage",
+  "screed": "Chapes",
+  "drywall": "Plâtrerie",
+  "insulation": "Isolation",
+  "reinforcement": "Ferraillage",
+  "concrete": "Béton",
+  "walls": "Maçonnerie",
+  "earthworks": "Terrassement",
+  "rental": "Location",
+  "waterproofing": "Étanchéité",
+  "roofing": "Toiture",
+  "electricity": "Électricité",
+  "plumbing": "Plomberie",
+  "facade": "Façade",
+  "formwork": "Coffrage",
+  "fencing": "Clôtures",
+  "exterior": "Extérieurs",
+  "gates": "Portails",
+  "pool": "Piscine",
+  "networks": "Réseaux",
+  "garden": "Jardin",
+  "finishes": "Finitions"
+},
   "struct": {
     "tabs": {
       "groundwork": "Terrassement",
       "foundations": "Fondations",
       "walls": "Murs"
     },
+    
     "common": {
       "thickness": "Ép.",
       "items": "ouvrages",

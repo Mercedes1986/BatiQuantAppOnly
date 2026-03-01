@@ -425,15 +425,197 @@ export const DEFAULT_PRICES: Record<string, number> = {
 };
 
 /* -------------------------------------------------------
-   MATERIAL METADATA (i18n-ready)
+   MATERIAL METADATA (i18n-ready) — FULL (matches DEFAULT_PRICES)
 ------------------------------------------------------- */
 
-export const MATERIAL_METADATA: Record<string, MaterialMetadata> = {
-  PAINT_LITER: { label: tr("materials.PAINT_LITER", "Wall paint"), category: tr("categories.paint", "Painting"), unit: "€/L" },
-  PRIMER_LITER: { label: tr("materials.PRIMER_LITER", "Universal primer"), category: tr("categories.paint", "Painting"), unit: "€/L" },
+const cat = (key: string, fallbackEn: string) => tr(`categories.${key}`, fallbackEn);
+const mat = (key: string, fallbackEn: string) => tr(`materials.${key}`, fallbackEn);
 
-  CEMENT_BAG_35KG: { label: tr("materials.CEMENT_BAG_35KG", "Cement (35kg bag)"), category: tr("categories.masonry", "Masonry"), unit: "€/bag" },
-  CEMENT_BAG_25KG: { label: tr("materials.CEMENT_BAG_25KG", "Cement (25kg bag)"), category: tr("categories.masonry", "Masonry"), unit: "€/bag" },
+export const MATERIAL_METADATA: Record<string, MaterialMetadata> = {
+  // Paint
+  PAINT_LITER: { label: mat("PAINT_LITER", "Wall paint"), category: cat("paint", "Painting"), unit: "€/L" },
+  PRIMER_LITER: { label: mat("PRIMER_LITER", "Universal primer"), category: cat("paint", "Painting"), unit: "€/L" },
+
+  // Masonry / Aggregates
+  CEMENT_BAG_35KG: { label: mat("CEMENT_BAG_35KG", "Cement (35kg bag)"), category: cat("masonry", "Masonry"), unit: "€/bag" },
+  CEMENT_BAG_25KG: { label: mat("CEMENT_BAG_25KG", "Cement (25kg bag)"), category: cat("masonry", "Masonry"), unit: "€/bag" },
+
+  SAND_TON: { label: mat("SAND_TON", "Sand (ton)"), category: cat("aggregates", "Aggregates"), unit: "€/t" },
+  GRAVEL_TON: { label: mat("GRAVEL_TON", "Gravel (ton)"), category: cat("aggregates", "Aggregates"), unit: "€/t" },
+  SAND_BIGBAG: { label: mat("SAND_BIGBAG", "Sand (big bag ~1T)"), category: cat("aggregates", "Aggregates"), unit: "€/bigbag" },
+  GRAVEL_BIGBAG: { label: mat("GRAVEL_BIGBAG", "Gravel (big bag ~1T)"), category: cat("aggregates", "Aggregates"), unit: "€/bigbag" },
+
+  // Tiling
+  TILE_M2: { label: mat("TILE_M2", "Tiles (m²)"), category: cat("tiling", "Tiling"), unit: "€/m²" },
+  GLUE_BAG_25KG: { label: mat("GLUE_BAG_25KG", "Tile adhesive (25kg bag)"), category: cat("tiling", "Tiling"), unit: "€/bag" },
+  GROUT_BAG_5KG: { label: mat("GROUT_BAG_5KG", "Grout (5kg bag)"), category: cat("tiling", "Tiling"), unit: "€/bag" },
+  SKIRTING_METER: { label: mat("SKIRTING_METER", "Skirting board (meter)"), category: cat("tiling", "Tiling"), unit: "€/m" },
+  SPACERS_BOX: { label: mat("SPACERS_BOX", "Tile spacers (box)"), category: cat("tiling", "Tiling"), unit: "€/box" },
+
+  // Leveling / Screed
+  RAGREAGE_BAG_25KG: { label: mat("RAGREAGE_BAG_25KG", "Leveling compound (25kg bag)"), category: cat("leveling", "Leveling"), unit: "€/bag" },
+  RAGREAGE_FIBRE_25KG: { label: mat("RAGREAGE_FIBRE_25KG", "Fibre leveling compound (25kg bag)"), category: cat("leveling", "Leveling"), unit: "€/bag" },
+  PRIMER_FLOOR_LITER: { label: mat("PRIMER_FLOOR_LITER", "Floor primer (L)"), category: cat("leveling", "Leveling"), unit: "€/L" },
+  PERIPHERAL_BAND_M: { label: mat("PERIPHERAL_BAND_M", "Perimeter band (m)"), category: cat("leveling", "Leveling"), unit: "€/m" },
+  SCREED_MORTAR_BAG: { label: mat("SCREED_MORTAR_BAG", "Screed mortar (bag)"), category: cat("screed", "Screeds"), unit: "€/bag" },
+
+  // Drywall / Placo
+  PLACO_PLATE_BA13: { label: mat("PLACO_PLATE_BA13", "Drywall board BA13"), category: cat("drywall", "Drywall"), unit: "€/board" },
+  PLACO_PLATE_HYDRO: { label: mat("PLACO_PLATE_HYDRO", "Moisture resistant board (H1)"), category: cat("drywall", "Drywall"), unit: "€/board" },
+  PLACO_PLATE_FIRE: { label: mat("PLACO_PLATE_FIRE", "Fire-rated / acoustic board"), category: cat("drywall", "Drywall"), unit: "€/board" },
+  RAIL_3M: { label: mat("RAIL_3M", "Track rail (3m)"), category: cat("drywall", "Drywall"), unit: "€/pc" },
+  MONTANT_3M: { label: mat("MONTANT_3M", "Stud (3m)"), category: cat("drywall", "Drywall"), unit: "€/pc" },
+  FURRING_3M: { label: mat("FURRING_3M", "Furring channel (3m)"), category: cat("drywall", "Drywall"), unit: "€/pc" },
+  HANGER_BOX_50: { label: mat("HANGER_BOX_50", "Hangers (box of 50)"), category: cat("drywall", "Drywall"), unit: "€/box" },
+  SCREWS_BOX_1000: { label: mat("SCREWS_BOX_1000", "Drywall screws (box of 1000)"), category: cat("drywall", "Drywall"), unit: "€/box" },
+  JOINT_TAPE_ROLL: { label: mat("JOINT_TAPE_ROLL", "Joint tape (roll)"), category: cat("drywall", "Drywall"), unit: "€/roll" },
+  COMPOUND_BAG_25KG: { label: mat("COMPOUND_BAG_25KG", "Joint compound (25kg bag)"), category: cat("drywall", "Drywall"), unit: "€/bag" },
+  MAP_BAG_25KG: { label: mat("MAP_BAG_25KG", "Plaster adhesive MAP (25kg bag)"), category: cat("drywall", "Drywall"), unit: "€/bag" },
+  INSULATION_M2: { label: mat("INSULATION_M2", "Insulation (m²)"), category: cat("insulation", "Insulation"), unit: "€/m²" },
+  CORNER_BEAD_3M: { label: mat("CORNER_BEAD_3M", "Corner bead (3m)"), category: cat("drywall", "Drywall"), unit: "€/pc" },
+
+  // Reinforcement
+  MESH_PANEL_ST10: { label: mat("MESH_PANEL_ST10", "Welded mesh panel ST10"), category: cat("reinforcement", "Reinforcement"), unit: "€/panel" },
+  MESH_PANEL_ST25: { label: mat("MESH_PANEL_ST25", "Welded mesh panel ST25C"), category: cat("reinforcement", "Reinforcement"), unit: "€/panel" },
+  MESH_PANEL_ST40: { label: mat("MESH_PANEL_ST40", "Welded mesh panel ST40C"), category: cat("reinforcement", "Reinforcement"), unit: "€/panel" },
+
+  REBAR_KG: { label: mat("REBAR_KG", "Rebar (kg)"), category: cat("reinforcement", "Reinforcement"), unit: "€/kg" },
+  CHAINAGE_3M: { label: mat("CHAINAGE_3M", "Ring beam steel (3m)"), category: cat("reinforcement", "Reinforcement"), unit: "€/pc" },
+  REBAR_CAGE_35_15_6M: { label: mat("REBAR_CAGE_35_15_6M", "Footing cage 35×15 (6m)"), category: cat("reinforcement", "Reinforcement"), unit: "€/pc" },
+  REBAR_CAGE_15_35_6M: { label: mat("REBAR_CAGE_15_35_6M", "Footing cage 15×35 (6m)"), category: cat("reinforcement", "Reinforcement"), unit: "€/pc" },
+  REBAR_CAGE_20_20_6M: { label: mat("REBAR_CAGE_20_20_6M", "Grade beam cage 20×20 (6m)"), category: cat("reinforcement", "Reinforcement"), unit: "€/pc" },
+
+  // Concrete / BPE
+  BPE_M3: { label: mat("BPE_M3", "Ready-mix concrete (m³)"), category: cat("concrete", "Concrete"), unit: "€/m³" },
+  DELIVERY_FEE: { label: mat("DELIVERY_FEE", "Delivery fee"), category: cat("concrete", "Concrete"), unit: "€" },
+  PUMP_FEE: { label: mat("PUMP_FEE", "Concrete pump fee"), category: cat("concrete", "Concrete"), unit: "€" },
+  CLEAN_CONCRETE_M3: { label: mat("CLEAN_CONCRETE_M3", "Blinding concrete (m³)"), category: cat("concrete", "Concrete"), unit: "€/m³" },
+
+  // Walls / Blocks
+  BLOCK_20_PALLET: { label: mat("BLOCK_20_PALLET", "Concrete blocks 20cm (pallet)"), category: cat("walls", "Walls"), unit: "€/pallet" },
+  BLOCK_20_UNIT: { label: mat("BLOCK_20_UNIT", "Concrete block 20cm (unit)"), category: cat("walls", "Walls"), unit: "€/unit" },
+  BLOCK_STEPOC_UNIT: { label: mat("BLOCK_STEPOC_UNIT", "Shuttering block (unit)"), category: cat("walls", "Walls"), unit: "€/unit" },
+  BRICK_20_UNIT: { label: mat("BRICK_20_UNIT", "Brick 20cm (unit)"), category: cat("walls", "Walls"), unit: "€/unit" },
+  CELLULAR_20_UNIT: { label: mat("CELLULAR_20_UNIT", "AAC block 20cm (unit)"), category: cat("walls", "Walls"), unit: "€/unit" },
+
+  BLOCK_10_UNIT: { label: mat("BLOCK_10_UNIT", "Concrete block 10cm (unit)"), category: cat("walls", "Walls"), unit: "€/unit" },
+  BLOCK_15_UNIT: { label: mat("BLOCK_15_UNIT", "Concrete block 15cm (unit)"), category: cat("walls", "Walls"), unit: "€/unit" },
+  BLOCK_25_UNIT: { label: mat("BLOCK_25_UNIT", "Concrete block 25cm (unit)"), category: cat("walls", "Walls"), unit: "€/unit" },
+
+  BLOCK_STEPOC_15_UNIT: { label: mat("BLOCK_STEPOC_15_UNIT", "Shuttering block 15cm (unit)"), category: cat("walls", "Walls"), unit: "€/unit" },
+  BLOCK_STEPOC_20_UNIT: { label: mat("BLOCK_STEPOC_20_UNIT", "Shuttering block 20cm (unit)"), category: cat("walls", "Walls"), unit: "€/unit" },
+  BLOCK_STEPOC_25_UNIT: { label: mat("BLOCK_STEPOC_25_UNIT", "Shuttering block 25cm (unit)"), category: cat("walls", "Walls"), unit: "€/unit" },
+
+  BRICK_15_UNIT: { label: mat("BRICK_15_UNIT", "Brick 15cm (unit)"), category: cat("walls", "Walls"), unit: "€/unit" },
+  CELLULAR_15_UNIT: { label: mat("CELLULAR_15_UNIT", "AAC block 15cm (unit)"), category: cat("walls", "Walls"), unit: "€/unit" },
+
+  MORTAR_BAG_25KG: { label: mat("MORTAR_BAG_25KG", "Masonry mortar (25kg bag)"), category: cat("masonry", "Masonry"), unit: "€/bag" },
+  GLUE_MORTAR_BAG_25KG: { label: mat("GLUE_MORTAR_BAG_25KG", "Thin-bed adhesive mortar (25kg bag)"), category: cat("masonry", "Masonry"), unit: "€/bag" },
+  LINTEL_PRECAST_M: { label: mat("LINTEL_PRECAST_M", "Precast lintel (meter)"), category: cat("walls", "Walls"), unit: "€/m" },
+  COATING_EXT_BAG: { label: mat("COATING_EXT_BAG", "Exterior render (bag)"), category: cat("facade", "Facade"), unit: "€/bag" },
+  COATING_INT_BAG: { label: mat("COATING_INT_BAG", "Interior plaster/render (bag)"), category: cat("finishes", "Finishes"), unit: "€/bag" },
+
+  // Earthworks
+  EXCAVATION_M3: { label: mat("EXCAVATION_M3", "Excavation (m³)"), category: cat("earthworks", "Earthworks"), unit: "€/m³" },
+  EVACUATION_M3: { label: mat("EVACUATION_M3", "Spoil disposal (m³)"), category: cat("earthworks", "Earthworks"), unit: "€/m³" },
+  TOPSOIL_STRIP_M2: { label: mat("TOPSOIL_STRIP_M2", "Topsoil stripping (m²)"), category: cat("earthworks", "Earthworks"), unit: "€/m²" },
+  GRAVEL_FOUNDATION_TON: { label: mat("GRAVEL_FOUNDATION_TON", "Foundation gravel (ton)"), category: cat("earthworks", "Earthworks"), unit: "€/t" },
+  GEOTEXTILE_M2: { label: mat("GEOTEXTILE_M2", "Geotextile (m²)"), category: cat("earthworks", "Earthworks"), unit: "€/m²" },
+  POLYANE_ROLL_150M2: { label: mat("POLYANE_ROLL_150M2", "Polythene roll (~150m²)"), category: cat("earthworks", "Earthworks"), unit: "€/roll" },
+  FORM_PANEL_M2: { label: mat("FORM_PANEL_M2", "Formwork panels (m²)"), category: cat("formwork", "Formwork"), unit: "€/m²" },
+  TRENCH_EXCAVATION_M3: { label: mat("TRENCH_EXCAVATION_M3", "Trench excavation (m³)"), category: cat("earthworks", "Earthworks"), unit: "€/m³" },
+  BACKFILL_M3: { label: mat("BACKFILL_M3", "Backfill / imported fill (m³)"), category: cat("earthworks", "Earthworks"), unit: "€/m³" },
+
+  // Equipment / Rental
+  DIGGER_DAY: { label: mat("DIGGER_DAY", "Mini excavator (day)"), category: cat("rental", "Rental"), unit: "€/day" },
+  DUMPER_DAY: { label: mat("DUMPER_DAY", "Dumper (day)"), category: cat("rental", "Rental"), unit: "€/day" },
+  SKIP_DAY: { label: mat("SKIP_DAY", "Skip / dumpster (day)"), category: cat("rental", "Rental"), unit: "€/day" },
+  COMPACTOR_DAY: { label: mat("COMPACTOR_DAY", "Compactor (day)"), category: cat("rental", "Rental"), unit: "€/day" },
+
+  // Waterproofing / Substructure
+  BITUMEN_COATING_BUCKET_25KG: { label: mat("BITUMEN_COATING_BUCKET_25KG", "Bitumen coating (25kg bucket)"), category: cat("waterproofing", "Waterproofing"), unit: "€/bucket" },
+  DELTA_MS_ROLL_20M: { label: mat("DELTA_MS_ROLL_20M", "Delta MS membrane (roll)"), category: cat("waterproofing", "Waterproofing"), unit: "€/roll" },
+  DRAIN_PIPE_50M: { label: mat("DRAIN_PIPE_50M", "Drain pipe (50m roll)"), category: cat("waterproofing", "Waterproofing"), unit: "€/roll" },
+  GEOTEXTILE_ROLL_50M2: { label: mat("GEOTEXTILE_ROLL_50M2", "Geotextile (50m² roll)"), category: cat("waterproofing", "Waterproofing"), unit: "€/roll" },
+
+  // Roofing
+  TILE_ROOF_M2: { label: mat("TILE_ROOF_M2", "Roof tiles (m²)"), category: cat("roofing", "Roofing"), unit: "€/m²" },
+  BATTEN_M: { label: mat("BATTEN_M", "Batten (meter)"), category: cat("roofing", "Roofing"), unit: "€/m" },
+  UNDERLAY_ROLL_75M2: { label: mat("UNDERLAY_ROLL_75M2", "Roof underlay (75m² roll)"), category: cat("roofing", "Roofing"), unit: "€/roll" },
+
+  // Electricity
+  CABLE_3G15_100M: { label: mat("CABLE_3G15_100M", "Cable 3G1.5 (100m)"), category: cat("electricity", "Electrical"), unit: "€/roll" },
+  CABLE_3G25_100M: { label: mat("CABLE_3G25_100M", "Cable 3G2.5 (100m)"), category: cat("electricity", "Electrical"), unit: "€/roll" },
+  CONDUIT_ICTA_20_100M: { label: mat("CONDUIT_ICTA_20_100M", "Conduit ICTA 20 (100m)"), category: cat("electricity", "Electrical"), unit: "€/roll" },
+  SOCKET_UNIT: { label: mat("SOCKET_UNIT", "Socket outlet (unit)"), category: cat("electricity", "Electrical"), unit: "€/unit" },
+  SWITCH_UNIT: { label: mat("SWITCH_UNIT", "Switch (unit)"), category: cat("electricity", "Electrical"), unit: "€/unit" },
+  BREAKER_UNIT: { label: mat("BREAKER_UNIT", "Circuit breaker (unit)"), category: cat("electricity", "Electrical"), unit: "€/unit" },
+
+  // Plumbing
+  PER_PIPE_100M: { label: mat("PER_PIPE_100M", "PEX/PER pipe (100m)"), category: cat("plumbing", "Plumbing"), unit: "€/roll" },
+  PVC_PIPE_4M: { label: mat("PVC_PIPE_4M", "PVC pipe (4m)"), category: cat("plumbing", "Plumbing"), unit: "€/pc" },
+
+  // Facade
+  FACADE_COATING_BAG: { label: mat("FACADE_COATING_BAG", "Facade render (bag)"), category: cat("facade", "Facade"), unit: "€/bag" },
+
+  // Formwork / concrete accessories
+  PROP_UNIT: { label: mat("PROP_UNIT", "Shoring prop (unit)"), category: cat("formwork", "Formwork"), unit: "€/unit" },
+  TIMBER_M: { label: mat("TIMBER_M", "Timber (meter)"), category: cat("formwork", "Formwork"), unit: "€/m" },
+  FORM_OIL_L: { label: mat("FORM_OIL_L", "Formwork oil (L)"), category: cat("formwork", "Formwork"), unit: "€/L" },
+
+  // Fencing / exterior
+  FENCE_MESH_M: { label: mat("FENCE_MESH_M", "Chain-link fence (meter)"), category: cat("fencing", "Fencing"), unit: "€/m" },
+  FENCE_RIGID_M: { label: mat("FENCE_RIGID_M", "Rigid panel fence (meter)"), category: cat("fencing", "Fencing"), unit: "€/m" },
+  FENCE_WOOD_M: { label: mat("FENCE_WOOD_M", "Wood fence (meter)"), category: cat("fencing", "Fencing"), unit: "€/m" },
+  FENCE_POST_UNIT: { label: mat("FENCE_POST_UNIT", "Fence post (unit)"), category: cat("fencing", "Fencing"), unit: "€/unit" },
+  BORDER_CONCRETE_M: { label: mat("BORDER_CONCRETE_M", "Concrete edging (meter)"), category: cat("exterior", "Exteriors"), unit: "€/m" },
+  WALL_COPING_UNIT: { label: mat("WALL_COPING_UNIT", "Wall coping (unit)"), category: cat("exterior", "Exteriors"), unit: "€/unit" },
+
+  // Terraces / decking
+  PAVERS_M2: { label: mat("PAVERS_M2", "Pavers (m²)"), category: cat("exterior", "Exteriors"), unit: "€/m²" },
+  WOOD_DECK_M2: { label: mat("WOOD_DECK_M2", "Wood deck (m²)"), category: cat("exterior", "Exteriors"), unit: "€/m²" },
+  COMPOSITE_DECK_M2: { label: mat("COMPOSITE_DECK_M2", "Composite deck (m²)"), category: cat("exterior", "Exteriors"), unit: "€/m²" },
+
+  // Gates
+  GATE_UNIT: { label: mat("GATE_UNIT", "Gate (unit)"), category: cat("gates", "Gates"), unit: "€/unit" },
+  GATE_MOTOR_UNIT: { label: mat("GATE_MOTOR_UNIT", "Gate motor (unit)"), category: cat("gates", "Gates"), unit: "€/unit" },
+  GATE_INSTALL_UNIT: { label: mat("GATE_INSTALL_UNIT", "Gate installation (unit)"), category: cat("gates", "Gates"), unit: "€/unit" },
+
+  // Pool
+  POOL_UNIT: { label: mat("POOL_UNIT", "Swimming pool (unit)"), category: cat("pool", "Pool"), unit: "€/unit" },
+  POOL_INSTALL_UNIT: { label: mat("POOL_INSTALL_UNIT", "Pool installation (unit)"), category: cat("pool", "Pool"), unit: "€/unit" },
+  POOL_COPING_ML: { label: mat("POOL_COPING_ML", "Pool coping (linear meter)"), category: cat("pool", "Pool"), unit: "€/m" },
+
+  // Networks / garden utilities
+  WATER_PIPE_M: { label: mat("WATER_PIPE_M", "Water pipe (meter)"), category: cat("networks", "Networks"), unit: "€/m" },
+  SEWER_PIPE_M: { label: mat("SEWER_PIPE_M", "Sewer pipe (meter)"), category: cat("networks", "Networks"), unit: "€/m" },
+  ELECTRIC_CONDUIT_M: { label: mat("ELECTRIC_CONDUIT_M", "Electric conduit (meter)"), category: cat("networks", "Networks"), unit: "€/m" },
+  MANHOLE_UNIT: { label: mat("MANHOLE_UNIT", "Manhole (unit)"), category: cat("networks", "Networks"), unit: "€/unit" },
+  GARDEN_LIGHT_UNIT: { label: mat("GARDEN_LIGHT_UNIT", "Garden light (unit)"), category: cat("garden", "Garden"), unit: "€/unit" },
+  TRANSFORMER_UNIT: { label: mat("TRANSFORMER_UNIT", "Transformer (unit)"), category: cat("garden", "Garden"), unit: "€/unit" },
+
+  // Soil / landscaping
+  TOPSOIL_M3: { label: mat("TOPSOIL_M3", "Topsoil (m³)"), category: cat("garden", "Garden"), unit: "€/m³" },
+  COMPOST_M3: { label: mat("COMPOST_M3", "Compost (m³)"), category: cat("garden", "Garden"), unit: "€/m³" },
+  MULCH_M3: { label: mat("MULCH_M3", "Mulch (m³)"), category: cat("garden", "Garden"), unit: "€/m³" },
+  DECOR_GRAVEL_TON: { label: mat("DECOR_GRAVEL_TON", "Decorative gravel (ton)"), category: cat("garden", "Garden"), unit: "€/t" },
+
+  // Lawn / fertilizer
+  LAWN_ROLL_M2: { label: mat("LAWN_ROLL_M2", "Lawn rolls (m²)"), category: cat("garden", "Garden"), unit: "€/m²" },
+  LAWN_SEED_KG: { label: mat("LAWN_SEED_KG", "Grass seed (kg)"), category: cat("garden", "Garden"), unit: "€/kg" },
+  FERTILIZER_KG: { label: mat("FERTILIZER_KG", "Fertilizer (kg)"), category: cat("garden", "Garden"), unit: "€/kg" },
+
+  // Irrigation
+  GARDEN_EDGING_M: { label: mat("GARDEN_EDGING_M", "Garden edging (meter)"), category: cat("garden", "Garden"), unit: "€/m" },
+  IRRIGATION_DRIP_M: { label: mat("IRRIGATION_DRIP_M", "Drip irrigation (meter)"), category: cat("garden", "Garden"), unit: "€/m" },
+  IRRIGATION_SPRINKLER_UNIT: { label: mat("IRRIGATION_SPRINKLER_UNIT", "Sprinkler (unit)"), category: cat("garden", "Garden"), unit: "€/unit" },
+  IRRIGATION_PROGRAMMER_UNIT: { label: mat("IRRIGATION_PROGRAMMER_UNIT", "Irrigation controller (unit)"), category: cat("garden", "Garden"), unit: "€/unit" },
+
+  // Plants
+  PLANT_UNIT: { label: mat("PLANT_UNIT", "Plant (unit)"), category: cat("garden", "Garden"), unit: "€/unit" },
+  SHRUB_UNIT: { label: mat("SHRUB_UNIT", "Shrub (unit)"), category: cat("garden", "Garden"), unit: "€/unit" },
+  HEDGE_PLANT_UNIT: { label: mat("HEDGE_PLANT_UNIT", "Hedge plant (unit)"), category: cat("garden", "Garden"), unit: "€/unit" },
+  TREE_UNIT: { label: mat("TREE_UNIT", "Tree (unit)"), category: cat("garden", "Garden"), unit: "€/unit" },
 };
 
 /* -------------------------------------------------------
