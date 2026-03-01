@@ -2079,7 +2079,11 @@
     "title": "Materials",
     "unit": "Unit",
     "unit_price_ht": "Unit price (excl. tax)",
-    "vat_rate": "VAT rate"
+    "vat_rate": "VAT rate",
+    "PAINT_LITER": "Wall paint",
+    "PRIMER_LITER": "Universal primer",
+    "CEMENT_BAG_35KG": "Cement (35kg bag)",
+    "CEMENT_BAG_25KG": "Cement (25kg bag)"
   },
   "notfound": {
     "description": "This page doesn't exist.",
@@ -2212,5 +2216,283 @@
     "m2": "m²",
     "package": "package",
     "piece": "piece"
+  },
+  "categories": {
+    "paint": "Painting",
+    "masonry": "Masonry",
+    "aggregates": "Aggregates",
+    "tiling": "Tiling",
+    "leveling": "Leveling",
+    "screed": "Screeds",
+    "drywall": "Drywall",
+    "insulation": "Insulation",
+    "reinforcement": "Reinforcement",
+    "concrete": "Concrete",
+    "walls": "Masonry",
+    "earthworks": "Earthworks",
+    "rental": "Rental",
+    "waterproofing": "Waterproofing",
+    "roofing": "Roofing",
+    "electricity": "Electrical",
+    "plumbing": "Plumbing",
+    "facade": "Facade",
+    "formwork": "Formwork",
+    "fencing": "Fencing",
+    "exterior": "Exterior works",
+    "gates": "Gates",
+    "pool": "Pool",
+    "networks": "Networks",
+    "garden": "Garden",
+    "finishes": "Finishes"
+  },
+  "calculators": {
+    "groundwork": {
+      "name": "Groundworks",
+      "desc": "Excavation, trenches, backfill",
+      "alt": "Groundworks: excavation, trenches and backfill"
+    },
+    "foundations": {
+      "name": "Foundations",
+      "desc": "Footings, raft, concrete, rebar",
+      "alt": "Foundations: footings, raft, concrete and rebar"
+    },
+    "substructure": {
+      "name": "Substructure",
+      "desc": "Crawl space, retaining walls, drainage",
+      "alt": "Substructure: crawl space, retaining walls, drainage"
+    },
+    "concrete": {
+      "name": "Concrete / Slab",
+      "desc": "Slabs, floors, mix ratios",
+      "alt": "Concrete and slab: slabs, floors and mix ratios"
+    },
+    "walls": {
+      "name": "Walls",
+      "desc": "Blocks, bricks, lintels",
+      "alt": "Walls: blocks, bricks and lintels"
+    },
+    "stairs": {
+      "name": "Concrete stairs",
+      "desc": "Steps, slab, formwork",
+      "alt": "Concrete stairs: steps, slab and formwork"
+    },
+    "roof": {
+      "name": "Roof",
+      "desc": "Framing, tiles, gutters",
+      "alt": "Roof: framing, tiles and gutters"
+    },
+    "joinery": {
+      "name": "Joinery",
+      "desc": "Windows, doors, shutters",
+      "alt": "Joinery: windows, doors and shutters"
+    },
+    "placo": {
+      "name": "Drywall / Insulation",
+      "desc": "Partitions, linings, ceilings",
+      "alt": "Drywall and insulation: partitions, linings and ceilings"
+    },
+    "electricity": {
+      "name": "Electrical",
+      "desc": "Cables, conduits, devices",
+      "alt": "Electrical: cables, conduits and devices"
+    },
+    "plumbing": {
+      "name": "Plumbing",
+      "desc": "Pipes, drains, fittings",
+      "alt": "Plumbing: pipes, drains and fittings"
+    },
+    "hvac": {
+      "name": "Heating / Ventilation",
+      "desc": "Ventilation, radiators, heat pumps",
+      "alt": "Heating and ventilation: radiators, heat pumps and ventilation"
+    },
+    "screed": {
+      "name": "Screeds",
+      "desc": "Liquid screed, traditional screed",
+      "alt": "Screeds: liquid screed and traditional screed"
+    },
+    "tiles": {
+      "name": "Tiling",
+      "desc": "Floor tiles, wall tiles, adhesive",
+      "alt": "Tiling: floor tiles, wall tiles and adhesive"
+    },
+    "leveling": {
+      "name": "Leveling",
+      "desc": "Floor leveling (renovation)",
+      "alt": "Leveling: floor leveling in renovation"
+    },
+    "paint": {
+      "name": "Painting",
+      "desc": "Walls, ceilings",
+      "alt": "Painting: walls and ceilings"
+    },
+    "facade": {
+      "name": "Facade",
+      "desc": "Render, cladding",
+      "alt": "Facade: render and cladding"
+    },
+    "exterior": {
+      "name": "Exteriors",
+      "desc": "Terrace, fencing, paths",
+      "alt": "Exteriors: terrace, fencing and paths"
+    }
+  },
+  "steps": {
+    "groups": {
+      "go": "Structural work",
+      "so": "Second fix",
+      "fin": "Finishes"
+    },
+    "go": {
+      "groundwork": "Groundworks",
+      "foundations": "Foundations",
+      "substructure": "Substructure",
+      "slab": "Ground floor slab",
+      "walls": "Wall construction",
+      "stairs": "Concrete stairs",
+      "roofing": "Roof / framing",
+      "windows": "External joinery"
+    },
+    "so": {
+      "lining": "Wall lining (insulation)",
+      "partitions": "Partitions",
+      "ceilings": "Ceilings",
+      "electricity": "Electrical",
+      "plumbing": "Plumbing",
+      "hvac": "Heating / ventilation",
+      "screed": "Screed / levelling"
+    },
+    "fin": {
+      "flooring": "Flooring (tiles/wood)",
+      "painting": "Painting",
+      "facade": "Facade",
+      "exterior": "Exteriors"
+    }
+  },
+  "tips": {
+    "paint": {
+      "1": "Always apply a primer on bare surfaces (drywall, plaster) to reduce absorption.",
+      "2": "Cross-coat (horizontal then vertical) to avoid streaks.",
+      "3": "Avoid painting above 25°C (too fast drying) or below 10°C."
+    },
+    "concrete": {
+      "1": "Respect water dosage: too much water weakens concrete (shrinkage, cracks).",
+      "2": "For a driveable slab, aim for 12–15cm thickness + ST25C mesh.",
+      "3": "Lift the mesh with spacers so it sits in the concrete, not on the ground.",
+      "4": "Plan expansion joints every 15–20m² to prevent cracking."
+    }
+  },
+  "packaging": {
+    "paint": {
+      "10l": "10L can",
+      "5l": "5L can",
+      "2_5l": "2.5L can",
+      "1l": "1L can"
+    },
+    "concrete": {
+      "25kg": "25kg bag",
+      "35kg": "35kg bag",
+      "1t": "1T big bag"
+    }
+  },
+  "tiles": {
+    "patterns": {
+      "straight": "Straight lay",
+      "staggered": "Staggered lay (1/2, 1/3)",
+      "diagonal": "Diagonal lay"
+    }
+  },
+  "leveling": {
+    "substrates": {
+      "concrete": "Concrete / cement screed",
+      "tile": "Existing tiles (non-porous)",
+      "wood": "Wood / OSB / parquet",
+      "anhydrite": "Anhydrite screed"
+    },
+    "warnings": {
+      "tile": "A dedicated bonding primer is required",
+      "wood": "Fibre-reinforced leveling compound is required on wood",
+      "anhydrite": "Sanding + specific primer required"
+    },
+    "products": {
+      "standard": "Standard self-levelling (P3)",
+      "fibre": "Fibre-reinforced (renovation/wood)",
+      "thicks": "High-build / patching",
+      "exterior": "Exterior"
+    }
+  },
+  "placo": {
+    "boards": {
+      "ba13": "BA13 standard",
+      "hydro": "Moisture resistant (H1)",
+      "fire": "Fire-rated / acoustic"
+    },
+    "profiles": {
+      "m48": "Stud M48 / Track R48 (standard)",
+      "m70": "Stud M70 / Track R70 (enhanced insulation)",
+      "m90": "Stud M90 (large volumes)"
+    },
+    "insulation": {
+      "gr32": "Glass wool (GR32) - roll",
+      "rock": "Rock wool - panel",
+      "pse": "Expanded polystyrene (EPS)",
+      "xps": "Extruded polystyrene (XPS)",
+      "wood": "Wood fiber",
+      "bio": "Hemp / recycled cotton"
+    }
+  },
+  "openings": {
+    "doors": {
+      "63": "Door 63 cm",
+      "73": "Door 73 cm (standard)",
+      "83": "Door 83 cm (accessible)",
+      "93": "Door 93 cm",
+      "140": "Double door 140 cm"
+    },
+    "windows": {
+      "60x60": "Window 60×60",
+      "75x60": "Window 75×60",
+      "100x115": "Window 100×115",
+      "120x115": "Window 120×115",
+      "120x125": "Window 120×125",
+      "120x215": "French door 120×215",
+      "215x240": "Sliding bay 215×240"
+    }
+  },
+  "mesh": {
+    "ST10": "ST10 (light - terrace)",
+    "ST25C": "ST25C (standard - slab)",
+    "ST40C": "ST40C (heavy - structural)"
+  },
+  "soil": {
+    "soil": "Topsoil",
+    "clay": "Clay / silt",
+    "sand": "Sand",
+    "gravel": "Gravel / stones",
+    "rock": "Broken rock",
+    "mixed": "All-in (mixed)"
+  },
+  "groundwork": {
+    "project": {
+      "house": "Single-family house",
+      "extension": "Extension",
+      "garage": "Garage",
+      "terrace": "Terrace",
+      "pool": "Swimming pool",
+      "other": "Other"
+    }
+  },
+  "foundations": {
+    "strip": "Strip footings",
+    "raft": "Raft foundation (load-bearing slab)",
+    "pads": "Pad footings"
+  },
+  "reinforcement": {
+    "S35": "Footing cage S35 (15×35) - 6 bars",
+    "S15": "Footing cage S15 (15×15) - 4 bars",
+    "L20": "Longrine cage 20×20 - 4 bars",
+    "ST25C": "ST25C mesh (raft)",
+    "HA10": "Rebar HA10 (reinforcement)",
+    "HA12": "Rebar HA12 (reinforcement)"
   }
 }

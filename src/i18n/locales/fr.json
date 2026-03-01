@@ -69,40 +69,39 @@
     "settings": "Réglages"
   },
   "categories": {
-  "paint": "Peinture",
-  "masonry": "Maçonnerie",
-  "aggregates": "Agrégats",
-  "tiling": "Carrelage",
-  "leveling": "Ragréage",
-  "screed": "Chapes",
-  "drywall": "Plâtrerie",
-  "insulation": "Isolation",
-  "reinforcement": "Ferraillage",
-  "concrete": "Béton",
-  "walls": "Maçonnerie",
-  "earthworks": "Terrassement",
-  "rental": "Location",
-  "waterproofing": "Étanchéité",
-  "roofing": "Toiture",
-  "electricity": "Électricité",
-  "plumbing": "Plomberie",
-  "facade": "Façade",
-  "formwork": "Coffrage",
-  "fencing": "Clôtures",
-  "exterior": "Extérieurs",
-  "gates": "Portails",
-  "pool": "Piscine",
-  "networks": "Réseaux",
-  "garden": "Jardin",
-  "finishes": "Finitions"
-},
+    "paint": "Peinture",
+    "masonry": "Maçonnerie",
+    "aggregates": "Agrégats",
+    "tiling": "Carrelage",
+    "leveling": "Ragréage",
+    "screed": "Chapes",
+    "drywall": "Plâtrerie",
+    "insulation": "Isolation",
+    "reinforcement": "Ferraillage",
+    "concrete": "Béton",
+    "walls": "Maçonnerie",
+    "earthworks": "Terrassement",
+    "rental": "Location",
+    "waterproofing": "Étanchéité",
+    "roofing": "Toiture",
+    "electricity": "Électricité",
+    "plumbing": "Plomberie",
+    "facade": "Façade",
+    "formwork": "Coffrage",
+    "fencing": "Clôtures",
+    "exterior": "Extérieurs",
+    "gates": "Portails",
+    "pool": "Piscine",
+    "networks": "Réseaux",
+    "garden": "Jardin",
+    "finishes": "Finitions"
+  },
   "struct": {
     "tabs": {
       "groundwork": "Terrassement",
       "foundations": "Fondations",
       "walls": "Murs"
     },
-    
     "common": {
       "thickness": "Ép.",
       "items": "ouvrages",
@@ -2108,7 +2107,11 @@
     "title": "Matériaux",
     "unit": "Unité",
     "unit_price_ht": "Prix unitaire HT",
-    "vat_rate": "Taux de TVA"
+    "vat_rate": "Taux de TVA",
+    "PAINT_LITER": "Peinture murs",
+    "PRIMER_LITER": "Sous-couche universelle",
+    "CEMENT_BAG_35KG": "Ciment (sac 35 kg)",
+    "CEMENT_BAG_25KG": "Ciment (sac 25 kg)"
   },
   "notfound": {
     "description": "Cette page n’existe pas.",
@@ -2241,5 +2244,255 @@
     "m2": "m²",
     "package": "colis",
     "piece": "pièce"
+  },
+  "calculators": {
+    "groundwork": {
+      "name": "Terrassement",
+      "desc": "Excavation, tranchées, remblai",
+      "alt": "Terrassement : excavation, tranchées et remblai"
+    },
+    "foundations": {
+      "name": "Fondations",
+      "desc": "Semelles, radier, béton, ferraillage",
+      "alt": "Fondations : semelles, radier, béton et ferraillage"
+    },
+    "substructure": {
+      "name": "Soubassement",
+      "desc": "Vide sanitaire, murs de soutènement, drainage",
+      "alt": "Soubassement : vide sanitaire, murs de soutènement, drainage"
+    },
+    "concrete": {
+      "name": "Béton / Dalle",
+      "desc": "Dalles, planchers, dosages",
+      "alt": "Béton et dalle : dalles, planchers et dosages"
+    },
+    "walls": {
+      "name": "Murs",
+      "desc": "Parpaings, briques, linteaux",
+      "alt": "Murs : parpaings, briques et linteaux"
+    },
+    "stairs": {
+      "name": "Escalier béton",
+      "desc": "Marches, dalle, coffrage",
+      "alt": "Escalier béton : marches, dalle et coffrage"
+    },
+    "roof": {
+      "name": "Toiture",
+      "desc": "Charpente, tuiles, gouttières",
+      "alt": "Toiture : charpente, tuiles et gouttières"
+    },
+    "joinery": {
+      "name": "Menuiseries",
+      "desc": "Fenêtres, portes, volets",
+      "alt": "Menuiseries : fenêtres, portes et volets"
+    },
+    "placo": {
+      "name": "Placo / Isolation",
+      "desc": "Cloisons, doublages, plafonds",
+      "alt": "Placo et isolation : cloisons, doublages et plafonds"
+    },
+    "electricity": {
+      "name": "Électricité",
+      "desc": "Câbles, gaines, appareillage",
+      "alt": "Électricité : câbles, gaines et appareillage"
+    },
+    "plumbing": {
+      "name": "Plomberie",
+      "desc": "Tuyaux, évacuations, raccords",
+      "alt": "Plomberie : tuyaux, évacuations et raccords"
+    },
+    "hvac": {
+      "name": "Chauffage / Ventilation",
+      "desc": "Ventilation, radiateurs, pompes à chaleur",
+      "alt": "Chauffage et ventilation : radiateurs, PAC et ventilation"
+    },
+    "screed": {
+      "name": "Chapes",
+      "desc": "Chape fluide, chape traditionnelle",
+      "alt": "Chapes : chape fluide et chape traditionnelle"
+    },
+    "tiles": {
+      "name": "Carrelage",
+      "desc": "Sol, murs, colle",
+      "alt": "Carrelage : sol, murs et colle"
+    },
+    "leveling": {
+      "name": "Ragréage",
+      "desc": "Ragréage sol (rénovation)",
+      "alt": "Ragréage : ragréage de sol en rénovation"
+    },
+    "paint": {
+      "name": "Peinture",
+      "desc": "Murs, plafonds",
+      "alt": "Peinture : murs et plafonds"
+    },
+    "facade": {
+      "name": "Façade",
+      "desc": "Enduit, bardage",
+      "alt": "Façade : enduit et bardage"
+    },
+    "exterior": {
+      "name": "Extérieurs",
+      "desc": "Terrasse, clôtures, chemins",
+      "alt": "Extérieurs : terrasse, clôtures et chemins"
+    }
+  },
+  "steps": {
+    "groups": {
+      "go": "Gros œuvre",
+      "so": "Second œuvre",
+      "fin": "Finitions"
+    },
+    "go": {
+      "groundwork": "Terrassement",
+      "foundations": "Fondations",
+      "substructure": "Soubassement",
+      "slab": "Dalle RDC",
+      "walls": "Élévation des murs",
+      "stairs": "Escalier béton",
+      "roofing": "Toiture / charpente",
+      "windows": "Menuiseries extérieures"
+    },
+    "so": {
+      "lining": "Doublage (isolation)",
+      "partitions": "Cloisons",
+      "ceilings": "Plafonds",
+      "electricity": "Électricité",
+      "plumbing": "Plomberie",
+      "hvac": "Chauffage / ventilation",
+      "screed": "Chape / ragréage"
+    },
+    "fin": {
+      "flooring": "Sols (carrelage/parquet)",
+      "painting": "Peinture",
+      "facade": "Façade",
+      "exterior": "Extérieurs"
+    }
+  },
+  "tips": {
+    "paint": {
+      "1": "Toujours appliquer une sous-couche sur supports bruts (placo, plâtre) pour limiter l’absorption.",
+      "2": "Croiser les passes (horizontale puis verticale) pour éviter les traces.",
+      "3": "Éviter de peindre au-dessus de 25°C (séchage trop rapide) ou en dessous de 10°C."
+    },
+    "concrete": {
+      "1": "Respectez le dosage en eau : trop d’eau affaiblit le béton (retrait, fissures).",
+      "2": "Pour une dalle carrossable, viser 12–15 cm + treillis ST25C.",
+      "3": "Rehausser le treillis avec des cales : il doit être dans le béton, pas au sol.",
+      "4": "Prévoir des joints de dilatation tous les 15–20 m² pour limiter les fissures."
+    }
+  },
+  "packaging": {
+    "paint": {
+      "10l": "Bidon 10 L",
+      "5l": "Bidon 5 L",
+      "2_5l": "Bidon 2,5 L",
+      "1l": "Bidon 1 L"
+    },
+    "concrete": {
+      "25kg": "Sac 25 kg",
+      "35kg": "Sac 35 kg",
+      "1t": "Big bag 1 T"
+    }
+  },
+  "tiles": {
+    "patterns": {
+      "straight": "Pose droite",
+      "staggered": "Pose décalée (1/2, 1/3)",
+      "diagonal": "Pose en diagonale"
+    }
+  },
+  "leveling": {
+    "substrates": {
+      "concrete": "Béton / chape ciment",
+      "tile": "Carrelage existant (non poreux)",
+      "wood": "Bois / OSB / parquet",
+      "anhydrite": "Chape anhydrite"
+    },
+    "warnings": {
+      "tile": "Un primaire d’accrochage dédié est requis",
+      "wood": "Ragréage fibré requis sur support bois",
+      "anhydrite": "Ponçage + primaire spécifique requis"
+    },
+    "products": {
+      "standard": "Ragréage standard (P3)",
+      "fibre": "Ragréage fibré (rénovation/bois)",
+      "thicks": "Ragréage forte épaisseur / rebouchage",
+      "exterior": "Ragréage extérieur"
+    }
+  },
+  "placo": {
+    "boards": {
+      "ba13": "BA13 standard",
+      "hydro": "Hydrofuge (H1)",
+      "fire": "Feu / acoustique"
+    },
+    "profiles": {
+      "m48": "Montant M48 / Rail R48 (standard)",
+      "m70": "Montant M70 / Rail R70 (isolation renforcée)",
+      "m90": "Montant M90 (grands volumes)"
+    },
+    "insulation": {
+      "gr32": "Laine de verre (GR32) - rouleau",
+      "rock": "Laine de roche - panneau",
+      "pse": "Polystyrène expansé (PSE)",
+      "xps": "Polystyrène extrudé (XPS)",
+      "wood": "Fibre de bois",
+      "bio": "Chanvre / coton recyclé"
+    }
+  },
+  "openings": {
+    "doors": {
+      "63": "Porte 63 cm",
+      "73": "Porte 73 cm (standard)",
+      "83": "Porte 83 cm (PMR)",
+      "93": "Porte 93 cm",
+      "140": "Double porte 140 cm"
+    },
+    "windows": {
+      "60x60": "Fenêtre 60×60",
+      "75x60": "Fenêtre 75×60",
+      "100x115": "Fenêtre 100×115",
+      "120x115": "Fenêtre 120×115",
+      "120x125": "Fenêtre 120×125",
+      "120x215": "Porte-fenêtre 120×215",
+      "215x240": "Baie coulissante 215×240"
+    }
+  },
+  "mesh": {
+    "ST10": "ST10 (léger - terrasse)",
+    "ST25C": "ST25C (standard - dalle)",
+    "ST40C": "ST40C (lourd - structure)"
+  },
+  "soil": {
+    "soil": "Terre végétale",
+    "clay": "Argile / limon",
+    "sand": "Sable",
+    "gravel": "Gravier / cailloux",
+    "rock": "Roche (massif)",
+    "mixed": "Tout-venant (mix)"
+  },
+  "groundwork": {
+    "project": {
+      "house": "Maison individuelle",
+      "extension": "Extension",
+      "garage": "Garage",
+      "terrace": "Terrasse",
+      "pool": "Piscine",
+      "other": "Autre"
+    }
+  },
+  "foundations": {
+    "strip": "Semelles filantes",
+    "raft": "Radier (dalle porteuse)",
+    "pads": "Plots isolés"
+  },
+  "reinforcement": {
+    "S35": "Cage semelle S35 (15×35) - 6 fils",
+    "S15": "Cage semelle S15 (15×15) - 4 fils",
+    "L20": "Cage longrine 20×20 - 4 fils",
+    "ST25C": "Treillis ST25C (radier)",
+    "HA10": "Fer HA10 (armature)",
+    "HA12": "Fer HA12 (armature)"
   }
 }
