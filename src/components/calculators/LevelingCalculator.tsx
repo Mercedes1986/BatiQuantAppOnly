@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { CalculatorType, CalculationResult, Unit } from "../../../types";
 import { DEFAULT_PRICES, LEVELING_PRODUCTS, LEVELING_SUBSTRATES } from "../../constants";
 import { getUnitPrice } from "../../services/materialsService";
@@ -22,11 +23,11 @@ interface LevelingZone {
   id: string;
   label: string;
   area: number;
-  substrate: string; // 'concrete', 'tile', 'wood', 'anhydrite', ...
+  substrate: string;
   thicknessMode: ThicknessMode;
-  thicknessVal: number; // mm (avg)
-  thicknessMin?: number; // mm
-  thicknessMax?: number; // mm
+  thicknessVal: number; // mm avg
+  thicknessMin?: number;
+  thicknessMax?: number;
 }
 
 interface Props {
@@ -41,12 +42,14 @@ const round2 = (n: number) => Math.round((n + Number.EPSILON) * 100) / 100;
 const clamp = (n: number, min: number, max: number) => Math.min(max, Math.max(min, n));
 
 export const LevelingCalculator: React.FC<Props> = ({ onCalculate }) => {
+  const { t } = useTranslation();
+
   const [step, setStep] = useState(1);
   const [proMode, setProMode] = useState(false);
 
   // --- 1. Zones ---
   const [zones, setZones] = useState<LevelingZone[]>([]);
-  const [newZoneLabel, setNewZoneLabel] = useState("Salon");
+  const [newZoneLabel, setNewZoneLabel] = useState("");
   const [newZoneArea, setNewZoneArea] = useState("");
   const [newZoneSubstrate, setNewZoneSubstrate] = useState("concrete");
 
@@ -85,7 +88,7 @@ export const LevelingCalculator: React.FC<Props> = ({ onCalculate }) => {
     compoundFibre: priceOr("RAGREAGE_FIBRE_25KG", 24),
     primerL: priceOr("PRIMER_FLOOR_LITER", 12),
     bandM: priceOr("PERIPHERAL_BAND_M", 1.2),
-    meshRoll: priceOr("MESH_FIBERGLASS_ROLL_50M2", 40), // roll ~50m²
+    meshRoll: priceOr("MESH_FIBERGLASS_ROLL_50M2", 40),
     laborM2: priceOr("LABOR_LEVELING_M2", 25),
     laborPrep: priceOr("LABOR_PREP_M2", 8),
   }));
@@ -99,6 +102,7 @@ export const LevelingCalculator: React.FC<Props> = ({ onCalculate }) => {
     if (!(area > 0)) return;
 
     const id = Date.now().toString();
+    const label = (newZoneLabel || t("calc.leveling.default_zone")).trim();
 
     if (newZoneThicknessMode === "avg") {
       const th = toNum(newZoneThickAvg, 0);
@@ -108,7 +112,7 @@ export const LevelingCalculator: React.FC<Props> = ({ onCalculate }) => {
         ...prev,
         {
           id,
-          label: (newZoneLabel || "Zone").trim(),
+          label,
           area,
           substrate: newZoneSubstrate,
           thicknessMode: "avg",
@@ -126,7 +130,7 @@ export const LevelingCalculator: React.FC<Props> = ({ onCalculate }) => {
         ...prev,
         {
           id,
-          label: (newZoneLabel || "Zone").trim(),
+          label,
           area,
           substrate: newZoneSubstrate,
           thicknessMode: "minmax",
@@ -142,7 +146,7 @@ export const LevelingCalculator: React.FC<Props> = ({ onCalculate }) => {
 
   const removeZone = (id: string) => setZones((prev) => prev.filter((z) => z.id !== id));
 
-  // --- Auto recommendations (non-destructive) ---
+  // --- Auto recommendations ---
   const [autoProductLocked, setAutoProductLocked] = useState(true);
 
   useEffect(() => {
@@ -170,8 +174,13 @@ export const LevelingCalculator: React.FC<Props> = ({ onCalculate }) => {
 
     const productDef =
       (LEVELING_PRODUCTS as any[]).find((p: any) => p?.id === productId) ||
-      ((LEVELING_PRODUCTS as any[])[0] as any) ||
-      { id: "standard", label: "Standard", minThick: 1, maxThick: 50, density: 1.6 };
+      ((LEVELING_PRODUCTS as any[])[0] as any) || {
+        id: "standard",
+        label: t("calc.leveling.product_fallback_label"),
+        minThick: 1,
+        maxThick: 50,
+        density: 1.6,
+      };
 
     let totalArea = 0;
     let perimeterTotal = 0;
@@ -188,17 +197,31 @@ export const LevelingCalculator: React.FC<Props> = ({ onCalculate }) => {
       const minTh = toNum((productDef as any).minThick, 1);
       const maxTh = toNum((productDef as any).maxThick, 50);
 
-      if (th < minTh) warnings.push(`${z.label}: épaisseur ${th}mm trop faible pour ${productDef.label}.`);
-      if (th > maxTh) warnings.push(`${z.label}: épaisseur ${th}mm trop élevée pour ${productDef.label}.`);
+      if (th < minTh) {
+        warnings.push(
+          t("calc.leveling.warn_thickness_too_low", { label: z.label, th, minTh, product: String(productDef.label ?? "") })
+        );
+      }
+      if (th > maxTh) {
+        warnings.push(
+          t("calc.leveling.warn_thickness_too_high", { label: z.label, th, maxTh, product: String(productDef.label ?? "") })
+        );
+      }
 
       if (z.thicknessMode === "minmax" && z.thicknessMin !== undefined && z.thicknessMax !== undefined) {
         if (z.thicknessMax - z.thicknessMin >= 10) {
-          warnings.push(`${z.label}: écart min/max important (${z.thicknessMin}-${z.thicknessMax}mm) → prévoir passes.`);
+          warnings.push(
+            t("calc.leveling.warn_minmax_gap", {
+              label: z.label,
+              tMin: z.thicknessMin,
+              tMax: z.thicknessMax,
+            })
+          );
         }
       }
 
-      if (z.substrate === "wood" && !useMesh) warnings.push(`${z.label}: support bois → treillis conseillé.`);
-      if (z.substrate === "tile" && !usePrimer) warnings.push(`${z.label}: carrelage → primaire conseillé.`);
+      if (z.substrate === "wood" && !useMesh) warnings.push(t("calc.leveling.warn_wood_mesh", { label: z.label }));
+      if (z.substrate === "tile" && !usePrimer) warnings.push(t("calc.leveling.warn_tile_primer", { label: z.label }));
     });
 
     const totalWeightWithWaste = totalWeight * (1 + wastePct / 100);
@@ -211,14 +234,17 @@ export const LevelingCalculator: React.FC<Props> = ({ onCalculate }) => {
     if (bags > 0) {
       materialsList.push({
         id: "compound",
-        name: `Ragréage ${productDef.label}`,
+        name: t("calc.leveling.mat_compound", { product: String(productDef.label ?? "") }),
         quantity: bags,
         quantityRaw: totalWeightWithWaste,
         unit: Unit.BAG,
         unitPrice: round2(pricePerBag),
         totalPrice: round2(costCompound),
         category: CalculatorType.RAGREAGE,
-        details: `${totalWeightWithWaste.toFixed(0)}kg • sac ${bagSize}kg`,
+        details: t("calc.leveling.mat_compound_details", {
+          kg: totalWeightWithWaste.toFixed(0),
+          bagSize,
+        }),
       });
     }
 
@@ -232,7 +258,7 @@ export const LevelingCalculator: React.FC<Props> = ({ onCalculate }) => {
 
       materialsList.push({
         id: "primer",
-        name: `Primaire d'accrochage (${primerLayers} couche${primerLayers > 1 ? "s" : ""})`,
+        name: t("calc.leveling.mat_primer", { layers: primerLayers }),
         quantity: litersRounded,
         quantityRaw: totalL,
         unit: Unit.LITER,
@@ -251,14 +277,14 @@ export const LevelingCalculator: React.FC<Props> = ({ onCalculate }) => {
 
       materialsList.push({
         id: "mesh",
-        name: "Treillis de verre (renfort)",
+        name: t("calc.leveling.mat_mesh"),
         quantity: rolls,
         quantityRaw: meshArea,
         unit: Unit.ROLL,
         unitPrice: round2(prices.meshRoll),
         totalPrice: round2(costMesh),
         category: CalculatorType.RAGREAGE,
-        details: "≈ 50m² / rouleau",
+        details: t("calc.leveling.mat_mesh_details"),
       });
     }
 
@@ -270,7 +296,7 @@ export const LevelingCalculator: React.FC<Props> = ({ onCalculate }) => {
 
       materialsList.push({
         id: "band",
-        name: "Bande périphérique",
+        name: t("calc.leveling.mat_band"),
         quantity: len,
         quantityRaw: perimeterTotal,
         unit: Unit.METER,
@@ -290,7 +316,7 @@ export const LevelingCalculator: React.FC<Props> = ({ onCalculate }) => {
       materialsList.push(
         {
           id: "lab_prep",
-          name: "Main d’œuvre – préparation",
+          name: t("calc.leveling.mat_labor_prep"),
           quantity: round2(totalArea),
           unit: Unit.M2,
           unitPrice: round2(prices.laborPrep),
@@ -299,7 +325,7 @@ export const LevelingCalculator: React.FC<Props> = ({ onCalculate }) => {
         },
         {
           id: "lab_app",
-          name: "Main d’œuvre – coulage ragréage",
+          name: t("calc.leveling.mat_labor_pour"),
           quantity: round2(totalArea),
           unit: Unit.M2,
           unitPrice: round2(prices.laborM2),
@@ -312,7 +338,7 @@ export const LevelingCalculator: React.FC<Props> = ({ onCalculate }) => {
     const totalCost = costCompound + costPrimer + costMesh + costBand + costLabor;
 
     const avgThick = zones.length > 0 ? zones.reduce((a, b) => a + b.thicknessVal, 0) / zones.length : 0;
-    if (zones.length === 0) warnings.push("Ajoutez au moins une zone pour obtenir un calcul.");
+    if (zones.length === 0) warnings.push(t("calc.leveling.warn_add_zone"));
 
     return {
       totalCost: round2(totalCost),
@@ -322,34 +348,30 @@ export const LevelingCalculator: React.FC<Props> = ({ onCalculate }) => {
       warnings,
       bags,
       totalWeightWithWaste,
-      productLabel: String(productDef.label ?? "Ragréage"),
+      productLabel: String(productDef.label ?? t("calc.leveling.product_fallback_label")),
     };
-  }, [
-    zones,
-    productId,
-    bagSize,
-    wastePct,
-    usePrimer,
-    primerLayers,
-    usePeripheralBand,
-    useMesh,
-    prices,
-    proMode,
-  ]);
+  }, [t, zones, productId, bagSize, wastePct, usePrimer, primerLayers, usePeripheralBand, useMesh, prices, proMode]);
 
   useEffect(() => {
     onCalculate({
-      summary: `${calculationData.totalArea.toFixed(1)} m² de ragréage`,
+      summary: t("calc.leveling.summary", { area: calculationData.totalArea.toFixed(1) }),
       details: [
-        { label: "Surface", value: calculationData.totalArea.toFixed(1), unit: "m²" },
-        { label: "Épaisseur moy.", value: calculationData.avgThick.toFixed(1), unit: "mm" },
-        { label: "Produit", value: calculationData.productLabel, unit: "" },
+        { label: t("calc.leveling.detail_area"), value: calculationData.totalArea.toFixed(1), unit: "m²" },
+        { label: t("calc.leveling.detail_avg_thickness"), value: calculationData.avgThick.toFixed(1), unit: "mm" },
+        { label: t("calc.leveling.detail_product"), value: calculationData.productLabel, unit: "" },
       ],
       materials: calculationData.materials,
       totalCost: calculationData.totalCost,
       warnings: calculationData.warnings.length ? calculationData.warnings : undefined,
     });
-  }, [calculationData, onCalculate]);
+  }, [calculationData, onCalculate, t]);
+
+  const stepLabel = (s: number) => {
+    if (s === 1) return t("calc.leveling.step_1");
+    if (s === 2) return t("calc.leveling.step_2");
+    if (s === 3) return t("calc.leveling.step_3");
+    return t("calc.leveling.step_4");
+  };
 
   return (
     <div className="space-y-6 animate-in fade-in">
@@ -364,10 +386,7 @@ export const LevelingCalculator: React.FC<Props> = ({ onCalculate }) => {
               step === s ? "bg-white shadow text-blue-600" : "text-slate-400"
             }`}
           >
-            {s === 1 && "1. Zones"}
-            {s === 2 && "2. Produit"}
-            {s === 3 && "3. Prép."}
-            {s === 4 && "4. Devis"}
+            {stepLabel(s)}
           </button>
         ))}
       </div>
@@ -377,7 +396,7 @@ export const LevelingCalculator: React.FC<Props> = ({ onCalculate }) => {
         <div className="space-y-4">
           <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
             <ScanLine size={16} className="mr-2 shrink-0 mt-0.5" />
-            Ajoutez les zones à ragréer (support + épaisseur).
+            {t("calc.leveling.help_step1")}
           </div>
 
           <div className="space-y-2">
@@ -386,25 +405,33 @@ export const LevelingCalculator: React.FC<Props> = ({ onCalculate }) => {
                 <div className="min-w-0">
                   <span className="font-bold text-slate-700 block truncate">{z.label}</span>
                   <span className="text-xs text-slate-500">
-                    {z.area} m² •{" "}
-                    {z.thicknessMode === "avg"
-                      ? `${z.thicknessVal} mm`
-                      : `${z.thicknessMin}-${z.thicknessMax} mm (moy ${z.thicknessVal.toFixed(1)} mm)`}{" "}
-                    • {(LEVELING_SUBSTRATES as any[]).find((s: any) => s.id === z.substrate)?.label || z.substrate}
+                    {t("calc.leveling.zone_line", {
+                      area: z.area,
+                      thicknessText:
+                        z.thicknessMode === "avg"
+                          ? t("calc.leveling.thickness_avg_value", { mm: z.thicknessVal })
+                          : t("calc.leveling.thickness_minmax_value", {
+                              min: z.thicknessMin,
+                              max: z.thicknessMax,
+                              avg: z.thicknessVal.toFixed(1),
+                            }),
+                      substrate:
+                        (LEVELING_SUBSTRATES as any[]).find((s: any) => s.id === z.substrate)?.label || z.substrate,
+                    })}
                   </span>
                 </div>
-                <button type="button" onClick={() => removeZone(z.id)} className="text-red-400 p-2">
+                <button type="button" onClick={() => removeZone(z.id)} className="text-red-400 p-2" aria-label={t("common.remove")}>
                   <Trash2 size={16} />
                 </button>
               </div>
             ))}
-            {zones.length === 0 && <div className="text-center text-sm text-slate-400 py-4 italic">Aucune zone ajoutée.</div>}
+            {zones.length === 0 && <div className="text-center text-sm text-slate-400 py-4 italic">{t("calc.leveling.empty_zones")}</div>}
           </div>
 
           <div className="bg-slate-50 p-3 rounded-xl border border-blue-200 space-y-2">
             <input
               type="text"
-              placeholder="Nom (ex: Salon)"
+              placeholder={t("calc.leveling.ph_zone_name")}
               value={newZoneLabel}
               onChange={(e) => setNewZoneLabel(e.target.value)}
               className="w-full p-2 text-xs border rounded bg-white text-slate-900"
@@ -413,7 +440,7 @@ export const LevelingCalculator: React.FC<Props> = ({ onCalculate }) => {
             <div className="grid grid-cols-2 gap-2">
               <input
                 type="number"
-                placeholder="Surface (m²)"
+                placeholder={t("calc.leveling.ph_area")}
                 value={newZoneArea}
                 onChange={(e) => setNewZoneArea(e.target.value)}
                 className="p-2 text-xs border rounded bg-white text-slate-900"
@@ -438,21 +465,21 @@ export const LevelingCalculator: React.FC<Props> = ({ onCalculate }) => {
                 onClick={() => setNewZoneThicknessMode("avg")}
                 className={`flex-1 py-1.5 text-xs font-bold rounded ${newZoneThicknessMode === "avg" ? "bg-white shadow" : "text-slate-500"}`}
               >
-                Épaisseur moy.
+                {t("calc.leveling.thickness_mode_avg")}
               </button>
               <button
                 type="button"
                 onClick={() => setNewZoneThicknessMode("minmax")}
                 className={`flex-1 py-1.5 text-xs font-bold rounded ${newZoneThicknessMode === "minmax" ? "bg-white shadow" : "text-slate-500"}`}
               >
-                Min / Max
+                {t("calc.leveling.thickness_mode_minmax")}
               </button>
             </div>
 
             {newZoneThicknessMode === "avg" ? (
               <input
                 type="number"
-                placeholder="Épaisseur (mm)"
+                placeholder={t("calc.leveling.ph_thickness_avg")}
                 value={newZoneThickAvg}
                 onChange={(e) => setNewZoneThickAvg(e.target.value)}
                 className="w-full p-2 text-xs border rounded bg-white text-slate-900"
@@ -461,14 +488,14 @@ export const LevelingCalculator: React.FC<Props> = ({ onCalculate }) => {
               <div className="grid grid-cols-2 gap-2">
                 <input
                   type="number"
-                  placeholder="Min (mm)"
+                  placeholder={t("calc.leveling.ph_thickness_min")}
                   value={newZoneThickMin}
                   onChange={(e) => setNewZoneThickMin(e.target.value)}
                   className="p-2 text-xs border rounded bg-white text-slate-900"
                 />
                 <input
                   type="number"
-                  placeholder="Max (mm)"
+                  placeholder={t("calc.leveling.ph_thickness_max")}
                   value={newZoneThickMax}
                   onChange={(e) => setNewZoneThickMax(e.target.value)}
                   className="p-2 text-xs border rounded bg-white text-slate-900"
@@ -481,7 +508,7 @@ export const LevelingCalculator: React.FC<Props> = ({ onCalculate }) => {
               onClick={addZone}
               className="w-full py-2 bg-blue-600 text-white font-bold rounded text-xs flex justify-center items-center"
             >
-              <Plus size={14} className="mr-1" /> Ajouter zone
+              <Plus size={14} className="mr-1" /> {t("calc.leveling.btn_add_zone")}
             </button>
           </div>
 
@@ -490,7 +517,7 @@ export const LevelingCalculator: React.FC<Props> = ({ onCalculate }) => {
             onClick={() => setStep(2)}
             className="w-full py-3 bg-blue-600 text-white rounded-xl font-bold flex justify-center items-center mt-2"
           >
-            Suivant <ArrowRight size={18} className="ml-2" />
+            {t("common.next")} <ArrowRight size={18} className="ml-2" />
           </button>
         </div>
       )}
@@ -500,15 +527,16 @@ export const LevelingCalculator: React.FC<Props> = ({ onCalculate }) => {
         <div className="space-y-4">
           <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
             <Layers size={16} className="mr-2 shrink-0 mt-0.5" />
-            Sélection du ragréage. Auto-reco : <span className="font-bold ml-1">{autoProductLocked ? "ON" : "OFF"}</span>
+            {t("calc.leveling.help_step2")}{" "}
+            <span className="font-bold ml-1">{autoProductLocked ? t("common.on") : t("common.off")}</span>
           </div>
 
           <div className="bg-white p-3 rounded-xl border border-slate-200">
             <div className="flex justify-between items-center mb-3">
-              <h4 className="text-xs font-bold text-slate-500 uppercase">Produit</h4>
+              <h4 className="text-xs font-bold text-slate-500 uppercase">{t("calc.leveling.product_title")}</h4>
               <label className="flex items-center gap-2 text-xs text-slate-600">
                 <input type="checkbox" checked={autoProductLocked} onChange={(e) => setAutoProductLocked(e.target.checked)} />
-                Auto
+                {t("common.auto")}
               </label>
             </div>
 
@@ -528,7 +556,11 @@ export const LevelingCalculator: React.FC<Props> = ({ onCalculate }) => {
                   <div>
                     <span className="font-bold block text-sm">{p.label}</span>
                     <span className="text-[10px] opacity-75">
-                      Ép. {p.minThick}-{p.maxThick}mm • densité {p.density} kg/(m²·mm)
+                      {t("calc.leveling.product_specs", {
+                        min: p.minThick,
+                        max: p.maxThick,
+                        density: p.density,
+                      })}
                     </span>
                   </div>
                   {productId === p.id && <Check size={16} />}
@@ -538,14 +570,14 @@ export const LevelingCalculator: React.FC<Props> = ({ onCalculate }) => {
 
             <div className="grid grid-cols-2 gap-4 mt-4">
               <div>
-                <label className="block text-xs font-bold text-slate-500 mb-1">Sac (kg)</label>
+                <label className="block text-xs font-bold text-slate-500 mb-1">{t("calc.leveling.bag_size")}</label>
                 <select value={bagSize} onChange={(e) => setBagSize(toNum(e.target.value, 25))} className="w-full p-2 border rounded bg-white text-sm text-slate-900">
-                  <option value={20}>20 kg</option>
-                  <option value={25}>25 kg</option>
+                  <option value={20}>{t("calc.leveling.bag_kg", { kg: 20 })}</option>
+                  <option value={25}>{t("calc.leveling.bag_kg", { kg: 25 })}</option>
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-bold text-slate-500 mb-1">Pertes (%)</label>
+                <label className="block text-xs font-bold text-slate-500 mb-1">{t("calc.leveling.waste_pct")}</label>
                 <input
                   type="number"
                   value={wastePct}
@@ -556,17 +588,19 @@ export const LevelingCalculator: React.FC<Props> = ({ onCalculate }) => {
             </div>
 
             <div className="mt-3 text-xs text-slate-500">
-              Estimation : <span className="font-bold">{calculationData.bags}</span> sac(s) •{" "}
-              <span className="font-bold">{calculationData.totalWeightWithWaste.toFixed(0)} kg</span>
+              {t("calc.leveling.estimate_line", {
+                bags: calculationData.bags,
+                kg: calculationData.totalWeightWithWaste.toFixed(0),
+              })}
             </div>
           </div>
 
           <div className="flex gap-3">
             <button type="button" onClick={() => setStep(1)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
-              Retour
+              {t("common.back")}
             </button>
             <button type="button" onClick={() => setStep(3)} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold">
-              Suivant
+              {t("common.next")}
             </button>
           </div>
         </div>
@@ -577,19 +611,19 @@ export const LevelingCalculator: React.FC<Props> = ({ onCalculate }) => {
         <div className="space-y-4">
           <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
             <Construction size={16} className="mr-2 shrink-0 mt-0.5" />
-            Préparation du support (primaire, bande périphérique, treillis).
+            {t("calc.leveling.help_step3")}
           </div>
 
           <div className="space-y-3">
             <div className="p-3 bg-white border rounded-lg">
               <label className="flex items-center justify-between cursor-pointer mb-2">
-                <span className="text-sm font-bold text-slate-700">Primaire d'accrochage</span>
+                <span className="text-sm font-bold text-slate-700">{t("calc.leveling.opt_primer")}</span>
                 <input type="checkbox" checked={usePrimer} onChange={(e) => setUsePrimer(e.target.checked)} className="h-5 w-5 text-blue-600 rounded" />
               </label>
 
               {usePrimer && (
                 <div className="pl-2 flex items-center space-x-3">
-                  <span className="text-xs text-slate-500">Couches :</span>
+                  <span className="text-xs text-slate-500">{t("calc.leveling.layers")}:</span>
                   <div className="flex bg-slate-100 rounded p-0.5">
                     <button type="button" onClick={() => setPrimerLayers(1)} className={`px-3 py-1 text-xs rounded ${primerLayers === 1 ? "bg-white shadow font-bold" : ""}`}>
                       1
@@ -604,16 +638,16 @@ export const LevelingCalculator: React.FC<Props> = ({ onCalculate }) => {
 
             <label className="flex items-center justify-between p-3 bg-white border rounded-lg cursor-pointer">
               <div>
-                <span className="text-sm font-bold text-slate-700">Bande périphérique</span>
-                <p className="text-[10px] text-slate-400">Désolidarisation des murs</p>
+                <span className="text-sm font-bold text-slate-700">{t("calc.leveling.opt_band")}</span>
+                <p className="text-[10px] text-slate-400">{t("calc.leveling.opt_band_help")}</p>
               </div>
               <input type="checkbox" checked={usePeripheralBand} onChange={(e) => setUsePeripheralBand(e.target.checked)} className="h-5 w-5 text-blue-600 rounded" />
             </label>
 
             <label className="flex items-center justify-between p-3 bg-white border rounded-lg cursor-pointer">
               <div>
-                <span className="text-sm font-bold text-slate-700">Treillis de verre</span>
-                <p className="text-[10px] text-slate-400">Renfort (souvent requis sur bois)</p>
+                <span className="text-sm font-bold text-slate-700">{t("calc.leveling.opt_mesh")}</span>
+                <p className="text-[10px] text-slate-400">{t("calc.leveling.opt_mesh_help")}</p>
               </div>
               <input type="checkbox" checked={useMesh} onChange={(e) => setUseMesh(e.target.checked)} className="h-5 w-5 text-blue-600 rounded" />
             </label>
@@ -622,21 +656,21 @@ export const LevelingCalculator: React.FC<Props> = ({ onCalculate }) => {
           <div className="bg-slate-50 p-3 rounded-lg flex items-start text-xs text-slate-600">
             <Clock size={16} className="mr-2 mt-0.5 shrink-0" />
             <div>
-              <span className="font-bold block mb-1">Séchage indicatif</span>
+              <span className="font-bold block mb-1">{t("calc.leveling.drying_title")}</span>
               <ul className="list-disc pl-4 space-y-0.5">
-                <li>Circulation : 3–4 h</li>
-                <li>Carrelage : ~24 h</li>
-                <li>Parquet/PVC : 48–72 h</li>
+                <li>{t("calc.leveling.drying_walk")}</li>
+                <li>{t("calc.leveling.drying_tile")}</li>
+                <li>{t("calc.leveling.drying_floor")}</li>
               </ul>
             </div>
           </div>
 
           <div className="flex gap-3">
             <button type="button" onClick={() => setStep(2)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
-              Retour
+              {t("common.back")}
             </button>
             <button type="button" onClick={() => setStep(4)} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold">
-              Suivant
+              {t("common.next")}
             </button>
           </div>
         </div>
@@ -647,43 +681,43 @@ export const LevelingCalculator: React.FC<Props> = ({ onCalculate }) => {
         <div className="space-y-4">
           <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
             <CircleDollarSign size={16} className="mr-2 shrink-0 mt-0.5" />
-            Ajustez les prix unitaires.
+            {t("calc.leveling.help_step4")}
           </div>
 
           <div className="bg-white p-3 rounded-xl border border-slate-200">
             <div className="flex justify-between items-center mb-3">
-              <h4 className="text-xs font-bold text-slate-500 uppercase">Tarifs</h4>
+              <h4 className="text-xs font-bold text-slate-500 uppercase">{t("calc.leveling.prices_title")}</h4>
               <button type="button" onClick={() => setProMode(!proMode)} className="text-xs flex items-center text-blue-600">
-                <Settings size={12} className="mr-1" /> {proMode ? "Mode Pro" : "Mode Simple"}
+                <Settings size={12} className="mr-1" /> {proMode ? t("common.pro_mode") : t("common.simple_mode")}
               </button>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-[10px] text-slate-500 mb-1">Ragréage standard (€/sac)</label>
+                <label className="block text-[10px] text-slate-500 mb-1">{t("calc.leveling.price_compound_std")}</label>
                 <input type="number" value={prices.compoundBag} onChange={(e) => updatePrice("compoundBag", e.target.value)} className="w-full p-1.5 border rounded text-sm bg-white text-slate-900" />
               </div>
 
               <div>
-                <label className="block text-[10px] text-slate-500 mb-1">Ragréage fibré (€/sac)</label>
+                <label className="block text-[10px] text-slate-500 mb-1">{t("calc.leveling.price_compound_fibre")}</label>
                 <input type="number" value={prices.compoundFibre} onChange={(e) => updatePrice("compoundFibre", e.target.value)} className="w-full p-1.5 border rounded text-sm bg-white text-slate-900" />
               </div>
 
               <div>
-                <label className="block text-[10px] text-slate-500 mb-1">Primaire (€/L)</label>
+                <label className="block text-[10px] text-slate-500 mb-1">{t("calc.leveling.price_primer")}</label>
                 <input type="number" value={prices.primerL} onChange={(e) => updatePrice("primerL", e.target.value)} className="w-full p-1.5 border rounded text-sm bg-white text-slate-900" />
               </div>
 
               {useMesh && (
                 <div>
-                  <label className="block text-[10px] text-slate-500 mb-1">Treillis (€/rlx)</label>
+                  <label className="block text-[10px] text-slate-500 mb-1">{t("calc.leveling.price_mesh")}</label>
                   <input type="number" value={prices.meshRoll} onChange={(e) => updatePrice("meshRoll", e.target.value)} className="w-full p-1.5 border rounded text-sm bg-white text-slate-900" />
                 </div>
               )}
 
               {usePeripheralBand && (
                 <div>
-                  <label className="block text-[10px] text-slate-500 mb-1">Bande (€/m)</label>
+                  <label className="block text-[10px] text-slate-500 mb-1">{t("calc.leveling.price_band")}</label>
                   <input type="number" value={prices.bandM} onChange={(e) => updatePrice("bandM", e.target.value)} className="w-full p-1.5 border rounded text-sm bg-white text-slate-900" />
                 </div>
               )}
@@ -692,11 +726,11 @@ export const LevelingCalculator: React.FC<Props> = ({ onCalculate }) => {
             {proMode && (
               <div className="mt-4 pt-3 border-t border-slate-100 grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[10px] text-blue-600 font-bold mb-1">MO coulage (€/m²)</label>
+                  <label className="block text-[10px] text-blue-600 font-bold mb-1">{t("calc.leveling.price_labor_pour")}</label>
                   <input type="number" value={prices.laborM2} onChange={(e) => updatePrice("laborM2", e.target.value)} className="w-full p-1.5 border border-blue-200 rounded text-sm bg-white text-slate-900" />
                 </div>
                 <div>
-                  <label className="block text-[10px] text-blue-600 font-bold mb-1">MO prépa (€/m²)</label>
+                  <label className="block text-[10px] text-blue-600 font-bold mb-1">{t("calc.leveling.price_labor_prep")}</label>
                   <input type="number" value={prices.laborPrep} onChange={(e) => updatePrice("laborPrep", e.target.value)} className="w-full p-1.5 border border-blue-200 rounded text-sm bg-white text-slate-900" />
                 </div>
               </div>
@@ -715,10 +749,10 @@ export const LevelingCalculator: React.FC<Props> = ({ onCalculate }) => {
 
           <div className="flex gap-3 pt-2">
             <button type="button" onClick={() => setStep(3)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
-              Retour
+              {t("common.back")}
             </button>
             <button type="button" disabled className="flex-1 py-3 bg-emerald-100 text-emerald-700 rounded-xl font-bold flex justify-center items-center">
-              <Check size={18} className="mr-2" /> Calculé
+              <Check size={18} className="mr-2" /> {t("common.calculated")}
             </button>
           </div>
         </div>

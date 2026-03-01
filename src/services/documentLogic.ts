@@ -11,6 +11,8 @@ import { ComputedQuote } from "./quote";
 import { generateId } from "./storage";
 import { generateDocumentNumber, saveQuote, saveInvoice, getQuote } from "./documentsStorage";
 
+const todayISO = () => new Date().toISOString().split("T")[0];
+
 export const createQuoteFromProject = (
   project: HouseProject,
   computed: ComputedQuote,
@@ -55,7 +57,7 @@ export const createQuoteFromProject = (
     projectId: project.id,
     number: docNumber,
     createdAt: new Date().toISOString(),
-    date: new Date().toISOString().split("T")[0],
+    date: todayISO(),
     validUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
     client,
     lines,
@@ -81,15 +83,17 @@ export const createQuoteFromSimpleProject = (
   let totalHT = 0;
 
   project.items.forEach((item) => {
-    const lineTotal = item.quantity * item.unitPrice;
+    const qty = Number(item.quantity) || 0;
+    const up = Number(item.unitPrice) || 0;
+    const lineTotal = qty * up;
     totalHT += lineTotal;
 
     lines.push({
       id: generateId(),
       description: item.name + (item.details ? ` (${item.details})` : ""),
-      quantity: item.quantity,
+      quantity: qty,
       unit: item.unit,
-      unitPrice: item.unitPrice,
+      unitPrice: up,
       totalHT: lineTotal,
       vatRate: 20,
     });
@@ -104,7 +108,7 @@ export const createQuoteFromSimpleProject = (
     projectId: project.id,
     number: docNumber,
     createdAt: new Date().toISOString(),
-    date: new Date().toISOString().split("T")[0],
+    date: todayISO(),
     validUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
     client,
     lines,
@@ -133,9 +137,9 @@ export const convertQuoteToInvoice = (quoteId: string): string | null => {
     quoteSourceId: quote.id,
     number: docNumber,
     createdAt: new Date().toISOString(),
-    date: new Date().toISOString().split("T")[0],
-    client: quote.client,
-    lines: quote.lines.map((l) => ({ ...l })),
+    date: todayISO(),
+    client: { ...quote.client },
+    lines: quote.lines.map((l) => ({ ...l })), // copy
     totalHT: quote.totalHT,
     totalVAT: quote.totalVAT,
     totalTTC: quote.totalTTC,
@@ -144,8 +148,8 @@ export const convertQuoteToInvoice = (quoteId: string): string | null => {
 
   saveInvoice(invoice);
 
-  quote.status = "invoiced";
-  saveQuote(quote);
+  const updatedQuote: QuoteDocument = { ...quote, status: "invoiced" };
+  saveQuote(updatedQuote);
 
   return docId;
 };
@@ -157,7 +161,10 @@ export const recalculateTotals = (doc: QuoteDocument | InvoiceDocument) => {
   const nextLines = doc.lines.map((line) => {
     if (line.unitPrice === 0) return { ...line };
 
-    const lineTotal = (Number(line.quantity) || 0) * (Number(line.unitPrice) || 0);
+    const qty = Number(line.quantity) || 0;
+    const up = Number(line.unitPrice) || 0;
+    const lineTotal = qty * up;
+
     const vatRate = Number(line.vatRate) || 0;
     totalHT += lineTotal;
     totalVAT += lineTotal * (vatRate / 100);

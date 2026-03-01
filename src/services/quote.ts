@@ -62,14 +62,16 @@ export const calculateQuote = (project: HouseProject): ComputedQuote => {
 
       if (stepData && Array.isArray((stepData as any).materials)) {
         (stepData as any).materials.forEach((mat: any) => {
-          const total = (Number(mat.quantity) || 0) * (Number(mat.unitPrice) || 0);
+          const qty = Number(mat.quantity) || 0;
+          const up = Number(mat.unitPrice) || 0;
+          const total = qty * up;
 
           items.push({
             id: mat.id,
             label: mat.name,
-            quantity: Number(mat.quantity) || 0,
+            quantity: qty,
             unit: mat.unit,
-            unitPrice: Number(mat.unitPrice) || 0,
+            unitPrice: up,
             totalPrice: total,
             type: "material",
             isManual: false,
@@ -81,14 +83,16 @@ export const calculateQuote = (project: HouseProject): ComputedQuote => {
       }
 
       stepManualLines.forEach((line) => {
-        const total = (Number(line.quantity) || 0) * (Number(line.unitPrice) || 0);
+        const qty = Number(line.quantity) || 0;
+        const up = Number(line.unitPrice) || 0;
+        const total = qty * up;
 
         items.push({
           id: line.id,
           label: line.label,
-          quantity: Number(line.quantity) || 0,
+          quantity: qty,
           unit: line.unit,
-          unitPrice: Number(line.unitPrice) || 0,
+          unitPrice: up,
           totalPrice: total,
           type: line.category,
           isManual: true,
@@ -96,6 +100,7 @@ export const calculateQuote = (project: HouseProject): ComputedQuote => {
 
         if (line.category === "labor") totalLaborHT += total;
         else totalMaterialsHT += total;
+
         sectionTotal += total;
       });
 
@@ -116,14 +121,16 @@ export const calculateQuote = (project: HouseProject): ComputedQuote => {
     let sectionTotal = 0;
 
     globalLines.forEach((line) => {
-      const total = (Number(line.quantity) || 0) * (Number(line.unitPrice) || 0);
+      const qty = Number(line.quantity) || 0;
+      const up = Number(line.unitPrice) || 0;
+      const total = qty * up;
 
       items.push({
         id: line.id,
         label: line.label,
-        quantity: Number(line.quantity) || 0,
+        quantity: qty,
         unit: line.unit,
-        unitPrice: Number(line.unitPrice) || 0,
+        unitPrice: up,
         totalPrice: total,
         type: line.category,
         isManual: true,
@@ -131,6 +138,7 @@ export const calculateQuote = (project: HouseProject): ComputedQuote => {
 
       if (line.category === "labor") totalLaborHT += total;
       else totalMaterialsHT += total;
+
       sectionTotal += total;
     });
 
@@ -185,8 +193,7 @@ export const generateQuoteCSV = (
   ];
 
   const rows: string[] = [];
-
-  const f = (n: number) => String(n.toFixed(2)).replace(".", ",");
+  const f = (n: number) => String((Number(n) || 0).toFixed(2)).replace(".", ",");
 
   quote.sections.forEach((sec) => {
     sec.items.forEach((item) => {

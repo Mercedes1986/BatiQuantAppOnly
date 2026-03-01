@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { CalculatorType, CalculationResult, Unit } from "../../../types";
 import { DEFAULT_PRICES } from "../../constants";
 import { getUnitPrice } from "../../services/materialsService";
@@ -40,6 +41,8 @@ const priceOr = (key: string, fallback: number) => {
 };
 
 export const RoofCalculator: React.FC<Props> = ({ onCalculate }) => {
+  const { t } = useTranslation();
+
   const [step, setStep] = useState(1);
   const [proMode, setProMode] = useState(false);
 
@@ -64,6 +67,10 @@ export const RoofCalculator: React.FC<Props> = ({ onCalculate }) => {
   const [gutterType, setGutterType] = useState<GutterType>("pvc");
   const [downspouts, setDownspouts] = useState<number>(4);
   const [valleyLen, setValleyLen] = useState<string>("0"); // m
+
+  const coverLabel = (m: CoverMaterial) => t(`calc.roof.cover.${m}`, { defaultValue: m });
+  const gutterLabel = (g: GutterType) => t(`calc.roof.gutter.${g}`, { defaultValue: g });
+  const roofTypeLabel = (rt: RoofType) => t(`calc.roof.type.${rt}`, { defaultValue: rt });
 
   // --- 5. Pricing ---
   const [prices, setPrices] = useState(() => ({
@@ -173,35 +180,28 @@ export const RoofCalculator: React.FC<Props> = ({ onCalculate }) => {
       hipLen = slopeLen * 1.5 * 4;
     }
 
-    const totalAreaWithWaste = realArea * (1 + wastePct / 100);
+    const totalAreaWithWaste = realArea * (1 + clamp(wastePct, 0, 40) / 100);
 
     const materials: any[] = [];
     let totalCost = 0;
-
-    const coverName =
-      coverMaterial === "tile_mech"
-        ? "Tuiles mécaniques"
-        : coverMaterial === "tile_flat"
-        ? "Tuiles plates"
-        : coverMaterial === "slate"
-        ? "Ardoises"
-        : coverMaterial === "steel"
-        ? "Bac acier"
-        : "Zinc (joint debout)";
 
     // Cover
     const costCover = totalAreaWithWaste * prices.coverM2;
     totalCost += costCover;
     materials.push({
       id: "cover",
-      name: coverName,
+      name: coverLabel(coverMaterial),
       quantity: Math.ceil(totalAreaWithWaste),
       quantityRaw: totalAreaWithWaste,
       unit: Unit.M2,
       unitPrice: round2(prices.coverM2),
       totalPrice: round2(costCover),
       category: CalculatorType.ROOF,
-      details: `Surface réelle: ${realArea.toFixed(1)} m² (+${wastePct}%)`,
+      details: t("calc.roof.mat.cover_details", {
+        real: realArea.toFixed(1),
+        waste: clamp(wastePct, 0, 40),
+        defaultValue: `Real area: ${realArea.toFixed(1)} m² (+${clamp(wastePct, 0, 40)}%)`,
+      }),
     });
 
     // Ridge
@@ -210,7 +210,7 @@ export const RoofCalculator: React.FC<Props> = ({ onCalculate }) => {
       totalCost += costRidge;
       materials.push({
         id: "ridge",
-        name: "Faîtage",
+        name: t("calc.roof.mat.ridge", { defaultValue: "Ridge" }),
         quantity: round2(ridgeLen),
         quantityRaw: ridgeLen,
         unit: Unit.METER,
@@ -226,7 +226,7 @@ export const RoofCalculator: React.FC<Props> = ({ onCalculate }) => {
       totalCost += costVerge;
       materials.push({
         id: "verge",
-        name: "Rives",
+        name: t("calc.roof.mat.verge", { defaultValue: "Verges / edges" }),
         quantity: round2(vergeLen),
         quantityRaw: vergeLen,
         unit: Unit.METER,
@@ -242,7 +242,7 @@ export const RoofCalculator: React.FC<Props> = ({ onCalculate }) => {
       totalCost += costHip;
       materials.push({
         id: "hip",
-        name: "Arêtiers",
+        name: t("calc.roof.mat.hip", { defaultValue: "Hips" }),
         quantity: round2(hipLen),
         quantityRaw: hipLen,
         unit: Unit.METER,
@@ -259,7 +259,7 @@ export const RoofCalculator: React.FC<Props> = ({ onCalculate }) => {
       totalCost += costValley;
       materials.push({
         id: "valley",
-        name: "Noues (zinguerie)",
+        name: t("calc.roof.mat.valley", { defaultValue: "Valleys (zincwork)" }),
         quantity: round2(vLen),
         quantityRaw: vLen,
         unit: Unit.METER,
@@ -276,7 +276,7 @@ export const RoofCalculator: React.FC<Props> = ({ onCalculate }) => {
       totalCost += costScreen;
       materials.push({
         id: "screen",
-        name: "Écran sous-toiture (HPV)",
+        name: t("calc.roof.mat.screen", { defaultValue: "Underlay (HPV)" }),
         quantity: Math.ceil(screenArea),
         quantityRaw: screenArea,
         unit: Unit.M2,
@@ -290,7 +290,7 @@ export const RoofCalculator: React.FC<Props> = ({ onCalculate }) => {
       totalCost += costCB;
       materials.push({
         id: "counter_batten",
-        name: "Contre-lattage (ventilation)",
+        name: t("calc.roof.mat.counter_batten", { defaultValue: "Counter-battens" }),
         quantity: Math.ceil(cbLen),
         quantityRaw: cbLen,
         unit: Unit.METER,
@@ -307,7 +307,10 @@ export const RoofCalculator: React.FC<Props> = ({ onCalculate }) => {
       totalCost += costInsul;
       materials.push({
         id: "insulation",
-        name: `Isolation rampants (${insulThick}mm)`,
+        name: t("calc.roof.mat.insulation", {
+          thick: insulThick,
+          defaultValue: `Insulation (${insulThick}mm)`,
+        }),
         quantity: Math.ceil(insulArea),
         quantityRaw: insulArea,
         unit: Unit.M2,
@@ -322,7 +325,7 @@ export const RoofCalculator: React.FC<Props> = ({ onCalculate }) => {
         totalCost += costVapor;
         materials.push({
           id: "vapor",
-          name: "Pare-vapeur / frein-vapeur",
+          name: t("calc.roof.mat.vapor", { defaultValue: "Vapor barrier" }),
           quantity: Math.ceil(vaporArea),
           quantityRaw: vaporArea,
           unit: Unit.M2,
@@ -339,14 +342,17 @@ export const RoofCalculator: React.FC<Props> = ({ onCalculate }) => {
       totalCost += costGutter;
       materials.push({
         id: "gutter",
-        name: `Gouttières (${gutterType.toUpperCase()})`,
+        name: t("calc.roof.mat.gutter", { defaultValue: "Gutters" }),
         quantity: Math.ceil(eavesLen),
         quantityRaw: eavesLen,
         unit: Unit.METER,
         unitPrice: round2(prices.gutterM),
         totalPrice: round2(costGutter),
         category: CalculatorType.ROOF,
-        details: "Crochets inclus (approx.)",
+        details: t("calc.roof.mat.gutter_details", {
+          type: gutterLabel(gutterType),
+          defaultValue: `Type: ${gutterLabel(gutterType)} • hooks included (approx.)`,
+        }),
       });
 
       const ds = Math.max(0, Math.floor(downspouts));
@@ -355,7 +361,7 @@ export const RoofCalculator: React.FC<Props> = ({ onCalculate }) => {
         totalCost += costDS;
         materials.push({
           id: "downspouts",
-          name: "Descentes EP + naissances",
+          name: t("calc.roof.mat.downspouts", { defaultValue: "Downspouts" }),
           quantity: ds,
           unit: Unit.PIECE,
           unitPrice: round2(prices.downspoutU),
@@ -371,7 +377,7 @@ export const RoofCalculator: React.FC<Props> = ({ onCalculate }) => {
       totalCost += costLabor;
       materials.push({
         id: "labor",
-        name: "Main d'œuvre couverture",
+        name: t("calc.roof.mat.labor", { defaultValue: "Labor (roofing)" }),
         quantity: round2(realArea),
         quantityRaw: realArea,
         unit: Unit.M2,
@@ -383,11 +389,11 @@ export const RoofCalculator: React.FC<Props> = ({ onCalculate }) => {
 
     // Warnings
     if (roofType !== "flat") {
-      if (coverMaterial.startsWith("tile") && slopePct < 10) warnings.push("Pente faible (<10%) pour une couverture en tuiles.");
-      if (coverMaterial === "zinc" && slopePct < 5) warnings.push("Zinc joint debout : pente très faible, vérifier prescriptions fabricant.");
+      if (coverMaterial.startsWith("tile") && slopePct < 10) warnings.push(t("calc.roof.warn.low_slope_tiles", { defaultValue: "Low slope (<10%) for a tiled roof." }));
+      if (coverMaterial === "zinc" && slopePct < 5) warnings.push(t("calc.roof.warn.low_slope_zinc", { defaultValue: "Standing seam zinc: very low slope, check manufacturer specs." }));
     } else {
       if (coverMaterial !== "steel" && coverMaterial !== "zinc") {
-        warnings.push("Toit plat : bac acier/zinc/EPDM sont généralement plus adaptés qu'une tuile.");
+        warnings.push(t("calc.roof.warn.flat_roof_material", { defaultValue: "Flat roof: steel/zinc/EPDM are usually more suitable than tiles." }));
       }
     }
 
@@ -405,6 +411,7 @@ export const RoofCalculator: React.FC<Props> = ({ onCalculate }) => {
       warnings,
     };
   }, [
+    t,
     roofType,
     dimL,
     dimW,
@@ -421,34 +428,41 @@ export const RoofCalculator: React.FC<Props> = ({ onCalculate }) => {
     valleyLen,
     prices,
     proMode,
+    coverLabel,
+    gutterLabel,
   ]);
 
   useEffect(() => {
     if (!calculationData.ok) {
       onCalculate({
-        summary: "Toiture",
+        summary: t("calc.roof.title", { defaultValue: "Roof" }),
         details: [],
         materials: [],
         totalCost: 0,
-        warnings: ["Renseignez Longueur et Largeur pour calculer la toiture."],
+        warnings: [t("calc.roof.warn.fill_dims", { defaultValue: "Fill in Length and Width to calculate the roof." })],
       });
       return;
     }
 
     onCalculate({
-      summary: `${calculationData.realArea.toFixed(1)} m² de couverture`,
+      summary: t("calc.roof.summary", {
+        area: calculationData.realArea.toFixed(1),
+        defaultValue: `${calculationData.realArea.toFixed(1)} m²`,
+      }),
       details: [
-        { label: "Surface au sol", value: calculationData.projectedArea.toFixed(1), unit: "m²" },
-        { label: "Pente", value: slope, unit: "%" },
-        { label: "Surface toiture", value: calculationData.realArea.toFixed(1), unit: "m²" },
-        { label: "Faîtage", value: calculationData.ridgeLen.toFixed(1), unit: "m" },
-        { label: "Égouts", value: calculationData.eavesLen.toFixed(1), unit: "m" },
+        { label: t("calc.roof.detail.projected_area", { defaultValue: "Projected area" }), value: calculationData.projectedArea.toFixed(1), unit: "m²" },
+        { label: t("calc.roof.detail.slope", { defaultValue: "Slope" }), value: slope, unit: "%" },
+        { label: t("calc.roof.detail.real_area", { defaultValue: "Roof area" }), value: calculationData.realArea.toFixed(1), unit: "m²" },
+        { label: t("calc.roof.detail.ridge", { defaultValue: "Ridge" }), value: calculationData.ridgeLen.toFixed(1), unit: "m" },
+        { label: t("calc.roof.detail.eaves", { defaultValue: "Eaves" }), value: calculationData.eavesLen.toFixed(1), unit: "m" },
       ],
       materials: calculationData.materials,
       totalCost: calculationData.totalCost,
       warnings: calculationData.warnings.length ? calculationData.warnings : undefined,
     });
-  }, [calculationData, onCalculate, slope]);
+  }, [calculationData, onCalculate, slope, t]);
+
+  const stepTitle = (s: number) => t(`calc.roof.steps.${s}`, { defaultValue: String(s) });
 
   return (
     <div className="space-y-6 animate-in fade-in">
@@ -463,11 +477,7 @@ export const RoofCalculator: React.FC<Props> = ({ onCalculate }) => {
               step === s ? "bg-white shadow text-blue-600" : "text-slate-400"
             }`}
           >
-            {s === 1 && "1. Plan"}
-            {s === 2 && "2. Couvert."}
-            {s === 3 && "3. Sous-c."}
-            {s === 4 && "4. EP / Zinc"}
-            {s === 5 && "5. Prix"}
+            {stepTitle(s)}
           </button>
         ))}
       </div>
@@ -477,102 +487,63 @@ export const RoofCalculator: React.FC<Props> = ({ onCalculate }) => {
         <div className="space-y-4">
           <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
             <Info size={16} className="mr-2 shrink-0 mt-0.5" />
-            Définissez la forme du toit et les dimensions au sol (hors tout).
+            {t("calc.roof.ui.step1_hint", { defaultValue: "Define roof shape and footprint dimensions." })}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">Type de toit</label>
+            <label className="block text-sm font-medium text-slate-700 mb-2">
+              {t("calc.roof.ui.roof_type", { defaultValue: "Roof type" })}
+            </label>
             <div className="grid grid-cols-4 gap-2">
-              <button
-                type="button"
-                onClick={() => setRoofType("1pan")}
-                className={`p-2 rounded border text-xs font-bold flex flex-col items-center ${
-                  roofType === "1pan" ? "bg-stone-100 border-stone-500 text-stone-800 ring-1 ring-stone-500" : "bg-white text-slate-500"
-                }`}
-              >
-                <Home size={18} className="mb-1" />
-                1 pan
-              </button>
-              <button
-                type="button"
-                onClick={() => setRoofType("2pans")}
-                className={`p-2 rounded border text-xs font-bold flex flex-col items-center ${
-                  roofType === "2pans" ? "bg-stone-100 border-stone-500 text-stone-800 ring-1 ring-stone-500" : "bg-white text-slate-500"
-                }`}
-              >
-                <Home size={18} className="mb-1" />
-                2 pans
-              </button>
-              <button
-                type="button"
-                onClick={() => setRoofType("4pans")}
-                className={`p-2 rounded border text-xs font-bold flex flex-col items-center ${
-                  roofType === "4pans" ? "bg-stone-100 border-stone-500 text-stone-800 ring-1 ring-stone-500" : "bg-white text-slate-500"
-                }`}
-              >
-                <Home size={18} className="mb-1" />
-                4 pans
-              </button>
-              <button
-                type="button"
-                onClick={() => setRoofType("flat")}
-                className={`p-2 rounded border text-xs font-bold flex flex-col items-center ${
-                  roofType === "flat" ? "bg-stone-100 border-stone-500 text-stone-800 ring-1 ring-stone-500" : "bg-white text-slate-500"
-                }`}
-              >
-                <Layers size={18} className="mb-1" />
-                plat
-              </button>
+              {(["1pan", "2pans", "4pans", "flat"] as RoofType[]).map((rt) => (
+                <button
+                  key={rt}
+                  type="button"
+                  onClick={() => setRoofType(rt)}
+                  className={`p-2 rounded border text-xs font-bold flex flex-col items-center ${
+                    roofType === rt ? "bg-stone-100 border-stone-500 text-stone-800 ring-1 ring-stone-500" : "bg-white text-slate-500"
+                  }`}
+                >
+                  {rt === "flat" ? <Layers size={18} className="mb-1" /> : <Home size={18} className="mb-1" />}
+                  {roofTypeLabel(rt)}
+                </button>
+              ))}
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-slate-500 mb-1">Longueur (m)</label>
+              <label className="block text-xs font-bold text-slate-500 mb-1">{t("calc.roof.ui.length_m", { defaultValue: "Length (m)" })}</label>
               <input
                 type="number"
                 value={dimL}
                 onChange={(e) => setDimL(e.target.value)}
                 className="w-full p-3 rounded-lg border border-slate-300 bg-white text-slate-900 font-bold"
-                placeholder="Ex: 10"
+                placeholder={t("calc.roof.ui.ph_length", { defaultValue: "e.g. 10" })}
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-slate-500 mb-1">Largeur (m)</label>
+              <label className="block text-xs font-bold text-slate-500 mb-1">{t("calc.roof.ui.width_m", { defaultValue: "Width (m)" })}</label>
               <input
                 type="number"
                 value={dimW}
                 onChange={(e) => setDimW(e.target.value)}
                 className="w-full p-3 rounded-lg border border-slate-300 bg-white text-slate-900 font-bold"
-                placeholder="Ex: 8"
+                placeholder={t("calc.roof.ui.ph_width", { defaultValue: "e.g. 8" })}
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-slate-500 mb-1">Pente (%)</label>
-              <input
-                type="number"
-                value={slope}
-                onChange={(e) => setSlope(e.target.value)}
-                className="w-full p-3 rounded-lg border border-slate-300 bg-white text-slate-900"
-              />
+              <label className="block text-xs font-bold text-slate-500 mb-1">{t("calc.roof.ui.slope_pct", { defaultValue: "Slope (%)" })}</label>
+              <input type="number" value={slope} onChange={(e) => setSlope(e.target.value)} className="w-full p-3 rounded-lg border border-slate-300 bg-white text-slate-900" />
             </div>
             <div>
-              <label className="block text-xs font-bold text-slate-500 mb-1">Débord (cm)</label>
-              <input
-                type="number"
-                value={overhang}
-                onChange={(e) => setOverhang(e.target.value)}
-                className="w-full p-3 rounded-lg border border-slate-300 bg-white text-slate-900"
-              />
+              <label className="block text-xs font-bold text-slate-500 mb-1">{t("calc.roof.ui.overhang_cm", { defaultValue: "Overhang (cm)" })}</label>
+              <input type="number" value={overhang} onChange={(e) => setOverhang(e.target.value)} className="w-full p-3 rounded-lg border border-slate-300 bg-white text-slate-900" />
             </div>
           </div>
 
-          <button
-            type="button"
-            onClick={() => setStep(2)}
-            className="w-full py-3 bg-blue-600 text-white rounded-xl font-bold flex justify-center items-center"
-          >
-            Suivant <ArrowRight size={18} className="ml-2" />
+          <button type="button" onClick={() => setStep(2)} className="w-full py-3 bg-blue-600 text-white rounded-xl font-bold flex justify-center items-center">
+            {t("common.next", { defaultValue: "Next" })} <ArrowRight size={18} className="ml-2" />
           </button>
         </div>
       )}
@@ -582,27 +553,27 @@ export const RoofCalculator: React.FC<Props> = ({ onCalculate }) => {
         <div className="space-y-4">
           <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
             <Ruler size={16} className="mr-2 shrink-0 mt-0.5" />
-            Choix de la couverture et pertes.
+            {t("calc.roof.ui.step2_hint", { defaultValue: "Choose covering and waste." })}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">Matériau</label>
+            <label className="block text-sm font-medium text-slate-700 mb-2">{t("calc.roof.ui.cover_material", { defaultValue: "Covering material" })}</label>
             <select
               value={coverMaterial}
               onChange={(e) => setCoverMaterial(e.target.value as any)}
               className="w-full p-3 rounded-lg border border-slate-300 bg-white text-slate-900"
             >
-              <option value="tile_mech">Tuiles mécaniques</option>
-              <option value="tile_flat">Tuiles plates</option>
-              <option value="slate">Ardoises</option>
-              <option value="steel">Bac acier</option>
-              <option value="zinc">Zinc (joint debout)</option>
+              {(["tile_mech", "tile_flat", "slate", "steel", "zinc"] as CoverMaterial[]).map((m) => (
+                <option key={m} value={m}>
+                  {coverLabel(m)}
+                </option>
+              ))}
             </select>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-slate-500 mb-1">Pertes (%)</label>
+              <label className="block text-xs font-bold text-slate-500 mb-1">{t("calc.roof.ui.waste_pct", { defaultValue: "Waste (%)" })}</label>
               <input
                 type="number"
                 value={wastePct}
@@ -614,10 +585,10 @@ export const RoofCalculator: React.FC<Props> = ({ onCalculate }) => {
 
           <div className="flex gap-3">
             <button type="button" onClick={() => setStep(1)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
-              Retour
+              {t("common.back", { defaultValue: "Back" })}
             </button>
             <button type="button" onClick={() => setStep(3)} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold">
-              Suivant
+              {t("common.next", { defaultValue: "Next" })}
             </button>
           </div>
         </div>
@@ -628,31 +599,31 @@ export const RoofCalculator: React.FC<Props> = ({ onCalculate }) => {
         <div className="space-y-4">
           <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
             <Layers size={16} className="mr-2 shrink-0 mt-0.5" />
-            Écran sous-toiture, isolation et pare-vapeur.
+            {t("calc.roof.ui.step3_hint", { defaultValue: "Underlay, insulation and vapor barrier." })}
           </div>
 
           <div className="space-y-3">
             <label className="flex items-center justify-between p-3 bg-white border rounded-lg cursor-pointer">
-              <span className="text-sm font-bold text-slate-700">Écran sous-toiture (HPV)</span>
+              <span className="text-sm font-bold text-slate-700">{t("calc.roof.ui.screen", { defaultValue: "Underlay screen (HPV)" })}</span>
               <input type="checkbox" checked={useScreen} onChange={(e) => setUseScreen(e.target.checked)} className="h-5 w-5 text-blue-600 rounded" />
             </label>
 
             <label className="flex items-center justify-between p-3 bg-white border rounded-lg cursor-pointer">
-              <span className="text-sm font-bold text-slate-700">Isolation rampants</span>
+              <span className="text-sm font-bold text-slate-700">{t("calc.roof.ui.insulation", { defaultValue: "Rafter insulation" })}</span>
               <input type="checkbox" checked={useInsulation} onChange={(e) => setUseInsulation(e.target.checked)} className="h-5 w-5 text-blue-600 rounded" />
             </label>
 
             {useInsulation && (
               <div className="bg-white border rounded-lg p-3 space-y-3">
                 <div>
-                  <label className="block text-xs text-slate-500 mb-1">Épaisseur isolant (mm)</label>
+                  <label className="block text-xs text-slate-500 mb-1">{t("calc.roof.ui.insul_thick_mm", { defaultValue: "Insulation thickness (mm)" })}</label>
                   <input type="number" value={insulThick} onChange={(e) => setInsulThick(e.target.value)} className="w-full p-2 text-sm border rounded bg-white text-slate-900" />
                 </div>
 
                 <label className="flex items-center justify-between cursor-pointer">
                   <div>
-                    <span className="text-sm font-bold text-slate-700 block">Pare-vapeur / frein-vapeur</span>
-                    <span className="text-[10px] text-slate-400">Compté si activé</span>
+                    <span className="text-sm font-bold text-slate-700 block">{t("calc.roof.ui.vapor", { defaultValue: "Vapor barrier" })}</span>
+                    <span className="text-[10px] text-slate-400">{t("calc.roof.ui.vapor_help", { defaultValue: "Included only if enabled" })}</span>
                   </div>
                   <input type="checkbox" checked={useVapor} onChange={(e) => setUseVapor(e.target.checked)} className="h-5 w-5 text-blue-600 rounded" />
                 </label>
@@ -662,10 +633,10 @@ export const RoofCalculator: React.FC<Props> = ({ onCalculate }) => {
 
           <div className="flex gap-3">
             <button type="button" onClick={() => setStep(2)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
-              Retour
+              {t("common.back", { defaultValue: "Back" })}
             </button>
             <button type="button" onClick={() => setStep(4)} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold">
-              Suivant
+              {t("common.next", { defaultValue: "Next" })}
             </button>
           </div>
         </div>
@@ -676,37 +647,43 @@ export const RoofCalculator: React.FC<Props> = ({ onCalculate }) => {
         <div className="space-y-4">
           <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
             <Droplets size={16} className="mr-2 shrink-0 mt-0.5" />
-            Gouttières, descentes et noues.
+            {t("calc.roof.ui.step4_hint", { defaultValue: "Gutters, downspouts and valleys." })}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">Gouttières</label>
+            <label className="block text-sm font-medium text-slate-700 mb-2">{t("calc.roof.ui.gutters", { defaultValue: "Gutters" })}</label>
             <select value={gutterType} onChange={(e) => setGutterType(e.target.value as any)} className="w-full p-3 rounded-lg border border-slate-300 bg-white text-slate-900">
-              <option value="pvc">PVC</option>
-              <option value="alu">Aluminium</option>
-              <option value="zinc">Zinc</option>
-              <option value="copper">Cuivre</option>
+              {(["pvc", "alu", "zinc", "copper"] as GutterType[]).map((g) => (
+                <option key={g} value={g}>
+                  {gutterLabel(g)}
+                </option>
+              ))}
             </select>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-slate-500 mb-1">Nb descentes</label>
-              <input type="number" value={downspouts} onChange={(e) => setDownspouts(clamp(toNum(e.target.value, 0), 0, 20))} className="w-full p-2 border rounded bg-white text-slate-900" />
+              <label className="block text-xs font-bold text-slate-500 mb-1">{t("calc.roof.ui.downspouts", { defaultValue: "Downspouts" })}</label>
+              <input
+                type="number"
+                value={downspouts}
+                onChange={(e) => setDownspouts(clamp(toNum(e.target.value, 0), 0, 20))}
+                className="w-full p-2 border rounded bg-white text-slate-900"
+              />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-500 mb-1">Noues (ml)</label>
+              <label className="block text-xs font-bold text-slate-500 mb-1">{t("calc.roof.ui.valleys_m", { defaultValue: "Valleys (m)" })}</label>
               <input type="number" value={valleyLen} onChange={(e) => setValleyLen(e.target.value)} className="w-full p-2 border rounded bg-white text-slate-900" />
             </div>
           </div>
 
           <div className="flex gap-3">
             <button type="button" onClick={() => setStep(3)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
-              Retour
+              {t("common.back", { defaultValue: "Back" })}
             </button>
             <button type="button" onClick={() => setStep(5)} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold">
-              Suivant
+              {t("common.next", { defaultValue: "Next" })}
             </button>
           </div>
         </div>
@@ -717,48 +694,49 @@ export const RoofCalculator: React.FC<Props> = ({ onCalculate }) => {
         <div className="space-y-4">
           <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
             <CircleDollarSign size={16} className="mr-2 shrink-0 mt-0.5" />
-            Ajustez les prix unitaires.
+            {t("calc.roof.ui.step5_hint", { defaultValue: "Adjust unit prices." })}
           </div>
 
           <div className="bg-white p-3 rounded-xl border border-slate-200">
             <div className="flex justify-between items-center mb-3">
-              <h4 className="text-xs font-bold text-slate-500 uppercase">Tarifs</h4>
+              <h4 className="text-xs font-bold text-slate-500 uppercase">{t("calc.roof.ui.prices_title", { defaultValue: "Prices" })}</h4>
               <button type="button" onClick={() => setProMode(!proMode)} className="text-xs flex items-center text-blue-600">
-                <Settings size={12} className="mr-1" /> {proMode ? "Mode Pro" : "Mode Simple"}
+                <Settings size={12} className="mr-1" />{" "}
+                {proMode ? t("common.pro_mode", { defaultValue: "Pro mode" }) : t("common.simple_mode", { defaultValue: "Simple mode" })}
               </button>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-[10px] uppercase text-slate-500 font-bold mb-1">Couverture (€/m²)</label>
+                <label className="block text-[10px] uppercase text-slate-500 font-bold mb-1">{t("calc.roof.price.cover_m2", { defaultValue: "Covering (€/m²)" })}</label>
                 <input type="number" value={prices.coverM2} onChange={(e) => updatePrice("coverM2", e.target.value)} className="w-full p-2 border rounded bg-white text-sm" />
               </div>
 
               <div>
-                <label className="block text-[10px] uppercase text-slate-500 font-bold mb-1">Gouttière (€/m)</label>
+                <label className="block text-[10px] uppercase text-slate-500 font-bold mb-1">{t("calc.roof.price.gutter_m", { defaultValue: "Gutter (€/m)" })}</label>
                 <input type="number" value={prices.gutterM} onChange={(e) => updatePrice("gutterM", e.target.value)} className="w-full p-2 border rounded bg-white text-sm" />
               </div>
 
               <div>
-                <label className="block text-[10px] uppercase text-slate-500 font-bold mb-1">Faîtage (€/m)</label>
+                <label className="block text-[10px] uppercase text-slate-500 font-bold mb-1">{t("calc.roof.price.ridge_m", { defaultValue: "Ridge (€/m)" })}</label>
                 <input type="number" value={prices.ridgeM} onChange={(e) => updatePrice("ridgeM", e.target.value)} className="w-full p-2 border rounded bg-white text-sm" />
               </div>
 
               <div>
-                <label className="block text-[10px] uppercase text-slate-500 font-bold mb-1">Noues (€/m)</label>
+                <label className="block text-[10px] uppercase text-slate-500 font-bold mb-1">{t("calc.roof.price.valley_m", { defaultValue: "Valleys (€/m)" })}</label>
                 <input type="number" value={prices.valleyM} onChange={(e) => updatePrice("valleyM", e.target.value)} className="w-full p-2 border rounded bg-white text-sm" />
               </div>
 
               {useScreen && roofType !== "flat" && (
                 <div>
-                  <label className="block text-[10px] uppercase text-slate-500 font-bold mb-1">Écran (€/m²)</label>
+                  <label className="block text-[10px] uppercase text-slate-500 font-bold mb-1">{t("calc.roof.price.screen_m2", { defaultValue: "Underlay (€/m²)" })}</label>
                   <input type="number" value={prices.screenM2} onChange={(e) => updatePrice("screenM2", e.target.value)} className="w-full p-2 border rounded bg-white text-sm" />
                 </div>
               )}
 
               {useInsulation && (
                 <div>
-                  <label className="block text-[10px] uppercase text-slate-500 font-bold mb-1">Isolant (€/m²)</label>
+                  <label className="block text-[10px] uppercase text-slate-500 font-bold mb-1">{t("calc.roof.price.insul_m2", { defaultValue: "Insulation (€/m²)" })}</label>
                   <input type="number" value={prices.insulM2} onChange={(e) => updatePrice("insulM2", e.target.value)} className="w-full p-2 border rounded bg-white text-sm" />
                 </div>
               )}
@@ -767,7 +745,7 @@ export const RoofCalculator: React.FC<Props> = ({ onCalculate }) => {
             {proMode && (
               <div className="mt-4 pt-3 border-t border-slate-100 grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[10px] text-blue-600 font-bold mb-1">Main d'œuvre (€/m²)</label>
+                  <label className="block text-[10px] text-blue-600 font-bold mb-1">{t("calc.roof.price.labor_m2", { defaultValue: "Labor (€/m²)" })}</label>
                   <input type="number" value={prices.laborM2} onChange={(e) => updatePrice("laborM2", e.target.value)} className="w-full p-2 border border-blue-200 rounded bg-white text-sm" />
                 </div>
               </div>
@@ -787,10 +765,10 @@ export const RoofCalculator: React.FC<Props> = ({ onCalculate }) => {
 
           <div className="flex gap-3 pt-4">
             <button type="button" onClick={() => setStep(4)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
-              Retour
+              {t("common.back", { defaultValue: "Back" })}
             </button>
             <button type="button" className="flex-1 py-3 bg-emerald-100 text-emerald-700 rounded-xl font-bold flex justify-center items-center">
-              <Check size={18} className="mr-2" /> Terminé
+              <Check size={18} className="mr-2" /> {t("common.done", { defaultValue: "Done" })}
             </button>
           </div>
         </div>

@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { CalculatorType, CalculationResult, Unit } from "../../../types";
 import { DEFAULT_PRICES, PLACO_BOARD_TYPES, PLACO_INSULATION_TYPES } from "../../constants";
 import { getUnitPrice } from "../../services/materialsService";
@@ -21,8 +22,8 @@ import {
 interface Opening {
   id: string;
   type: "door" | "window";
-  width: number; // m
-  height: number; // m
+  width: number;
+  height: number;
   quantity: number;
 }
 
@@ -46,22 +47,13 @@ const getOptionalNumber = (obj: unknown, key: string): number | undefined => {
   return typeof v === "number" && Number.isFinite(v) ? v : undefined;
 };
 
-/**
- * ✅ MAJ:
- * - prix: catalogue > DEFAULT_PRICES > fallback (évite NaN/0)
- * - prix plaque dépend vraiment du boardId (BA13/HYDRO/FIRE)
- * - ossature: rails/ montants + renforts ouvertures
- * - plafond: fourrures + suspentes avec entraxes configurables
- * - ajoute membrane si activée
- * - warnings dimensions / ouvertures / épaisseurs incohérentes
- * - ✅ FIX TS: PLACO_INSULATION_TYPES peut ne pas avoir minThick/maxThick → lecture "safe"
- * - ✅ FIX TS: PLACO_BOARD_TYPES peut ne pas avoir area → lecture "safe"
- */
 export const PlacoCalculator: React.FC<Props> = ({
   onCalculate,
   initialMode = "partition",
   hideTabs = false,
 }) => {
+  const { t } = useTranslation();
+
   const [step, setStep] = useState(1);
   const [proMode, setProMode] = useState(false);
 
@@ -108,7 +100,7 @@ export const PlacoCalculator: React.FC<Props> = ({
     return fallback;
   };
 
-  // --- 5. Pricing ---
+  // --- Pricing ---
   const [prices, setPrices] = useState(() => ({
     board_BA13: priceOr("PLACO_PLATE_BA13", 10),
     board_HYDRO: priceOr("PLACO_PLATE_HYDRO", 14),
@@ -132,7 +124,7 @@ export const PlacoCalculator: React.FC<Props> = ({
     compoundBag25: priceOr("COMPOUND_BAG_25KG", 18),
     screwBox1000: priceOr("SCREWS_BOX_1000", 25),
 
-    laborM2: 35.0,
+    laborM2: priceOr("LABOR_PLACO_M2", 35),
   }));
 
   const updatePrice = (key: keyof typeof prices, val: string) => {
@@ -163,6 +155,35 @@ export const PlacoCalculator: React.FC<Props> = ({
     );
   };
 
+  const modeLabel = (m: "partition" | "lining" | "ceiling") =>
+    m === "partition"
+      ? t("calc.placo.mode.partition")
+      : m === "lining"
+      ? t("calc.placo.mode.lining")
+      : t("calc.placo.mode.ceiling");
+
+  const stepLabel = (s: number) => {
+    if (s === 1) return t("calc.placo.step_1");
+    if (s === 2) return t("calc.placo.step_2");
+    if (s === 3) return t("calc.placo.step_3");
+    if (s === 4) return t("calc.placo.step_4");
+    return t("calc.placo.step_5");
+  };
+
+  const openingTypeLabel = (type: "door" | "window") =>
+    type === "door" ? t("calc.placo.opening.door") : t("calc.placo.opening.window");
+
+  const boardLabel = (id: string) => {
+    const b = PLACO_BOARD_TYPES.find((x: any) => x.id === id);
+    // Si tes constants ont encore b.label en dur, la vraie solution est d’y mettre une clé i18n (labelKey).
+    return String((b as any)?.label ?? id);
+  };
+
+  const insulationLabel = (id: string) => {
+    const it = (PLACO_INSULATION_TYPES as any[]).find((x: any) => String(x.id) === String(id));
+    return String(it?.label ?? id);
+  };
+
   // --- Calculation Engine ---
   const calculationData = useMemo(() => {
     const L = toNum(dimL, 0);
@@ -174,9 +195,8 @@ export const PlacoCalculator: React.FC<Props> = ({
     let totalCost = 0;
 
     const hasValidDims = mode === "ceiling" ? L > 0 && W > 0 : L > 0 && H > 0;
-    if (!hasValidDims) warnings.push("Dimensions invalides : vérifiez Longueur et Hauteur/Largeur.");
+    if (!hasValidDims) warnings.push(t("calc.placo.warn_invalid_dims"));
 
-    // --- Surfaces ---
     const surfaceBrute = mode === "ceiling" ? L * W : L * H;
 
     // Openings (partition/lining only)
@@ -190,19 +210,16 @@ export const PlacoCalculator: React.FC<Props> = ({
     }
 
     const surfaceNette = Math.max(0, surfaceBrute - openingArea);
-    if (mode !== "ceiling" && openingArea > surfaceBrute) {
-      warnings.push("Ouvertures > surface brute : surface nette ramenée à 0.");
-    }
+    if (mode !== "ceiling" && openingArea > surfaceBrute) warnings.push(t("calc.placo.warn_openings_gt_surface"));
 
-    // --- Boards ---
+    // Boards
     const boardDef = PLACO_BOARD_TYPES.find((b: any) => b.id === boardId) ?? PLACO_BOARD_TYPES[0];
     let layers = doubleSkin ? 2 : 1;
     if (mode === "partition") layers *= 2; // 2 faces
 
     const boardAreaNeeded = surfaceNette * layers * (1 + wastePct / 100);
     const boardAreaPerPlate = getOptionalNumber(boardDef, "area") ?? 3; // fallback 3m²
-    const nbBoards =
-      boardAreaNeeded > 0 ? Math.ceil(boardAreaNeeded / Math.max(0.1, boardAreaPerPlate)) : 0;
+    const nbBoards = boardAreaNeeded > 0 ? Math.ceil(boardAreaNeeded / Math.max(0.1, boardAreaPerPlate)) : 0;
 
     const unitBoardPrice =
       boardId === "HYDRO" ? prices.board_HYDRO : boardId === "FIRE" ? prices.board_FIRE : prices.board_BA13;
@@ -212,20 +229,22 @@ export const PlacoCalculator: React.FC<Props> = ({
       totalCost += costBoards;
       materialsList.push({
         id: "boards",
-        name: `Plaques ${String((boardDef as any)?.label ?? boardId)}`,
+        name: t("calc.placo.mat.boards", { label: boardLabel(boardId) }),
         quantity: nbBoards,
         unit: Unit.PIECE,
         unitPrice: round2(unitBoardPrice),
         totalPrice: round2(costBoards),
         category: CalculatorType.PLACO,
-        details: `${layers} peau(x) • ${surfaceNette.toFixed(1)} m² nets`,
+        details: t("calc.placo.mat.boards_details", {
+          layers,
+          net: surfaceNette.toFixed(1),
+        }),
       });
     }
 
-    // --- Frame / Grid ---
+    // Frame / Grid
     if (surfaceNette > 0) {
       if (mode === "partition" || mode === "lining") {
-        // Rails: top + bottom
         const railLen = L * 2 * (1 + wastePct / 100);
         const nbRails = Math.ceil(railLen / 3);
         const costRails = nbRails * prices.rail3m;
@@ -233,7 +252,7 @@ export const PlacoCalculator: React.FC<Props> = ({
 
         materialsList.push({
           id: "rails",
-          name: `Rails ${frameType.replace("M", "R")} (3m)`,
+          name: t("calc.placo.mat.rails", { frame: frameType.replace("M", "R") }),
           quantity: nbRails,
           unit: Unit.PIECE,
           unitPrice: round2(prices.rail3m),
@@ -241,9 +260,8 @@ export const PlacoCalculator: React.FC<Props> = ({
           category: CalculatorType.PLACO,
         });
 
-        // Studs: base spacing + ends + reinforcement for openings
         const baseStuds = Math.ceil((L * 100) / Math.max(20, studSpacing)) + 1;
-        const studsForOpenings = openingCount * 3; // 2 jambs + linteau
+        const studsForOpenings = openingCount * 3;
         const totalStuds = baseStuds + studsForOpenings;
 
         const costStuds = totalStuds * prices.stud3m;
@@ -251,16 +269,15 @@ export const PlacoCalculator: React.FC<Props> = ({
 
         materialsList.push({
           id: "studs",
-          name: `Montants ${frameType} (3m)`,
+          name: t("calc.placo.mat.studs", { frame: frameType }),
           quantity: totalStuds,
           unit: Unit.PIECE,
           unitPrice: round2(prices.stud3m),
           totalPrice: round2(costStuds),
           category: CalculatorType.PLACO,
-          details: `Entraxe ${studSpacing} cm${openingCount ? ` • renforts: +${studsForOpenings}` : ""}`,
+          details: t("calc.placo.mat.studs_details", { spacing: studSpacing, extra: studsForOpenings }),
         });
       } else {
-        // Ceiling: furring lines + perimeter angles + hangers
         const furringLines = Math.ceil((W * 100) / Math.max(30, ceilingFurringSpacing)) + 1;
         const totalFurringLen = furringLines * L * (1 + wastePct / 100);
         const nbFurring = Math.ceil(totalFurringLen / 3);
@@ -270,13 +287,13 @@ export const PlacoCalculator: React.FC<Props> = ({
 
         materialsList.push({
           id: "furring",
-          name: "Fourrures F530 (3m)",
+          name: t("calc.placo.mat.furring"),
           quantity: nbFurring,
           unit: Unit.PIECE,
           unitPrice: round2(prices.furring3m),
           totalPrice: round2(costFurring),
           category: CalculatorType.PLACO,
-          details: `Entraxe ${ceilingFurringSpacing} cm`,
+          details: t("calc.placo.mat.furring_details", { spacing: ceilingFurringSpacing }),
         });
 
         const perim = (L + W) * 2;
@@ -286,7 +303,7 @@ export const PlacoCalculator: React.FC<Props> = ({
 
         materialsList.push({
           id: "angles",
-          name: "Cornières de rive (3m)",
+          name: t("calc.placo.mat.edge_angles"),
           quantity: nbAngles,
           unit: Unit.PIECE,
           unitPrice: round2(prices.cornerBead3m),
@@ -301,18 +318,18 @@ export const PlacoCalculator: React.FC<Props> = ({
 
         materialsList.push({
           id: "hangers",
-          name: "Suspentes",
+          name: t("calc.placo.mat.hangers"),
           quantity: totalHangers,
           unit: Unit.PIECE,
           unitPrice: round2(prices.hangerUnit),
           totalPrice: round2(costHangers),
           category: CalculatorType.PLACO,
-          details: `Pas ${hangerSpacing} m`,
+          details: t("calc.placo.mat.hangers_details", { step: hangerSpacing }),
         });
       }
     }
 
-    // --- Insulation ---
+    // Insulation
     if (useInsulation && surfaceBrute > 0) {
       const insulArea = surfaceBrute * (1 + wastePct / 100);
       const costInsul = insulArea * prices.insulationM2;
@@ -320,7 +337,7 @@ export const PlacoCalculator: React.FC<Props> = ({
 
       materialsList.push({
         id: "insul",
-        name: `Isolant ${insulType} (ép. ${insulThick} mm)`,
+        name: t("calc.placo.mat.insulation", { type: insulationLabel(insulType), thick: insulThick }),
         quantity: round2(insulArea),
         unit: Unit.M2,
         unitPrice: round2(prices.insulationM2),
@@ -328,18 +345,22 @@ export const PlacoCalculator: React.FC<Props> = ({
         category: CalculatorType.PLACO,
       });
 
-      // ✅ FIX TS: minThick peut ne pas exister selon ton constant
       const insMeta = (PLACO_INSULATION_TYPES as unknown as Array<Record<string, unknown>>).find(
-        (x) => String(x.id) === insulType
+        (x) => String((x as any).id) === insulType
       );
-
-      const minThick = insMeta ? toNum(insMeta.minThick, NaN) : NaN;
+      const minThick = insMeta ? toNum((insMeta as any).minThick, NaN) : NaN;
       if (Number.isFinite(minThick) && toNum(insulThick, 0) < minThick) {
-        warnings.push(`Isolant ${insulType}: épaisseur ${insulThick}mm inférieure au minimum conseillé (${minThick}mm).`);
+        warnings.push(
+          t("calc.placo.warn_insul_thick_low", {
+            type: insulType,
+            thick: insulThick,
+            min: minThick,
+          })
+        );
       }
     }
 
-    // --- Membrane ---
+    // Membrane
     if (useMembrane && surfaceBrute > 0) {
       const memArea = surfaceBrute * 1.1;
       const costMem = memArea * prices.membraneM2;
@@ -347,17 +368,17 @@ export const PlacoCalculator: React.FC<Props> = ({
 
       materialsList.push({
         id: "membrane",
-        name: "Membrane pare-vapeur",
+        name: t("calc.placo.mat.membrane"),
         quantity: round2(memArea),
         unit: Unit.M2,
         unitPrice: round2(prices.membraneM2),
         totalPrice: round2(costMem),
         category: CalculatorType.PLACO,
-        details: "+10% recouvrements",
+        details: t("calc.placo.mat.membrane_details"),
       });
     }
 
-    // --- Consumables ---
+    // Consumables
     if (surfaceNette > 0) {
       const totalScrews = surfaceNette * layers * 15;
       const boxesScrews = Math.ceil(totalScrews / 1000);
@@ -366,7 +387,7 @@ export const PlacoCalculator: React.FC<Props> = ({
 
       materialsList.push({
         id: "screws",
-        name: "Vis TTPC (boîte 1000)",
+        name: t("calc.placo.mat.screws"),
         quantity: boxesScrews,
         unit: Unit.BOX,
         unitPrice: round2(prices.screwBox1000),
@@ -381,7 +402,7 @@ export const PlacoCalculator: React.FC<Props> = ({
 
       materialsList.push({
         id: "tape",
-        name: "Bande à joints (150m)",
+        name: t("calc.placo.mat.joint_tape"),
         quantity: rollsTape,
         unit: Unit.ROLL,
         unitPrice: round2(prices.tapeRoll150),
@@ -396,7 +417,7 @@ export const PlacoCalculator: React.FC<Props> = ({
 
       materialsList.push({
         id: "compound",
-        name: "Enduit à joints (25kg)",
+        name: t("calc.placo.mat.joint_compound"),
         quantity: bagsCompound,
         unit: Unit.BAG,
         unitPrice: round2(prices.compoundBag25),
@@ -405,14 +426,14 @@ export const PlacoCalculator: React.FC<Props> = ({
       });
     }
 
-    // --- Labor ---
+    // Labor
     if (proMode && surfaceNette > 0) {
       const laborCost = surfaceNette * prices.laborM2;
       totalCost += laborCost;
 
       materialsList.push({
         id: "labor",
-        name: "Main d'œuvre plaquiste",
+        name: t("calc.placo.mat.labor"),
         quantity: round2(surfaceNette),
         unit: Unit.M2,
         unitPrice: round2(prices.laborM2),
@@ -421,8 +442,8 @@ export const PlacoCalculator: React.FC<Props> = ({
       });
     }
 
-    if (surfaceBrute <= 0) warnings.push("Surface = 0 : renseignez les dimensions.");
-    if (mode !== "ceiling" && openings.length && surfaceNette === 0) warnings.push("Surface nette nulle : vérifiez les ouvertures.");
+    if (surfaceBrute <= 0) warnings.push(t("calc.placo.warn_surface_zero"));
+    if (mode !== "ceiling" && openings.length && surfaceNette === 0) warnings.push(t("calc.placo.warn_net_surface_zero"));
 
     return {
       totalCost: round2(totalCost),
@@ -431,6 +452,7 @@ export const PlacoCalculator: React.FC<Props> = ({
       warnings,
     };
   }, [
+    t,
     mode,
     dimL,
     dimH,
@@ -451,26 +473,19 @@ export const PlacoCalculator: React.FC<Props> = ({
     proMode,
   ]);
 
-  // Pass results
   useEffect(() => {
     onCalculate({
-      summary: `${calculationData.surfaceNette.toFixed(1)} m² de ${
-        mode === "partition" ? "cloison" : mode === "lining" ? "doublage" : "plafond"
-      }`,
+      summary: t("calc.placo.summary", { area: calculationData.surfaceNette.toFixed(1), mode: modeLabel(mode) }),
       details: [
-        {
-          label: "Mode",
-          value: mode === "partition" ? "Cloison" : mode === "lining" ? "Doublage" : "Plafond",
-          unit: "",
-        },
-        { label: "Surface nette", value: calculationData.surfaceNette.toFixed(1), unit: "m²" },
-        { label: "Ossature", value: mode === "ceiling" ? "F530" : frameType, unit: "" },
+        { label: t("calc.placo.detail.mode"), value: modeLabel(mode), unit: "" },
+        { label: t("calc.placo.detail.net_area"), value: calculationData.surfaceNette.toFixed(1), unit: "m²" },
+        { label: t("calc.placo.detail.frame"), value: mode === "ceiling" ? "F530" : frameType, unit: "" },
       ],
       materials: calculationData.materials,
       totalCost: calculationData.totalCost,
       warnings: calculationData.warnings.length ? calculationData.warnings : undefined,
     });
-  }, [calculationData, onCalculate, mode, frameType]);
+  }, [calculationData, onCalculate, mode, frameType, t]);
 
   return (
     <div className="space-y-6 animate-in fade-in">
@@ -484,7 +499,7 @@ export const PlacoCalculator: React.FC<Props> = ({
               mode === "partition" ? "bg-white shadow text-indigo-600" : "text-slate-500"
             }`}
           >
-            <ArrowRightLeft size={16} className="mr-1" /> Cloison
+            <ArrowRightLeft size={16} className="mr-1" /> {t("calc.placo.mode.partition")}
           </button>
           <button
             type="button"
@@ -493,7 +508,7 @@ export const PlacoCalculator: React.FC<Props> = ({
               mode === "lining" ? "bg-white shadow text-indigo-600" : "text-slate-500"
             }`}
           >
-            <PanelTop size={16} className="mr-1" /> Doublage
+            <PanelTop size={16} className="mr-1" /> {t("calc.placo.mode.lining")}
           </button>
           <button
             type="button"
@@ -502,7 +517,7 @@ export const PlacoCalculator: React.FC<Props> = ({
               mode === "ceiling" ? "bg-white shadow text-indigo-600" : "text-slate-500"
             }`}
           >
-            <Spline size={16} className="mr-1" /> Plafond
+            <Spline size={16} className="mr-1" /> {t("calc.placo.mode.ceiling")}
           </button>
         </div>
       )}
@@ -518,11 +533,7 @@ export const PlacoCalculator: React.FC<Props> = ({
               step === s ? "bg-white shadow text-blue-600" : "text-slate-400"
             }`}
           >
-            {s === 1 && "1. Plan"}
-            {s === 2 && "2. Plaque"}
-            {s === 3 && "3. Isol."}
-            {s === 4 && "4. Devis"}
-            {s === 5 && "5. Prix"}
+            {stepLabel(s)}
           </button>
         ))}
       </div>
@@ -543,12 +554,12 @@ export const PlacoCalculator: React.FC<Props> = ({
         <div className="space-y-4">
           <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
             <Ruler size={16} className="mr-2 shrink-0 mt-0.5" />
-            Dimensions de la zone et ouvertures (si applicable).
+            {t("calc.placo.help_step1")}
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-slate-500 mb-1">Longueur (m)</label>
+              <label className="block text-xs font-bold text-slate-500 mb-1">{t("calc.placo.len_m")}</label>
               <input
                 type="number"
                 value={dimL}
@@ -559,7 +570,7 @@ export const PlacoCalculator: React.FC<Props> = ({
 
             {mode === "ceiling" ? (
               <div>
-                <label className="block text-xs font-bold text-slate-500 mb-1">Largeur (m)</label>
+                <label className="block text-xs font-bold text-slate-500 mb-1">{t("calc.placo.wid_m")}</label>
                 <input
                   type="number"
                   value={dimW}
@@ -569,7 +580,7 @@ export const PlacoCalculator: React.FC<Props> = ({
               </div>
             ) : (
               <div>
-                <label className="block text-xs font-bold text-slate-500 mb-1">Hauteur (m)</label>
+                <label className="block text-xs font-bold text-slate-500 mb-1">{t("calc.placo.hgt_m")}</label>
                 <input
                   type="number"
                   value={dimH}
@@ -583,13 +594,13 @@ export const PlacoCalculator: React.FC<Props> = ({
           {mode !== "ceiling" && (
             <div className="bg-slate-50 p-3 rounded-lg border border-slate-200">
               <div className="flex justify-between items-center mb-2">
-                <span className="text-xs font-bold text-slate-500 uppercase">Ouvertures</span>
+                <span className="text-xs font-bold text-slate-500 uppercase">{t("calc.placo.openings_title")}</span>
                 <button
                   type="button"
                   onClick={() => setShowAddOpening(!showAddOpening)}
                   className="text-blue-600 text-xs font-bold flex items-center"
                 >
-                  <Plus size={14} className="mr-1" /> Ajouter
+                  <Plus size={14} className="mr-1" /> {t("common.add")}
                 </button>
               </div>
 
@@ -601,19 +612,19 @@ export const PlacoCalculator: React.FC<Props> = ({
                       onChange={(e) => setNewOpType(e.target.value as any)}
                       className="text-xs p-1 border rounded bg-white text-slate-900"
                     >
-                      <option value="door">Porte</option>
-                      <option value="window">Fenêtre</option>
+                      <option value="door">{t("calc.placo.opening.door")}</option>
+                      <option value="window">{t("calc.placo.opening.window")}</option>
                     </select>
                     <input
                       type="number"
-                      placeholder="L"
+                      placeholder={t("calc.placo.ph_w")}
                       value={newOpW}
                       onChange={(e) => setNewOpW(e.target.value)}
                       className="w-16 p-1 text-xs border rounded bg-white text-slate-900"
                     />
                     <input
                       type="number"
-                      placeholder="H"
+                      placeholder={t("calc.placo.ph_h")}
                       value={newOpH}
                       onChange={(e) => setNewOpH(e.target.value)}
                       className="w-16 p-1 text-xs border rounded bg-white text-slate-900"
@@ -624,7 +635,7 @@ export const PlacoCalculator: React.FC<Props> = ({
                     onClick={addOpening}
                     className="w-full bg-blue-100 text-blue-700 py-1 rounded text-xs font-bold"
                   >
-                    Valider
+                    {t("common.validate")}
                   </button>
                 </div>
               )}
@@ -633,12 +644,13 @@ export const PlacoCalculator: React.FC<Props> = ({
                 {openings.map((op) => (
                   <div key={op.id} className="flex justify-between items-center bg-white p-2 rounded border">
                     <div className="text-xs text-slate-700">
-                      {op.type === "door" ? "Porte" : "Fenêtre"} {op.width}×{op.height} m{" "}
+                      {openingTypeLabel(op.type)} {op.width}×{op.height} m{" "}
                       <span className="text-slate-400">•</span>{" "}
                       <button
                         type="button"
                         onClick={() => updateOpeningQty(op.id, -1)}
                         className="px-2 py-0.5 border rounded text-slate-500"
+                        aria-label={t("common.decrease")}
                       >
                         -
                       </button>{" "}
@@ -647,46 +659,51 @@ export const PlacoCalculator: React.FC<Props> = ({
                         type="button"
                         onClick={() => updateOpeningQty(op.id, +1)}
                         className="px-2 py-0.5 border rounded text-slate-500"
+                        aria-label={t("common.increase")}
                       >
                         +
                       </button>
                     </div>
-                    <button type="button" onClick={() => removeOpening(op.id)} className="text-red-400">
+                    <button type="button" onClick={() => removeOpening(op.id)} className="text-red-400" aria-label={t("common.remove")}>
                       <Trash2 size={14} />
                     </button>
                   </div>
                 ))}
-                {openings.length === 0 && <span className="text-xs text-slate-400 italic">Aucune ouverture.</span>}
+                {openings.length === 0 && <span className="text-xs text-slate-400 italic">{t("calc.placo.no_opening")}</span>}
               </div>
             </div>
           )}
 
           {mode === "ceiling" && (
             <div className="bg-white p-3 rounded-lg border border-slate-200">
-              <div className="text-xs font-bold text-slate-500 uppercase mb-2">Grille plafond</div>
+              <div className="text-xs font-bold text-slate-500 uppercase mb-2">{t("calc.placo.ceiling_grid_title")}</div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[10px] text-slate-500 mb-1">Entraxe fourrures (cm)</label>
+                  <label className="block text-[10px] text-slate-500 mb-1">{t("calc.placo.ceiling_furring_spacing_cm")}</label>
                   <select
                     value={ceilingFurringSpacing}
                     onChange={(e) => setCeilingFurringSpacing(toNum(e.target.value, 50))}
                     className="w-full p-2 border rounded bg-white text-sm text-slate-900"
                   >
-                    <option value={40}>40</option>
-                    <option value={50}>50</option>
-                    <option value={60}>60</option>
+                    {[40, 50, 60].map((v) => (
+                      <option key={v} value={v}>
+                        {v}
+                      </option>
+                    ))}
                   </select>
                 </div>
                 <div>
-                  <label className="block text-[10px] text-slate-500 mb-1">Pas suspentes (m)</label>
+                  <label className="block text-[10px] text-slate-500 mb-1">{t("calc.placo.hanger_spacing_m")}</label>
                   <select
                     value={hangerSpacing}
                     onChange={(e) => setHangerSpacing(toNum(e.target.value, 1.2))}
                     className="w-full p-2 border rounded bg-white text-sm text-slate-900"
                   >
-                    <option value={1.0}>1.0</option>
-                    <option value={1.2}>1.2</option>
-                    <option value={1.3}>1.3</option>
+                    {[1.0, 1.2, 1.3].map((v) => (
+                      <option key={v} value={v}>
+                        {v}
+                      </option>
+                    ))}
                   </select>
                 </div>
               </div>
@@ -698,7 +715,7 @@ export const PlacoCalculator: React.FC<Props> = ({
             onClick={() => setStep(2)}
             className="w-full py-3 bg-blue-600 text-white rounded-xl font-bold flex justify-center items-center mt-2"
           >
-            Suivant <ArrowRight size={18} className="ml-2" />
+            {t("common.next")} <ArrowRight size={18} className="ml-2" />
           </button>
         </div>
       )}
@@ -708,12 +725,12 @@ export const PlacoCalculator: React.FC<Props> = ({
         <div className="space-y-4">
           <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
             <LayoutTemplate size={16} className="mr-2 shrink-0 mt-0.5" />
-            Type de plaques et ossature.
+            {t("calc.placo.help_step2")}
           </div>
 
           <div className="space-y-3">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Type de plaque</label>
+              <label className="block text-sm font-medium text-slate-700 mb-1">{t("calc.placo.board_type")}</label>
               <div className="grid grid-cols-1 gap-2">
                 {PLACO_BOARD_TYPES.map((b: any) => (
                   <button
@@ -726,7 +743,7 @@ export const PlacoCalculator: React.FC<Props> = ({
                         : "bg-white text-slate-600"
                     }`}
                   >
-                    <span className="font-bold block">{b.label}</span>
+                    <span className="font-bold block">{String(b.label ?? b.id)}</span>
                   </button>
                 ))}
               </div>
@@ -735,26 +752,31 @@ export const PlacoCalculator: React.FC<Props> = ({
             {mode !== "ceiling" && (
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-slate-500 mb-1">Ossature</label>
+                  <label className="block text-xs font-bold text-slate-500 mb-1">{t("calc.placo.frame")}</label>
                   <select
                     value={frameType}
                     onChange={(e) => setFrameType(e.target.value as any)}
                     className="w-full p-2 border rounded bg-white text-slate-900 text-sm"
                   >
-                    <option value="M48">M48</option>
-                    <option value="M70">M70</option>
-                    <option value="M90">M90</option>
+                    {["M48", "M70", "M90"].map((v) => (
+                      <option key={v} value={v}>
+                        {v}
+                      </option>
+                    ))}
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-500 mb-1">Entraxe (cm)</label>
+                  <label className="block text-xs font-bold text-slate-500 mb-1">{t("calc.placo.stud_spacing_cm")}</label>
                   <select
                     value={studSpacing}
                     onChange={(e) => setStudSpacing(toNum(e.target.value, 60))}
                     className="w-full p-2 border rounded bg-white text-slate-900 text-sm"
                   >
-                    <option value={60}>60</option>
-                    <option value={40}>40</option>
+                    {[60, 40].map((v) => (
+                      <option key={v} value={v}>
+                        {v}
+                      </option>
+                    ))}
                   </select>
                 </div>
               </div>
@@ -762,7 +784,7 @@ export const PlacoCalculator: React.FC<Props> = ({
 
             <div className="grid grid-cols-2 gap-4">
               <label className="flex items-center justify-between p-3 bg-white border rounded-lg">
-                <span className="text-sm font-medium">Double peau</span>
+                <span className="text-sm font-medium">{t("calc.placo.double_skin")}</span>
                 <input
                   type="checkbox"
                   checked={doubleSkin}
@@ -771,7 +793,7 @@ export const PlacoCalculator: React.FC<Props> = ({
                 />
               </label>
               <div>
-                <label className="block text-xs font-bold text-slate-500 mb-1">Pertes (%)</label>
+                <label className="block text-xs font-bold text-slate-500 mb-1">{t("calc.placo.waste_pct")}</label>
                 <input
                   type="number"
                   value={wastePct}
@@ -783,19 +805,11 @@ export const PlacoCalculator: React.FC<Props> = ({
           </div>
 
           <div className="flex gap-3">
-            <button
-              type="button"
-              onClick={() => setStep(1)}
-              className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold"
-            >
-              Retour
+            <button type="button" onClick={() => setStep(1)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
+              {t("common.back")}
             </button>
-            <button
-              type="button"
-              onClick={() => setStep(3)}
-              className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold"
-            >
-              Suivant
+            <button type="button" onClick={() => setStep(3)} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold">
+              {t("common.next")}
             </button>
           </div>
         </div>
@@ -806,12 +820,12 @@ export const PlacoCalculator: React.FC<Props> = ({
         <div className="space-y-4">
           <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
             <Wind size={16} className="mr-2 shrink-0 mt-0.5" />
-            Isolation et pare-vapeur.
+            {t("calc.placo.help_step3")}
           </div>
 
           <div className="bg-white p-3 rounded-xl border border-slate-200">
             <label className="flex items-center justify-between mb-4 cursor-pointer">
-              <span className="font-bold text-slate-800">Ajouter isolant</span>
+              <span className="font-bold text-slate-800">{t("calc.placo.use_insulation")}</span>
               <input
                 type="checkbox"
                 checked={useInsulation}
@@ -823,21 +837,21 @@ export const PlacoCalculator: React.FC<Props> = ({
             {useInsulation && (
               <div className="space-y-3 animate-in fade-in">
                 <div>
-                  <label className="block text-xs font-bold text-slate-500 mb-1">Type</label>
+                  <label className="block text-xs font-bold text-slate-500 mb-1">{t("calc.placo.insul_type")}</label>
                   <select
                     value={insulType}
                     onChange={(e) => setInsulType(e.target.value)}
                     className="w-full p-2 border rounded bg-white text-slate-900 text-sm"
                   >
-                    {PLACO_INSULATION_TYPES.map((t: any) => (
-                      <option key={t.id} value={t.id}>
-                        {t.label}
+                    {PLACO_INSULATION_TYPES.map((tt: any) => (
+                      <option key={tt.id} value={tt.id}>
+                        {String(tt.label ?? tt.id)}
                       </option>
                     ))}
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-500 mb-1">Épaisseur (mm)</label>
+                  <label className="block text-xs font-bold text-slate-500 mb-1">{t("calc.placo.insul_thick_mm")}</label>
                   <input
                     type="number"
                     value={insulThick}
@@ -855,24 +869,16 @@ export const PlacoCalculator: React.FC<Props> = ({
                 onChange={(e) => setUseMembrane(e.target.checked)}
                 className="mr-2 rounded text-blue-600"
               />
-              <span className="text-sm text-slate-700">Pare-vapeur indépendant</span>
+              <span className="text-sm text-slate-700">{t("calc.placo.use_membrane")}</span>
             </label>
           </div>
 
           <div className="flex gap-3">
-            <button
-              type="button"
-              onClick={() => setStep(2)}
-              className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold"
-            >
-              Retour
+            <button type="button" onClick={() => setStep(2)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
+              {t("common.back")}
             </button>
-            <button
-              type="button"
-              onClick={() => setStep(4)}
-              className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold"
-            >
-              Suivant
+            <button type="button" onClick={() => setStep(4)} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold">
+              {t("common.next")}
             </button>
           </div>
         </div>
@@ -882,10 +888,10 @@ export const PlacoCalculator: React.FC<Props> = ({
       {step === 4 && (
         <div className="text-center py-10">
           <Check size={48} className="mx-auto text-emerald-500 mb-4" />
-          <h3 className="text-xl font-bold text-slate-800">Calcul prêt</h3>
-          <p className="text-slate-500 mb-6">Vous pouvez ajuster les prix si besoin.</p>
+          <h3 className="text-xl font-bold text-slate-800">{t("calc.placo.ready_title")}</h3>
+          <p className="text-slate-500 mb-6">{t("calc.placo.ready_desc")}</p>
           <button type="button" onClick={() => setStep(5)} className="text-blue-600 font-bold underline">
-            Modifier les prix
+            {t("calc.placo.edit_prices")}
           </button>
         </div>
       )}
@@ -895,82 +901,45 @@ export const PlacoCalculator: React.FC<Props> = ({
         <div className="space-y-4">
           <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
             <Euro size={16} className="mr-2 shrink-0 mt-0.5" />
-            Ajustement des prix unitaires.
+            {t("calc.placo.help_step5")}
           </div>
 
           <div className="bg-white p-3 rounded-xl border border-slate-200">
             <div className="flex justify-between items-center mb-3">
-              <h4 className="text-xs font-bold text-slate-500 uppercase">Tarifs</h4>
-              <button
-                type="button"
-                onClick={() => setProMode(!proMode)}
-                className="text-xs flex items-center text-blue-600"
-              >
-                <Settings size={12} className="mr-1" /> {proMode ? "Mode Pro" : "Mode Simple"}
+              <h4 className="text-xs font-bold text-slate-500 uppercase">{t("calc.placo.prices_title")}</h4>
+              <button type="button" onClick={() => setProMode(!proMode)} className="text-xs flex items-center text-blue-600">
+                <Settings size={12} className="mr-1" /> {proMode ? t("common.pro_mode") : t("common.simple_mode")}
               </button>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-[10px] text-slate-500 mb-1">BA13 (€/plaque)</label>
-                <input
-                  type="number"
-                  value={prices.board_BA13}
-                  onChange={(e) => updatePrice("board_BA13", e.target.value)}
-                  className="w-full p-1.5 border rounded text-sm bg-white text-slate-900"
-                />
-              </div>
-              <div>
-                <label className="block text-[10px] text-slate-500 mb-1">Hydro (€/plaque)</label>
-                <input
-                  type="number"
-                  value={prices.board_HYDRO}
-                  onChange={(e) => updatePrice("board_HYDRO", e.target.value)}
-                  className="w-full p-1.5 border rounded text-sm bg-white text-slate-900"
-                />
-              </div>
-              <div>
-                <label className="block text-[10px] text-slate-500 mb-1">Feu (€/plaque)</label>
-                <input
-                  type="number"
-                  value={prices.board_FIRE}
-                  onChange={(e) => updatePrice("board_FIRE", e.target.value)}
-                  className="w-full p-1.5 border rounded text-sm bg-white text-slate-900"
-                />
-              </div>
-              <div>
-                <label className="block text-[10px] text-slate-500 mb-1">Isolant (€/m²)</label>
-                <input
-                  type="number"
-                  value={prices.insulationM2}
-                  onChange={(e) => updatePrice("insulationM2", e.target.value)}
-                  className="w-full p-1.5 border rounded text-sm bg-white text-slate-900"
-                />
-              </div>
-
-              <div>
-                <label className="block text-[10px] text-slate-500 mb-1">Rail 3m (€/u)</label>
-                <input
-                  type="number"
-                  value={prices.rail3m}
-                  onChange={(e) => updatePrice("rail3m", e.target.value)}
-                  className="w-full p-1.5 border rounded text-sm bg-white text-slate-900"
-                />
-              </div>
-              <div>
-                <label className="block text-[10px] text-slate-500 mb-1">Montant 3m (€/u)</label>
-                <input
-                  type="number"
-                  value={prices.stud3m}
-                  onChange={(e) => updatePrice("stud3m", e.target.value)}
-                  className="w-full p-1.5 border rounded text-sm bg-white text-slate-900"
-                />
-              </div>
+              {[
+                ["board_BA13", "calc.placo.price.ba13"],
+                ["board_HYDRO", "calc.placo.price.hydro"],
+                ["board_FIRE", "calc.placo.price.fire"],
+                ["insulationM2", "calc.placo.price.insulation_m2"],
+                ["rail3m", "calc.placo.price.rail_3m"],
+                ["stud3m", "calc.placo.price.stud_3m"],
+                ["tapeRoll150", "calc.placo.price.tape_150"],
+                ["compoundBag25", "calc.placo.price.compound_25"],
+                ["screwBox1000", "calc.placo.price.screws_1000"],
+                ["membraneM2", "calc.placo.price.membrane_m2"],
+              ].map(([k, key]) => (
+                <div key={k}>
+                  <label className="block text-[10px] text-slate-500 mb-1">{t(key)}</label>
+                  <input
+                    type="number"
+                    value={(prices as any)[k]}
+                    onChange={(e) => updatePrice(k as any, e.target.value)}
+                    className="w-full p-1.5 border rounded text-sm bg-white text-slate-900"
+                  />
+                </div>
+              ))}
 
               {mode === "ceiling" && (
                 <>
                   <div>
-                    <label className="block text-[10px] text-slate-500 mb-1">Fourrure 3m (€/u)</label>
+                    <label className="block text-[10px] text-slate-500 mb-1">{t("calc.placo.price.furring_3m")}</label>
                     <input
                       type="number"
                       value={prices.furring3m}
@@ -979,7 +948,7 @@ export const PlacoCalculator: React.FC<Props> = ({
                     />
                   </div>
                   <div>
-                    <label className="block text-[10px] text-slate-500 mb-1">Suspente (€/u)</label>
+                    <label className="block text-[10px] text-slate-500 mb-1">{t("calc.placo.price.hanger_unit")}</label>
                     <input
                       type="number"
                       value={prices.hangerUnit}
@@ -989,50 +958,12 @@ export const PlacoCalculator: React.FC<Props> = ({
                   </div>
                 </>
               )}
-
-              <div>
-                <label className="block text-[10px] text-slate-500 mb-1">Bande joints 150m (€/rlx)</label>
-                <input
-                  type="number"
-                  value={prices.tapeRoll150}
-                  onChange={(e) => updatePrice("tapeRoll150", e.target.value)}
-                  className="w-full p-1.5 border rounded text-sm bg-white text-slate-900"
-                />
-              </div>
-              <div>
-                <label className="block text-[10px] text-slate-500 mb-1">Enduit joints 25kg (€/sac)</label>
-                <input
-                  type="number"
-                  value={prices.compoundBag25}
-                  onChange={(e) => updatePrice("compoundBag25", e.target.value)}
-                  className="w-full p-1.5 border rounded text-sm bg-white text-slate-900"
-                />
-              </div>
-
-              <div>
-                <label className="block text-[10px] text-slate-500 mb-1">Vis 1000 (€/boîte)</label>
-                <input
-                  type="number"
-                  value={prices.screwBox1000}
-                  onChange={(e) => updatePrice("screwBox1000", e.target.value)}
-                  className="w-full p-1.5 border rounded text-sm bg-white text-slate-900"
-                />
-              </div>
-              <div>
-                <label className="block text-[10px] text-slate-500 mb-1">Membrane (€/m²)</label>
-                <input
-                  type="number"
-                  value={prices.membraneM2}
-                  onChange={(e) => updatePrice("membraneM2", e.target.value)}
-                  className="w-full p-1.5 border rounded text-sm bg-white text-slate-900"
-                />
-              </div>
             </div>
 
             {proMode && (
               <div className="mt-4 pt-3 border-t border-slate-100 grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[10px] text-blue-600 font-bold mb-1">MO pose (€/m²)</label>
+                  <label className="block text-[10px] text-blue-600 font-bold mb-1">{t("calc.placo.price.labor_m2")}</label>
                   <input
                     type="number"
                     value={prices.laborM2}
@@ -1045,19 +976,11 @@ export const PlacoCalculator: React.FC<Props> = ({
           </div>
 
           <div className="flex gap-3 pt-2">
-            <button
-              type="button"
-              onClick={() => setStep(4)}
-              className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold"
-            >
-              Retour
+            <button type="button" onClick={() => setStep(4)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
+              {t("common.back")}
             </button>
-            <button
-              type="button"
-              disabled
-              className="flex-1 py-3 bg-emerald-100 text-emerald-700 rounded-xl font-bold flex justify-center items-center"
-            >
-              <Check size={18} className="mr-2" /> Calculé
+            <button type="button" disabled className="flex-1 py-3 bg-emerald-100 text-emerald-700 rounded-xl font-bold flex justify-center items-center">
+              <Check size={18} className="mr-2" /> {t("common.calculated")}
             </button>
           </div>
         </div>

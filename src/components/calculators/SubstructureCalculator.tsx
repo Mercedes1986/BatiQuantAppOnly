@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { CalculatorType, CalculationResult, Unit } from "../../../types";
 import { DEFAULT_PRICES, getWallUnitPriceKey } from "../../constants";
 import { getUnitPrice } from "../../services/materialsService";
@@ -35,12 +36,12 @@ const round2 = (n: number) => Math.round((n + Number.EPSILON) * 100) / 100;
 const clamp = (n: number, min: number, max: number) => Math.min(max, Math.max(min, n));
 
 /**
- * ✅ MAJ / FIX
- * - Prix: Override local (step 4) > Catalogue (getUnitPrice) > DEFAULT_PRICES > fallback
- * - Conversion des prix “rouleau” (DeltaMS 20m², drain 50m) en €/m² ou €/m
- * - Évite les NaN (getUnitPrice/DEFAULT_PRICES vides)
- * - Warnings cohérents et affichage simple
- * - Sépare “Options avancées” (step 1) du step 4 (prix) -> plus de confusion avec proMode
+ * ✅ UPDATE (i18n + no hardcoded UI strings)
+ * - UI texts moved to i18n (t(..., defaultValue))
+ * - Warnings moved to i18n (still accept dynamic values)
+ * - Same pricing logic: Override local > Catalog > DEFAULT_PRICES > fallback
+ * - Roll-based conversions kept (DeltaMS 20m², drain 50m) to €/m² or €/m
+ * - Keeps "advanced options" separate from step 4 pricing overrides
  */
 
 const KEYS = {
@@ -61,30 +62,32 @@ const KEYS = {
 } as const;
 
 export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
+  const { t } = useTranslation();
+
   const [step, setStep] = useState(1);
 
-  // “Options avancées” (UI uniquement)
+  // “Advanced options” (UI only)
   const [advanced, setAdvanced] = useState(false);
 
-  // --- 1) Murs ---
+  // --- 1) Walls ---
   const [perimeter, setPerimeter] = useState<string>("");
-  const [height, setHeight] = useState<string>("0.60"); // ~3 rangs
+  const [height, setHeight] = useState<string>("0.60"); // ~3 rows
   const [openingsArea, setOpeningsArea] = useState<string>("");
 
   const [wallMode, setWallMode] = useState<WallMode>("masonry");
   const [wallFamily, setWallFamily] = useState<WallFamily>("parpaing");
   const [wallBlockId, setWallBlockId] = useState<string>("parpaing-20");
 
-  // Béton banché
+  // Poured concrete wall
   const [wallThickness, setWallThickness] = useState("20"); // cm
 
-  // Pertes
+  // Waste
   const [wasteBlock, setWasteBlock] = useState(5);
 
-  // Stepoc : fallback remplissage si spec n'a pas fillM3PerM2
+  // Stepoc: fallback fill if spec has no fillM3PerM2
   const [stepocFillRate, setStepocFillRate] = useState(140); // L/m² fallback
 
-  // --- 2) Étanchéité ---
+  // --- 2) Waterproofing ---
   const [percentBuried, setPercentBuried] = useState(100);
   const [useArase, setUseArase] = useState(true);
   const [useBitumen, setUseBitumen] = useState(true);
@@ -99,13 +102,12 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
   const [manholes, setManholes] = useState(4);
 
   /**
-   * Overrides locaux (prioritaires)
+   * Local overrides (highest priority)
    * ex: BPE_M3, DELTA_MS_ROLL_20M, DRAIN_PIPE_50M, etc.
    */
   const [unitOverrides, setUnitOverrides] = useState<Record<string, number>>({});
 
-  const setOverride = (key: string, val: number) =>
-    setUnitOverrides((prev) => ({ ...prev, [key]: val }));
+  const setOverride = (key: string, val: number) => setUnitOverrides((prev) => ({ ...prev, [key]: val }));
 
   const fromDefaults = (key: string) => {
     const raw = (DEFAULT_PRICES as any)?.[key];
@@ -113,7 +115,7 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
     return Number.isFinite(n) ? n : undefined;
   };
 
-  // ✅ helper prix: Override > Catalogue > DEFAULT_PRICES > fallback
+  // ✅ price helper: Override > Catalog > DEFAULT_PRICES > fallback
   const getP = (key: string, fallback: number) => {
     const o = unitOverrides[key];
     if (o !== undefined && Number.isFinite(o)) return o;
@@ -127,13 +129,13 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
     return fallback;
   };
 
-  // --- Spec sélectionnée (maçonnerie) ---
+  // --- Selected masonry spec ---
   const selectedSpec = useMemo(() => {
     if (wallMode !== "masonry") return undefined;
     return getWallBlockSpec(wallBlockId) ?? WALL_BLOCK_SPECS[0];
   }, [wallMode, wallBlockId]);
 
-  // --- Clé prix bloc active (selon variante) ---
+  // --- Active block price key (depending on variant) ---
   const activeBlockPriceKey = useMemo(() => {
     if (!selectedSpec) return null;
     try {
@@ -143,7 +145,7 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
     }
   }, [selectedSpec]);
 
-  // Force un bloc valide quand on change de famille
+  // Force a valid block when family changes
   useEffect(() => {
     if (wallMode !== "masonry") return;
     const list = getSpecsByFamily(wallFamily);
@@ -156,6 +158,23 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
 
   // Keep step in bounds
   useEffect(() => setStep((s) => clamp(s, 1, 4)), []);
+
+  const wallModeLabel = (m: WallMode) =>
+    t(`calc.substructure.wall_mode.${m}`, {
+      defaultValue: m === "masonry" ? "Masonry (blocks)" : "Poured concrete",
+    });
+
+  const wallFamilyLabel = (fam: WallFamily) =>
+    t(`calc.substructure.wall_family.${fam}`, {
+      defaultValue:
+        fam === "parpaing"
+          ? "Concrete block"
+          : fam === "brique"
+          ? "Brick"
+          : fam === "cellulaire"
+          ? "AAC block"
+          : "Shuttering block",
+    });
 
   // --- CALC ENGINE ---
   const calculationData = useMemo(() => {
@@ -171,8 +190,12 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
         totalCost: 0,
         materials: [] as any[],
         details: [] as any[],
-        summary: "Soubassement",
-        warnings: ["Renseignez un périmètre et une hauteur pour calculer."],
+        summary: t("calc.substructure.title", { defaultValue: "Substructure" }),
+        warnings: [
+          t("calc.substructure.warn.fill_perimeter_height", {
+            defaultValue: "Enter a perimeter and height to calculate.",
+          }),
+        ],
       };
     }
 
@@ -181,7 +204,11 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
     const treatedSurface = netSurface * (Math.max(0, Math.min(100, percentBuried)) / 100);
 
     if (deductions > 0 && deductions > grossSurface) {
-      warnings.push("Les déductions dépassent la surface brute (surface nette ramenée à 0).");
+      warnings.push(
+        t("calc.substructure.warn.deductions_over_gross", {
+          defaultValue: "Deductions exceed gross surface (net surface set to 0).",
+        })
+      );
     }
 
     const materials: any[] = [];
@@ -207,18 +234,22 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
 
       materials.push({
         id: "blocks_sub",
-        name: selectedSpec.label,
+        name: selectedSpec.label, // comes from data/specs (not UI hardcoded)
         quantity: totalBlocks,
         quantityRaw: totalBlocks,
         unit: Unit.PIECE,
         unitPrice: round2(unitPriceBlock),
         totalPrice: round2(costBlocks),
         category: CalculatorType.SUBSTRUCTURE,
-        details: `${selectedSpec.unitsPerM2.toFixed(2)} u/m² — ép. ${selectedSpec.thicknessCm}cm`,
+        details: t("calc.substructure.mat.blocks_details", {
+          u: selectedSpec.unitsPerM2.toFixed(2),
+          th: selectedSpec.thicknessCm,
+          defaultValue: `${selectedSpec.unitsPerM2.toFixed(2)} u/m² — th. ${selectedSpec.thicknessCm}cm`,
+        }),
         systemKey: blockKey,
       });
 
-      // Mortier / colle
+      // Mortar / glue
       const bagsPerM2 = selectedSpec.mortarKind === "mortier" ? 1 / 3 : 1 / 5;
       const bags = Math.max(0, Math.ceil(netSurface * bagsPerM2));
 
@@ -232,19 +263,22 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
         id: "mortar",
         name:
           selectedSpec.mortarKind === "mortier"
-            ? "Mortier de montage (Sac 25kg)"
-            : "Colle / Mortier-colle (Sac 25kg)",
+            ? t("calc.substructure.mat.mortar", { defaultValue: "Masonry mortar (25kg bag)" })
+            : t("calc.substructure.mat.glue", { defaultValue: "Adhesive / thin-bed mortar (25kg bag)" }),
         quantity: bags,
         quantityRaw: bags,
         unit: Unit.BAG,
         unitPrice: round2(mortarUnitPrice),
         totalPrice: round2(costMortar),
         category: CalculatorType.SUBSTRUCTURE,
-        details: selectedSpec.mortarKind === "mortier" ? "~1 sac / 3 m²" : "~1 sac / 5 m²",
+        details:
+          selectedSpec.mortarKind === "mortier"
+            ? t("calc.substructure.mat.mortar_ratio", { defaultValue: "~1 bag / 3 m²" })
+            : t("calc.substructure.mat.glue_ratio", { defaultValue: "~1 bag / 5 m²" }),
         systemKey: mortarKey,
       });
 
-      // Stepoc : béton de remplissage
+      // Stepoc: concrete infill
       if (selectedSpec.family === "stepoc") {
         const fillM3PerM2 = selectedSpec.fillM3PerM2 ?? stepocFillRate / 1000;
         const volFill = netSurface * fillM3PerM2;
@@ -256,7 +290,7 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
 
         materials.push({
           id: "concrete_fill",
-          name: "Béton de remplissage (Stepoc)",
+          name: t("calc.substructure.mat.stepoc_fill", { defaultValue: "Concrete infill (Stepoc)" }),
           quantity: round2(volFill),
           quantityRaw: volFill,
           unit: Unit.M3,
@@ -265,13 +299,19 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
           category: CalculatorType.SUBSTRUCTURE,
           details:
             selectedSpec.fillM3PerM2 != null
-              ? `${(fillM3PerM2 * 1000).toFixed(0)} L/m² (spec)`
-              : `${stepocFillRate} L/m² (fallback)`,
+              ? t("calc.substructure.mat.stepoc_fill_detail_spec", {
+                  lpm2: (fillM3PerM2 * 1000).toFixed(0),
+                  defaultValue: `${(fillM3PerM2 * 1000).toFixed(0)} L/m² (spec)`,
+                })
+              : t("calc.substructure.mat.stepoc_fill_detail_fallback", {
+                  lpm2: stepocFillRate,
+                  defaultValue: `${stepocFillRate} L/m² (fallback)`,
+                }),
           systemKey: KEYS.CONCRETE,
         });
       }
     } else {
-      // Mur béton banché
+      // Poured concrete wall
       const thM = (Math.max(0, toNum(wallThickness, 20)) || 20) / 100;
       const vol = netSurface * thM * 1.05;
 
@@ -282,7 +322,10 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
 
       materials.push({
         id: "concrete_wall",
-        name: `Béton Mur Banché (ép. ${toNum(wallThickness, 20).toFixed(0)}cm)`,
+        name: t("calc.substructure.mat.poured_wall", {
+          th: toNum(wallThickness, 20).toFixed(0),
+          defaultValue: `Poured concrete wall (th. ${toNum(wallThickness, 20).toFixed(0)}cm)`,
+        }),
         quantity: round2(vol),
         quantityRaw: vol,
         unit: Unit.M3,
@@ -295,7 +338,7 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
 
     // --- 2) Waterproofing ---
     if (useArase) {
-      // 1 rouleau ~20m
+      // 1 roll ~20m
       const rolls = Math.max(1, Math.ceil(P / 20));
       const araseUnit = getP(KEYS.ARASE_ROLL, 15);
       const costArase = rolls * araseUnit;
@@ -303,20 +346,20 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
 
       materials.push({
         id: "arase",
-        name: "Arase étanche (bande)",
+        name: t("calc.substructure.mat.dpc", { defaultValue: "DPC strip (damp-proof course)" }),
         quantity: rolls,
         quantityRaw: P,
         unit: Unit.ROLL,
         unitPrice: round2(araseUnit),
         totalPrice: round2(costArase),
         category: CalculatorType.SUBSTRUCTURE,
-        details: "≈ 1 rouleau / 20 m",
+        details: t("calc.substructure.mat.dpc_ratio", { defaultValue: "≈ 1 roll / 20 m" }),
         systemKey: KEYS.ARASE_ROLL,
       });
     }
 
     if (useBitumen) {
-      // ~0.5 kg/m² par couche, +10%
+      // ~0.5 kg/m² per coat, +10%
       const kgNeeded = treatedSurface * 0.5 * Math.max(1, bitumenLayers) * 1.1;
       const buckets = Math.ceil(kgNeeded / 25);
 
@@ -326,14 +369,21 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
 
       materials.push({
         id: "bitumen",
-        name: `Enduit bitumineux (${bitumenLayers} couche${bitumenLayers > 1 ? "s" : ""})`,
+        name: t("calc.substructure.mat.bitumen", {
+          n: bitumenLayers,
+          defaultValue: `Bitumen coating (${bitumenLayers} coat${bitumenLayers > 1 ? "s" : ""})`,
+        }),
         quantity: buckets,
         quantityRaw: kgNeeded,
         unit: Unit.BUCKET,
         unitPrice: round2(bitUnit),
         totalPrice: round2(costBit),
         category: CalculatorType.SUBSTRUCTURE,
-        details: `${kgNeeded.toFixed(1)} kg sur ${treatedSurface.toFixed(1)} m²`,
+        details: t("calc.substructure.mat.bitumen_detail", {
+          kg: kgNeeded.toFixed(1),
+          m2: treatedSurface.toFixed(1),
+          defaultValue: `${kgNeeded.toFixed(1)} kg over ${treatedSurface.toFixed(1)} m²`,
+        }),
         systemKey: KEYS.BITUMEN,
       });
     }
@@ -341,7 +391,7 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
     if (useDeltaMS) {
       const areaDelta = treatedSurface * 1.15;
 
-      // Delta: prix au rouleau 20m² -> €/m²
+      // Delta: roll price 20m² -> €/m²
       const rollUnit = getP(KEYS.DELTA_ROLL, Number((DEFAULT_PRICES as any)?.DELTA_MS_ROLL_20M ?? 120));
       const deltaM2 = rollUnit / 20;
 
@@ -350,18 +400,18 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
 
       materials.push({
         id: "deltams",
-        name: "Protection Delta MS",
+        name: t("calc.substructure.mat.delta_ms", { defaultValue: "Delta MS protection" }),
         quantity: round2(areaDelta),
         quantityRaw: areaDelta,
         unit: Unit.M2,
         unitPrice: round2(deltaM2),
         totalPrice: round2(costDelta),
         category: CalculatorType.SUBSTRUCTURE,
-        details: "≈ +15% recouvrement",
+        details: t("calc.substructure.mat.delta_ms_overlap", { defaultValue: "≈ +15% overlaps" }),
         systemKey: KEYS.DELTA_ROLL,
       });
 
-      // Profilés: ~1 pour 2m
+      // Profiles: ~1 per 2m
       const profiles = Math.max(1, Math.ceil(P / 2));
       const profUnit = getP(KEYS.DELTA_PROFILE, 8);
       const costProf = profiles * profUnit;
@@ -369,7 +419,7 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
 
       materials.push({
         id: "delta_profile",
-        name: "Profilé de finition Delta",
+        name: t("calc.substructure.mat.delta_profile", { defaultValue: "Delta finishing profile" }),
         quantity: profiles,
         quantityRaw: P,
         unit: Unit.PIECE,
@@ -384,7 +434,7 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
     if (useDrain) {
       const len = P * 1.05;
 
-      // Drain: prix au rouleau 50m -> €/m
+      // Drain: roll price 50m -> €/m
       const drainRoll = getP(KEYS.DRAIN_ROLL, Number((DEFAULT_PRICES as any)?.DRAIN_PIPE_50M ?? 70));
       const drainM = drainRoll / 50;
 
@@ -393,7 +443,7 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
 
       materials.push({
         id: "drain_pipe",
-        name: "Drain agricole Ø100",
+        name: t("calc.substructure.mat.drain_pipe", { defaultValue: "Drain pipe Ø100" }),
         quantity: Math.ceil(len),
         quantityRaw: len,
         unit: Unit.METER,
@@ -403,7 +453,7 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
         systemKey: KEYS.DRAIN_ROLL,
       });
 
-      // Gravier drainant
+      // Gravel
       const w = Math.max(0, toNum(trenchWidth, 0.3));
       const h = Math.max(0, toNum(gravelHeight, 0.4));
       const volGrav = P * w * h; // m3
@@ -415,20 +465,23 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
 
       materials.push({
         id: "gravel_drain",
-        name: "Gravier drainant",
+        name: t("calc.substructure.mat.gravel", { defaultValue: "Drainage gravel" }),
         quantity: round2(tonsGrav),
         quantityRaw: volGrav,
         unit: Unit.TON,
         unitPrice: round2(gravUnit),
         totalPrice: round2(costGrav),
         category: CalculatorType.SUBSTRUCTURE,
-        details: `Vol: ${volGrav.toFixed(2)} m³`,
+        details: t("calc.substructure.mat.gravel_detail", {
+          vol: volGrav.toFixed(2),
+          defaultValue: `Vol: ${volGrav.toFixed(2)} m³`,
+        }),
         systemKey: KEYS.GRAVEL_TON,
       });
 
-      // Géotextile
+      // Geotextile
       if (useGeo) {
-        const linearW = w + 2 * h + 0.3; // enveloppe
+        const linearW = w + 2 * h + 0.3; // wrap
         const areaGeo = P * linearW;
 
         const geoUnit = getP(KEYS.GEO_M2, Number((DEFAULT_PRICES as any)?.GEOTEXTILE_M2 ?? 1.2));
@@ -437,7 +490,7 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
 
         materials.push({
           id: "geo_drain",
-          name: "Géotextile (enrobage drain)",
+          name: t("calc.substructure.mat.geotextile", { defaultValue: "Geotextile (drain wrap)" }),
           quantity: Math.ceil(areaGeo),
           quantityRaw: areaGeo,
           unit: Unit.M2,
@@ -448,7 +501,7 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
         });
       }
 
-      // Regards
+      // Manholes
       const mh = Math.max(0, Math.floor(manholes));
       if (mh > 0) {
         const manUnit = getP(KEYS.MANHOLE, 45);
@@ -457,7 +510,7 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
 
         materials.push({
           id: "manhole",
-          name: "Regards de visite",
+          name: t("calc.substructure.mat.manholes", { defaultValue: "Inspection chambers" }),
           quantity: mh,
           quantityRaw: mh,
           unit: Unit.PIECE,
@@ -470,31 +523,41 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
     }
 
     const details: any[] = [
-      { label: "Périmètre", value: P.toFixed(1), unit: "m" },
-      { label: "Hauteur", value: H.toFixed(2), unit: "m" },
-      { label: "Surface nette", value: netSurface.toFixed(1), unit: "m²" },
-      { label: "Surface traitée", value: treatedSurface.toFixed(1), unit: "m²" },
+      { label: t("calc.substructure.detail.perimeter", { defaultValue: "Perimeter" }), value: P.toFixed(1), unit: "m" },
+      { label: t("calc.substructure.detail.height", { defaultValue: "Height" }), value: H.toFixed(2), unit: "m" },
+      { label: t("calc.substructure.detail.net_surface", { defaultValue: "Net surface" }), value: netSurface.toFixed(1), unit: "m²" },
+      { label: t("calc.substructure.detail.treated_surface", { defaultValue: "Treated surface" }), value: treatedSurface.toFixed(1), unit: "m²" },
     ];
 
     if (wallMode === "masonry" && selectedSpec) {
-      details.push({ label: "Bloc", value: selectedSpec.label, unit: "" });
-      details.push({ label: "Conso", value: selectedSpec.unitsPerM2.toFixed(2), unit: "u/m²" });
+      details.push({ label: t("calc.substructure.detail.block", { defaultValue: "Block" }), value: selectedSpec.label, unit: "" });
+      details.push({ label: t("calc.substructure.detail.consumption", { defaultValue: "Consumption" }), value: selectedSpec.unitsPerM2.toFixed(2), unit: "u/m²" });
     } else {
-      details.push({ label: "Mur", value: "Béton banché", unit: "" });
-      details.push({ label: "Épaisseur", value: `${toNum(wallThickness, 20).toFixed(0)}`, unit: "cm" });
+      details.push({ label: t("calc.substructure.detail.wall", { defaultValue: "Wall" }), value: t("calc.substructure.detail.poured_concrete", { defaultValue: "Poured concrete" }), unit: "" });
+      details.push({ label: t("calc.substructure.detail.thickness", { defaultValue: "Thickness" }), value: `${toNum(wallThickness, 20).toFixed(0)}`, unit: "cm" });
     }
 
-    if (netSurface <= 0) warnings.push("Surface nette nulle : vérifiez périmètre/hauteur/déductions.");
+    if (netSurface <= 0) {
+      warnings.push(
+        t("calc.substructure.warn.net_zero", {
+          defaultValue: "Net surface is zero: check perimeter/height/deductions.",
+        })
+      );
+    }
 
     return {
       ok: true,
-      summary: `${netSurface.toFixed(1)} m² de soubassement`,
+      summary: t("calc.substructure.summary", {
+        m2: netSurface.toFixed(1),
+        defaultValue: `${netSurface.toFixed(1)} m²`,
+      }),
       totalCost: round2(totalCost),
       materials,
       details,
       warnings,
     };
   }, [
+    t,
     perimeter,
     height,
     openingsArea,
@@ -549,10 +612,15 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
           onChange={(e) => setOverride(k, toNum(e.target.value, 0))}
           className="w-full p-2 border rounded bg-white text-sm"
         />
-        {hint && <p className="text-[10px] text-slate-400 mt-1">{hint}</p>}
+        {hint ? <p className="text-[10px] text-slate-400 mt-1">{hint}</p> : null}
       </div>
     );
   };
+
+  const stepLabel = (s: number) =>
+    t(`calc.substructure.steps.${s}`, {
+      defaultValue: s === 1 ? "1. Walls" : s === 2 ? "2. Waterproof" : s === 3 ? "3. Drainage" : "4. Prices",
+    });
 
   return (
     <div className="space-y-6 animate-in fade-in">
@@ -567,10 +635,7 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
               step === s ? "bg-white shadow text-blue-600" : "text-slate-400"
             }`}
           >
-            {s === 1 && "1. Murs"}
-            {s === 2 && "2. Étanche."}
-            {s === 3 && "3. Drain."}
-            {s === 4 && "4. Prix"}
+            {stepLabel(s)}
           </button>
         ))}
       </div>
@@ -591,12 +656,16 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
         <div className="space-y-4">
           <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
             <Info size={16} className="mr-2 shrink-0 mt-0.5" />
-            Définissez le périmètre et la hauteur des murs de soubassement.
+            {t("calc.substructure.ui.step1_hint", {
+              defaultValue: "Define the perimeter and height of the substructure walls.",
+            })}
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-slate-500 mb-1">Périmètre (m)</label>
+              <label className="block text-xs font-bold text-slate-500 mb-1">
+                {t("calc.substructure.ui.perimeter_m", { defaultValue: "Perimeter (m)" })}
+              </label>
               <input
                 type="number"
                 value={perimeter}
@@ -605,7 +674,9 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-slate-500 mb-1">Hauteur (m)</label>
+              <label className="block text-xs font-bold text-slate-500 mb-1">
+                {t("calc.substructure.ui.height_m", { defaultValue: "Height (m)" })}
+              </label>
               <input
                 type="number"
                 value={height}
@@ -616,39 +687,35 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">Type de mur</label>
+            <label className="block text-sm font-medium text-slate-700 mb-2">
+              {t("calc.substructure.ui.wall_type", { defaultValue: "Wall type" })}
+            </label>
             <div className="grid grid-cols-2 gap-2">
-              <button
-                type="button"
-                onClick={() => setWallMode("masonry")}
-                className={`p-2 rounded border text-xs font-medium ${
-                  wallMode === "masonry"
-                    ? "bg-stone-100 border-stone-500 text-stone-800 ring-1 ring-stone-500"
-                    : "bg-white text-slate-500"
-                }`}
-              >
-                Maçonnerie (blocs)
-              </button>
-              <button
-                type="button"
-                onClick={() => setWallMode("concrete")}
-                className={`p-2 rounded border text-xs font-medium ${
-                  wallMode === "concrete"
-                    ? "bg-stone-100 border-stone-500 text-stone-800 ring-1 ring-stone-500"
-                    : "bg-white text-slate-500"
-                }`}
-              >
-                Béton banché
-              </button>
+              {(["masonry", "concrete"] as WallMode[]).map((m) => (
+                <button
+                  key={m}
+                  type="button"
+                  onClick={() => setWallMode(m)}
+                  className={`p-2 rounded border text-xs font-medium ${
+                    wallMode === m
+                      ? "bg-stone-100 border-stone-500 text-stone-800 ring-1 ring-stone-500"
+                      : "bg-white text-slate-500"
+                  }`}
+                >
+                  {wallModeLabel(m)}
+                </button>
+              ))}
             </div>
           </div>
 
           {wallMode === "masonry" && (
             <div className="space-y-3">
               <div>
-                <label className="block text-xs font-bold text-slate-500 mb-1">Famille</label>
+                <label className="block text-xs font-bold text-slate-500 mb-1">
+                  {t("calc.substructure.ui.family", { defaultValue: "Family" })}
+                </label>
                 <div className="grid grid-cols-2 gap-2">
-                  {(["parpaing", "brique", "cellulaire", "stepoc"] as const).map((fam) => (
+                  {(["parpaing", "brique", "cellulaire", "stepoc"] as WallFamily[]).map((fam) => (
                     <button
                       key={fam}
                       type="button"
@@ -659,17 +726,16 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
                           : "bg-white text-slate-500"
                       }`}
                     >
-                      {fam === "parpaing" && "Parpaing"}
-                      {fam === "brique" && "Brique"}
-                      {fam === "cellulaire" && "Béton cellulaire"}
-                      {fam === "stepoc" && "Bloc à bancher"}
+                      {wallFamilyLabel(fam)}
                     </button>
                   ))}
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-500 mb-1">Format / Épaisseur</label>
+                <label className="block text-xs font-bold text-slate-500 mb-1">
+                  {t("calc.substructure.ui.block_variant", { defaultValue: "Format / thickness" })}
+                </label>
                 <select
                   className="w-full p-3 rounded-lg border border-slate-300 bg-white text-slate-900 font-bold"
                   value={wallBlockId}
@@ -682,19 +748,23 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
                   ))}
                 </select>
 
-                {selectedSpec && (
+                {selectedSpec ? (
                   <p className="text-xs text-slate-500 mt-1">
-                    Épaisseur : <b>{selectedSpec.thicknessCm}cm</b> • Conso :{" "}
+                    {t("calc.substructure.ui.thickness", { defaultValue: "Thickness" })}:{" "}
+                    <b>{selectedSpec.thicknessCm}cm</b> •{" "}
+                    {t("calc.substructure.ui.consumption", { defaultValue: "Consumption" })}:{" "}
                     <b>{selectedSpec.unitsPerM2.toFixed(2)} u/m²</b>
                   </p>
-                )}
+                ) : null}
               </div>
             </div>
           )}
 
           {wallMode === "concrete" && (
             <div>
-              <label className="block text-xs font-bold text-slate-500 mb-1">Épaisseur (cm)</label>
+              <label className="block text-xs font-bold text-slate-500 mb-1">
+                {t("calc.substructure.ui.thickness_cm", { defaultValue: "Thickness (cm)" })}
+              </label>
               <input
                 type="number"
                 value={wallThickness}
@@ -710,13 +780,16 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
               onClick={() => setAdvanced((v) => !v)}
               className="flex items-center text-xs font-bold text-slate-500 mb-2 uppercase"
             >
-              <Settings size={12} className="mr-1" /> Options avancées
+              <Settings size={12} className="mr-1" />{" "}
+              {t("calc.substructure.ui.advanced", { defaultValue: "Advanced options" })}
             </button>
 
             {advanced ? (
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[10px] text-slate-500 uppercase">Déductions (m²)</label>
+                  <label className="block text-[10px] text-slate-500 uppercase">
+                    {t("calc.substructure.ui.deductions_m2", { defaultValue: "Deductions (m²)" })}
+                  </label>
                   <input
                     type="number"
                     value={openingsArea}
@@ -724,8 +797,11 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
                     className="w-full p-1.5 text-sm border rounded bg-white"
                   />
                 </div>
+
                 <div>
-                  <label className="block text-[10px] text-slate-500 uppercase">Pertes (%)</label>
+                  <label className="block text-[10px] text-slate-500 uppercase">
+                    {t("calc.substructure.ui.waste_pct", { defaultValue: "Waste (%)" })}
+                  </label>
                   <input
                     type="number"
                     value={wasteBlock}
@@ -737,7 +813,9 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
                 {wallMode === "masonry" && selectedSpec?.family === "stepoc" && (
                   <div className="col-span-2">
                     <label className="block text-[10px] text-slate-500 uppercase">
-                      Remplissage Stepoc (L/m²) — fallback
+                      {t("calc.substructure.ui.stepoc_fill_fallback", {
+                        defaultValue: "Stepoc fill (L/m²) — fallback",
+                      })}
                     </label>
                     <input
                       type="number"
@@ -746,13 +824,17 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
                       className="w-full p-1.5 text-sm border rounded bg-white"
                     />
                     <p className="text-[11px] text-slate-400 mt-1">
-                      Si la spec fournit déjà fillM3PerM2, elle est prioritaire.
+                      {t("calc.substructure.ui.stepoc_fill_note", {
+                        defaultValue: "If the spec provides fillM3PerM2, it is used first.",
+                      })}
                     </p>
                   </div>
                 )}
               </div>
             ) : (
-              <p className="text-xs text-slate-400 italic">Déductions, pertes, Stepoc…</p>
+              <p className="text-xs text-slate-400 italic">
+                {t("calc.substructure.ui.advanced_hint", { defaultValue: "Deductions, waste, Stepoc fill…" })}
+              </p>
             )}
           </div>
 
@@ -761,7 +843,7 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
             onClick={() => setStep(2)}
             className="w-full py-3 bg-blue-600 text-white rounded-xl font-bold flex justify-center items-center"
           >
-            Suivant <ArrowRight size={18} className="ml-2" />
+            {t("common.next", { defaultValue: "Next" })} <ArrowRight size={18} className="ml-2" />
           </button>
         </div>
       )}
@@ -771,13 +853,17 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
         <div className="space-y-4">
           <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
             <Droplets size={16} className="mr-2 shrink-0 mt-0.5" />
-            Protection des murs contre l’humidité (murs enterrés).
+            {t("calc.substructure.ui.step2_hint", {
+              defaultValue: "Waterproofing protection (buried walls).",
+            })}
           </div>
 
           <div className="space-y-3">
             <label className="block">
               <div className="flex justify-between mb-1">
-                <span className="text-xs font-bold text-slate-500 uppercase">Surface enterrée</span>
+                <span className="text-xs font-bold text-slate-500 uppercase">
+                  {t("calc.substructure.ui.buried_share", { defaultValue: "Buried share" })}
+                </span>
                 <span className="text-xs font-bold text-blue-600">{percentBuried}%</span>
               </div>
               <input
@@ -793,8 +879,12 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
 
             <label className="flex items-center justify-between p-3 bg-white border rounded-lg cursor-pointer hover:bg-slate-50">
               <div>
-                <span className="text-sm font-bold text-slate-700">Arase étanche</span>
-                <p className="text-xs text-slate-400">Rupture de capillarité</p>
+                <span className="text-sm font-bold text-slate-700">
+                  {t("calc.substructure.ui.dpc", { defaultValue: "DPC strip" })}
+                </span>
+                <p className="text-xs text-slate-400">
+                  {t("calc.substructure.ui.dpc_help", { defaultValue: "Capillary break" })}
+                </p>
               </div>
               <input
                 type="checkbox"
@@ -806,8 +896,12 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
 
             <label className="flex items-center justify-between p-3 bg-white border rounded-lg cursor-pointer hover:bg-slate-50">
               <div>
-                <span className="text-sm font-bold text-slate-700">Enduit bitumineux</span>
-                <p className="text-xs text-slate-400">Imperméabilisation extérieure</p>
+                <span className="text-sm font-bold text-slate-700">
+                  {t("calc.substructure.ui.bitumen", { defaultValue: "Bitumen coating" })}
+                </span>
+                <p className="text-xs text-slate-400">
+                  {t("calc.substructure.ui.bitumen_help", { defaultValue: "External waterproofing" })}
+                </p>
               </div>
               <input
                 type="checkbox"
@@ -819,7 +913,9 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
 
             {useBitumen && (
               <div className="pl-4 flex items-center space-x-2">
-                <span className="text-xs text-slate-500">Couches :</span>
+                <span className="text-xs text-slate-500">
+                  {t("calc.substructure.ui.coats", { defaultValue: "Coats:" })}
+                </span>
                 <div className="flex bg-slate-100 rounded p-0.5">
                   <button
                     type="button"
@@ -841,8 +937,12 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
 
             <label className="flex items-center justify-between p-3 bg-white border rounded-lg cursor-pointer hover:bg-slate-50">
               <div>
-                <span className="text-sm font-bold text-slate-700">Delta MS</span>
-                <p className="text-xs text-slate-400">Protection mécanique</p>
+                <span className="text-sm font-bold text-slate-700">
+                  {t("calc.substructure.ui.delta_ms", { defaultValue: "Delta MS membrane" })}
+                </span>
+                <p className="text-xs text-slate-400">
+                  {t("calc.substructure.ui.delta_ms_help", { defaultValue: "Mechanical protection" })}
+                </p>
               </div>
               <input
                 type="checkbox"
@@ -854,11 +954,19 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
           </div>
 
           <div className="flex gap-3">
-            <button type="button" onClick={() => setStep(1)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
-              Retour
+            <button
+              type="button"
+              onClick={() => setStep(1)}
+              className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold"
+            >
+              {t("common.back", { defaultValue: "Back" })}
             </button>
-            <button type="button" onClick={() => setStep(3)} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold">
-              Suivant
+            <button
+              type="button"
+              onClick={() => setStep(3)}
+              className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold"
+            >
+              {t("common.next", { defaultValue: "Next" })}
             </button>
           </div>
         </div>
@@ -869,13 +977,22 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
         <div className="space-y-4">
           <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
             <ScanLine size={16} className="mr-2 shrink-0 mt-0.5" />
-            Drainage périphérique (drain + gravier + géotextile).
+            {t("calc.substructure.ui.step3_hint", {
+              defaultValue: "Perimeter drainage (pipe + gravel + geotextile).",
+            })}
           </div>
 
           <div className="flex items-center justify-between mb-4">
-            <span className="font-bold text-slate-800">Installer un drain ?</span>
+            <span className="font-bold text-slate-800">
+              {t("calc.substructure.ui.install_drain", { defaultValue: "Install drain?" })}
+            </span>
             <label className="relative inline-flex items-center cursor-pointer">
-              <input type="checkbox" checked={useDrain} onChange={(e) => setUseDrain(e.target.checked)} className="sr-only peer" />
+              <input
+                type="checkbox"
+                checked={useDrain}
+                onChange={(e) => setUseDrain(e.target.checked)}
+                className="sr-only peer"
+              />
               <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600" />
             </label>
           </div>
@@ -883,10 +1000,14 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
           {useDrain && (
             <div className="space-y-4 animate-in slide-in-from-right-2">
               <div className="bg-white p-3 rounded-lg border border-slate-200">
-                <h4 className="text-xs font-bold text-slate-500 uppercase mb-3">Tranchée drainante</h4>
+                <h4 className="text-xs font-bold text-slate-500 uppercase mb-3">
+                  {t("calc.substructure.ui.trench", { defaultValue: "Drain trench" })}
+                </h4>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs text-slate-500 mb-1">Largeur (m)</label>
+                    <label className="block text-xs text-slate-500 mb-1">
+                      {t("calc.substructure.ui.trench_width_m", { defaultValue: "Width (m)" })}
+                    </label>
                     <input
                       type="number"
                       value={trenchWidth}
@@ -895,7 +1016,9 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-slate-500 mb-1">Hauteur gravier (m)</label>
+                    <label className="block text-xs text-slate-500 mb-1">
+                      {t("calc.substructure.ui.gravel_height_m", { defaultValue: "Gravel height (m)" })}
+                    </label>
                     <input
                       type="number"
                       value={gravelHeight}
@@ -907,18 +1030,37 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
               </div>
 
               <label className="flex items-center justify-between p-3 border rounded bg-white">
-                <span className="text-sm font-medium">Géotextile</span>
-                <input type="checkbox" checked={useGeo} onChange={(e) => setUseGeo(e.target.checked)} className="h-5 w-5 text-blue-600 rounded" />
+                <span className="text-sm font-medium">
+                  {t("calc.substructure.ui.geotextile", { defaultValue: "Geotextile" })}
+                </span>
+                <input
+                  type="checkbox"
+                  checked={useGeo}
+                  onChange={(e) => setUseGeo(e.target.checked)}
+                  className="h-5 w-5 text-blue-600 rounded"
+                />
               </label>
 
               <div className="flex items-center justify-between p-3 border rounded bg-white">
-                <span className="text-sm font-medium">Regards de visite</span>
+                <span className="text-sm font-medium">
+                  {t("calc.substructure.ui.manholes", { defaultValue: "Inspection chambers" })}
+                </span>
                 <div className="flex items-center space-x-2">
-                  <button type="button" onClick={() => setManholes((v) => Math.max(0, v - 1))} className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center font-bold">
+                  <button
+                    type="button"
+                    onClick={() => setManholes((v) => Math.max(0, v - 1))}
+                    className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center font-bold"
+                    aria-label={t("common.decrease", { defaultValue: "Decrease" })}
+                  >
                     -
                   </button>
                   <span className="w-4 text-center font-bold text-sm">{manholes}</span>
-                  <button type="button" onClick={() => setManholes((v) => v + 1)} className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center font-bold">
+                  <button
+                    type="button"
+                    onClick={() => setManholes((v) => v + 1)}
+                    className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center font-bold"
+                    aria-label={t("common.increase", { defaultValue: "Increase" })}
+                  >
                     +
                   </button>
                 </div>
@@ -927,11 +1069,19 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
           )}
 
           <div className="flex gap-3">
-            <button type="button" onClick={() => setStep(2)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
-              Retour
+            <button
+              type="button"
+              onClick={() => setStep(2)}
+              className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold"
+            >
+              {t("common.back", { defaultValue: "Back" })}
             </button>
-            <button type="button" onClick={() => setStep(4)} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold">
-              Suivant
+            <button
+              type="button"
+              onClick={() => setStep(4)}
+              className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold"
+            >
+              {t("common.next", { defaultValue: "Next" })}
             </button>
           </div>
         </div>
@@ -942,13 +1092,15 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
         <div className="space-y-4">
           <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
             <CircleDollarSign size={16} className="mr-2 shrink-0 mt-0.5" />
-            Overrides locaux (prioritaires sur le catalogue) pour ce calcul.
+            {t("calc.substructure.ui.step4_hint", {
+              defaultValue: "Local overrides (highest priority) for this calculation.",
+            })}
           </div>
 
           <div className="bg-white p-3 rounded-xl border border-slate-200">
             <div className="grid grid-cols-2 gap-3">
-              {/* Bloc */}
-              {wallMode === "masonry" && selectedSpec && (
+              {/* Block */}
+              {wallMode === "masonry" && selectedSpec ? (
                 <div className="col-span-2">
                   {(() => {
                     const fallbackBlock =
@@ -962,84 +1114,133 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
 
                     return (
                       <PriceInput
-                        label={`Bloc (€/u) — ${selectedSpec.label}`}
+                        label={t("calc.substructure.ui.price.block_unit", {
+                          label: selectedSpec.label,
+                          defaultValue: `Block (€/pc) — ${selectedSpec.label}`,
+                        })}
                         k={blockKey}
                         fallback={fallbackBlock}
-                        hint={`Clé: ${blockKey}`}
+                        hint={t("calc.substructure.ui.price.key_hint", {
+                          k: blockKey,
+                          defaultValue: `Key: ${blockKey}`,
+                        })}
                       />
                     );
                   })()}
                 </div>
-              )}
+              ) : null}
 
-              <PriceInput label="Béton (€/m³)" k={KEYS.CONCRETE} fallback={Number((DEFAULT_PRICES as any)?.BPE_M3 ?? 130)} hint={`Clé: ${KEYS.CONCRETE}`} />
+              <PriceInput
+                label={t("calc.substructure.ui.price.concrete", { defaultValue: "Concrete (€/m³)" })}
+                k={KEYS.CONCRETE}
+                fallback={Number((DEFAULT_PRICES as any)?.BPE_M3 ?? 130)}
+                hint={t("calc.substructure.ui.price.key_hint", { k: KEYS.CONCRETE, defaultValue: `Key: ${KEYS.CONCRETE}` })}
+              />
 
-              {wallMode === "masonry" && (
+              {wallMode === "masonry" ? (
                 <>
-                  <PriceInput label="Mortier (€/sac 25kg)" k={KEYS.MORTAR} fallback={Number((DEFAULT_PRICES as any)?.MORTAR_BAG_25KG ?? 8)} hint={`Clé: ${KEYS.MORTAR}`} />
-                  <PriceInput label="Colle (€/sac 25kg)" k={KEYS.GLUE} fallback={Number((DEFAULT_PRICES as any)?.MORTAR_BAG_25KG ?? 8)} hint={`Clé: ${KEYS.GLUE}`} />
+                  <PriceInput
+                    label={t("calc.substructure.ui.price.mortar", { defaultValue: "Mortar (€/25kg bag)" })}
+                    k={KEYS.MORTAR}
+                    fallback={Number((DEFAULT_PRICES as any)?.MORTAR_BAG_25KG ?? 8)}
+                    hint={t("calc.substructure.ui.price.key_hint", { k: KEYS.MORTAR, defaultValue: `Key: ${KEYS.MORTAR}` })}
+                  />
+                  <PriceInput
+                    label={t("calc.substructure.ui.price.glue", { defaultValue: "Adhesive (€/25kg bag)" })}
+                    k={KEYS.GLUE}
+                    fallback={Number((DEFAULT_PRICES as any)?.MORTAR_BAG_25KG ?? 8)}
+                    hint={t("calc.substructure.ui.price.key_hint", { k: KEYS.GLUE, defaultValue: `Key: ${KEYS.GLUE}` })}
+                  />
                 </>
-              )}
+              ) : null}
 
-              {useBitumen && (
+              {useBitumen ? (
                 <PriceInput
-                  label="Bitume (€/seau 25kg)"
+                  label={t("calc.substructure.ui.price.bitumen", { defaultValue: "Bitumen (€/25kg bucket)" })}
                   k={KEYS.BITUMEN}
                   fallback={Number((DEFAULT_PRICES as any)?.BITUMEN_COATING_BUCKET_25KG ?? 55)}
-                  hint={`Clé: ${KEYS.BITUMEN}`}
+                  hint={t("calc.substructure.ui.price.key_hint", { k: KEYS.BITUMEN, defaultValue: `Key: ${KEYS.BITUMEN}` })}
                 />
-              )}
+              ) : null}
 
-              {useDeltaMS && (
+              {useDeltaMS ? (
                 <PriceInput
-                  label="Delta MS (€/rouleau ~20m²)"
+                  label={t("calc.substructure.ui.price.delta_roll", { defaultValue: "Delta MS (€/roll ~20m²)" })}
                   k={KEYS.DELTA_ROLL}
                   fallback={Number((DEFAULT_PRICES as any)?.DELTA_MS_ROLL_20M ?? 120)}
-                  hint={`Clé: ${KEYS.DELTA_ROLL}`}
+                  hint={t("calc.substructure.ui.price.key_hint", { k: KEYS.DELTA_ROLL, defaultValue: `Key: ${KEYS.DELTA_ROLL}` })}
                 />
-              )}
+              ) : null}
 
-              {useDeltaMS && <PriceInput label="Profilé Delta (€/u)" k={KEYS.DELTA_PROFILE} fallback={8} hint="fallback local (si non catalogué)" />}
-
-              {useArase && <PriceInput label="Arase (€/rouleau 20m)" k={KEYS.ARASE_ROLL} fallback={15} hint="fallback local (si non catalogué)" />}
-
-              {useDrain && (
+              {useDeltaMS ? (
                 <PriceInput
-                  label="Drain (€/rouleau 50m)"
+                  label={t("calc.substructure.ui.price.delta_profile", { defaultValue: "Delta profile (€/pc)" })}
+                  k={KEYS.DELTA_PROFILE}
+                  fallback={8}
+                  hint={t("calc.substructure.ui.price.fallback_hint", { defaultValue: "Local fallback (if not in catalog)" })}
+                />
+              ) : null}
+
+              {useArase ? (
+                <PriceInput
+                  label={t("calc.substructure.ui.price.dpc_roll", { defaultValue: "DPC strip (€/roll 20m)" })}
+                  k={KEYS.ARASE_ROLL}
+                  fallback={15}
+                  hint={t("calc.substructure.ui.price.fallback_hint", { defaultValue: "Local fallback (if not in catalog)" })}
+                />
+              ) : null}
+
+              {useDrain ? (
+                <PriceInput
+                  label={t("calc.substructure.ui.price.drain_roll", { defaultValue: "Drain pipe (€/roll 50m)" })}
                   k={KEYS.DRAIN_ROLL}
                   fallback={Number((DEFAULT_PRICES as any)?.DRAIN_PIPE_50M ?? 70)}
-                  hint={`Clé: ${KEYS.DRAIN_ROLL}`}
+                  hint={t("calc.substructure.ui.price.key_hint", { k: KEYS.DRAIN_ROLL, defaultValue: `Key: ${KEYS.DRAIN_ROLL}` })}
                 />
-              )}
+              ) : null}
 
-              {useDrain && (
+              {useDrain ? (
                 <PriceInput
-                  label="Gravier (€/T)"
+                  label={t("calc.substructure.ui.price.gravel_ton", { defaultValue: "Gravel (€/ton)" })}
                   k={KEYS.GRAVEL_TON}
                   fallback={Number((DEFAULT_PRICES as any)?.GRAVEL_FOUNDATION_TON ?? 45)}
-                  hint={`Clé: ${KEYS.GRAVEL_TON}`}
+                  hint={t("calc.substructure.ui.price.key_hint", { k: KEYS.GRAVEL_TON, defaultValue: `Key: ${KEYS.GRAVEL_TON}` })}
                 />
-              )}
+              ) : null}
 
-              {useDrain && useGeo && (
+              {useDrain && useGeo ? (
                 <PriceInput
-                  label="Géotextile (€/m²)"
+                  label={t("calc.substructure.ui.price.geo_m2", { defaultValue: "Geotextile (€/m²)" })}
                   k={KEYS.GEO_M2}
                   fallback={Number((DEFAULT_PRICES as any)?.GEOTEXTILE_M2 ?? 1.2)}
-                  hint={`Clé: ${KEYS.GEO_M2}`}
+                  hint={t("calc.substructure.ui.price.key_hint", { k: KEYS.GEO_M2, defaultValue: `Key: ${KEYS.GEO_M2}` })}
                 />
-              )}
+              ) : null}
 
-              {useDrain && <PriceInput label="Regard (€/u)" k={KEYS.MANHOLE} fallback={45} hint={`Clé: ${KEYS.MANHOLE} (fallback 45)`} />}
+              {useDrain ? (
+                <PriceInput
+                  label={t("calc.substructure.ui.price.manhole_unit", { defaultValue: "Manhole (€/pc)" })}
+                  k={KEYS.MANHOLE}
+                  fallback={45}
+                  hint={t("calc.substructure.ui.price.fallback_value_hint", { v: 45, defaultValue: "Fallback: 45" })}
+                />
+              ) : null}
             </div>
           </div>
 
           <div className="flex gap-3 pt-2">
-            <button type="button" onClick={() => setStep(3)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
-              Retour
+            <button
+              type="button"
+              onClick={() => setStep(3)}
+              className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold"
+            >
+              {t("common.back", { defaultValue: "Back" })}
             </button>
-            <button type="button" className="flex-1 py-3 bg-emerald-100 text-emerald-700 rounded-xl font-bold flex justify-center items-center">
-              <Check size={18} className="mr-2" /> Terminé
+            <button
+              type="button"
+              className="flex-1 py-3 bg-emerald-100 text-emerald-700 rounded-xl font-bold flex justify-center items-center"
+            >
+              <Check size={18} className="mr-2" /> {t("common.done", { defaultValue: "Done" })}
             </button>
           </div>
         </div>
@@ -1047,3 +1248,12 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
     </div>
   );
 };
+
+/**
+ * i18n keys you should add (examples):
+ * - common.next / common.back / common.done / common.increase / common.decrease
+ * - calc.substructure.*
+ *
+ * This file now contains no hardcoded UI strings (everything goes through t(..., defaultValue)).
+ * Remaining non-translated text comes from data/specs (selectedSpec.label), which is expected.
+ */
