@@ -256,5 +256,69 @@
       "binder": "Mortar/adhesive",
       "summary_units": "{{units}} units ({{m2}} m²)"
     }
+  },
+
+  "menu": {
+    "title": "App menu",
+    "subtitle": "Quick access to sections + tools",
+
+    "back_dashboard": "Dashboard",
+    "back_dashboard_title": "Back to dashboard",
+
+    "how": {
+      "title": "How does it work?",
+      "text": "Use Calculator to estimate your quantities, then Projects to find your saved calculations. For full tracking, create a Site and save the results step by step. Remember to export as JSON to back up your data."
+    },
+
+    "open": "Open",
+
+    "cards": {
+      "calc": {
+        "title": "Calculator",
+        "desc": "Access all calculators to estimate quantities and costs.",
+        "badge": "TOOLS",
+        "cta": "Open"
+      },
+      "site": {
+        "title": "Site",
+        "desc": "Create a site and save results step-by-step (full tracking).",
+        "cta": "Open"
+      },
+      "projects": {
+        "title": "Projects",
+        "desc": "Find your saved calculations (estimates, materials, costs).",
+        "cta": "Open"
+      },
+      "pricing": {
+        "title": "Materials & Pricing",
+        "desc": "Adjust prices, create custom materials, labor + data.",
+        "cta": "Open"
+      },
+      "settings": {
+        "title": "Settings",
+        "desc": "Configure the app (options, preferences, display).",
+        "cta": "Open"
+      },
+      "json": {
+        "title": "JSON backup",
+        "badge": "RECOMMENDED",
+        "desc": "Export/import your data to avoid any loss (recommended).",
+        "cta": "Open"
+      }
+    },
+
+    "tools": {
+      "title": "All tools (quick access)",
+      "subtitle": "Click a tool to open the calculator directly."
+    }
+  },
+
+  "nav": {
+    "menu": "Menu",
+    "calc": "Calculator",
+    "site": "Site",
+    "projects": "Projects",
+    "materials": "Materials",
+    "settings": "Settings"
   }
 }
