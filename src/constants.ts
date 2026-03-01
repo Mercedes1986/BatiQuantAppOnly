@@ -514,7 +514,188 @@ export const MATERIAL_METADATA: Record<string, MaterialMetadata> = (() => {
   base.CEMENT_BAG_25KG = { label: tr("materials.CEMENT_BAG_25KG", "Cement (25kg bag)"), category: tr("categories.masonry", "Masonry"), unit: "€/bag" };
 
   return base;
-})();
+})()
+
+
+// ---- helpers (used by Materials page) ----
+const titleCase = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+
+const humanizeKey = (k: string) =>
+  k
+    .replace(/_/g, " ")
+    .toLowerCase()
+    .split(" ")
+    .filter(Boolean)
+    .map(titleCase)
+    .join(" ");
+
+const categoryFallbackEn: Record<string, string> = {
+  paint: "Painting",
+  masonry: "Masonry",
+  aggregates: "Aggregates",
+  tiling: "Tiling",
+  leveling: "Leveling",
+  screed: "Screeds",
+  drywall: "Drywall",
+  insulation: "Insulation",
+  reinforcement: "Reinforcement",
+  concrete: "Concrete",
+  walls: "Walls",
+  earthworks: "Earthworks",
+  rental: "Rental",
+  waterproofing: "Waterproofing",
+  roofing: "Roofing",
+  electricity: "Electricity",
+  plumbing: "Plumbing",
+  facade: "Facade",
+  formwork: "Formwork",
+  fencing: "Fencing",
+  exterior: "Exteriors",
+  gates: "Gates",
+  pool: "Pool",
+  networks: "Networks",
+  garden: "Garden",
+  finishes: "Finishes",
+  other: "Other",
+};
+
+export const CATEGORY_ORDER: string[] = [
+  "aggregates",
+  "earthworks",
+  "concrete",
+  "reinforcement",
+  "masonry",
+  "walls",
+  "formwork",
+  "waterproofing",
+  "roofing",
+  "drywall",
+  "insulation",
+  "electricity",
+  "plumbing",
+  "networks",
+  "facade",
+  "tiling",
+  "leveling",
+  "screed",
+  "paint",
+  "exterior",
+  "fencing",
+  "gates",
+  "pool",
+  "garden",
+  "rental",
+  "finishes",
+  "other",
+];
+
+const inferUnit = (key: string): string => {
+  if (/_M3$/.test(key)) return "€/m³";
+  if (/_M2$/.test(key)) return "€/m²";
+  if (/_TON$/.test(key)) return "€/t";
+  if (/_KG$/.test(key)) return "€/kg";
+  if (/_LITER$/.test(key) || /_L$/.test(key)) return "€/L";
+  if (/_METER$/.test(key) || /_ML$/.test(key) || /_M$/.test(key)) return "€/m";
+  if (/_DAY$/.test(key)) return "€/day";
+  if (/_ROLL/.test(key)) return "€/roll";
+  if (/_PANEL/.test(key)) return "€/panel";
+  if (/_KIT/.test(key)) return "€/kit";
+  if (/_BOX/.test(key)) return "€/box";
+  if (/_BAG/.test(key) || /_SAC/.test(key)) return "€/bag";
+  if (/_BUCKET/.test(key)) return "€/bucket";
+  if (/_PALLET/.test(key)) return "€/pallet";
+  if (/_UNIT$/.test(key) || /_PIECE$/.test(key)) return "€/unit";
+  return "€";
+};
+
+const inferCategoryKey = (key: string): keyof typeof categoryFallbackEn => {
+  const k = key.toUpperCase();
+
+  if (k.includes("PAINT") || k.includes("PRIMER")) return "paint";
+
+  if (k.includes("TILE") || k.includes("GROUT") || k.includes("SPACER") || k.includes("SKIRTING")) return "tiling";
+
+  if (k.includes("RAGREAGE") || k.includes("LEVEL") || k.includes("PERIPHERAL_BAND")) return "leveling";
+  if (k.includes("SCREED") || k.includes("CHAPE")) return "screed";
+
+  if (
+    k.includes("PLACO") ||
+    k.includes("RAIL") ||
+    k.includes("MONTANT") ||
+    k.includes("FURRING") ||
+    k.includes("HANGER") ||
+    k.includes("SCREWS") ||
+    k.includes("JOINT_TAPE") ||
+    k.includes("COMPOUND") ||
+    k === "MAP_BAG_25KG"
+  )
+    return "drywall";
+  if (k.includes("INSULATION") || k.includes("ISOL")) return "insulation";
+
+  if (k.includes("REBAR") || k.includes("MESH") || k.includes("CHAINAGE") || k.includes("STEEL")) return "reinforcement";
+
+  if (k.includes("BPE") || k.includes("CONCRETE") || k.includes("PUMP") || k.includes("DELIVERY")) return "concrete";
+
+  if (k.includes("BLOCK") || k.includes("BRICK") || k.includes("CELLULAR") || k.includes("LINTEL") || k.includes("STEPOC")) return "walls";
+  if (k.includes("CEMENT") || k.includes("MORTAR") || k.includes("GLUE_MORTAR")) return "masonry";
+
+  if (k.includes("SAND") || k.includes("GRAVEL") || k.includes("TOPSOIL") || k.includes("COMPOST") || k.includes("MULCH") || k.includes("DECOR_GRAVEL"))
+    return "aggregates";
+  if (k.includes("EXCAV") || k.includes("EVAC") || k.includes("BACKFILL") || k.includes("TRENCH") || k.includes("STRIP")) return "earthworks";
+
+  if (k.includes("FORM_")) return "formwork";
+
+  if (k.includes("BITUMEN") || k.includes("DELTA_MS") || k.includes("DRAIN") || k.includes("DPC") || k.includes("GEOTEXTILE") || k.includes("POLYANE"))
+    return "waterproofing";
+
+  if (k.includes("ROOF") || k.includes("BATTEN") || k.includes("UNDERLAY") || k.includes("GUTTER")) return "roofing";
+
+  if (k.includes("CABLE") || k.includes("CONDUIT") || k.includes("SOCKET") || k.includes("SWITCH") || k.includes("BREAKER") || k.includes("PANEL"))
+    return "electricity";
+
+  if (k.includes("PVC_PIPE") || k.includes("PER_PIPE") || k.includes("WATER_PIPE") || k.includes("SEWER_PIPE")) return "plumbing";
+  if (k.includes("MANHOLE") || k.includes("ELECTRIC_CONDUIT")) return "networks";
+
+  if (k.includes("FACADE") || k.includes("COATING_EXT") || (k.includes("COATING_") && !k.includes("BITUMEN_COATING"))) return "facade";
+
+  if (k.includes("FENCE") || k.includes("BORDER") || k.includes("WALL_COPING")) return "fencing";
+  if (k.includes("PAVERS") || k.includes("DECK")) return "exterior";
+  if (k.includes("GATE")) return "gates";
+  if (k.includes("POOL")) return "pool";
+  if (
+    k.includes("LAWN") ||
+    k.includes("PLANT") ||
+    k.includes("SHRUB") ||
+    k.includes("HEDGE") ||
+    k.includes("TREE") ||
+    k.includes("FERTILIZER") ||
+    k.includes("IRRIGATION") ||
+    k.includes("GARDEN")
+  )
+    return "garden";
+
+  if (k.includes("DIGGER") || k.includes("DUMPER") || k.includes("SKIP") || k.includes("COMPACTOR")) return "rental";
+
+  return "other";
+};
+
+/**
+ * Safe metadata accessor:
+ * - uses explicit MATERIAL_METADATA when present
+ * - otherwise infers label/category/unit from the key (prevents everything going to "Other")
+ */
+export const getMaterialMetadata = (key: string): MaterialMetadata => {
+  const direct = MATERIAL_METADATA[key];
+  if (direct && direct.label && direct.category) return direct;
+
+  const cKey = inferCategoryKey(key);
+  const category = cat(cKey, categoryFallbackEn[cKey] || "Other");
+  const label = mat(key, humanizeKey(key));
+  const unit = inferUnit(key);
+
+  return { label, category, unit };
+};
+;
 
 /* -------------------------------------------------------
    Helper: map block spec -> price key (SAFE)

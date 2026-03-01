@@ -1,5 +1,5 @@
 // src/services/materialsService.ts
-import { DEFAULT_PRICES, MATERIAL_METADATA } from "../constants";
+import { DEFAULT_PRICES, getMaterialMetadata } from "../constants";
 import type {
   CustomMaterial,
   TaxSettings,

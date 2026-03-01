@@ -39,7 +39,6 @@ import {
 
 import { CustomMaterial, Unit, TaxSettings, LaborSettings } from "../types";
 import { generateId } from "../services/storage";
-import { MATERIAL_METADATA } from "../constants";
 
 type TabKey = "system" | "custom" | "labor" | "data";
 
@@ -75,13 +74,13 @@ export const MaterialsPage: React.FC = () => {
     [i18n.language]
   );
 
-  // categories based on system list (not translated metadata)
+  // categories based on loaded system list (updates when data/lang changes)
   const categories = useMemo(() => {
-    const list = getSystemMaterialsList();
-    return Array.from(new Set(list.map((m: any) => String(m.category || ""))))
-      .filter(Boolean)
-      .sort((a, b) => a.localeCompare(b));
-  }, []);
+    const list = systemMaterials || [];
+    const cats = Array.from(new Set(list.map((m: any) => String(m.category || "")).filter(Boolean)));
+    cats.sort((a, b) => a.localeCompare(b, i18n.language || undefined));
+    return cats;
+  }, [systemMaterials, i18n.language]);
 
   const loadAll = useCallback(() => {
     setSystemMaterials(getSystemMaterialsList());
