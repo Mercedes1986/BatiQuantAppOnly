@@ -23,12 +23,21 @@ i18n
     nonExplicitSupportedLngs: true,
     load: "languageOnly",
     interpolation: { escapeValue: false },
+
+    returnNull: false,
+    returnEmptyString: false,
+
     detection: {
       order: ["localStorage", "navigator", "htmlTag"],
       caches: ["localStorage"],
       lookupLocalStorage: "i18nextLng",
     },
+
     react: { useSuspense: false },
+
+    // (Optionnel) utile pour détecter les clés manquantes pendant dev
+    // saveMissing: true,
+    // missingKeyHandler: (_, __, key) => console.warn("[i18n missing]", key),
   });
 
 // ✅ synchronise <html lang="...">

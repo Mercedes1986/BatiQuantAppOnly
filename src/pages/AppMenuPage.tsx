@@ -28,12 +28,17 @@ type SectionCard = {
   badge?: string;
 };
 
+/**
+ * IMPORTANT:
+ * - On met des defaultValue en ANGLAIS ici pour éviter du FR en fallback quand une clé EN manque.
+ * - Le vrai 100% vient de en.json complet (clés présentes). Mais ceci évite le "Franglais" en cas de trou.
+ */
 const PageLoader = () => {
   const { t } = useTranslation();
   return (
     <div className="flex flex-col items-center justify-center h-64 text-slate-400">
       <div className="w-8 h-8 border-2 border-slate-200 border-t-slate-500 rounded-full animate-spin mb-2" />
-      <span className="text-sm">{t("common.loading", { defaultValue: "Chargement…" })}</span>
+      <span className="text-sm">{t("common.loading", { defaultValue: "Loading…" })}</span>
     </div>
   );
 };
@@ -83,7 +88,7 @@ const ImageSectionCard: React.FC<{
         <p className="text-sm text-slate-600 leading-snug">{card.desc}</p>
 
         <div className="mt-3 inline-flex items-center text-sm font-extrabold text-blue-700">
-          {t("menu.open", { defaultValue: "Ouvrir" })} <ChevronRight size={18} className="ml-1" />
+          {t("menu.open", { defaultValue: "Open" })} <ChevronRight size={18} className="ml-1" />
         </div>
       </div>
 
@@ -100,60 +105,63 @@ export const AppMenuPage: React.FC = () => {
   const sectionCards: SectionCard[] = useMemo(
     () => [
       {
-        title: t("menu.cards.calc.title", { defaultValue: "Calcul" }),
+        title: t("menu.cards.calc.title", { defaultValue: "Calculator" }),
         desc: t("menu.cards.calc.desc", {
-          defaultValue: "Accédez à tous les calculateurs pour estimer quantités et coûts.",
+          defaultValue: "Access all calculators to estimate quantities and costs.",
         }),
         path: "#tools",
         icon: <Hammer size={18} />,
         imageSrc: "/images/menu/calcul.jpg",
-        badge: t("menu.cards.calc.badge", { defaultValue: "Outils" }),
+        badge: t("menu.cards.calc.badge", { defaultValue: "TOOLS" }),
       },
       {
-        title: t("menu.cards.house.title", { defaultValue: "Chantier" }),
+        // NOTE: le code utilise house => la clé doit être menu.cards.house.*
+        title: t("menu.cards.house.title", { defaultValue: "Site" }),
         desc: t("menu.cards.house.desc", {
-          defaultValue: "Créez un chantier et enregistrez les résultats par étape (suivi complet).",
+          defaultValue: "Create a site and save results step-by-step (full tracking).",
         }),
         path: "/app/house",
         icon: <HardHat size={18} />,
         imageSrc: "/images/menu/chantier.jpg",
       },
       {
-        title: t("menu.cards.projects.title", { defaultValue: "Projets" }),
+        title: t("menu.cards.projects.title", { defaultValue: "Projects" }),
         desc: t("menu.cards.projects.desc", {
-          defaultValue: "Retrouvez vos calculs sauvegardés (estimations, matériaux, coûts).",
+          defaultValue: "Find your saved calculations (estimates, materials, costs).",
         }),
         path: "/app/projects",
         icon: <FolderOpen size={18} />,
         imageSrc: "/images/menu/projets.jpg",
       },
       {
-        title: t("menu.cards.materials.title", { defaultValue: "Matériaux & Prix" }),
+        // NOTE: le code utilise materials => la clé doit être menu.cards.materials.*
+        title: t("menu.cards.materials.title", { defaultValue: "Materials & Pricing" }),
         desc: t("menu.cards.materials.desc", {
-          defaultValue: "Ajustez les prix, créez des matériaux perso, main d’œuvre + données.",
+          defaultValue: "Adjust prices, create custom materials, labor + data.",
         }),
         path: "/app/materials",
         icon: <Boxes size={18} />,
         imageSrc: "/images/menu/materiaux.jpg",
       },
       {
-        title: t("menu.cards.settings.title", { defaultValue: "Réglages" }),
+        title: t("menu.cards.settings.title", { defaultValue: "Settings" }),
         desc: t("menu.cards.settings.desc", {
-          defaultValue: "Paramétrez l’application (options, préférences, affichage).",
+          defaultValue: "Configure the app (options, preferences, display).",
         }),
         path: "/app/settings",
         icon: <SettingsIcon size={18} />,
         imageSrc: "/images/menu/reglages.jpg",
       },
       {
-        title: t("menu.cards.backup.title", { defaultValue: "Sauvegarde JSON" }),
+        // NOTE: le code utilise backup => la clé doit être menu.cards.backup.*
+        title: t("menu.cards.backup.title", { defaultValue: "JSON backup" }),
         desc: t("menu.cards.backup.desc", {
-          defaultValue: "Exportez/importez vos données pour éviter toute perte (recommandé).",
+          defaultValue: "Export/import your data to avoid any loss (recommended).",
         }),
         path: "/app/materials?tab=data",
         icon: <ShieldCheck size={18} />,
         imageSrc: "/images/menu/sauvegarde.jpg",
-        badge: t("menu.cards.backup.badge", { defaultValue: "Recommandé" }),
+        badge: t("menu.cards.backup.badge", { defaultValue: "RECOMMENDED" }),
       },
     ],
     [t]
@@ -199,10 +207,10 @@ export const AppMenuPage: React.FC = () => {
             </div>
             <div>
               <h1 className="text-xl font-extrabold text-slate-900">
-                {t("menu.title", { defaultValue: "Menu de l’application" })}
+                {t("menu.title", { defaultValue: "App menu" })}
               </h1>
               <p className="text-xs text-slate-500">
-                {t("menu.subtitle", { defaultValue: "Accès direct aux sections + aux outils" })}
+                {t("menu.subtitle", { defaultValue: "Quick access to sections + tools" })}
               </p>
             </div>
           </div>
@@ -210,11 +218,11 @@ export const AppMenuPage: React.FC = () => {
           <button
             onClick={() => navigate("/app")}
             className="inline-flex items-center px-3 py-2 rounded-xl text-sm font-extrabold bg-slate-100 text-slate-700 hover:bg-slate-200"
-            title={t("menu.back_dashboard_title", { defaultValue: "Retour au tableau de bord" })}
+            title={t("menu.back_dashboard_title", { defaultValue: "Back to dashboard" })}
             type="button"
           >
             <ArrowLeft size={16} className="mr-2" />
-            {t("menu.back_dashboard", { defaultValue: "Tableau de bord" })}
+            {t("menu.back_dashboard", { defaultValue: "Dashboard" })}
           </button>
         </div>
       </div>
@@ -227,12 +235,12 @@ export const AppMenuPage: React.FC = () => {
             </div>
             <div>
               <div className="font-extrabold text-slate-900">
-                {t("menu.how.title", { defaultValue: "Comment ça marche ?" })}
+                {t("menu.how.title", { defaultValue: "How does it work?" })}
               </div>
               <p className="text-sm text-slate-600 mt-1 leading-relaxed">
                 {t("menu.how.text", {
                   defaultValue:
-                    "Utilisez Calcul pour estimer vos quantités, puis Projets pour retrouver vos calculs. Pour un suivi complet, créez un Chantier et enregistrez les résultats par étape. Pensez à exporter en JSON pour sauvegarder vos données.",
+                    "Use Calculator to estimate your quantities, then Projects to find your saved calculations. For full tracking, create a Site and save results step by step. Remember to export as JSON to back up your data.",
                 })}
               </p>
             </div>
@@ -241,17 +249,17 @@ export const AppMenuPage: React.FC = () => {
 
         <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {sectionCards.map((c) => (
-            <ImageSectionCard key={c.title} card={c} onClick={() => goTo(c.path)} />
+            <ImageSectionCard key={`${c.path}-${c.title}`} card={c} onClick={() => goTo(c.path)} />
           ))}
         </div>
 
         <div id="tools" className="mt-8">
           <h2 className="text-xl font-extrabold text-slate-900">
-            {t("menu.tools.title", { defaultValue: "Tous les outils (accès direct)" })}
+            {t("menu.tools.title", { defaultValue: "All tools (quick access)" })}
           </h2>
           <p className="text-sm text-slate-600 mt-1">
             {t("menu.tools.subtitle", {
-              defaultValue: "Cliquez sur un outil pour ouvrir le calculateur directement.",
+              defaultValue: "Click a tool to open the calculator directly.",
             })}
           </p>
 

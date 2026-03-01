@@ -1,3 +1,4 @@
+// DashboardPage.tsx (updated: EN defaultValue to avoid FR fallback)
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { CalculatorCard } from "../components/ui/CalculatorCard";
@@ -21,7 +22,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onSelectCalc }) =>
             <span className="text-blue-600">{t("app.name_suffix", { defaultValue: "Quant" })}</span>
           </h1>
           <p className="text-slate-500 text-sm">
-            {t("dashboard.subtitle", { defaultValue: "L'outil de référence pour vos chantiers." })}
+            {t("dashboard.subtitle", { defaultValue: "The go-to tool for your job sites." })}
           </p>
         </header>
 

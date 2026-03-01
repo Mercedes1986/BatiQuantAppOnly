@@ -1,4 +1,21 @@
 {
+  "common": {
+    "loading": "Loading…"
+  },
+
+  "calculator": {
+    "open": "Open calculator"
+  },
+
+  "nav": {
+    "menu": "Menu",
+    "calc": "Calculator",
+    "site": "Site",
+    "projects": "Projects",
+    "materials": "Materials",
+    "settings": "Settings"
+  },
+
   "struct": {
     "tabs": {
       "groundwork": "Groundworks",
@@ -276,34 +293,28 @@
       "calc": {
         "title": "Calculator",
         "desc": "Access all calculators to estimate quantities and costs.",
-        "badge": "TOOLS",
-        "cta": "Open"
+        "badge": "TOOLS"
       },
-      "site": {
+      "house": {
         "title": "Site",
-        "desc": "Create a site and save results step-by-step (full tracking).",
-        "cta": "Open"
+        "desc": "Create a site and save results step-by-step (full tracking)."
       },
       "projects": {
         "title": "Projects",
-        "desc": "Find your saved calculations (estimates, materials, costs).",
-        "cta": "Open"
+        "desc": "Find your saved calculations (estimates, materials, costs)."
       },
-      "pricing": {
+      "materials": {
         "title": "Materials & Pricing",
-        "desc": "Adjust prices, create custom materials, labor + data.",
-        "cta": "Open"
+        "desc": "Adjust prices, create custom materials, labor + data."
       },
       "settings": {
         "title": "Settings",
-        "desc": "Configure the app (options, preferences, display).",
-        "cta": "Open"
+        "desc": "Configure the app (options, preferences, display)."
       },
-      "json": {
+      "backup": {
         "title": "JSON backup",
-        "badge": "RECOMMENDED",
         "desc": "Export/import your data to avoid any loss (recommended).",
-        "cta": "Open"
+        "badge": "RECOMMENDED"
       }
     },
 
@@ -311,14 +322,5 @@
       "title": "All tools (quick access)",
       "subtitle": "Click a tool to open the calculator directly."
     }
-  },
-
-  "nav": {
-    "menu": "Menu",
-    "calc": "Calculator",
-    "site": "Site",
-    "projects": "Projects",
-    "materials": "Materials",
-    "settings": "Settings"
   }
 }

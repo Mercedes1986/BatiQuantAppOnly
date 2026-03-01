@@ -8,6 +8,12 @@ interface CalculatorCardProps {
   onClick: () => void;
 }
 
+/**
+ * Update goals:
+ * - Keep the same i18n key: calculator.open
+ * - Replace FR defaultValue -> EN to prevent FR fallback ("Franglais") if EN key is missing
+ * - Minor a11y: add type="button"
+ */
 export const CalculatorCard: React.FC<CalculatorCardProps> = ({ config, onClick }) => {
   const { t } = useTranslation();
   const IconComponent = (Icons as any)[config.icon] || Icons.Calculator;
@@ -15,6 +21,7 @@ export const CalculatorCard: React.FC<CalculatorCardProps> = ({ config, onClick 
 
   return (
     <button
+      type="button"
       onClick={onClick}
       className="group w-full text-left bg-white rounded-2xl border border-slate-100 shadow-sm hover:border-blue-200 hover:shadow-md active:scale-[0.99] transition-all overflow-hidden"
     >
@@ -59,7 +66,7 @@ export const CalculatorCard: React.FC<CalculatorCardProps> = ({ config, onClick 
         <div className="flex items-center gap-2 text-xs text-slate-500">
           <Icons.Sparkles size={14} className="text-slate-300" />
           <span className="truncate">
-            {t("calculator.open", { defaultValue: "Ouvrir le calculateur" })}
+            {t("calculator.open", { defaultValue: "Open calculator" })}
           </span>
         </div>
         <span className="text-[11px] text-slate-400"> </span>

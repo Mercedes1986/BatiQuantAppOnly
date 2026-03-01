@@ -1,21 +1,9 @@
+// ProjectsPage.tsx (updated: EN defaultValue to avoid FR fallback, keys unchanged)
 import React, { useState, useEffect, useMemo } from "react";
-import {
-  Trash2,
-  Printer,
-  ChevronRight,
-  PieChart,
-  FileText,
-  FolderOpen,
-} from "lucide-react";
+import { Trash2, Printer, ChevronRight, PieChart, FileText, FolderOpen } from "lucide-react";
 import { getProjects, deleteProject } from "../services/storage";
 import { Project, ClientInfo } from "../types";
-import {
-  PieChart as RePieChart,
-  Pie,
-  Cell,
-  ResponsiveContainer,
-  Tooltip,
-} from "recharts";
+import { PieChart as RePieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import { createQuoteFromSimpleProject } from "../services/documentLogic";
 import { getCompanyProfile } from "../services/documentsStorage";
 import { useNavigate } from "react-router-dom";
@@ -50,7 +38,7 @@ export const ProjectsPage: React.FC = () => {
     e.stopPropagation();
     const ok = window.confirm(
       t("projects.confirm_delete", {
-        defaultValue: "Supprimer définitivement ce projet ?",
+        defaultValue: "Delete this project permanently?",
       })
     );
     if (!ok) return;
@@ -68,7 +56,7 @@ export const ProjectsPage: React.FC = () => {
       const ok = window.confirm(
         t("projects.need_company_profile", {
           defaultValue:
-            "Pour créer un devis, vous devez d'abord configurer votre profil entreprise (Nom, SIRET...). Aller aux réglages ?",
+            "To create a quote, you must first set up your company profile (Name, SIRET, etc.). Go to settings now?",
         })
       );
       if (ok) navigate("/app/settings");
@@ -83,28 +71,21 @@ export const ProjectsPage: React.FC = () => {
     if (!profile) return;
 
     try {
-      const quoteId = createQuoteFromSimpleProject(
-        selectedProject,
-        profile,
-        client
-      );
+      const quoteId = createQuoteFromSimpleProject(selectedProject, profile, client);
       setShowClientModal(false);
       navigate(`/app/quotes/${quoteId}`);
     } catch (e) {
       console.error(e);
       window.alert(
         t("projects.quote_error", {
-          defaultValue: "Erreur lors de la création du devis.",
+          defaultValue: "Error while creating the quote.",
         })
       );
     }
   };
 
   if (selectedProject) {
-    const totalCost = selectedProject.items.reduce(
-      (sum, item) => sum + item.totalPrice,
-      0
-    );
+    const totalCost = selectedProject.items.reduce((sum, item) => sum + item.totalPrice, 0);
 
     const chartData = selectedProject.items.map((item) => ({
       name: item.name,
@@ -120,7 +101,7 @@ export const ProjectsPage: React.FC = () => {
             type="button"
           >
             <ChevronRight className="rotate-180 mr-1" size={20} />{" "}
-            {t("common.back", { defaultValue: "Retour" })}
+            {t("common.back", { defaultValue: "Back" })}
           </button>
 
           <div className="flex gap-2">
@@ -130,13 +111,13 @@ export const ProjectsPage: React.FC = () => {
               type="button"
             >
               <FileText size={18} className="mr-2" />{" "}
-              {t("projects.quote", { defaultValue: "Devis" })}
+              {t("projects.quote", { defaultValue: "Quote" })}
             </button>
 
             <button
               onClick={handlePrint}
               className="p-2.5 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-colors"
-              title={t("projects.print", { defaultValue: "Imprimer" })}
+              title={t("projects.print", { defaultValue: "Print" })}
               type="button"
             >
               <Printer size={22} />
@@ -145,7 +126,7 @@ export const ProjectsPage: React.FC = () => {
             <button
               onClick={(e) => handleDelete(selectedProject.id, e)}
               className="p-2.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-colors"
-              title={t("common.delete", { defaultValue: "Supprimer" })}
+              title={t("common.delete", { defaultValue: "Delete" })}
               type="button"
             >
               <Trash2 size={22} />
@@ -155,23 +136,17 @@ export const ProjectsPage: React.FC = () => {
 
         <div className="p-6 max-w-3xl mx-auto printable-content">
           <div className="mb-8 border-b-2 border-slate-800 pb-4">
-            <h1 className="text-3xl font-extrabold text-slate-900 mb-2">
-              {selectedProject.name}
-            </h1>
+            <h1 className="text-3xl font-extrabold text-slate-900 mb-2">{selectedProject.name}</h1>
             <p className="text-slate-500 font-medium">
-              {t("projects.created_on", { defaultValue: "Créé le" })}{" "}
-              {new Date(selectedProject.date).toLocaleDateString(
-                i18n.language || undefined
-              )}
+              {t("projects.created_on", { defaultValue: "Created on" })}{" "}
+              {new Date(selectedProject.date).toLocaleDateString(i18n.language || undefined)}
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 gap-10">
             <div>
               <h2 className="text-lg font-extrabold mb-4 flex items-center text-slate-800">
-                {t("projects.materials_list", {
-                  defaultValue: "Liste des matériaux",
-                })}
+                {t("projects.materials_list", { defaultValue: "Materials list" })}
               </h2>
 
               <ul className="space-y-3">
@@ -181,26 +156,19 @@ export const ProjectsPage: React.FC = () => {
                     className="flex justify-between items-center p-3 bg-slate-50 rounded-xl border border-slate-100 print:border-slate-300"
                   >
                     <div>
-                      <span className="font-extrabold text-slate-700 block text-sm">
-                        {item.name}
-                      </span>
+                      <span className="font-extrabold text-slate-700 block text-sm">{item.name}</span>
                       <span className="text-xs text-slate-500 font-medium">
-                        {item.quantity} {item.unit} ×{" "}
-                        {euro.format(item.unitPrice)}
+                        {item.quantity} {item.unit} × {euro.format(item.unitPrice)}
                       </span>
                     </div>
-                    <span className="font-extrabold text-slate-800">
-                      {euro.format(item.totalPrice)}
-                    </span>
+                    <span className="font-extrabold text-slate-800">{euro.format(item.totalPrice)}</span>
                   </li>
                 ))}
               </ul>
 
               <div className="mt-6 p-5 bg-blue-50 rounded-2xl flex justify-between items-center print:bg-transparent print:border-t-2 print:border-slate-900">
                 <span className="font-extrabold text-xl text-blue-900">
-                  {t("projects.total_estimated", {
-                    defaultValue: "Total Estimé",
-                  })}
+                  {t("projects.total_estimated", { defaultValue: "Estimated total" })}
                 </span>
                 <span className="font-extrabold text-2xl text-blue-600 print:text-black">
                   {euro.format(totalCost)}
@@ -211,9 +179,7 @@ export const ProjectsPage: React.FC = () => {
             <div className="print:hidden">
               <h2 className="text-lg font-extrabold mb-4 flex items-center text-slate-800">
                 <PieChart className="mr-2 text-slate-400" size={20} />{" "}
-                {t("projects.cost_breakdown", {
-                  defaultValue: "Répartition des coûts",
-                })}
+                {t("projects.cost_breakdown", { defaultValue: "Cost breakdown" })}
               </h2>
 
               <div className="h-64 w-full">
@@ -229,10 +195,7 @@ export const ProjectsPage: React.FC = () => {
                       dataKey="value"
                     >
                       {chartData.map((_, index) => (
-                        <Cell
-                          key={`cell-${index}`}
-                          fill={CHART_COLORS[index % CHART_COLORS.length]}
-                        />
+                        <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
                       ))}
                     </Pie>
 
@@ -253,7 +216,7 @@ export const ProjectsPage: React.FC = () => {
           {selectedProject.notes && (
             <div className="mt-10 p-5 bg-amber-50 border border-amber-100 rounded-2xl print:border-slate-300">
               <h3 className="font-extrabold text-amber-800 mb-2 print:text-black">
-                {t("projects.notes", { defaultValue: "Notes & Conseils" })}
+                {t("projects.notes", { defaultValue: "Notes & tips" })}
               </h3>
               <p className="text-sm text-amber-900/80 whitespace-pre-line print:text-black leading-relaxed">
                 {selectedProject.notes}
@@ -263,8 +226,7 @@ export const ProjectsPage: React.FC = () => {
 
           <div className="mt-12 text-center text-xs text-slate-400 print:block hidden">
             {t("projects.print_footer", {
-              defaultValue:
-                "Document généré par BatiQuant - Estimations non contractuelles.",
+              defaultValue: "Document generated by BatiQuant - Non-contractual estimates.",
             })}
           </div>
         </div>
@@ -281,14 +243,14 @@ export const ProjectsPage: React.FC = () => {
   return (
     <div className="p-4 pb-24 bg-slate-50 min-h-screen">
       <h1 className="text-2xl font-extrabold text-slate-800 mb-6 px-2">
-        {t("projects.title", { defaultValue: "Mes Projets (Calculs)" })}
+        {t("projects.title", { defaultValue: "My projects (calculations)" })}
       </h1>
 
       {projects.length === 0 ? (
         <div className="text-center py-20 opacity-50">
           <FolderOpen size={64} className="mx-auto text-slate-300" />
           <p className="mt-4 text-slate-500 font-medium">
-            {t("projects.empty", { defaultValue: "Aucun calcul sauvegardé." })}
+            {t("projects.empty", { defaultValue: "No saved calculations." })}
           </p>
         </div>
       ) : (
@@ -302,15 +264,10 @@ export const ProjectsPage: React.FC = () => {
                 className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex justify-between items-center active:scale-[0.98] transition-all cursor-pointer hover:border-blue-200"
               >
                 <div>
-                  <h3 className="font-extrabold text-slate-800 text-lg">
-                    {project.name}
-                  </h3>
+                  <h3 className="font-extrabold text-slate-800 text-lg">{project.name}</h3>
                   <p className="text-xs text-slate-500 mt-1 font-medium">
-                    {new Date(project.date).toLocaleDateString(
-                      i18n.language || undefined
-                    )}{" "}
-                    • {project.items.length}{" "}
-                    {t("projects.items", { defaultValue: "éléments" })}
+                    {new Date(project.date).toLocaleDateString(i18n.language || undefined)} •{" "}
+                    {project.items.length} {t("projects.items", { defaultValue: "items" })}
                   </p>
                 </div>
 

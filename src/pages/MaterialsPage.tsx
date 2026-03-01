@@ -1,3 +1,4 @@
+// MaterialsPage.tsx (updated: EN defaultValue to avoid FR fallback, keys unchanged)
 import React, { useEffect, useRef, useMemo, useState, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
 import {
@@ -74,7 +75,7 @@ export const MaterialsPage: React.FC = () => {
     [i18n.language]
   );
 
-  // ✅ categories basées sur la liste système (pas sur MATERIAL_METADATA traduite)
+  // categories based on system list (not translated metadata)
   const categories = useMemo(() => {
     const list = getSystemMaterialsList();
     return Array.from(new Set(list.map((m: any) => String(m.category || ""))))
@@ -190,7 +191,7 @@ export const MaterialsPage: React.FC = () => {
       URL.revokeObjectURL(url);
     } catch (e) {
       console.error(e);
-      window.alert(t("materials.export_error", { defaultValue: "Erreur lors de l’export." }));
+      window.alert(t("materials.export_error", { defaultValue: "Export failed." }));
     }
   };
 
@@ -206,14 +207,14 @@ export const MaterialsPage: React.FC = () => {
 
         const ok = importAppData(content, "replace");
         if (ok) {
-          window.alert(t("materials.import_ok", { defaultValue: "Import réussi !" }));
+          window.alert(t("materials.import_ok", { defaultValue: "Import successful!" }));
           loadAll();
         } else {
-          window.alert(t("materials.import_invalid", { defaultValue: "Erreur: Fichier invalide." }));
+          window.alert(t("materials.import_invalid", { defaultValue: "Error: Invalid file." }));
         }
       } catch (err) {
         console.error(err);
-        window.alert(t("materials.import_invalid", { defaultValue: "Erreur: Fichier invalide." }));
+        window.alert(t("materials.import_invalid", { defaultValue: "Error: Invalid file." }));
       } finally {
         if (fileInputRef.current) fileInputRef.current.value = "";
       }
@@ -230,12 +231,12 @@ export const MaterialsPage: React.FC = () => {
 
   const tabLabel = (tab: TabKey) =>
     tab === "system"
-      ? t("materials.tabs.catalog", { defaultValue: "Catalogue" })
+      ? t("materials.tabs.catalog", { defaultValue: "Catalog" })
       : tab === "custom"
-      ? t("materials.tabs.custom", { defaultValue: "Mes Matériaux" })
+      ? t("materials.tabs.custom", { defaultValue: "My materials" })
       : tab === "labor"
-      ? t("materials.tabs.labor", { defaultValue: "Main d'œuvre" })
-      : t("materials.tabs.data", { defaultValue: "Données" });
+      ? t("materials.tabs.labor", { defaultValue: "Labor" })
+      : t("materials.tabs.data", { defaultValue: "Data" });
 
   return (
     <div className="pb-20 min-h-screen bg-slate-50">
@@ -243,7 +244,7 @@ export const MaterialsPage: React.FC = () => {
         <div className="p-4">
           <div className="flex justify-between items-center mb-4">
             <h1 className="text-2xl font-extrabold text-slate-800">
-              {t("materials.title", { defaultValue: "Matériaux & Prix" })}
+              {t("materials.title", { defaultValue: "Materials & Pricing" })}
             </h1>
 
             <div className="flex items-center space-x-2 bg-slate-100 p-1 rounded-lg">
@@ -295,7 +296,7 @@ export const MaterialsPage: React.FC = () => {
               <Search size={18} className="absolute left-3 top-3 text-slate-400" />
               <input
                 type="text"
-                placeholder={t("materials.search", { defaultValue: "Rechercher..." })}
+                placeholder={t("materials.search", { defaultValue: "Search..." })}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-10 p-2.5 bg-white border border-slate-200 rounded-lg text-sm text-slate-800 focus:ring-2 focus:ring-blue-100 outline-none"
@@ -309,7 +310,7 @@ export const MaterialsPage: React.FC = () => {
                   ? "bg-amber-100 border-amber-300 text-amber-600"
                   : "bg-white border-slate-200 text-slate-400"
               }`}
-              title={t("materials.favorites", { defaultValue: "Favoris" })}
+              title={t("materials.favorites", { defaultValue: "Favorites" })}
               type="button"
             >
               <Star size={20} fill={showFavoritesOnly ? "currentColor" : "none"} />
@@ -327,7 +328,7 @@ export const MaterialsPage: React.FC = () => {
                 }`}
                 type="button"
               >
-                {t("materials.all", { defaultValue: "Tout" })}
+                {t("materials.all", { defaultValue: "All" })}
               </button>
 
               {categories.map((c) => (
@@ -359,10 +360,19 @@ export const MaterialsPage: React.FC = () => {
               >
                 <div className="flex justify-between items-start mb-2">
                   <div className="flex items-start gap-2">
-                    <button onClick={() => handleFavorite(item.key)} className="mt-0.5" title={t("materials.favorite", { defaultValue: "Favori" })} type="button">
+                    <button
+                      onClick={() => handleFavorite(item.key)}
+                      className="mt-0.5"
+                      title={t("materials.favorite", { defaultValue: "Favorite" })}
+                      type="button"
+                    >
                       <Star
                         size={16}
-                        className={favorites.includes(item.key) ? "text-amber-400 fill-amber-400" : "text-slate-400"}
+                        className={
+                          favorites.includes(item.key)
+                            ? "text-amber-400 fill-amber-400"
+                            : "text-slate-400"
+                        }
                       />
                     </button>
 
@@ -387,7 +397,7 @@ export const MaterialsPage: React.FC = () => {
                       <button
                         onClick={() => handleReset(item.key)}
                         className="text-slate-700 hover:text-red-600 p-1.5 bg-white/45 rounded border border-slate-200"
-                        title={t("materials.reset", { defaultValue: "Réinitialiser" })}
+                        title={t("materials.reset", { defaultValue: "Reset" })}
                         type="button"
                       >
                         <RotateCcw size={14} />
@@ -398,7 +408,7 @@ export const MaterialsPage: React.FC = () => {
                       className={`p-1.5 rounded border border-slate-200 ${
                         item.isMapped ? "text-emerald-800 bg-emerald-100/70" : "text-slate-700 bg-white/45"
                       }`}
-                      title={t("materials.map", { defaultValue: "Associer un matériau" })}
+                      title={t("materials.map", { defaultValue: "Map a material" })}
                       type="button"
                     >
                       <LinkIcon size={14} />
@@ -435,7 +445,7 @@ export const MaterialsPage: React.FC = () => {
 
             {filteredSystemList.length === 0 && (
               <div className="text-center py-10 text-slate-400 text-sm">
-                {t("materials.none_found", { defaultValue: "Aucun matériau trouvé." })}
+                {t("materials.none_found", { defaultValue: "No materials found." })}
               </div>
             )}
           </div>
@@ -466,7 +476,8 @@ export const MaterialsPage: React.FC = () => {
               className="w-full py-3 mb-4 bg-blue-600 text-white rounded-xl font-extrabold flex justify-center items-center shadow-md text-sm"
               type="button"
             >
-              <Plus size={18} className="mr-2" /> {t("materials.create_custom", { defaultValue: "Créer un matériau" })}
+              <Plus size={18} className="mr-2" />{" "}
+              {t("materials.create_custom", { defaultValue: "Create a material" })}
             </button>
           )}
 
@@ -479,10 +490,13 @@ export const MaterialsPage: React.FC = () => {
                 <div>
                   <span className="font-extrabold text-slate-900 block text-sm">{mat.label}</span>
                   <div className="text-xs text-slate-700 mt-0.5 flex items-center space-x-2">
-                    <span className="bg-white/45 px-1.5 rounded uppercase border border-slate-200">{mat.category}</span>
+                    <span className="bg-white/45 px-1.5 rounded uppercase border border-slate-200">
+                      {mat.category}
+                    </span>
                     <span>•</span>
                     <span className="font-mono text-blue-800 font-extrabold">
-                      {euro.format(tax.mode === "TTC" ? mat.price * (1 + tax.vatRate / 100) : mat.price)} {tax.mode} / {mat.unit}
+                      {euro.format(tax.mode === "TTC" ? mat.price * (1 + tax.vatRate / 100) : mat.price)}{" "}
+                      {tax.mode} / {mat.unit}
                     </span>
                   </div>
                 </div>
@@ -494,7 +508,7 @@ export const MaterialsPage: React.FC = () => {
                       setShowCustomForm(true);
                     }}
                     className="p-2 text-slate-700 hover:bg-white/45 rounded border border-transparent hover:border-slate-200"
-                    title={t("common.edit", { defaultValue: "Modifier" })}
+                    title={t("common.edit", { defaultValue: "Edit" })}
                     type="button"
                   >
                     <Edit2 size={16} />
@@ -502,14 +516,16 @@ export const MaterialsPage: React.FC = () => {
 
                   <button
                     onClick={() => {
-                      const ok = window.confirm(t("materials.confirm_delete_custom", { defaultValue: "Supprimer ?" }));
+                      const ok = window.confirm(
+                        t("materials.confirm_delete_custom", { defaultValue: "Delete?" })
+                      );
                       if (ok) {
                         deleteCustomMaterial(mat.id);
                         loadAll();
                       }
                     }}
                     className="p-2 text-slate-700 hover:text-red-600 hover:bg-red-50 rounded border border-transparent hover:border-red-200"
-                    title={t("common.delete", { defaultValue: "Supprimer" })}
+                    title={t("common.delete", { defaultValue: "Delete" })}
                     type="button"
                   >
                     <Trash2 size={16} />
@@ -521,7 +537,9 @@ export const MaterialsPage: React.FC = () => {
             {customMaterials.length === 0 && !showCustomForm && (
               <div className="text-center py-10 text-slate-400 border-2 border-dashed border-slate-200 rounded-xl bg-white">
                 <Package size={32} className="mx-auto mb-2 opacity-50" />
-                <p className="text-sm">{t("materials.none_custom", { defaultValue: "Aucun matériau personnalisé." })}</p>
+                <p className="text-sm">
+                  {t("materials.none_custom", { defaultValue: "No custom materials." })}
+                </p>
               </div>
             )}
           </div>
@@ -535,7 +553,7 @@ export const MaterialsPage: React.FC = () => {
               <div className="flex items-center">
                 <Users size={20} className="text-blue-600 mr-2" />
                 <span className="font-extrabold text-slate-800">
-                  {t("materials.labor.title", { defaultValue: "Paramètres Main d'œuvre" })}
+                  {t("materials.labor.title", { defaultValue: "Labor settings" })}
                 </span>
               </div>
 
@@ -550,16 +568,22 @@ export const MaterialsPage: React.FC = () => {
               </label>
             </div>
 
-            <div className={`space-y-4 transition-opacity ${labor.enabled ? "opacity-100" : "opacity-50 pointer-events-none"}`}>
+            <div
+              className={`space-y-4 transition-opacity ${
+                labor.enabled ? "opacity-100" : "opacity-50 pointer-events-none"
+              }`}
+            >
               <div>
                 <label className="block text-xs font-extrabold text-slate-500 mb-1">
-                  {t("materials.labor.rate", { defaultValue: "Taux Horaire Moyen (€/h)" })}
+                  {t("materials.labor.rate", { defaultValue: "Average hourly rate (€/h)" })}
                 </label>
                 <div className="relative">
                   <input
                     type="number"
                     value={labor.globalHourlyRate}
-                    onChange={(e) => handleLaborChange({ globalHourlyRate: parseFloat(e.target.value) })}
+                    onChange={(e) =>
+                      handleLaborChange({ globalHourlyRate: parseFloat(e.target.value) })
+                    }
                     className="w-full p-2 pl-8 border rounded-lg bg-slate-50 text-slate-900 font-extrabold"
                   />
                   <span className="absolute left-3 top-2.5 text-slate-400 text-xs">€</span>
@@ -570,7 +594,7 @@ export const MaterialsPage: React.FC = () => {
                 <Info size={14} className="inline mr-1 -mt-0.5" />
                 {t("materials.labor.info", {
                   defaultValue:
-                    "Ce taux sera utilisé pour estimer le coût de la main d'œuvre dans les calculateurs si le mode Pro est activé.",
+                    "This rate will be used to estimate labor cost in calculators when Pro mode is enabled.",
                 })}
               </div>
             </div>
@@ -582,13 +606,14 @@ export const MaterialsPage: React.FC = () => {
         <div className="p-4 space-y-4 animate-in fade-in">
           <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
             <h3 className="font-extrabold text-slate-800 mb-3 flex items-center">
-              <Settings size={18} className="mr-2" /> {t("materials.tax_config", { defaultValue: "Configuration Fiscale" })}
+              <Settings size={18} className="mr-2" />{" "}
+              {t("materials.tax_config", { defaultValue: "Tax configuration" })}
             </h3>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-extrabold text-slate-500 mb-1">
-                  {t("materials.vat_rate", { defaultValue: "Taux TVA (%)" })}
+                  {t("materials.vat_rate", { defaultValue: "VAT rate (%)" })}
                 </label>
                 <select
                   value={tax.vatRate}
@@ -606,7 +631,8 @@ export const MaterialsPage: React.FC = () => {
 
           <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
             <h3 className="font-extrabold text-slate-800 mb-3 flex items-center">
-              <Download size={18} className="mr-2 text-blue-600" /> {t("materials.backup_restore", { defaultValue: "Sauvegarde & Restauration" })}
+              <Download size={18} className="mr-2 text-blue-600" />{" "}
+              {t("materials.backup_restore", { defaultValue: "Backup & restore" })}
             </h3>
 
             <div className="grid grid-cols-2 gap-3">
@@ -616,18 +642,28 @@ export const MaterialsPage: React.FC = () => {
                 type="button"
               >
                 <Download size={24} className="text-blue-600 mb-2" />
-                <span className="text-sm font-extrabold text-slate-700">{t("materials.export_json", { defaultValue: "Exporter JSON" })}</span>
+                <span className="text-sm font-extrabold text-slate-700">
+                  {t("materials.export_json", { defaultValue: "Export JSON" })}
+                </span>
               </button>
 
               <label className="flex flex-col items-center justify-center p-4 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors cursor-pointer">
                 <Upload size={24} className="text-emerald-600 mb-2" />
-                <span className="text-sm font-extrabold text-slate-700">{t("materials.import_json", { defaultValue: "Importer JSON" })}</span>
-                <input type="file" ref={fileInputRef} className="hidden" accept=".json,application/json" onChange={handleImport} />
+                <span className="text-sm font-extrabold text-slate-700">
+                  {t("materials.import_json", { defaultValue: "Import JSON" })}
+                </span>
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  className="hidden"
+                  accept=".json,application/json"
+                  onChange={handleImport}
+                />
               </label>
             </div>
 
             <p className="text-xs text-slate-400 mt-3 text-center">
-              {t("materials.backup_hint", { defaultValue: "Exportez vos données pour les transférer sur un autre appareil." })}
+              {t("materials.backup_hint", { defaultValue: "Export your data to transfer to another device." })}
             </p>
           </div>
         </div>
@@ -637,9 +673,11 @@ export const MaterialsPage: React.FC = () => {
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl w-full max-w-sm max-h-[80vh] flex flex-col shadow-xl">
             <div className="p-4 border-b">
-              <h3 className="font-extrabold text-lg">{t("materials.map_title", { defaultValue: "Associer un matériau" })}</h3>
+              <h3 className="font-extrabold text-lg">
+                {t("materials.map_title", { defaultValue: "Map a material" })}
+              </h3>
               <p className="text-xs text-slate-500">
-                {t("materials.map_replace", { defaultValue: "Remplace" })}{" "}
+                {t("materials.map_replace", { defaultValue: "Replaces" })}{" "}
                 {MATERIAL_METADATA[mappingTarget]?.label || mappingTarget}
               </p>
             </div>
@@ -650,7 +688,7 @@ export const MaterialsPage: React.FC = () => {
                 className="w-full text-left p-3 rounded hover:bg-slate-50 text-sm text-red-600 font-extrabold border-b border-slate-100"
                 type="button"
               >
-                {t("materials.map_none", { defaultValue: "Aucune association (Défaut)" })}
+                {t("materials.map_none", { defaultValue: "No mapping (default)" })}
               </button>
 
               {customMaterials.map((m) => (
@@ -667,7 +705,7 @@ export const MaterialsPage: React.FC = () => {
 
               {customMaterials.length === 0 && (
                 <div className="p-4 text-center text-slate-400 text-sm">
-                  {t("materials.map_need_custom", { defaultValue: "Créez d'abord des matériaux personnalisés." })}
+                  {t("materials.map_need_custom", { defaultValue: "Create custom materials first." })}
                 </div>
               )}
             </div>
@@ -678,7 +716,7 @@ export const MaterialsPage: React.FC = () => {
                 className="w-full py-2 bg-slate-100 rounded-lg text-slate-600 font-extrabold text-sm"
                 type="button"
               >
-                {t("common.cancel", { defaultValue: "Annuler" })}
+                {t("common.cancel", { defaultValue: "Cancel" })}
               </button>
             </div>
           </div>
@@ -702,7 +740,7 @@ const CustomMaterialForm: React.FC<{
     onSave({
       id: initial?.id || generateId(),
       label: (formData.get("label") as string) || "",
-      category: (formData.get("category") as string) || t("materials.misc", { defaultValue: "Divers" }),
+      category: (formData.get("category") as string) || t("materials.misc", { defaultValue: "Misc" }),
       unit: (formData.get("unit") as string) as any,
       price: parseFloat(formData.get("price") as string),
       createdAt: initial?.createdAt || Date.now(),
@@ -712,36 +750,46 @@ const CustomMaterialForm: React.FC<{
   return (
     <div className="bg-white p-4 rounded-xl border border-blue-200 shadow-lg mb-4 animate-in zoom-in-95">
       <h3 className="font-extrabold text-lg mb-4 text-slate-800">
-        {initial ? t("common.edit", { defaultValue: "Modifier" }) : t("materials.new", { defaultValue: "Nouveau" })}{" "}
-        {t("materials.material", { defaultValue: "Matériau" })}
+        {initial ? t("common.edit", { defaultValue: "Edit" }) : t("materials.new", { defaultValue: "New" })}{" "}
+        {t("materials.material", { defaultValue: "Material" })}
       </h3>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-xs font-extrabold text-slate-500 mb-1">{t("materials.name", { defaultValue: "Nom" })}</label>
+          <label className="block text-xs font-extrabold text-slate-500 mb-1">
+            {t("materials.name", { defaultValue: "Name" })}
+          </label>
           <input
             name="label"
             defaultValue={initial?.label}
             required
             className="w-full p-2 border rounded bg-white text-slate-900 text-sm"
-            placeholder={t("materials.name_placeholder", { defaultValue: "Ex: Peinture Luxe" })}
+            placeholder={t("materials.name_placeholder", { defaultValue: "e.g. Premium paint" })}
           />
         </div>
 
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-xs font-extrabold text-slate-500 mb-1">{t("materials.category", { defaultValue: "Catégorie" })}</label>
+            <label className="block text-xs font-extrabold text-slate-500 mb-1">
+              {t("materials.category", { defaultValue: "Category" })}
+            </label>
             <input
               name="category"
               defaultValue={initial?.category}
               className="w-full p-2 border rounded bg-white text-slate-900 text-sm"
-              placeholder={t("materials.category_placeholder", { defaultValue: "Ex: Peinture" })}
+              placeholder={t("materials.category_placeholder", { defaultValue: "e.g. Paint" })}
             />
           </div>
 
           <div>
-            <label className="block text-xs font-extrabold text-slate-500 mb-1">{t("materials.unit", { defaultValue: "Unité" })}</label>
-            <select name="unit" defaultValue={initial?.unit || Unit.PIECE} className="w-full p-2 border rounded bg-white text-slate-900 text-sm">
+            <label className="block text-xs font-extrabold text-slate-500 mb-1">
+              {t("materials.unit", { defaultValue: "Unit" })}
+            </label>
+            <select
+              name="unit"
+              defaultValue={initial?.unit || Unit.PIECE}
+              className="w-full p-2 border rounded bg-white text-slate-900 text-sm"
+            >
               {Object.values(Unit).map((u) => (
                 <option key={u} value={u}>
                   {u}
@@ -752,7 +800,9 @@ const CustomMaterialForm: React.FC<{
         </div>
 
         <div>
-          <label className="block text-xs font-extrabold text-slate-500 mb-1">{t("materials.unit_price_ht", { defaultValue: "Prix Unitaire HT (€)" })}</label>
+          <label className="block text-xs font-extrabold text-slate-500 mb-1">
+            {t("materials.unit_price_ht", { defaultValue: "Unit price (excl. VAT) (€)" })}
+          </label>
           <input
             name="price"
             type="number"
@@ -764,11 +814,18 @@ const CustomMaterialForm: React.FC<{
         </div>
 
         <div className="flex gap-3 pt-2">
-          <button type="button" onClick={onCancel} className="flex-1 py-2 text-slate-500 text-sm font-extrabold">
-            {t("common.cancel", { defaultValue: "Annuler" })}
+          <button
+            type="button"
+            onClick={onCancel}
+            className="flex-1 py-2 text-slate-500 text-sm font-extrabold"
+          >
+            {t("common.cancel", { defaultValue: "Cancel" })}
           </button>
-          <button type="submit" className="flex-1 py-2 bg-blue-600 text-white rounded-lg font-extrabold text-sm shadow-sm">
-            {t("common.save", { defaultValue: "Enregistrer" })}
+          <button
+            type="submit"
+            className="flex-1 py-2 bg-blue-600 text-white rounded-lg font-extrabold text-sm shadow-sm"
+          >
+            {t("common.save", { defaultValue: "Save" })}
           </button>
         </div>
       </form>

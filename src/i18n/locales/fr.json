@@ -1,4 +1,21 @@
 {
+  "common": {
+    "loading": "Chargement…"
+  },
+
+  "calculator": {
+    "open": "Ouvrir le calculateur"
+  },
+
+  "nav": {
+    "menu": "Menu",
+    "calc": "Calcul",
+    "site": "Chantier",
+    "projects": "Projets",
+    "materials": "Mat.",
+    "settings": "Réglages"
+  },
+
   "struct": {
     "tabs": {
       "groundwork": "Terrassement",
@@ -60,21 +77,11 @@
         "4": "4. Logist.",
         "5": "5. Devis"
       },
-      "step1": {
-        "hint": "Définissez l'emprise du chantier et le décapage de la terre végétale."
-      },
-      "step2": {
-        "hint": "Ajoutez les fouilles spécifiques (fondations, réseaux, plateforme)."
-      },
-      "step3": {
-        "hint": "Nature du sol et foisonnement (augmentation du volume)."
-      },
-      "step4": {
-        "hint": "Gestion des terres et moyens matériels."
-      },
-      "step5": {
-        "hint": "Tarification du terrassement."
-      },
+      "step1": { "hint": "Définissez l'emprise du chantier et le décapage de la terre végétale." },
+      "step2": { "hint": "Ajoutez les fouilles spécifiques (fondations, réseaux, plateforme)." },
+      "step3": { "hint": "Nature du sol et foisonnement (augmentation du volume)." },
+      "step4": { "hint": "Gestion des terres et moyens matériels." },
+      "step5": { "hint": "Tarification du terrassement." },
       "strip": "Décapage terre végétale",
       "excav": "Excavation / fouilles",
       "excav_details": "{{count}} ouvrages - x{{swell}}",
@@ -128,21 +135,11 @@
         "4": "4. Divers",
         "5": "5. Devis"
       },
-      "step1": {
-        "hint": "Choisissez le type de fondations et les dimensions globales."
-      },
-      "step2": {
-        "hint": "Calcul automatique des fouilles en fonction des fondations choisies."
-      },
-      "step3": {
-        "hint": "Dimensionnement du béton et des armatures."
-      },
-      "step4": {
-        "hint": "Coffrage et protection."
-      },
-      "step5": {
-        "hint": "Récapitulatif des prix unitaires."
-      },
+      "step1": { "hint": "Choisissez le type de fondations et les dimensions globales." },
+      "step2": { "hint": "Calcul automatique des fouilles en fonction des fondations choisies." },
+      "step3": { "hint": "Dimensionnement du béton et des armatures." },
+      "step4": { "hint": "Coffrage et protection." },
+      "step5": { "hint": "Récapitulatif des prix unitaires." },
       "systems": "Systèmes constructifs",
       "strip": "Semelles filantes",
       "strip_hint": "Sous murs porteurs",
@@ -200,24 +197,12 @@
         "5": "5. Finition",
         "6": "6. Devis"
       },
-      "step1": {
-        "hint": "Dimensions des murs."
-      },
-      "step2": {
-        "hint": "Choix du matériau."
-      },
-      "step3": {
-        "hint": "Ouvertures."
-      },
-      "step4": {
-        "hint": "Chaînages et linteaux."
-      },
-      "step5": {
-        "hint": "Finitions."
-      },
-      "step6": {
-        "hint": "Prix unitaires murs."
-      },
+      "step1": { "hint": "Dimensions des murs." },
+      "step2": { "hint": "Choix du matériau." },
+      "step3": { "hint": "Ouvertures." },
+      "step4": { "hint": "Chaînages et linteaux." },
+      "step5": { "hint": "Finitions." },
+      "step6": { "hint": "Prix unitaires murs." },
       "mode_global": "Global",
       "mode_segments": "Segments",
       "perimeter_total": "Périmètre total (m)",
@@ -287,6 +272,55 @@
       "units": "Blocs/éléments",
       "binder": "Mortier/colle",
       "summary_units": "{{units}} unités ({{m2}}m²)"
+    }
+  },
+
+  "menu": {
+    "title": "Menu de l’application",
+    "subtitle": "Accès direct aux sections + aux outils",
+
+    "back_dashboard": "Tableau de bord",
+    "back_dashboard_title": "Retour au tableau de bord",
+
+    "how": {
+      "title": "Comment ça marche ?",
+      "text": "Utilisez Calcul pour estimer vos quantités, puis Projets pour retrouver vos calculs. Pour un suivi complet, créez un Chantier et enregistrez les résultats par étape. Pensez à exporter en JSON pour sauvegarder vos données."
+    },
+
+    "open": "Ouvrir",
+
+    "cards": {
+      "calc": {
+        "title": "Calcul",
+        "desc": "Accédez à tous les calculateurs pour estimer quantités et coûts.",
+        "badge": "OUTILS"
+      },
+      "house": {
+        "title": "Chantier",
+        "desc": "Créez un chantier et enregistrez les résultats par étape (suivi complet)."
+      },
+      "projects": {
+        "title": "Projets",
+        "desc": "Retrouvez vos calculs sauvegardés (estimations, matériaux, coûts)."
+      },
+      "materials": {
+        "title": "Matériaux & Prix",
+        "desc": "Ajustez les prix, créez des matériaux perso, main d’œuvre + données."
+      },
+      "settings": {
+        "title": "Réglages",
+        "desc": "Paramétrez l’application (options, préférences, affichage)."
+      },
+      "backup": {
+        "title": "Sauvegarde JSON",
+        "desc": "Exportez/importez vos données pour éviter toute perte (recommandé).",
+        "badge": "RECOMMANDÉ"
+      }
+    },
+
+    "tools": {
+      "title": "Tous les outils (accès direct)",
+      "subtitle": "Cliquez sur un outil pour ouvrir le calculateur directement."
     }
   }
 }

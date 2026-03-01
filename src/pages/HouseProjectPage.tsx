@@ -31,6 +31,12 @@ import { getCompanyProfile, getQuotes } from "../services/documentsStorage";
 import { ClientModal } from "../components/documents/ClientModal";
 import { useTranslation } from "react-i18next";
 
+/**
+ * Update goals:
+ * - Keep the same i18n keys (house.*, common.*)
+ * - Replace ALL defaultValue FR -> EN to avoid FR fallback when EN key is missing (prevents "Franglais")
+ * - Do not change logic / routing / data model
+ */
 export const HouseProjectPage: React.FC = () => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
@@ -123,7 +129,7 @@ export const HouseProjectPage: React.FC = () => {
   };
 
   const handleDelete = (id: string) => {
-    const ok = window.confirm(t("house.confirm_delete", { defaultValue: "Supprimer ce chantier ?" }));
+    const ok = window.confirm(t("house.confirm_delete", { defaultValue: "Delete this site?" }));
     if (!ok) return;
 
     deleteHouseProject(id);
@@ -173,7 +179,7 @@ export const HouseProjectPage: React.FC = () => {
       const ok = window.confirm(
         t("house.need_company_profile", {
           defaultValue:
-            "Vous devez d'abord configurer votre profil entreprise dans les réglages. Y aller maintenant ?",
+            "You must first set up your company profile in Settings. Go there now?",
         })
       );
       if (ok) navigate("/app/settings");
@@ -195,7 +201,9 @@ export const HouseProjectPage: React.FC = () => {
     } catch (e) {
       console.error("Quote generation error:", e);
       window.alert(
-        t("house.quote_error", { defaultValue: "Une erreur est survenue lors de la création du devis." })
+        t("house.quote_error", {
+          defaultValue: "An error occurred while creating the quote.",
+        })
       );
     }
   };
@@ -215,13 +223,14 @@ export const HouseProjectPage: React.FC = () => {
               className="flex items-center text-slate-500 font-medium hover:text-blue-600"
               type="button"
             >
-              <ArrowLeft size={20} className="mr-1" /> {t("common.back", { defaultValue: "Retour" })}
+              <ArrowLeft size={20} className="mr-1" />{" "}
+              {t("common.back", { defaultValue: "Back" })}
             </button>
 
             <div className="text-right">
               <h1 className="text-lg font-extrabold text-slate-800">{currentProject.name}</h1>
               <p className="text-xs text-slate-500">
-                {t("house.budget_steps", { defaultValue: "Budget étapes" })}:{" "}
+                {t("house.budget_steps", { defaultValue: "Steps budget" })}:{" "}
                 {euro.format(totalBudget).replace(/\s/g, " ")}
               </p>
             </div>
@@ -237,7 +246,8 @@ export const HouseProjectPage: React.FC = () => {
               }`}
               type="button"
             >
-              <Layers size={18} className="mr-2" /> {t("house.tabs.steps", { defaultValue: "Étapes" })}
+              <Layers size={18} className="mr-2" />{" "}
+              {t("house.tabs.steps", { defaultValue: "Steps" })}
             </button>
 
             <button
@@ -249,7 +259,8 @@ export const HouseProjectPage: React.FC = () => {
               }`}
               type="button"
             >
-              <FileText size={18} className="mr-2" /> {t("house.tabs.quote", { defaultValue: "Devis" })}
+              <FileText size={18} className="mr-2" />{" "}
+              {t("house.tabs.quote", { defaultValue: "Quote" })}
             </button>
           </div>
         </div>
@@ -261,7 +272,7 @@ export const HouseProjectPage: React.FC = () => {
                 <div className="bg-white rounded-xl shadow-md border-2 border-blue-100 p-4 mb-6 animate-in fade-in">
                   <div className="flex justify-between items-center mb-4">
                     <h2 className="text-sm font-extrabold text-blue-600 uppercase">
-                      {t("house.edit_data", { defaultValue: "Modification Données" })}
+                      {t("house.edit_data", { defaultValue: "Edit data" })}
                     </h2>
                     <button onClick={() => setIsEditingParams(false)} type="button">
                       <X size={20} className="text-slate-400" />
@@ -271,7 +282,7 @@ export const HouseProjectPage: React.FC = () => {
                   <div className="grid grid-cols-2 gap-4 mb-4">
                     <div>
                       <label className="block text-xs font-extrabold text-slate-500 mb-1">
-                        {t("house.surface", { defaultValue: "Surface (m²)" })}
+                        {t("house.surface", { defaultValue: "Area (m²)" })}
                       </label>
                       <input
                         type="number"
@@ -283,19 +294,21 @@ export const HouseProjectPage: React.FC = () => {
 
                     <div>
                       <label className="block text-xs font-extrabold text-slate-500 mb-1">
-                        {t("house.perimeter", { defaultValue: "Périmètre (m)" })}
+                        {t("house.perimeter", { defaultValue: "Perimeter (m)" })}
                       </label>
                       <input
                         type="number"
                         value={editParams.perimeter}
-                        onChange={(e) => setEditParams({ ...editParams, perimeter: e.target.value })}
+                        onChange={(e) =>
+                          setEditParams({ ...editParams, perimeter: e.target.value })
+                        }
                         className="w-full p-2 border rounded bg-white text-slate-900"
                       />
                     </div>
 
                     <div>
                       <label className="block text-xs font-extrabold text-slate-500 mb-1">
-                        {t("house.ceiling_height", { defaultValue: "H. Sous Plafond (m)" })}
+                        {t("house.ceiling_height", { defaultValue: "Ceiling height (m)" })}
                       </label>
                       <input
                         type="number"
@@ -311,20 +324,21 @@ export const HouseProjectPage: React.FC = () => {
                     className="w-full py-2 bg-blue-600 text-white rounded-lg font-extrabold shadow-sm"
                     type="button"
                   >
-                    {t("common.save", { defaultValue: "Enregistrer" })}
+                    {t("common.save", { defaultValue: "Save" })}
                   </button>
                 </div>
               ) : (
                 <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-4 mb-6 relative group">
                   <div className="flex justify-between items-start mb-3">
                     <h2 className="text-sm font-extrabold text-slate-400 uppercase flex items-center">
-                      <Ruler size={16} className="mr-2" /> {t("house.site_data", { defaultValue: "Données Chantier" })}
+                      <Ruler size={16} className="mr-2" />{" "}
+                      {t("house.site_data", { defaultValue: "Site data" })}
                     </h2>
                     <button
                       onClick={startEditParams}
                       className="p-1.5 bg-slate-50 text-slate-400 rounded-full hover:bg-blue-50 hover:text-blue-600 transition-colors"
                       type="button"
-                      aria-label={t("house.edit", { defaultValue: "Modifier" })}
+                      aria-label={t("house.edit", { defaultValue: "Edit" })}
                     >
                       <Pencil size={16} />
                     </button>
@@ -333,7 +347,7 @@ export const HouseProjectPage: React.FC = () => {
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
                       <span className="block text-slate-500 text-xs">
-                        {t("house.surface_living", { defaultValue: "Surface Habitable" })}
+                        {t("house.surface_living", { defaultValue: "Living area" })}
                       </span>
                       <span className="font-extrabold text-slate-800 text-lg">
                         {currentProject.params.surfaceArea} m²
@@ -342,7 +356,7 @@ export const HouseProjectPage: React.FC = () => {
 
                     <div>
                       <span className="block text-slate-500 text-xs">
-                        {t("house.perimeter_label", { defaultValue: "Périmètre" })}
+                        {t("house.perimeter_label", { defaultValue: "Perimeter" })}
                       </span>
                       <span className="font-extrabold text-slate-800 text-lg">
                         {currentProject.params.perimeter.toFixed(1)} m
@@ -351,7 +365,7 @@ export const HouseProjectPage: React.FC = () => {
 
                     <div>
                       <span className="block text-slate-500 text-xs">
-                        {t("house.ceiling_height_label", { defaultValue: "Hauteur plafond" })}
+                        {t("house.ceiling_height_label", { defaultValue: "Ceiling height" })}
                       </span>
                       <span className="font-extrabold text-slate-800">
                         {currentProject.params.ceilingHeight} m
@@ -359,10 +373,12 @@ export const HouseProjectPage: React.FC = () => {
                     </div>
 
                     <div>
-                      <span className="block text-slate-500 text-xs">{t("house.levels", { defaultValue: "Niveaux" })}</span>
+                      <span className="block text-slate-500 text-xs">
+                        {t("house.levels", { defaultValue: "Levels" })}
+                      </span>
                       <span className="font-extrabold text-slate-800">
                         {currentProject.params.levels === 1
-                          ? t("house.single_storey", { defaultValue: "Plain-pied" })
+                          ? t("house.single_storey", { defaultValue: "Single-storey" })
                           : `R+${currentProject.params.levels - 1}`}
                       </span>
                     </div>
@@ -373,7 +389,9 @@ export const HouseProjectPage: React.FC = () => {
               <div className="space-y-6">
                 {CONSTRUCTION_STEPS.map((group) => (
                   <div key={group.id}>
-                    <h3 className="text-sm font-extrabold text-slate-900 mb-3 px-1">{group.label}</h3>
+                    <h3 className="text-sm font-extrabold text-slate-900 mb-3 px-1">
+                      {group.label}
+                    </h3>
                     <div className="space-y-2">
                       {group.steps.map((step) => {
                         const stepData = currentProject.steps[step.id];
@@ -397,14 +415,20 @@ export const HouseProjectPage: React.FC = () => {
                             <div className="flex items-center space-x-3">
                               <div
                                 className={`p-2 rounded-lg ${
-                                  isDone ? "bg-emerald-100 text-emerald-600" : "bg-slate-100 text-slate-500"
+                                  isDone
+                                    ? "bg-emerald-100 text-emerald-600"
+                                    : "bg-slate-100 text-slate-500"
                                 }`}
                               >
                                 <Icon size={20} />
                               </div>
 
                               <div className="text-left">
-                                <span className={`block font-medium ${isDone ? "text-emerald-900" : "text-slate-700"}`}>
+                                <span
+                                  className={`block font-medium ${
+                                    isDone ? "text-emerald-900" : "text-slate-700"
+                                  }`}
+                                >
                                   {step.label}
                                 </span>
 
@@ -416,7 +440,7 @@ export const HouseProjectPage: React.FC = () => {
 
                                 {!step.calc && (
                                   <span className="text-[10px] text-slate-400">
-                                    {t("house.coming_soon", { defaultValue: "Bientôt disponible" })}
+                                    {t("house.coming_soon", { defaultValue: "Coming soon" })}
                                   </span>
                                 )}
                               </div>
@@ -443,7 +467,7 @@ export const HouseProjectPage: React.FC = () => {
                 <div className="flex justify-between items-center mb-4">
                   <h3 className="font-extrabold text-slate-800 text-lg flex items-center">
                     <FileCheck className="mr-2 text-emerald-600" size={20} />{" "}
-                    {t("house.official_docs", { defaultValue: "Documents Officiels" })}
+                    {t("house.official_docs", { defaultValue: "Official documents" })}
                   </h3>
 
                   <button
@@ -451,7 +475,8 @@ export const HouseProjectPage: React.FC = () => {
                     className="bg-emerald-600 text-white px-3 py-1.5 rounded-lg text-sm font-extrabold shadow-sm hover:bg-emerald-700 transition-colors flex items-center"
                     type="button"
                   >
-                    <Plus size={16} className="mr-1" /> {t("house.generate_quote", { defaultValue: "Générer Devis" })}
+                    <Plus size={16} className="mr-1" />{" "}
+                    {t("house.generate_quote", { defaultValue: "Generate quote" })}
                   </button>
                 </div>
 
@@ -478,15 +503,16 @@ export const HouseProjectPage: React.FC = () => {
                               }`}
                             >
                               {q.status === "draft"
-                                ? t("house.quote_status.draft", { defaultValue: "Brouillon" })
+                                ? t("house.quote_status.draft", { defaultValue: "Draft" })
                                 : q.status === "invoiced"
-                                ? t("house.quote_status.invoiced", { defaultValue: "Facturé" })
+                                ? t("house.quote_status.invoiced", { defaultValue: "Invoiced" })
                                 : String(q.status)}
                             </span>
                           </div>
 
                           <div className="text-xs text-slate-500 mt-1">
-                            {new Date(q.date).toLocaleDateString(i18n.language || undefined)} • {q.client.name}
+                            {new Date(q.date).toLocaleDateString(i18n.language || undefined)} •{" "}
+                            {q.client.name}
                           </div>
                         </div>
 
@@ -496,7 +522,7 @@ export const HouseProjectPage: React.FC = () => {
                   </div>
                 ) : (
                   <div className="bg-slate-50 border border-dashed border-slate-300 rounded-xl p-6 text-center text-slate-400 text-sm">
-                    {t("house.no_official_docs", { defaultValue: "Aucun document officiel créé." })}
+                    {t("house.no_official_docs", { defaultValue: "No official document created." })}
                   </div>
                 )}
               </section>
@@ -506,7 +532,7 @@ export const HouseProjectPage: React.FC = () => {
               <section>
                 <h3 className="font-extrabold text-slate-800 text-lg mb-4 flex items-center">
                   <AlertTriangle className="mr-2 text-amber-500" size={20} />{" "}
-                  {t("house.quick_estimator", { defaultValue: "Estimateur Rapide" })}
+                  {t("house.quick_estimator", { defaultValue: "Quick estimator" })}
                 </h3>
                 <QuotePanel project={currentProject} onUpdate={reloadProject} />
               </section>
@@ -526,33 +552,33 @@ export const HouseProjectPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-slate-50 p-4 pb-20">
       <h1 className="text-2xl font-extrabold text-slate-800 mb-6">
-        {t("house.my_sites", { defaultValue: "Mes Chantiers" })}
+        {t("house.my_sites", { defaultValue: "My sites" })}
       </h1>
 
       {isCreating ? (
         <div className="bg-white p-4 rounded-xl shadow-lg border border-blue-100 animate-in zoom-in-95">
           <h2 className="font-extrabold text-lg mb-4">
-            {t("house.new_site", { defaultValue: "Nouveau Chantier" })}
+            {t("house.new_site", { defaultValue: "New site" })}
           </h2>
 
           <div className="space-y-4">
             <div>
               <label className="block text-xs font-extrabold text-slate-500 mb-1">
-                {t("house.project_name", { defaultValue: "Nom du projet" })}
+                {t("house.project_name", { defaultValue: "Project name" })}
               </label>
               <input
                 type="text"
                 autoFocus
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
-                placeholder={t("house.project_placeholder", { defaultValue: "Ex: Maison Lotissement" })}
+                placeholder={t("house.project_placeholder", { defaultValue: "e.g. New house build" })}
                 className="w-full p-3 border rounded-lg bg-white text-slate-900"
               />
             </div>
 
             <div>
               <label className="block text-xs font-extrabold text-slate-500 mb-1">
-                {t("house.surface_living_m2", { defaultValue: "Surface Habitable (m²)" })}
+                {t("house.surface_living_m2", { defaultValue: "Living area (m²)" })}
               </label>
               <input
                 type="number"
@@ -569,7 +595,7 @@ export const HouseProjectPage: React.FC = () => {
                 className="flex-1 py-3 text-slate-500 font-extrabold"
                 type="button"
               >
-                {t("common.cancel", { defaultValue: "Annuler" })}
+                {t("common.cancel", { defaultValue: "Cancel" })}
               </button>
 
               <button
@@ -577,7 +603,7 @@ export const HouseProjectPage: React.FC = () => {
                 className="flex-1 py-3 bg-blue-600 text-white font-extrabold rounded-lg shadow-md"
                 type="button"
               >
-                {t("house.create", { defaultValue: "Créer" })}
+                {t("house.create", { defaultValue: "Create" })}
               </button>
             </div>
           </div>
@@ -597,7 +623,8 @@ export const HouseProjectPage: React.FC = () => {
                 <div>
                   <h3 className="font-extrabold text-slate-800">{p.name}</h3>
                   <p className="text-xs text-slate-500">
-                    {p.params.surfaceArea} m² • {new Date(p.date).toLocaleDateString(i18n.language || undefined)}
+                    {p.params.surfaceArea} m² •{" "}
+                    {new Date(p.date).toLocaleDateString(i18n.language || undefined)}
                   </p>
                 </div>
               </div>
@@ -610,7 +637,7 @@ export const HouseProjectPage: React.FC = () => {
                   }}
                   className="p-2 text-slate-300 hover:text-red-400"
                   type="button"
-                  aria-label={t("common.delete", { defaultValue: "Supprimer" })}
+                  aria-label={t("common.delete", { defaultValue: "Delete" })}
                 >
                   <Trash2 size={18} />
                 </button>
@@ -647,10 +674,10 @@ export const HouseProjectPage: React.FC = () => {
                   </div>
                   <div>
                     <div className="text-white font-extrabold text-base leading-tight">
-                      {t("house.create_site", { defaultValue: "Créer un chantier" })}
+                      {t("house.create_site", { defaultValue: "Create a site" })}
                     </div>
                     <div className="text-white/80 text-xs font-semibold mt-0.5">
-                      {t("house.new_project", { defaultValue: "Nouveau projet" })}
+                      {t("house.new_project", { defaultValue: "New project" })}
                     </div>
                   </div>
                 </div>
