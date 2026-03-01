@@ -414,13 +414,13 @@ export const getSystemMaterialsList = () => {
   const tax = getTaxSettings();
   const customs = getCustomMaterials();
 
-    const keys = Array.from(new Set([...Object.keys(DEFAULT_PRICES), ...Object.keys(MATERIAL_METADATA)])).sort();
+    const keys = Object.keys(DEFAULT_PRICES).sort();
 
   return keys.map((key) => {
-        const meta = MATERIAL_METADATA[key] || { label: key, category: "Other", unit: "" };
-    const safeLabel = (meta as any).label && String((meta as any).label).trim() ? (meta as any).label : key;
-    const safeCategory = (meta as any).category && String((meta as any).category).trim() ? (meta as any).category : "Other";
-    const safeUnit = (meta as any).unit && String((meta as any).unit).trim() ? (meta as any).unit : "";
+        const meta = getMaterialMetadata(key);
+    const safeLabel = meta.label;
+    const safeCategory = meta.category;
+    const safeUnit = meta.unit;
     const defaultPrice = (DEFAULT_PRICES as any)[key] as number;
 
     const userOverride = overrides[key];

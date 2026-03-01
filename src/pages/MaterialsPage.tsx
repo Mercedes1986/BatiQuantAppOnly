@@ -1,6 +1,7 @@
 // MaterialsPage.tsx (updated: EN defaultValue to avoid FR fallback, keys unchanged)
 import React, { useEffect, useRef, useMemo, useState, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
+import { getMaterialMetadata } from "../constants";
 import {
   Search,
   RotateCcw,
@@ -677,7 +678,7 @@ export const MaterialsPage: React.FC = () => {
               </h3>
               <p className="text-xs text-slate-500">
                 {t("materials.map_replace", { defaultValue: "Replaces" })}{" "}
-                {MATERIAL_METADATA[mappingTarget]?.label || mappingTarget}
+                {getMaterialMetadata(mappingTarget).label || mappingTarget}
               </p>
             </div>
 

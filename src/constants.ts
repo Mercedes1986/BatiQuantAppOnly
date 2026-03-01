@@ -695,7 +695,6 @@ export const getMaterialMetadata = (key: string): MaterialMetadata => {
 
   return { label, category, unit };
 };
-;
 
 /* -------------------------------------------------------
    Helper: map block spec -> price key (SAFE)
