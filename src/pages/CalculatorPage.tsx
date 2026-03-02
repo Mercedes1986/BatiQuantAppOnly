@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 
 import { CalculatorType, CalculatorConfig, CalculationResult, Project } from "../types";
-import { CALCULATORS, STATIC_TIPS } from "../constants";
+import { getCalculators, getStaticTips } from "../constants";
 
 import { PaintCalculator } from "../components/calculators/PaintCalculator";
 import { ConcreteCalculator } from "../components/calculators/ConcreteCalculator";
@@ -49,16 +49,16 @@ export const CalculatorPage: React.FC<Props> = ({ type, onBack, onNavigateProjec
   const { t, i18n } = useTranslation();
 
   const config = useMemo(() => {
-    const c = CALCULATORS.find((x) => x.id === type) as CalculatorConfig | undefined;
+    const c = getCalculators().find((x) => x.id === type) as CalculatorConfig | undefined;
     return c;
-  }, [type]);
+  }, [type, i18n.language]);
 
   const [result, setResult] = useState<CalculationResult | null>(null);
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [newProjectName, setNewProjectName] = useState("");
   const [showTips, setShowTips] = useState(false);
 
-  const tips = STATIC_TIPS[type] || [];
+  const tips = (getStaticTips()[type] || []) as string[];
   const hasTips = tips.length > 0;
 
   const euro = useMemo(

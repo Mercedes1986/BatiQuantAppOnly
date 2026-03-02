@@ -68,6 +68,49 @@
     "materials": "Matériaux",
     "settings": "Réglages"
   },
+  "menu": {
+    "title": "Menu de l’application",
+    "subtitle": "Accès direct aux sections + aux outils",
+    "back_dashboard": "Tableau de bord",
+    "back_dashboard_title": "Retour au tableau de bord",
+    "how": {
+      "title": "Comment ça marche ?",
+      "text": "Utilisez Calcul pour estimer vos quantités, puis Projets pour retrouver vos calculs. Pour un suivi complet, créez un Chantier et enregistrez les résultats par étape. Pensez à exporter en JSON pour sauvegarder vos données."
+    },
+    "open": "Ouvrir",
+    "cards": {
+      "calc": {
+        "title": "Calcul",
+        "desc": "Accédez à tous les calculateurs pour estimer quantités et coûts.",
+        "badge": "OUTILS"
+      },
+      "house": {
+        "title": "Chantier",
+        "desc": "Créez un chantier et enregistrez les résultats par étape (suivi complet)."
+      },
+      "projects": {
+        "title": "Projets",
+        "desc": "Retrouvez vos calculs sauvegardés (estimations, matériaux, coûts)."
+      },
+      "materials": {
+        "title": "Matériaux & Prix",
+        "desc": "Ajustez les prix, créez des matériaux perso, main d’œuvre + données."
+      },
+      "settings": {
+        "title": "Réglages",
+        "desc": "Paramétrez l’application (options, préférences, affichage)."
+      },
+      "backup": {
+        "title": "Sauvegarde JSON",
+        "desc": "Exportez/importez vos données pour éviter toute perte (recommandé).",
+        "badge": "RECOMMANDÉ"
+      }
+    },
+    "tools": {
+      "title": "Tous les outils (accès direct)",
+      "subtitle": "Cliquez sur un outil pour ouvrir le calculateur directement."
+    }
+  },
   "struct": {
     "tabs": {
       "groundwork": "Terrassement",
@@ -382,49 +425,6 @@
       "units": "Blocs/éléments",
       "binder": "Mortier/colle",
       "summary_units": "{{units}} unités ({{m2}} m²)"
-    }
-  },
-  "menu": {
-    "title": "Menu de l’application",
-    "subtitle": "Accès direct aux sections + aux outils",
-    "back_dashboard": "Tableau de bord",
-    "back_dashboard_title": "Retour au tableau de bord",
-    "how": {
-      "title": "Comment ça marche ?",
-      "text": "Utilisez Calcul pour estimer vos quantités, puis Projets pour retrouver vos calculs. Pour un suivi complet, créez un Chantier et enregistrez les résultats par étape. Pensez à exporter en JSON pour sauvegarder vos données."
-    },
-    "open": "Ouvrir",
-    "cards": {
-      "calc": {
-        "title": "Calcul",
-        "desc": "Accédez à tous les calculateurs pour estimer quantités et coûts.",
-        "badge": "OUTILS"
-      },
-      "house": {
-        "title": "Chantier",
-        "desc": "Créez un chantier et enregistrez les résultats par étape (suivi complet)."
-      },
-      "projects": {
-        "title": "Projets",
-        "desc": "Retrouvez vos calculs sauvegardés (estimations, matériaux, coûts)."
-      },
-      "materials": {
-        "title": "Matériaux & Prix",
-        "desc": "Ajustez les prix, créez des matériaux perso, main d’œuvre + données."
-      },
-      "settings": {
-        "title": "Réglages",
-        "desc": "Paramétrez l’application (options, préférences, affichage)."
-      },
-      "backup": {
-        "title": "Sauvegarde JSON",
-        "desc": "Exportez/importez vos données pour éviter toute perte (recommandé).",
-        "badge": "RECOMMANDÉ"
-      }
-    },
-    "tools": {
-      "title": "Tous les outils (accès direct)",
-      "subtitle": "Cliquez sur un outil pour ouvrir le calculateur directement."
     }
   },
   "ads": {
@@ -2061,6 +2061,135 @@
     }
   },
   "materials": {
+    "BACKFILL_M3": "Remblai (m³)",
+    "BATTEN_M": "Liteau (m)",
+    "BITUMEN_COATING_BUCKET_25KG": "Bitume Enduit (seau) 25 kg",
+    "BLOCK_10_UNIT": "Parpaing 10 (unité)",
+    "BLOCK_15_UNIT": "Parpaing 15 (unité)",
+    "BLOCK_20_PALLET": "Parpaing 20 (palette)",
+    "BLOCK_20_UNIT": "Parpaing 20 (unité)",
+    "BLOCK_25_UNIT": "Parpaing 25 (unité)",
+    "BLOCK_STEPOC_15_UNIT": "Parpaing Bloc à bancher 15 (unité)",
+    "BLOCK_STEPOC_20_UNIT": "Parpaing Bloc à bancher 20 (unité)",
+    "BLOCK_STEPOC_25_UNIT": "Parpaing Bloc à bancher 25 (unité)",
+    "BLOCK_STEPOC_UNIT": "Parpaing Bloc à bancher (unité)",
+    "BORDER_CONCRETE_M": "Border béton (m)",
+    "BPE_M3": "Béton prêt à l'emploi (m³)",
+    "BREAKER_UNIT": "Disjoncteur (unité)",
+    "BRICK_15_UNIT": "Brique 15 (unité)",
+    "BRICK_20_UNIT": "Brique 20 (unité)",
+    "CABLE_3G15_100M": "Câble 3G15 100 m",
+    "CABLE_3G25_100M": "Câble 3G25 100 m",
+    "CELLULAR_15_UNIT": "Béton cellulaire 15 (unité)",
+    "CELLULAR_20_UNIT": "Béton cellulaire 20 (unité)",
+    "CEMENT_BAG_25KG": "Ciment (sac 25 kg)",
+    "CEMENT_BAG_35KG": "Ciment (sac 35 kg)",
+    "CHAINAGE_3M": "Chaînage 3 m",
+    "CLEAN_CONCRETE_M3": "Nettoyage béton (m³)",
+    "COATING_EXT_BAG": "Enduit extérieur (sac)",
+    "COATING_INT_BAG": "Enduit intérieur (sac)",
+    "COMPACTOR_DAY": "Plaque vibrante (jour)",
+    "COMPOSITE_DECK_M2": "Composite Terrasse (m²)",
+    "COMPOST_M3": "Compost (m³)",
+    "COMPOUND_BAG_25KG": "Enduit (sac) 25 kg",
+    "CONDUIT_ICTA_20_100M": "Gaine Icta 20 100 m",
+    "CORNER_BEAD_3M": "Angle cornière 3 m",
+    "DECOR_GRAVEL_TON": "décoratif Gravier (tonne)",
+    "DELIVERY_FEE": "Livraison Fee",
+    "DELTA_MS_ROLL_20M": "Delta MS (rouleau) 20 m",
+    "DIGGER_DAY": "Pelle (jour)",
+    "DRAIN_PIPE_50M": "Drain Tuyau 50 m",
+    "DUMPER_DAY": "Dumper (jour)",
+    "ELECTRIC_CONDUIT_M": "Electric Gaine (m)",
+    "EVACUATION_M3": "Evacuation (m³)",
+    "EXCAVATION_M3": "Terrassement (m³)",
+    "FACADE_COATING_BAG": "Façade Enduit (sac)",
+    "FENCE_MESH_M": "Clôture Treillis (m)",
+    "FENCE_POST_UNIT": "Clôture Post (unité)",
+    "FENCE_RIGID_M": "Clôture Rigid (m)",
+    "FENCE_WOOD_M": "Clôture Wood (m)",
+    "FERTILIZER_KG": "Engrais (kg)",
+    "FORM_OIL_L": "Coffrage Oil (L)",
+    "FORM_PANEL_M2": "Coffrage (panneau) (m²)",
+    "FURRING_3M": "Fourrure 3 m",
+    "GARDEN_EDGING_M": "Garden Edging (m)",
+    "GARDEN_LIGHT_UNIT": "Garden Light (unité)",
+    "GATE_INSTALL_UNIT": "Portail Install (unité)",
+    "GATE_MOTOR_UNIT": "Portail Motor (unité)",
+    "GATE_UNIT": "Portail (unité)",
+    "GEOTEXTILE_M2": "Géotextile (m²)",
+    "GEOTEXTILE_ROLL_50M2": "Géotextile (rouleau) 50M2",
+    "GLUE_BAG_25KG": "Colle (sac) 25 kg",
+    "GLUE_MORTAR_BAG_25KG": "Colle Mortier (sac) 25 kg",
+    "GRAVEL_BIGBAG": "Gravier Bigbag",
+    "GRAVEL_FOUNDATION_TON": "Gravier Foundation (tonne)",
+    "GRAVEL_TON": "Gravier (tonne)",
+    "GROUT_BAG_5KG": "Joint (sac) 5 kg",
+    "HANGER_BOX_50": "Suspente (boîte) 50",
+    "HEDGE_PLANT_UNIT": "Haie Plante (unité)",
+    "INSULATION_M2": "Isolation (m²)",
+    "IRRIGATION_DRIP_M": "Arrosage Drip (m)",
+    "IRRIGATION_PROGRAMMER_UNIT": "Arrosage Programmer (unité)",
+    "IRRIGATION_SPRINKLER_UNIT": "Arrosage Sprinkler (unité)",
+    "JOINT_TAPE_ROLL": "Joint bande (rouleau)",
+    "LAWN_ROLL_M2": "Gazon (rouleau) (m²)",
+    "LAWN_SEED_KG": "Gazon Seed (kg)",
+    "LINTEL_PRECAST_M": "Linteau Precast (m)",
+    "MANHOLE_UNIT": "Regard (unité)",
+    "MAP_BAG_25KG": "MAP (sac) 25 kg",
+    "MESH_PANEL_ST10": "Treillis (panneau) St10",
+    "MESH_PANEL_ST25": "Treillis (panneau) St25",
+    "MESH_PANEL_ST40": "Treillis (panneau) St40",
+    "MONTANT_3M": "Montant 3 m",
+    "MORTAR_BAG_25KG": "Mortier (sac) 25 kg",
+    "MULCH_M3": "Paillage (m³)",
+    "PAINT_LITER": "Peinture murs",
+    "PAVERS_M2": "Pavés (m²)",
+    "PERIPHERAL_BAND_M": "Périphérique bande (m)",
+    "PER_PIPE_100M": "Per Tuyau 100 m",
+    "PLACO_PLATE_BA13": "Plaque de plâtre plaque BA13",
+    "PLACO_PLATE_FIRE": "Plaque de plâtre plaque feu",
+    "PLACO_PLATE_HYDRO": "Plaque de plâtre plaque hydrofuge",
+    "PLANT_UNIT": "Plante (unité)",
+    "POLYANE_ROLL_150M2": "Polyane (rouleau) 150M2",
+    "POOL_COPING_ML": "Piscine Coping Ml",
+    "POOL_INSTALL_UNIT": "Piscine Install (unité)",
+    "POOL_UNIT": "Piscine (unité)",
+    "PRIMER_FLOOR_LITER": "Sous-couche sol (L)",
+    "PRIMER_LITER": "Sous-couche universelle",
+    "PROP_UNIT": "Prop (unité)",
+    "PUMP_FEE": "Pompe Fee",
+    "PVC_PIPE_4M": "PVC Tuyau 4 m",
+    "RAGREAGE_BAG_25KG": "Ragréage (sac) 25 kg",
+    "RAGREAGE_FIBRE_25KG": "Ragréage fibré 25 kg",
+    "RAIL_3M": "Rail 3 m",
+    "REBAR_CAGE_15_35_6M": "Fer à béton Cage 15 35 6 m",
+    "REBAR_CAGE_20_20_6M": "Fer à béton Cage 20 20 6 m",
+    "REBAR_CAGE_35_15_6M": "Fer à béton Cage 35 15 6 m",
+    "REBAR_KG": "Fer à béton (kg)",
+    "SAND_BIGBAG": "Sable Bigbag",
+    "SAND_TON": "Sable (tonne)",
+    "SCREED_MORTAR_BAG": "Chape Mortier (sac)",
+    "SCREWS_BOX_1000": "Vis (boîte) 1000",
+    "SEWER_PIPE_M": "eaux usées Tuyau (m)",
+    "SHRUB_UNIT": "Arbuste (unité)",
+    "SKIP_DAY": "Benne (jour)",
+    "SKIRTING_METER": "Plinthe (m)",
+    "SOCKET_UNIT": "Prise (unité)",
+    "SPACERS_BOX": "Croisillons (boîte)",
+    "SWITCH_UNIT": "Interrupteur (unité)",
+    "TILE_M2": "Carrelage (m²)",
+    "TILE_ROOF_M2": "Carrelage Toiture (m²)",
+    "TIMBER_M": "Timber (m)",
+    "TOPSOIL_M3": "Terre végétale (m³)",
+    "TOPSOIL_STRIP_M2": "Terre végétale Strip (m²)",
+    "TRANSFORMER_UNIT": "Transformer (unité)",
+    "TREE_UNIT": "Arbre (unité)",
+    "TRENCH_EXCAVATION_M3": "Trench Terrassement (m³)",
+    "UNDERLAY_ROLL_75M2": "Écran sous-toiture (rouleau) 75M2",
+    "WALL_COPING_UNIT": "Wall Coping (unité)",
+    "WATER_PIPE_M": "eau Tuyau (m)",
+    "WOOD_DECK_M2": "Wood Terrasse (m²)",
     "all": "Tout",
     "backup_hint": "Exportez votre catalogue pour le sauvegarder.",
     "backup_restore": "Sauvegarde / restauration",
@@ -2108,11 +2237,7 @@
     "title": "Matériaux",
     "unit": "Unité",
     "unit_price_ht": "Prix unitaire HT",
-    "vat_rate": "Taux de TVA",
-    "PAINT_LITER": "Peinture murs",
-    "PRIMER_LITER": "Sous-couche universelle",
-    "CEMENT_BAG_35KG": "Ciment (sac 35 kg)",
-    "CEMENT_BAG_25KG": "Ciment (sac 25 kg)"
+    "vat_rate": "Taux de TVA"
   },
   "notfound": {
     "description": "Cette page n’existe pas.",

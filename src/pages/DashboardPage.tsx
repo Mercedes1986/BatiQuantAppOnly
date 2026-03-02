@@ -2,7 +2,7 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { CalculatorCard } from "../components/ui/CalculatorCard";
-import { CALCULATORS } from "../constants";
+import { getCalculators } from "../constants";
 import { CalculatorType } from "../types";
 import { AdSlot } from "../components/ads/AdSlot";
 
@@ -27,7 +27,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onSelectCalc }) =>
         </header>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-10">
-          {CALCULATORS.map((calc) => (
+          {getCalculators().map((calc) => (
             <CalculatorCard key={calc.id} config={calc} onClick={() => onSelectCalc(calc.id)} />
           ))}
         </div>

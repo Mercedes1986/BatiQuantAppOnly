@@ -16,7 +16,7 @@ import { useTranslation } from "react-i18next";
 
 import { CalculatorPage } from "@/pages/CalculatorPage";
 import { CalculatorType } from "@/types";
-import { CALCULATORS } from "@/constants";
+import { getCalculators } from "@/constants";
 import { CalculatorCard } from "@/components/ui/CalculatorCard";
 
 type SectionCard = {
@@ -264,7 +264,7 @@ export const AppMenuPage: React.FC = () => {
           </p>
 
           <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {CALCULATORS.map((calc) => (
+            {getCalculators().map((calc) => (
               <CalculatorCard key={calc.id} config={calc} onClick={() => setSelectedCalc(calc.id)} />
             ))}
           </div>

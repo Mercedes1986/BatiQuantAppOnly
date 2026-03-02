@@ -58,7 +58,10 @@ const tr = (key: string, fallbackEn: string) => {
    CALCULATORS
 ------------------------------------------------------- */
 
-export const CALCULATORS: CalculatorConfig[] = [
+// NOTE: Do NOT export translated strings as a static constant.
+// If the user switches language after the app has loaded, static strings stay stuck.
+// Use a function so names/descriptions are resolved with the current i18next language.
+export const getCalculators = (): CalculatorConfig[] => [
   {
     id: CalculatorType.GROUNDWORK,
     name: tr("calculators.groundwork.name", "Groundworks"),
@@ -222,6 +225,11 @@ export const CALCULATORS: CalculatorConfig[] = [
     imageAlt: tr("calculators.exterior.alt", "Exteriors: terrace, fencing and paths"),
   },
 ];
+
+// Backward-compatible alias (some modules might still import CALCULATORS).
+// It resolves once at import time and may not react to language changes.
+// Prefer getCalculators() everywhere.
+export const CALCULATORS: CalculatorConfig[] = getCalculators();
 
 /* -------------------------------------------------------
    CONSTRUCTION STEPS
@@ -442,9 +450,11 @@ const cat = (key: string, fallbackEn: string) => tr(`categories.${key}`, fallbac
 const mat = (key: string, fallbackEn: string) => tr(`materials.${key}`, fallbackEn);
 
 export const MATERIAL_METADATA: Record<string, MaterialMetadata> = (() => {
-  // Heuristics to avoid empty catalogs when metadata is incomplete.
-  // You can still override any entry explicitly in the map below.
-  const inferUnit = (key: string): string => {
+  // IMPORTANT: do NOT call i18n at import time here.
+  // This map only provides *fallback* English labels/units.
+  // Translations are resolved dynamically in getMaterialMetadata().
+
+  const inferUnitLocal = (key: string): string => {
     const k = key.toUpperCase();
     if (k.includes("_LITER") || k.endsWith("_L")) return "€/L";
     if (k.includes("_M2")) return "€/m²";
@@ -459,44 +469,10 @@ export const MATERIAL_METADATA: Record<string, MaterialMetadata> = (() => {
     if (k.includes("_CART")) return "€/cartridge";
     if (k.includes("_BOX")) return "€/box";
     if (k.includes("_BAG")) return "€/bag";
+    if (k.includes("_BUCKET")) return "€/bucket";
+    if (k.includes("_PALLET")) return "€/pallet";
     if (k.includes("_UNIT")) return "€/unit";
     return "€";
-  };
-
-  const inferCategoryKey = (key: string): string => {
-    const k = key.toUpperCase();
-
-    if (k.includes("PAINT") || k.includes("PRIMER") || k.includes("TAPE") || k.includes("TARP") || k.includes("TOOLS")) return "paint";
-    if (k.includes("CEMENT") || k.includes("MORTAR") || k.includes("GLUE_MORTAR") || k.includes("BRICK") || k.includes("BLOCK") || k.includes("LINTEL")) return "masonry";
-    if (k.includes("SAND") || k.includes("GRAVEL") || k.includes("BIGBAG") || k.includes("DECOR_GRAVEL")) return "aggregates";
-    if (k.includes("TILE") || k.includes("GROUT") || k.includes("SKIRTING") || k.includes("SPACERS") || k.includes("SPEC")) return "tiling";
-    if (k.includes("RAGREAGE") || k.includes("LEVELING") || k.includes("PRIMER_FLOOR") || k.includes("PERIPHERAL_BAND") || k.includes("SCREED_MORTAR")) return "leveling";
-    if (k.includes("PLACO") || k.includes("RAIL_") || k.includes("MONTANT_") || k.includes("FURRING") || k.includes("HANGER") || k.includes("SCREWS") || k.includes("JOINT_TAPE") || k.includes("COMPOUND") || k == "MAP_BAG_25KG" || k.includes("CORNER_BEAD")) return "drywall";
-    if (k.includes("INSULATION")) return "insulation";
-    if (k.includes("MESH") || k.includes("REBAR") || k.includes("CHAINAGE") || k.includes("_STEEL") || k == "REBAR_KG") return "reinforcement";
-    if (k == "BPE_M3" || k.includes("CONCRETE")) return "concrete";
-
-    if (k.includes("EXCAVATION") || k.includes("EVACUATION") || k.includes("TOPSOIL") || k.includes("TRENCH") || k.includes("BACKFILL")) return "earthworks";
-    if (k.includes("DIGGER_DAY") || k.includes("DUMPER_DAY") || k.includes("SKIP_DAY") || k.includes("COMPACTOR_DAY")) return "rental";
-
-    if (k.includes("BITUMEN") || k.includes("DELTA_MS") || k.includes("DRAIN_PIPE") || k.includes("GEOTEXTILE") || k.includes("DPC") || k.includes("POLYANE")) return "waterproofing";
-    if (k.includes("ROOF") || k.includes("BATTEN") || k.includes("UNDERLAY") || k.includes("GUTTER") || k.includes("RIDGE") || k.includes("VALLEY")) return "roofing";
-
-    if (k.includes("CABLE") || k.includes("CONDUIT") || k.includes("SOCKET") || k.includes("SWITCH") || k.includes("BREAKER") || k.includes("TRANSFORMER")) return "electricity";
-    if (k.includes("PVC_PIPE") || k.includes("PER_PIPE") || k.includes("WATER_PIPE") || k.includes("SEWER_PIPE") || k.includes("MANHOLE")) return "plumbing";
-
-    if (k.includes("FACADE")) return "facade";
-    if (k.includes("FORM_") || k.includes("PROP_") || k.includes("TIMBER") || k.includes("FORM_PANEL")) return "formwork";
-
-    if (k.includes("FENCE") || k.includes("BORDER") || k.includes("WALL_COPING")) return "fencing";
-    if (k.includes("GATE")) return "gates";
-    if (k.includes("POOL")) return "pool";
-
-    if (k.includes("PAVERS") || k.includes("DECK")) return "exterior";
-
-    if (k.includes("LAWN") || k.includes("PLANT_UNIT") || k.includes("SHRUB") || k.includes("HEDGE") || k.includes("TREE") || k.includes("MULCH") || k.includes("COMPOST") || k.includes("FERTILIZER") || k.includes("IRRIGATION")) return "garden";
-
-    return "misc";
   };
 
   const humanize = (key: string) =>
@@ -507,25 +483,24 @@ export const MATERIAL_METADATA: Record<string, MaterialMetadata> = (() => {
 
   const base: Record<string, MaterialMetadata> = {};
 
-  // Build metadata for every price key so the catalog is never "empty".
+  // Build fallback metadata for every price key so the catalog is never empty.
+  // Labels are English-ish (humanized keys). Real translations come from fr/en JSON.
   Object.keys(DEFAULT_PRICES).forEach((key) => {
-    const catKey = inferCategoryKey(key);
     base[key] = {
-      label: tr(`materials.${key}`, humanize(key)),
-      category: tr(`categories.${catKey}`, catKey),
-      unit: inferUnit(key),
+      label: humanize(key),
+      category: "",
+      unit: inferUnitLocal(key),
     };
   });
 
-  // Explicit overrides (keep here if you want custom labels/units)
-  base.PAINT_LITER = { label: tr("materials.PAINT_LITER", "Wall paint"), category: tr("categories.paint", "Painting"), unit: "€/L" };
-  base.PRIMER_LITER = { label: tr("materials.PRIMER_LITER", "Universal primer"), category: tr("categories.paint", "Painting"), unit: "€/L" };
-  base.CEMENT_BAG_35KG = { label: tr("materials.CEMENT_BAG_35KG", "Cement (35kg bag)"), category: tr("categories.masonry", "Masonry"), unit: "€/bag" };
-  base.CEMENT_BAG_25KG = { label: tr("materials.CEMENT_BAG_25KG", "Cement (25kg bag)"), category: tr("categories.masonry", "Masonry"), unit: "€/bag" };
+  // Optional nicer fallbacks (still EN)
+  base.PAINT_LITER = { label: "Wall paint", category: "", unit: "€/L" };
+  base.PRIMER_LITER = { label: "Universal primer", category: "", unit: "€/L" };
+  base.CEMENT_BAG_35KG = { label: "Cement (35kg bag)", category: "", unit: "€/bag" };
+  base.CEMENT_BAG_25KG = { label: "Cement (25kg bag)", category: "", unit: "€/bag" };
 
   return base;
-})()
-
+})();
 
 // ---- helpers (used by Materials page) ----
 const titleCase = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
@@ -695,13 +670,23 @@ const inferCategoryKey = (key: string): keyof typeof categoryFallbackEn => {
  * - otherwise infers label/category/unit from the key (prevents everything going to "Other")
  */
 export const getMaterialMetadata = (key: string): MaterialMetadata => {
+  // IMPORTANT:
+  // - The app can switch language at runtime.
+  // - Any prebuilt metadata (created at import time) would freeze translations.
+  // So we always resolve label/category via i18next at call time.
+
   const direct = MATERIAL_METADATA[key];
-  if (direct && direct.label && direct.category) return direct;
 
   const cKey = inferCategoryKey(key);
   const category = cat(cKey, categoryFallbackEn[cKey] || "Other");
-  const label = mat(key, humanizeKey(key));
-  const unit = inferUnit(key);
+
+  // If a custom EN label exists in the metadata map, use it as fallback;
+  // otherwise humanize the key. Translation key stays `materials.<KEY>`.
+  const labelFallback = direct?.label || humanizeKey(key);
+  const label = mat(key, labelFallback);
+
+  // Unit inference is deterministic and language-independent.
+  const unit = direct?.unit || inferUnit(key);
 
   return { label, category, unit };
 };
@@ -748,7 +733,7 @@ export function getWallUnitPriceKey(spec: WallBlockSpecLite): string {
    STATIC_TIPS (i18n-ready)
 ------------------------------------------------------- */
 
-export const STATIC_TIPS: Record<string, string[]> = {
+export const getStaticTips = (): Record<string, string[]> => ({
   [CalculatorType.PAINT]: [
     tr("tips.paint.1", "Always apply a primer on bare surfaces (drywall, plaster) to reduce absorption."),
     tr("tips.paint.2", "Cross-coat (horizontal then vertical) to avoid streaks."),
@@ -810,7 +795,10 @@ export const STATIC_TIPS: Record<string, string[]> = {
     tr("tips.exterior.1", "Compact in layers: most outdoor failures come from insufficient base preparation."),
     tr("tips.exterior.2", "Add drainage considerations (slope away from buildings, permeable layers)."),
   ],
-};
+});
+
+// Backward-compatible alias (same limitation as CALCULATORS).
+export const STATIC_TIPS: Record<string, string[]> = getStaticTips();
 
 /* -------------------------------------------------------
    OTHER CONSTANTS (i18n-ready)

@@ -96,6 +96,12 @@ export const MaterialsPage: React.FC = () => {
     loadAll();
   }, [loadAll]);
 
+  // Recompute system labels/categories when language changes.
+  // (System list is built from getMaterialMetadata() which uses i18next at call time.)
+  useEffect(() => {
+    loadAll();
+  }, [i18n.language, loadAll]);
+
   useEffect(() => {
     const rawTab = String(searchParams.get("tab") || "").toLowerCase().trim();
     const allowed: TabKey[] = ["system", "custom", "labor", "data"];
