@@ -44,6 +44,24 @@ const clamp = (n: number, min: number, max: number) => Math.min(max, Math.max(mi
 export const LevelingCalculator: React.FC<Props> = ({ onCalculate }) => {
   const { t } = useTranslation();
 
+  // --- i18n (dynamic labels; avoids constants being stuck in EN after language switch) ---
+  const substrateLabel = (id: string) => {
+    const def = (LEVELING_SUBSTRATES as any[]).find((x: any) => x.id === id);
+    return t(`leveling.substrates.${id}`, { defaultValue: String(def?.label ?? id) });
+  };
+
+  const substrateWarning = (id: string) => {
+    const def = (LEVELING_SUBSTRATES as any[]).find((x: any) => x.id === id);
+    if (!def?.warning) return "";
+    // if warning is already a translated string from constants, keep it as defaultValue
+    return t(`leveling.warnings.${id}`, { defaultValue: String(def.warning) });
+  };
+
+  const productLabel = (id: string) => {
+    const def = (LEVELING_PRODUCTS as any[]).find((x: any) => x.id === id);
+    return t(`leveling.products.${id}`, { defaultValue: String(def?.label ?? id) });
+  };
+
   const [step, setStep] = useState(1);
   const [proMode, setProMode] = useState(false);
 
@@ -416,7 +434,7 @@ export const LevelingCalculator: React.FC<Props> = ({ onCalculate }) => {
                               avg: z.thicknessVal.toFixed(1),
                             }),
                       substrate:
-                        (LEVELING_SUBSTRATES as any[]).find((s: any) => s.id === z.substrate)?.label || z.substrate,
+                        substrateLabel(z.substrate),
                     })}
                   </span>
                 </div>
@@ -453,7 +471,7 @@ export const LevelingCalculator: React.FC<Props> = ({ onCalculate }) => {
               >
                 {(LEVELING_SUBSTRATES as any[]).map((s: any) => (
                   <option key={s.id} value={s.id}>
-                    {s.label}
+                    {substrateLabel(String(s.id))}
                   </option>
                 ))}
               </select>
@@ -554,7 +572,7 @@ export const LevelingCalculator: React.FC<Props> = ({ onCalculate }) => {
                   }`}
                 >
                   <div>
-                    <span className="font-bold block text-sm">{p.label}</span>
+                    <span className="font-bold block text-sm">{productLabel(String(p.id))}</span>
                     <span className="text-[10px] opacity-75">
                       {t("calc.leveling.product_specs", {
                         min: p.minThick,

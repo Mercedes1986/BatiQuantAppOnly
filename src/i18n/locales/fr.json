@@ -808,6 +808,24 @@
         "excav": "Terrassement",
         "foundation": "Fondation",
         "slab": "Dalle"
+      },
+      "zone_types": {
+        "terrace": "Terrasse",
+        "driveway": "Allée / accès",
+        "path": "Chemin",
+        "other": "Autre"
+      },
+      "network_types": {
+        "elec": "Électricité",
+        "water": "Eau",
+        "sewer": "Eaux usées",
+        "drain": "Drainage",
+        "light": "Éclairage"
+      },
+      "fence_types": {
+        "mesh_rigid": "Grillage rigide",
+        "mesh_soft": "Grillage souple",
+        "wood": "Clôture bois"
       }
     },
     "leveling": {
@@ -945,7 +963,12 @@
       "warn_invalid_dimensions": "Dimensions invalides.",
       "warn_no_surface_selected": "Sélectionnez au moins une surface.",
       "warn_too_many_openings": "Les ouvertures dépassent la surface des murs.",
-      "windows": "Fenêtres"
+      "windows": "Fenêtres",
+      "paint_type": {
+        "acry_mat": "Acrylique mat",
+        "acry_satin": "Acrylique satin",
+        "velours": "Velours"
+      }
     },
     "placo": {
       "board_type": "Type de plaque",
@@ -1137,6 +1160,13 @@
         "types": {
           "laundry": "Buanderie"
         }
+      },
+      "room_type": {
+        "bathroom": "Salle de bain",
+        "kitchen": "Cuisine",
+        "wc": "WC",
+        "laundry": "Buanderie",
+        "other": "Autre"
       }
     },
     "roof": {
@@ -1310,6 +1340,11 @@
         "fluid_anh": "Chape fluide (anhydrite)",
         "light": "Chape allégée",
         "ravoirage": "Ravoirage"
+      },
+      "reinforce": {
+        "none": "Aucun",
+        "mesh": "Treillis",
+        "fiber": "Fibres"
       }
     },
     "stairs": {
@@ -1590,7 +1625,20 @@
       "warn_double": "Double encollage recommandé pour ce format.",
       "warn_old_tile": "Pose sur ancien carrelage : préparation spécifique requise.",
       "warn_wet_no_spec": "Pièce humide sans étanchéité sélectionnée.",
-      "warn_wood": "Support bois : système spécifique requis."
+      "warn_wood": "Support bois : système spécifique requis.",
+      "zone_type": {
+        "floor": "Sol",
+        "wall": "Mur"
+      },
+      "pattern": {
+        "straight": "Pose droite",
+        "staggered": "Pose décalée (1/2, 1/3)",
+        "diagonal": "Pose en diagonale"
+      },
+      "joint_type": {
+        "cement": "Ciment",
+        "epoxy": "Époxy"
+      }
     },
     "foundations": {
       "mat": {
@@ -1615,7 +1663,9 @@
     "contact": "Contact",
     "email": "E-mail",
     "info": "Infos",
-    "name": "Nom du client",
+    "name": {
+      "placeholder": "Nom du client"
+    },
     "phone": "Téléphone",
     "zip": "Code postal"
   },
@@ -1999,7 +2049,12 @@
   },
   "invoice": {
     "payment_date": "Date de paiement",
-    "status": "Statut"
+    "status": {
+      "draft": "Brouillon",
+      "sent": "Envoyée",
+      "paid": "Payée",
+      "late": "En retard"
+    }
   },
   "joinery": {
     "add": "Ajouter",
@@ -2022,7 +2077,9 @@
       "install_name": "Pose",
       "supply_name": "Fourniture"
     },
-    "material": "Matériau",
+    "material": {
+      "wood": "Bois"
+    },
     "override_placeholder": "Surcharger le prix…",
     "override_supply": "Surcharger fourniture",
     "price_override": "Surcharge de prix",
@@ -2040,7 +2097,10 @@
       "reno_surcharge": "Surcoût rénovation",
       "silicone_cart": "Silicone (€/cart.)"
     },
-    "shutter": "Volet",
+    "shutter": {
+      "rolling": "Volet roulant",
+      "swing": "Volet battant"
+    },
     "stats": {
       "area": "Surface",
       "install": "Pose",
@@ -2061,9 +2121,15 @@
       "3": "3. Prix"
     },
     "summary": {
-      "units": "{{units}} unités"
+      "units": "unités"
     },
-    "supplies": "Fournitures",
+    "supplies": {
+      "compriband": "Compribande",
+      "silicone": "Silicone",
+      "foam": "Mousse expansive",
+      "fixings": "Fixations",
+      "silicone_yield": "Rendement silicone"
+    },
     "type": {
       "bay": "Baie",
       "door": "Porte",
