@@ -329,7 +329,10 @@
       "subtitle": "Estimez fouilles, béton et armatures pour vos fondations.",
       "title": "Calculateur de fondations",
       "warn_clay": "Sol argileux : peut nécessiter une étude spécifique (consultez un pro).",
-      "warn_frost": "Le hors-gel varie selon la région : appliquez les règles locales."
+      "warn_frost": "Le hors-gel varie selon la région : appliquez les règles locales.",
+      "pad_rect": "Plot isolé rectangulaire",
+      "pad_cyl": "Plot isolé cylindrique",
+      "thickness_m": "Épaisseur (m)"
     },
     "w": {
       "steps": {
@@ -1388,7 +1391,12 @@
       "warn_riser_high": "Contremarche trop haute.",
       "warn_riser_low": "Contremarche trop basse.",
       "warn_slope": "Pente trop forte.",
-      "warn_tread_short": "Giron trop court."
+      "warn_tread_short": "Giron trop court.",
+      "type": {
+        "straight": "Droit",
+        "quarter": "Quart-tournant",
+        "half": "Demi-tournant"
+      }
     },
     "substructure": {
       "detail": {
@@ -1583,6 +1591,19 @@
       "warn_old_tile": "Pose sur ancien carrelage : préparation spécifique requise.",
       "warn_wet_no_spec": "Pièce humide sans étanchéité sélectionnée.",
       "warn_wood": "Support bois : système spécifique requis."
+    },
+    "foundations": {
+      "mat": {
+        "foundation_concrete": "Béton de fondation",
+        "foundation_concrete_note": "Béton structurel (dosage/consistance selon besoin).",
+        "steel": "Acier (armatures)",
+        "excavation": "Terrassement / fouilles",
+        "clean_concrete": "Béton de propreté",
+        "evac": "Évacuation des terres",
+        "evac_swell": "Évacuation des terres (foisonnement)"
+      },
+      "warn_clay_risk": "Sol argileux : risque de retrait-gonflement (à vérifier).",
+      "warn_depth_lt_frost": "Profondeur faible : vérifier hors gel selon la zone."
     }
   },
   "client": {
@@ -1594,9 +1615,7 @@
     "contact": "Contact",
     "email": "E-mail",
     "info": "Infos",
-    "name": {
-      "placeholder": "Nom du client"
-    },
+    "name": "Nom du client",
     "phone": "Téléphone",
     "zip": "Code postal"
   },
@@ -1980,12 +1999,7 @@
   },
   "invoice": {
     "payment_date": "Date de paiement",
-    "status": {
-      "draft": "Brouillon",
-      "late": "En retard",
-      "paid": "Payée",
-      "sent": "Envoyée"
-    }
+    "status": "Statut"
   },
   "joinery": {
     "add": "Ajouter",
@@ -2008,9 +2022,7 @@
       "install_name": "Pose",
       "supply_name": "Fourniture"
     },
-    "material": {
-      "wood": "Bois"
-    },
+    "material": "Matériau",
     "override_placeholder": "Surcharger le prix…",
     "override_supply": "Surcharger fourniture",
     "price_override": "Surcharge de prix",
@@ -2028,10 +2040,7 @@
       "reno_surcharge": "Surcoût rénovation",
       "silicone_cart": "Silicone (€/cart.)"
     },
-    "shutter": {
-      "rolling": "Roulant",
-      "swing": "Battant"
-    },
+    "shutter": "Volet",
     "stats": {
       "area": "Surface",
       "install": "Pose",
@@ -2054,13 +2063,7 @@
     "summary": {
       "units": "{{units}} unités"
     },
-    "supplies": {
-      "compriband": "Compribande",
-      "fixings": "Fixations",
-      "foam": "Mousse",
-      "silicone": "Silicone",
-      "silicone_yield": "Rendement silicone"
-    },
+    "supplies": "Fournitures",
     "type": {
       "bay": "Baie",
       "door": "Porte",
@@ -2549,6 +2552,56 @@
       "2": "Pour une dalle carrossable, viser 12–15 cm + treillis ST25C.",
       "3": "Rehausser le treillis avec des cales : il doit être dans le béton, pas au sol.",
       "4": "Prévoir des joints de dilatation tous les 15–20 m² pour limiter les fissures."
+    },
+    "elec": {
+      "1": "Prévoyez une marge de 10–15% pour les chutes de gaines et câbles.",
+      "2": "Vérifiez les sections de câble et protections (disjoncteurs) selon les puissances."
+    },
+    "plumbing": {
+      "1": "Ajoutez 5–10% pour les chutes et raccords (coudes, tés, manchons).",
+      "2": "Pensez aux colliers, joints, et accessoires (siphons, vannes, flexibles)."
+    },
+    "walls": {
+      "1": "Ajoutez 5% de marge pour les découpes et la casse.",
+      "2": "N’oubliez pas les linteaux, chaînages et poteaux selon le plan."
+    },
+    "foundations": {
+      "1": "Vérifiez les profondeurs hors gel selon votre zone et la nature du sol.",
+      "2": "Prévoyez les surépaisseurs et recouvrements d’armatures.",
+      "3": "Ajoutez une marge pour le béton (pertes, coffrages, irrégularités)."
+    },
+    "substructure": {
+      "1": "Prévoir une pente de drainage et un exutoire (puits perdu / réseau).",
+      "2": "Ajouter une marge sur les granulats (compactage, pertes).",
+      "3": "Vérifier l’étanchéité (enduit/bitume) selon l’humidité du terrain."
+    },
+    "roof": {
+      "1": "Ajouter 8–12% de pertes selon la complexité (noues, arêtiers, découpes).",
+      "2": "Vérifier la compatibilité couverture / pente (DTU, fabricant)."
+    },
+    "tiles": {
+      "1": "Prévoir 8–12% de pertes (découpes, casses), plus en pose diagonale.",
+      "2": "Penser aux plinthes, croisillons, colle et joint selon le support."
+    },
+    "placo": {
+      "1": "Prévoir une marge pour chutes et découpes (5–10%).",
+      "2": "Ne pas oublier bandes, enduits, vis et rails/montants."
+    },
+    "screed": {
+      "1": "Vérifier l’épaisseur minimale et le type de chape selon l’usage.",
+      "2": "Prévoir les joints de fractionnement et le treillis/renfort si nécessaire."
+    },
+    "leveling": {
+      "1": "Préparer le support (primaire) pour éviter le décollement.",
+      "2": "Respecter les temps de séchage avant revêtement."
+    },
+    "facade": {
+      "1": "Prévoir une marge sur la surface (tableaux, linteaux, retours).",
+      "2": "Adapter l’enduit/isolant au support et aux conditions météo."
+    },
+    "exterior": {
+      "1": "Prévoir une marge sur les découpes (lames, dalles, pavés).",
+      "2": "Ajouter géotextile et compactage pour la durabilité."
     }
   },
   "packaging": {
@@ -2663,5 +2716,40 @@
     "ST25C": "Treillis ST25C (radier)",
     "HA10": "Fer HA10 (armature)",
     "HA12": "Fer HA12 (armature)"
+  },
+  "csv": {
+    "section": "Section",
+    "type": "Type",
+    "label": "Libellé",
+    "qty": "Qté",
+    "unit": "Unité",
+    "unit_price_ht": "Prix unitaire HT",
+    "material": "Matériaux",
+    "labor": "Main-d’œuvre",
+    "margin": "Marge",
+    "vat": "TVA",
+    "total_ht": "Total HT",
+    "total_ttc": "Total TTC",
+    "total_materials": "Total matériaux",
+    "total_labor": "Total main-d’œuvre"
+  },
+  "paint": {
+    "substrates": {
+      "smooth": "Support lisse",
+      "placo": "Placo",
+      "plaster": "Plâtre",
+      "concrete": "Béton",
+      "wood": "Bois"
+    }
+  },
+  "wallspecs": {
+    "parpaing10": "Parpaing 10 (10 cm)",
+    "parpaing15": "Parpaing 15 (15 cm)",
+    "parpaing20": "Parpaing 20 (20 cm)",
+    "parpaing25": "Parpaing 25 (25 cm)",
+    "stepoc20": "Bloc à bancher (Stepoc) 20",
+    "stepoc25": "Bloc à bancher (Stepoc) 25",
+    "brick_g7": "Brique G7",
+    "cellular_60x25x20": "Béton cellulaire 60×25×20"
   }
 }

@@ -962,34 +962,36 @@ export const CONCRETE_MIX_RATIOS: Record<number, { sand: number; gravel: number;
 };
 
 export const SOIL_PROPERTIES: SoilDef[] = [
-  { id: "soil", label: tr("soil.soil", "Topsoil"), bulkingFactor: 1.25, density: 1.4 },
-  { id: "clay", label: tr("soil.clay", "Clay / silt"), bulkingFactor: 1.3, density: 1.7 },
-  { id: "sand", label: tr("soil.sand", "Sand"), bulkingFactor: 1.15, density: 1.6 },
-  { id: "gravel", label: tr("soil.gravel", "Gravel / stones"), bulkingFactor: 1.1, density: 1.7 },
-  { id: "rock", label: tr("soil.rock", "Broken rock"), bulkingFactor: 1.5, density: 2.0 },
-  { id: "mixed", label: tr("soil.mixed", "All-in (mixed)"), bulkingFactor: 1.3, density: 1.8 },
+  // IMPORTANT: keep labels reactive to language changes.
+  // Using getters prevents strings from being frozen at module import time.
+  { id: "soil", get label() { return tr("soil.soil", "Topsoil"); }, bulkingFactor: 1.25, density: 1.4 },
+  { id: "clay", get label() { return tr("soil.clay", "Clay / silt"); }, bulkingFactor: 1.3, density: 1.7 },
+  { id: "sand", get label() { return tr("soil.sand", "Sand"); }, bulkingFactor: 1.15, density: 1.6 },
+  { id: "gravel", get label() { return tr("soil.gravel", "Gravel / stones"); }, bulkingFactor: 1.1, density: 1.7 },
+  { id: "rock", get label() { return tr("soil.rock", "Broken rock"); }, bulkingFactor: 1.5, density: 2.0 },
+  { id: "mixed", get label() { return tr("soil.mixed", "All-in (mixed)"); }, bulkingFactor: 1.3, density: 1.8 },
 ];
 
 export const GROUNDWORK_PROJECT_TYPES = [
-  { id: "house", label: tr("groundwork.project.house", "Single-family house") },
-  { id: "extension", label: tr("groundwork.project.extension", "Extension") },
-  { id: "garage", label: tr("groundwork.project.garage", "Garage") },
-  { id: "terrace", label: tr("groundwork.project.terrace", "Terrace") },
-  { id: "pool", label: tr("groundwork.project.pool", "Swimming pool") },
-  { id: "other", label: tr("groundwork.project.other", "Other") },
+  { id: "house", get label() { return tr("groundwork.project.house", "Single-family house"); } },
+  { id: "extension", get label() { return tr("groundwork.project.extension", "Extension"); } },
+  { id: "garage", get label() { return tr("groundwork.project.garage", "Garage"); } },
+  { id: "terrace", get label() { return tr("groundwork.project.terrace", "Terrace"); } },
+  { id: "pool", get label() { return tr("groundwork.project.pool", "Swimming pool"); } },
+  { id: "other", get label() { return tr("groundwork.project.other", "Other"); } },
 ];
 
 export const FOUNDATION_TYPES: FoundationDef[] = [
-  { id: "strip", label: tr("foundations.strip", "Strip footings"), defaultWidth: 0.5, defaultDepth: 0.35 },
-  { id: "raft", label: tr("foundations.raft", "Raft foundation (load-bearing slab)"), defaultWidth: 0, defaultDepth: 0.25 },
-  { id: "pads", label: tr("foundations.pads", "Pad footings"), defaultWidth: 0.6, defaultDepth: 0.6 },
+  { id: "strip", get label() { return tr("foundations.strip", "Strip footings"); }, defaultWidth: 0.5, defaultDepth: 0.35 },
+  { id: "raft", get label() { return tr("foundations.raft", "Raft foundation (load-bearing slab)"); }, defaultWidth: 0, defaultDepth: 0.25 },
+  { id: "pads", get label() { return tr("foundations.pads", "Pad footings"); }, defaultWidth: 0.6, defaultDepth: 0.6 },
 ];
 
 export const REINFORCEMENT_TYPES: ReinforcementDef[] = [
-  { id: "S35", label: tr("reinforcement.S35", "Footing cage S35 (15×35) - 6 bars"), type: "cage", unit: Unit.PIECE },
-  { id: "S15", label: tr("reinforcement.S15", "Footing cage S15 (15×15) - 4 bars"), type: "cage", unit: Unit.PIECE },
-  { id: "L20", label: tr("reinforcement.L20", "Longrine cage 20×20 - 4 bars"), type: "cage", unit: Unit.PIECE },
-  { id: "ST25C", label: tr("reinforcement.ST25C", "ST25C mesh (raft)"), type: "mesh", unit: Unit.PANEL },
-  { id: "HA10", label: tr("reinforcement.HA10", "Rebar HA10 (reinforcement)"), type: "bar", unit: Unit.BAR },
-  { id: "HA12", label: tr("reinforcement.HA12", "Rebar HA12 (reinforcement)"), type: "bar", unit: Unit.BAR },
+  { id: "S35", get label() { return tr("reinforcement.S35", "Footing cage S35 (15×35) - 6 bars"); }, type: "cage", unit: Unit.PIECE },
+  { id: "S15", get label() { return tr("reinforcement.S15", "Footing cage S15 (15×15) - 4 bars"); }, type: "cage", unit: Unit.PIECE },
+  { id: "L20", get label() { return tr("reinforcement.L20", "Longrine cage 20×20 - 4 bars"); }, type: "cage", unit: Unit.PIECE },
+  { id: "ST25C", get label() { return tr("reinforcement.ST25C", "ST25C mesh (raft)"); }, type: "mesh", unit: Unit.PANEL },
+  { id: "HA10", get label() { return tr("reinforcement.HA10", "Rebar HA10 (reinforcement)"); }, type: "bar", unit: Unit.BAR },
+  { id: "HA12", get label() { return tr("reinforcement.HA12", "Rebar HA12 (reinforcement)"); }, type: "bar", unit: Unit.BAR },
 ];
