@@ -142,7 +142,38 @@ export const StructuralCalculator: React.FC<Props> = ({
     setStep(1);
   }, [initialMode]);
 
-  // ======================================
+  
+  const formatWallSpecOption = (s: WallBlockSpec) => {
+    const anyS = s as any;
+    const parts: string[] = [];
+
+    const label = (s.label ?? "").toString().trim();
+    if (label) parts.push(label);
+
+    // Try to surface dimensions/format if available on the spec
+    const dimsStr =
+      (typeof anyS.dimensions === "string" && anyS.dimensions) ||
+      (typeof anyS.size === "string" && anyS.size) ||
+      (typeof anyS.format === "string" && anyS.format) ||
+      (typeof anyS.dimLabel === "string" && anyS.dimLabel) ||
+      "";
+
+    if (dimsStr && dimsStr.toString().trim()) {
+      parts.push(dimsStr.toString().trim());
+    } else {
+      const l = anyS.lengthCm ?? anyS.lCm;
+      const w = anyS.widthCm ?? anyS.wCm;
+      const h = anyS.heightCm ?? anyS.hCm;
+      const nums = [l, w, h].filter((n: any) => typeof n === "number" && Number.isFinite(n)) as number[];
+      if (nums.length >= 2) parts.push(nums.map((n) => `${n}cm`).join("×"));
+    }
+
+    parts.push(`${s.unitsPerM2.toFixed(2)} u/m²`);
+    if (typeof (s as any).thicknessCm === "number") parts.push(`${(s as any).thicknessCm}cm`);
+    return parts.join(" — ");
+  };
+
+// ======================================
   // Shared Geometry
   // ======================================
   const [dimL, setDimL] = useState<string>("");
@@ -2615,7 +2646,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                 >
                   {getSpecsByFamily(wWallFamily).map((s) => (
                     <option key={s.id} value={s.id}>
-                      {s.label} — {s.unitsPerM2.toFixed(2)} u/m²
+                      {formatWallSpecOption(s)}
                     </option>
                   ))}
                 </select>

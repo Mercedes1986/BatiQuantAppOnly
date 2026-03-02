@@ -1,4 +1,34 @@
 import React, { useEffect, useMemo, useState } from "react";
+  const formatWallSpecOption = (s: WallBlockSpec) => {
+    const anyS = s as any;
+    const parts: string[] = [];
+
+    const label = (s.label ?? "").toString().trim();
+    if (label) parts.push(label);
+
+    const dimsStr =
+      (typeof anyS.dimensions === "string" && anyS.dimensions) ||
+      (typeof anyS.size === "string" && anyS.size) ||
+      (typeof anyS.format === "string" && anyS.format) ||
+      (typeof anyS.dimLabel === "string" && anyS.dimLabel) ||
+      "";
+
+    if (dimsStr && dimsStr.toString().trim()) {
+      parts.push(dimsStr.toString().trim());
+    } else {
+      const l = anyS.lengthCm ?? anyS.lCm;
+      const w = anyS.widthCm ?? anyS.wCm;
+      const h = anyS.heightCm ?? anyS.hCm;
+      const nums = [l, w, h].filter((n: any) => typeof n === "number" && Number.isFinite(n)) as number[];
+      if (nums.length >= 2) parts.push(nums.map((n) => `${n}cm`).join("×"));
+    }
+
+    parts.push(`${s.unitsPerM2.toFixed(2)} units/m²`);
+    if (typeof (s as any).thicknessCm === "number") parts.push(`${(s as any).thicknessCm}cm`);
+    return parts.join(" — ");
+  };
+
+
 import { useTranslation } from "react-i18next";
 import { CalculatorType, CalculationResult, Unit } from "../../../types";
 import { DEFAULT_PRICES, getWallUnitPriceKey } from "../../constants";
@@ -743,7 +773,7 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
                 >
                   {getSpecsByFamily(wallFamily).map((s) => (
                     <option key={s.id} value={s.id}>
-                      {s.label} — {s.unitsPerM2.toFixed(2)} units/m²
+                      {formatWallSpecOption(s)}
                     </option>
                   ))}
                 </select>
