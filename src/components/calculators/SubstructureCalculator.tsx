@@ -244,7 +244,7 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
         details: t("calc.substructure.mat.blocks_details", {
           u: selectedSpec.unitsPerM2.toFixed(2),
           th: selectedSpec.thicknessCm,
-          defaultValue: `${selectedSpec.unitsPerM2.toFixed(2)} u/m² — th. ${selectedSpec.thicknessCm}cm`,
+          defaultValue: `${selectedSpec.unitsPerM2.toFixed(2)} units/m² — th. ${selectedSpec.thicknessCm}cm`,
         }),
         systemKey: blockKey,
       });
@@ -531,7 +531,7 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
 
     if (wallMode === "masonry" && selectedSpec) {
       details.push({ label: t("calc.substructure.detail.block", { defaultValue: "Block" }), value: selectedSpec.label, unit: "" });
-      details.push({ label: t("calc.substructure.detail.consumption", { defaultValue: "Consumption" }), value: selectedSpec.unitsPerM2.toFixed(2), unit: "u/m²" });
+      details.push({ label: t("calc.substructure.detail.consumption", { defaultValue: "Consumption" }), value: selectedSpec.unitsPerM2.toFixed(2), unit: "units/m²" });
     } else {
       details.push({ label: t("calc.substructure.detail.wall", { defaultValue: "Wall" }), value: t("calc.substructure.detail.poured_concrete", { defaultValue: "Poured concrete" }), unit: "" });
       details.push({ label: t("calc.substructure.detail.thickness", { defaultValue: "Thickness" }), value: `${toNum(wallThickness, 20).toFixed(0)}`, unit: "cm" });
@@ -743,7 +743,7 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
                 >
                   {getSpecsByFamily(wallFamily).map((s) => (
                     <option key={s.id} value={s.id}>
-                      {s.label} — {s.unitsPerM2.toFixed(2)} u/m²
+                      {s.label} — {s.unitsPerM2.toFixed(2)} units/m²
                     </option>
                   ))}
                 </select>
@@ -753,7 +753,7 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
                     {t("calc.substructure.ui.thickness", { defaultValue: "Thickness" })}:{" "}
                     <b>{selectedSpec.thicknessCm}cm</b> •{" "}
                     {t("calc.substructure.ui.consumption", { defaultValue: "Consumption" })}:{" "}
-                    <b>{selectedSpec.unitsPerM2.toFixed(2)} u/m²</b>
+                    <b>{selectedSpec.unitsPerM2.toFixed(2)} units/m²</b>
                   </p>
                 ) : null}
               </div>

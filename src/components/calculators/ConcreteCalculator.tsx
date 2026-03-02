@@ -157,7 +157,7 @@ export const ConcreteCalculator: React.FC<Props> = ({ onCalculate, initialArea, 
         totalCost: 0,
         materials: [],
         details: [],
-        summary: t("calc.concrete.summary_zero", { defaultValue: "0 m³ de béton" }),
+        summary: t("calc.concrete.summary_zero", { defaultValue: "Enter dimensions to see results." }),
       };
     }
 
@@ -179,13 +179,13 @@ export const ConcreteCalculator: React.FC<Props> = ({ onCalculate, initialArea, 
       const cost = vol * prices.herissonM3;
       add({
         id: "herisson",
-        name: t("calc.concrete.materials.herisson", { defaultValue: "Hérisson (Tout-venant)" }),
+        name: t("calc.concrete.materials.herisson", { defaultValue: "Sub-base (crushed aggregate)" }),
         quantity: parseFloat(vol.toFixed(2)),
         unit: Unit.M3,
         unitPrice: prices.herissonM3,
         totalPrice: parseFloat(cost.toFixed(2)),
         category: CalculatorType.CONCRETE,
-        details: t("calc.concrete.details.thickness_cm", { defaultValue: "Ép. {{cm}}cm", cm: layerHerisson }),
+        details: t("calc.concrete.details.thickness_cm", { defaultValue: "Thk. {{cm}} cm", cm: layerHerisson }),
       });
     }
 
@@ -226,7 +226,7 @@ export const ConcreteCalculator: React.FC<Props> = ({ onCalculate, initialArea, 
       const cost = perimeter * prices.stripMl;
       add({
         id: "strip",
-        name: t("calc.concrete.materials.edge_strip", { defaultValue: "Bande périphérique" }),
+        name: t("calc.concrete.materials.edge_strip", { defaultValue: "Perimeter strip" }),
         quantity: Math.ceil(perimeter),
         unit: Unit.METER,
         unitPrice: prices.stripMl,
@@ -247,14 +247,14 @@ export const ConcreteCalculator: React.FC<Props> = ({ onCalculate, initialArea, 
 
       add({
         id: "concrete_bpe",
-        name: t("calc.concrete.materials.bpe", { defaultValue: "Béton BPE (Toupie)" }),
+        name: t("calc.concrete.materials.bpe", { defaultValue: "Ready-mix concrete (truck)" }),
         quantity: volOrdered,
         unit: Unit.M3,
         unitPrice: prices.concreteBPE,
         totalPrice: parseFloat(costConc.toFixed(2)),
         category: CalculatorType.CONCRETE,
         details: t("calc.concrete.details.bpe_step", {
-          defaultValue: "Commandé par pas de 0,5m³ (besoin: {{need}}m³)",
+          defaultValue: "Ordered in 0.5 m³ increments (need: {{need}} m³)",
           need: volTotal.toFixed(2),
         }),
       });
@@ -286,7 +286,7 @@ export const ConcreteCalculator: React.FC<Props> = ({ onCalculate, initialArea, 
       add({
         id: "cement",
         name: t("calc.concrete.materials.cement_named", {
-          defaultValue: "Ciment ({{dosage}}kg/m³)",
+          defaultValue: "Cement ({{dosage}} kg/m³)",
           dosage: mixDosage,
         }),
         quantity: bags,
@@ -303,7 +303,7 @@ export const ConcreteCalculator: React.FC<Props> = ({ onCalculate, initialArea, 
 
       add({
         id: "sand",
-        name: t("calc.concrete.materials.sand", { defaultValue: "Sable à béton (0/4)" }),
+        name: t("calc.concrete.materials.sand", { defaultValue: "Concrete sand (0/4)" }),
         quantity: parseFloat((sandKg / 1000).toFixed(2)),
         unit: Unit.TON,
         unitPrice: prices.sandTon,
@@ -333,7 +333,7 @@ export const ConcreteCalculator: React.FC<Props> = ({ onCalculate, initialArea, 
       add({
         id: "mesh",
         name: t("calc.concrete.materials.mesh_named", {
-          defaultValue: "Treillis soudé {{label}}",
+          defaultValue: "Welded mesh {{label}}",
           label: meshDef.label,
         }),
         quantity: panels,
@@ -354,7 +354,7 @@ export const ConcreteCalculator: React.FC<Props> = ({ onCalculate, initialArea, 
       const cost = formArea * prices.formworkM2;
       add({
         id: "formwork",
-        name: t("calc.concrete.materials.formwork", { defaultValue: "Coffrage périphérique" }),
+        name: t("calc.concrete.materials.formwork", { defaultValue: "Perimeter formwork" }),
         quantity: parseFloat(formArea.toFixed(2)),
         unit: Unit.M2,
         unitPrice: prices.formworkM2,
@@ -393,7 +393,7 @@ export const ConcreteCalculator: React.FC<Props> = ({ onCalculate, initialArea, 
           unitPrice: prices.jointMl,
           totalPrice: parseFloat(cost.toFixed(2)),
           category: CalculatorType.CONCRETE,
-          details: t("calc.concrete.details.spacing_m", { defaultValue: "Pas ≈ {{m}}m", m: sp }),
+          details: t("calc.concrete.details.spacing_m", { defaultValue: "Spacing ≈ {{m}} m", m: sp }),
         });
       }
     }
@@ -403,7 +403,7 @@ export const ConcreteCalculator: React.FC<Props> = ({ onCalculate, initialArea, 
       const cost = area * prices.laborM2;
       add({
         id: "labor",
-        name: t("calc.concrete.materials.labor", { defaultValue: "Main d'œuvre (pose/finition)" }),
+        name: t("calc.concrete.materials.labor", { defaultValue: "Labor (placing/finishing)" }),
         quantity: parseFloat(area.toFixed(2)),
         unit: Unit.M2,
         unitPrice: prices.laborM2,
@@ -412,15 +412,15 @@ export const ConcreteCalculator: React.FC<Props> = ({ onCalculate, initialArea, 
       });
     }
 
-    details.push({ label: t("calc.concrete.kpi.area", { defaultValue: "Surface" }), value: area.toFixed(2), unit: "m²" });
-    details.push({ label: t("calc.concrete.kpi.thickness", { defaultValue: "Épaisseur" }), value: slabThick, unit: "cm" });
-    details.push({ label: t("calc.concrete.kpi.volume", { defaultValue: "Volume béton" }), value: volTotal.toFixed(2), unit: "m³" });
+    details.push({ label: t("calc.concrete.kpi.area", { defaultValue: "Area" }), value: area.toFixed(2), unit: "m²" });
+    details.push({ label: t("calc.concrete.kpi.thickness", { defaultValue: "Thickness" }), value: slabThick, unit: "cm" });
+    details.push({ label: t("calc.concrete.kpi.volume", { defaultValue: "Concrete volume" }), value: volTotal.toFixed(2), unit: "m³" });
 
     return {
       totalCost: parseFloat(totalCost.toFixed(2)),
       materials: materialsList,
       details,
-      summary: t("calc.concrete.summary", { defaultValue: "{{m3}} m³ de béton", m3: volTotal.toFixed(1) }),
+      summary: t("calc.concrete.summary", { defaultValue: "{{m3}} m³ of concrete", m3: volTotal.toFixed(1) }),
     };
   }, [
     shapeMode,
@@ -477,7 +477,7 @@ export const ConcreteCalculator: React.FC<Props> = ({ onCalculate, initialArea, 
           >
             {s === 1 && t("calc.concrete.steps.1", { defaultValue: "1. Dalle" })}
             {s === 2 && t("calc.concrete.steps.2", { defaultValue: "2. Couches" })}
-            {s === 3 && t("calc.concrete.steps.3", { defaultValue: "3. Béton" })}
+            {s === 3 && t("calc.concrete.steps.3", { defaultValue: "3. Concrete" })}
             {s === 4 && t("calc.concrete.steps.4", { defaultValue: "4. Devis" })}
           </button>
         ))}
@@ -489,7 +489,7 @@ export const ConcreteCalculator: React.FC<Props> = ({ onCalculate, initialArea, 
           <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
             <Info size={16} className="mr-2 shrink-0 mt-0.5" />
             {t("calc.concrete.step1.hint", {
-              defaultValue: "Définissez la surface et l’usage de la dalle pour pré-configurer les options.",
+              defaultValue: "Set slab area and usage to preconfigure options.",
             })}
           </div>
 
@@ -505,7 +505,7 @@ export const ConcreteCalculator: React.FC<Props> = ({ onCalculate, initialArea, 
                   usage === "interior" ? "bg-stone-100 border-stone-500 text-stone-800" : "bg-white text-slate-500"
                 }`}
               >
-                {t("calc.concrete.usage.interior", { defaultValue: "Intérieur" })}
+                {t("calc.concrete.usage.interior", { defaultValue: "Interior" })}
               </button>
               <button
                 type="button"
@@ -541,7 +541,7 @@ export const ConcreteCalculator: React.FC<Props> = ({ onCalculate, initialArea, 
               onClick={() => setShapeMode("area")}
               className={`flex-1 py-1.5 text-xs font-bold rounded ${shapeMode === "area" ? "bg-white shadow" : "text-slate-500"}`}
             >
-              {t("calc.concrete.shape.area", { defaultValue: "Surface" })}
+              {t("calc.concrete.shape.area", { defaultValue: "Area" })}
             </button>
           </div>
 
@@ -574,7 +574,7 @@ export const ConcreteCalculator: React.FC<Props> = ({ onCalculate, initialArea, 
             <div className="grid grid-cols-2 gap-4">
               <div className="col-span-2">
                 <label className="block text-xs font-bold text-slate-500 mb-1">
-                  {t("calc.concrete.inputs.area_m2", { defaultValue: "Surface (m²)" })}
+                  {t("calc.concrete.inputs.area_m2", { defaultValue: "Area (m²)" })}
                 </label>
                 <input
                   type="number"
@@ -585,7 +585,7 @@ export const ConcreteCalculator: React.FC<Props> = ({ onCalculate, initialArea, 
               </div>
               <div className="col-span-2">
                 <label className="block text-xs font-bold text-slate-500 mb-1">
-                  {t("calc.concrete.inputs.perimeter_m", { defaultValue: "Périmètre (m)" })}{" "}
+                  {t("calc.concrete.inputs.perimeter_m", { defaultValue: "Perimeter (m)" })}{" "}
                   <span className="text-[10px] font-normal text-slate-400">
                     {t("calc.concrete.inputs.perimeter_opt", { defaultValue: "(optionnel, utile pour coffrage)" })}
                   </span>
@@ -615,13 +615,13 @@ export const ConcreteCalculator: React.FC<Props> = ({ onCalculate, initialArea, 
         <div className="space-y-4">
           <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
             <Layers size={16} className="mr-2 shrink-0 mt-0.5" />
-            {t("calc.concrete.step2.hint", { defaultValue: "Couches de préparation sous la dalle." })}
+            {t("calc.concrete.step2.hint", { defaultValue: "Preparation layers under the slab." })}
           </div>
 
           <div className="bg-white p-3 rounded-lg border border-slate-200 space-y-3">
             <div>
               <label className="flex items-center justify-between mb-2">
-                <span className="text-sm font-bold text-slate-700">{t("calc.concrete.layers.herisson_cm", { defaultValue: "Hérisson (cm)" })}</span>
+                <span className="text-sm font-bold text-slate-700">{t("calc.concrete.layers.herisson_cm", { defaultValue: "Sub-base (cm)" })}</span>
                 <input
                   type="number"
                   value={layerHerisson}
@@ -629,7 +629,7 @@ export const ConcreteCalculator: React.FC<Props> = ({ onCalculate, initialArea, 
                   className="w-20 p-1 text-sm border rounded text-right bg-white text-slate-900"
                 />
               </label>
-              <p className="text-[10px] text-slate-400">{t("calc.concrete.layers.herisson_help", { defaultValue: "Couche drainante compactée." })}</p>
+              <p className="text-[10px] text-slate-400">{t("calc.concrete.layers.herisson_help", { defaultValue: "Compacted draining layer." })}</p>
             </div>
 
             <div className="border-t border-slate-100 pt-2">
@@ -646,7 +646,7 @@ export const ConcreteCalculator: React.FC<Props> = ({ onCalculate, initialArea, 
               </label>
               {useInsulation && (
                 <div className="flex items-center justify-between pl-4">
-                  <span className="text-xs text-slate-500">{t("calc.concrete.layers.insulation_thickness", { defaultValue: "Épaisseur (cm)" })}</span>
+                  <span className="text-xs text-slate-500">{t("calc.concrete.layers.insulation_thickness", { defaultValue: "Thickness (cm)" })}</span>
                   <input
                     type="number"
                     value={insulThick}
@@ -659,7 +659,7 @@ export const ConcreteCalculator: React.FC<Props> = ({ onCalculate, initialArea, 
 
             <div className="border-t border-slate-100 pt-2">
               <label className="flex items-center justify-between cursor-pointer">
-                <span className="text-sm font-bold text-slate-700">{t("calc.concrete.layers.edge_strip", { defaultValue: "Bande périphérique" })}</span>
+                <span className="text-sm font-bold text-slate-700">{t("calc.concrete.layers.edge_strip", { defaultValue: "Perimeter strip" })}</span>
                 <input type="checkbox" checked={useEdgeStrip} onChange={(e) => setUseEdgeStrip(e.target.checked)} className="h-5 w-5 text-blue-600 rounded" />
               </label>
             </div>
@@ -681,12 +681,12 @@ export const ConcreteCalculator: React.FC<Props> = ({ onCalculate, initialArea, 
         <div className="space-y-4">
           <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
             <Truck size={16} className="mr-2 shrink-0 mt-0.5" />
-            {t("calc.concrete.step3.hint", { defaultValue: "Configuration du béton, ferraillage, coffrage et joints." })}
+            {t("calc.concrete.step3.hint", { defaultValue: "Concrete setup, reinforcement, formwork and joints." })}
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-slate-500 mb-1">{t("calc.concrete.concrete.slab_thickness_cm", { defaultValue: "Épaisseur dalle (cm)" })}</label>
+              <label className="block text-xs font-bold text-slate-500 mb-1">{t("calc.concrete.concrete.slab_thickness_cm", { defaultValue: "Thickness dalle (cm)" })}</label>
               <input type="number" value={slabThick} onChange={(e) => setSlabThick(e.target.value)} className="w-full p-2 border rounded font-bold text-slate-900 bg-white" />
             </div>
             <div>
@@ -697,7 +697,7 @@ export const ConcreteCalculator: React.FC<Props> = ({ onCalculate, initialArea, 
 
           <div className="bg-slate-50 p-3 rounded-lg border border-slate-200">
             <div className="flex justify-between items-center mb-3">
-              <span className="text-sm font-bold text-slate-700">{t("calc.concrete.concrete.type", { defaultValue: "Type de béton" })}</span>
+              <span className="text-sm font-bold text-slate-700">{t("calc.concrete.concrete.type", { defaultValue: "Concrete type" })}</span>
               <div className="flex bg-white rounded border border-slate-200 p-0.5">
                 <button
                   type="button"
@@ -711,7 +711,7 @@ export const ConcreteCalculator: React.FC<Props> = ({ onCalculate, initialArea, 
                   onClick={() => setIsBPE(false)}
                   className={`px-2 py-1 text-xs rounded ${!isBPE ? "bg-blue-100 text-blue-700 font-bold" : "text-slate-500"}`}
                 >
-                  {t("calc.concrete.concrete.site_mix", { defaultValue: "Bétonnière" })}
+                  {t("calc.concrete.concrete.site_mix", { defaultValue: "Site mix" })}
                 </button>
               </div>
             </div>
@@ -748,7 +748,7 @@ export const ConcreteCalculator: React.FC<Props> = ({ onCalculate, initialArea, 
             <div className="flex items-center justify-between p-2 border rounded bg-white">
               <div className="flex items-center">
                 <input type="checkbox" checked={useMesh} onChange={(e) => setUseMesh(e.target.checked)} className="h-4 w-4 text-blue-600 rounded mr-2" />
-                <span className="text-sm font-medium">{t("calc.concrete.structure.mesh", { defaultValue: "Treillis soudé" })}</span>
+                <span className="text-sm font-medium">{t("calc.concrete.structure.mesh", { defaultValue: "Welded mesh" })}</span>
               </div>
               {useMesh && (
                 <select value={meshTypeId} onChange={(e) => setMeshTypeId(e.target.value)} className="text-xs p-1 border rounded max-w-[140px] bg-white text-slate-900">
@@ -762,7 +762,7 @@ export const ConcreteCalculator: React.FC<Props> = ({ onCalculate, initialArea, 
             </div>
 
             <label className="flex items-center justify-between p-2 border rounded bg-white">
-              <span className="text-sm font-medium">{t("calc.concrete.structure.formwork", { defaultValue: "Coffrage périphérique" })}</span>
+              <span className="text-sm font-medium">{t("calc.concrete.structure.formwork", { defaultValue: "Perimeter formwork" })}</span>
               <input type="checkbox" checked={useFormwork} onChange={(e) => setUseFormwork(e.target.checked)} className="h-4 w-4 text-blue-600 rounded" />
             </label>
 
@@ -811,30 +811,30 @@ export const ConcreteCalculator: React.FC<Props> = ({ onCalculate, initialArea, 
             {isBPE ? (
               <div className="grid grid-cols-2 gap-3 bg-blue-50 p-3 rounded border border-blue-100">
                 <div>
-                  <label className="block text-[10px] uppercase font-bold text-blue-800 mb-1">{t("calc.concrete.prices.bpe_m3", { defaultValue: "Béton BPE (€/m³)" })}</label>
+                  <label className="block text-[10px] uppercase font-bold text-blue-800 mb-1">{t("calc.concrete.prices.bpe_m3", { defaultValue: "Ready-mix (€/m³)" })}</label>
                   <input type="number" value={prices.concreteBPE} onChange={(e) => updatePrice("concreteBPE", e.target.value)} className="w-full p-2 text-sm border rounded bg-white text-slate-900" />
                 </div>
                 <div>
-                  <label className="block text-[10px] uppercase font-bold text-blue-800 mb-1">{t("calc.concrete.prices.delivery", { defaultValue: "Livraison (€)" })}</label>
+                  <label className="block text-[10px] uppercase font-bold text-blue-800 mb-1">{t("calc.concrete.prices.delivery", { defaultValue: "Delivery (€)" })}</label>
                   <input type="number" value={prices.delivery} onChange={(e) => updatePrice("delivery", e.target.value)} className="w-full p-2 text-sm border rounded bg-white text-slate-900" />
                 </div>
                 <div className="col-span-2">
-                  <label className="block text-[10px] uppercase font-bold text-blue-800 mb-1">{t("calc.concrete.prices.pump", { defaultValue: "Pompe (€)" })}</label>
+                  <label className="block text-[10px] uppercase font-bold text-blue-800 mb-1">{t("calc.concrete.prices.pump", { defaultValue: "Pump (€)" })}</label>
                   <input type="number" value={prices.pump} onChange={(e) => updatePrice("pump", e.target.value)} className="w-full p-2 text-sm border rounded bg-white text-slate-900" />
                 </div>
               </div>
             ) : (
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[10px] uppercase font-bold text-slate-500 mb-1">{t("calc.concrete.prices.cement_bag", { defaultValue: "Ciment (€/sac)" })}</label>
+                  <label className="block text-[10px] uppercase font-bold text-slate-500 mb-1">{t("calc.concrete.prices.cement_bag", { defaultValue: "Cement (€/bag)" })}</label>
                   <input type="number" value={prices.cementBag} onChange={(e) => updatePrice("cementBag", e.target.value)} className="w-full p-2 text-sm border rounded bg-white text-slate-900" />
                 </div>
                 <div>
-                  <label className="block text-[10px] uppercase font-bold text-slate-500 mb-1">{t("calc.concrete.prices.sand_ton", { defaultValue: "Sable (€/t)" })}</label>
+                  <label className="block text-[10px] uppercase font-bold text-slate-500 mb-1">{t("calc.concrete.prices.sand_ton", { defaultValue: "Sand (€/t)" })}</label>
                   <input type="number" value={prices.sandTon} onChange={(e) => updatePrice("sandTon", e.target.value)} className="w-full p-2 text-sm border rounded bg-white text-slate-900" />
                 </div>
                 <div>
-                  <label className="block text-[10px] uppercase font-bold text-slate-500 mb-1">{t("calc.concrete.prices.gravel_ton", { defaultValue: "Gravier (€/t)" })}</label>
+                  <label className="block text-[10px] uppercase font-bold text-slate-500 mb-1">{t("calc.concrete.prices.gravel_ton", { defaultValue: "Gravel (€/t)" })}</label>
                   <input type="number" value={prices.gravelTon} onChange={(e) => updatePrice("gravelTon", e.target.value)} className="w-full p-2 text-sm border rounded bg-white text-slate-900" />
                 </div>
               </div>
@@ -842,18 +842,18 @@ export const ConcreteCalculator: React.FC<Props> = ({ onCalculate, initialArea, 
 
             <div className="grid grid-cols-2 gap-3 mt-3">
               <div>
-                <label className="block text-[10px] uppercase font-bold text-slate-500 mb-1">{t("calc.concrete.prices.mesh_panel", { defaultValue: "Treillis (€/panneau)" })}</label>
+                <label className="block text-[10px] uppercase font-bold text-slate-500 mb-1">{t("calc.concrete.prices.mesh_panel", { defaultValue: "Mesh panel (€/panel)" })}</label>
                 <input type="number" value={prices.meshPanel} onChange={(e) => updatePrice("meshPanel", e.target.value)} className="w-full p-2 text-sm border rounded bg-white text-slate-900" />
               </div>
               <div>
-                <label className="block text-[10px] uppercase font-bold text-slate-500 mb-1">{t("calc.concrete.prices.formwork_m2", { defaultValue: "Coffrage (€/m²)" })}</label>
+                <label className="block text-[10px] uppercase font-bold text-slate-500 mb-1">{t("calc.concrete.prices.formwork_m2", { defaultValue: "Formwork (€/m²)" })}</label>
                 <input type="number" value={prices.formworkM2} onChange={(e) => updatePrice("formworkM2", e.target.value)} className="w-full p-2 text-sm border rounded bg-white text-slate-900" />
               </div>
             </div>
 
             {proMode && (
               <div className="mt-4 pt-3 border-t border-slate-100">
-                <label className="block text-[10px] text-blue-600 font-bold mb-1">{t("calc.concrete.prices.labor_m2", { defaultValue: "MO (€/m²)" })}</label>
+                <label className="block text-[10px] text-blue-600 font-bold mb-1">{t("calc.concrete.prices.labor_m2", { defaultValue: "Labor (€/m²)" })}</label>
                 <input type="number" value={prices.laborM2} onChange={(e) => updatePrice("laborM2", e.target.value)} className="w-full p-2 text-sm border border-blue-200 rounded bg-white text-slate-900" />
               </div>
             )}
@@ -864,7 +864,7 @@ export const ConcreteCalculator: React.FC<Props> = ({ onCalculate, initialArea, 
               {t("common.back", { defaultValue: "Back" })}
             </button>
             <button type="button" disabled className="flex-1 py-3 bg-emerald-100 text-emerald-700 rounded-xl font-bold flex justify-center items-center">
-              <Check size={18} className="mr-2" /> {t("calc.concrete.calculated", { defaultValue: "Calculé" })}
+              <Check size={18} className="mr-2" /> {t("calc.concrete.calculated", { defaultValue: "Calculated" })}
             </button>
           </div>
         </div>

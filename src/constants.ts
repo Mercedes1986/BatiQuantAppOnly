@@ -750,6 +750,56 @@ export const STATIC_TIPS: Record<string, string[]> = {
     tr("tips.concrete.3", "Lift the mesh with spacers so it sits in the concrete, not on the ground."),
     tr("tips.concrete.4", "Plan expansion joints every 15–20m² to prevent cracking."),
   ],
+  [CalculatorType.FOUNDATIONS]: [
+    tr("tips.foundations.1", "Double-check frost depth and soil conditions before sizing footings."),
+    tr("tips.foundations.2", "Keep reinforcement properly covered (concrete cover) to avoid corrosion."),
+    tr("tips.foundations.3", "Plan access for the mixer truck/pump early (turning radius, hose path)."),
+  ],
+  [CalculatorType.SUBSTRUCTURE]: [
+    tr("tips.substructure.1", "Waterproofing should go on a clean, dry surface — and protect it with a drainage membrane."),
+    tr("tips.substructure.2", "Always include weep points/manholes for perimeter drains to allow inspection."),
+    tr("tips.substructure.3", "On shuttering blocks, calculate fill concrete separately — it depends on the block type."),
+  ],
+  [CalculatorType.WALLS]: [
+    tr("tips.walls.1", "Check bond pattern and keep joints consistent to reduce waste and improve alignment."),
+    tr("tips.walls.2", "Don’t forget lintel bearings and horizontal ring beams where required."),
+  ],
+  [CalculatorType.PLACO]: [
+    tr("tips.placo.1", "Stagger board joints and keep screws ~30cm apart for standard drywall."),
+    tr("tips.placo.2", "Add acoustic tape under tracks to reduce sound bridges (partitions)."),
+  ],
+  [CalculatorType.ELECTRICITY]: [
+    tr("tips.elec.1", "Group circuits by use and keep dedicated lines for major appliances."),
+    tr("tips.elec.2", "Plan routes before cutting: shorter runs reduce cable, conduit and labor."),
+  ],
+  [CalculatorType.PLUMBING]: [
+    tr("tips.plumbing.1", "Prefer a manifold layout when maintenance access is easy — it simplifies balancing."),
+    tr("tips.plumbing.2", "Keep proper slopes on drains and avoid too many tight bends."),
+  ],
+  [CalculatorType.ROOF]: [
+    tr("tips.roof.1", "Verify minimum slopes required for your roofing material (tiles, zinc, membranes)."),
+    tr("tips.roof.2", "Add waste for cuts around valleys, hips and penetrations."),
+  ],
+  [CalculatorType.SCREED]: [
+    tr("tips.screed.1", "Respect curing and drying times before laying floor finishes."),
+    tr("tips.screed.2", "Use edge strip to reduce cracking and improve acoustics."),
+  ],
+  [CalculatorType.RAGREAGE]: [
+    tr("tips.leveling.1", "Primer is key — it improves adhesion and reduces bubbles on porous substrates."),
+    tr("tips.leveling.2", "For thick applications, consider fiber or mesh depending on the substrate."),
+  ],
+  [CalculatorType.TILES]: [
+    tr("tips.tiles.1", "Dry-lay a few tiles first to validate layout and minimize small edge cuts."),
+    tr("tips.tiles.2", "Use the right trowel size: larger tiles require more adhesive and often back-buttering."),
+  ],
+  [CalculatorType.FACADE]: [
+    tr("tips.facade.1", "Check substrate compatibility between render and paint systems (vapor permeability)."),
+    tr("tips.facade.2", "Plan scaffolding early — it often drives a big share of the cost."),
+  ],
+  [CalculatorType.EXTERIOR]: [
+    tr("tips.exterior.1", "Compact in layers: most outdoor failures come from insufficient base preparation."),
+    tr("tips.exterior.2", "Add drainage considerations (slope away from buildings, permeable layers)."),
+  ],
 };
 
 /* -------------------------------------------------------

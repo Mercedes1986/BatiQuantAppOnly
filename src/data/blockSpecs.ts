@@ -20,7 +20,7 @@ export type WallBlockSpec = {
 export const WALL_BLOCK_SPECS: WallBlockSpec[] = [
   {
     id: "parpaing-20",
-    label: tr("wallspecs.parpaing20", "Parpaing creux 20×20×50 (standard)"),
+    label: tr("wallspecs.parpaing20", "Hollow concrete block 20×20×50 (standard)"),
     family: "parpaing",
     thicknessCm: 20,
     dimsCm: { l: 50, h: 20, p: 20 },
@@ -29,7 +29,7 @@ export const WALL_BLOCK_SPECS: WallBlockSpec[] = [
   },
   {
     id: "parpaing-15",
-    label: tr("wallspecs.parpaing15", "Parpaing creux 15×20×50"),
+    label: tr("wallspecs.parpaing15", "Hollow concrete block 15×20×50"),
     family: "parpaing",
     thicknessCm: 15,
     dimsCm: { l: 50, h: 20, p: 15 },
@@ -38,7 +38,7 @@ export const WALL_BLOCK_SPECS: WallBlockSpec[] = [
   },
   {
     id: "parpaing-10",
-    label: tr("wallspecs.parpaing10", "Parpaing creux 10×20×50"),
+    label: tr("wallspecs.parpaing10", "Hollow concrete block 10×20×50"),
     family: "parpaing",
     thicknessCm: 10,
     dimsCm: { l: 50, h: 20, p: 10 },
@@ -47,7 +47,7 @@ export const WALL_BLOCK_SPECS: WallBlockSpec[] = [
   },
   {
     id: "parpaing-25",
-    label: tr("wallspecs.parpaing25", "Parpaing creux 25×20×50"),
+    label: tr("wallspecs.parpaing25", "Hollow concrete block 25×20×50"),
     family: "parpaing",
     thicknessCm: 25,
     dimsCm: { l: 50, h: 20, p: 25 },
@@ -57,7 +57,7 @@ export const WALL_BLOCK_SPECS: WallBlockSpec[] = [
 
   {
     id: "brique-g7-roulee",
-    label: tr("wallspecs.brick_g7", "Brique roulée (G7 / Optibric) — (exemple)"),
+    label: tr("wallspecs.brick_g7", "Rolled brick (G7 / Optibric) — example"),
     family: "brique",
     thicknessCm: 20,
     dimsCm: { l: 50, h: 20, p: 20 },
@@ -67,7 +67,7 @@ export const WALL_BLOCK_SPECS: WallBlockSpec[] = [
 
   {
     id: "siporex-60x25-20",
-    label: tr("wallspecs.cellular_60x25x20", "Béton cellulaire 60×25×20"),
+    label: tr("wallspecs.cellular_60x25x20", "AAC block 60×25×20"),
     family: "cellulaire",
     thicknessCm: 20,
     dimsCm: { l: 60, h: 25, p: 20 },
@@ -77,7 +77,7 @@ export const WALL_BLOCK_SPECS: WallBlockSpec[] = [
 
   {
     id: "stepoc-20",
-    label: tr("wallspecs.stepoc20", "Bloc à bancher (Stepoc) 20"),
+    label: tr("wallspecs.stepoc20", "Shuttering block (Stepoc) 20"),
     family: "stepoc",
     thicknessCm: 20,
     dimsCm: { l: 50, h: 20, p: 20 },
@@ -87,7 +87,7 @@ export const WALL_BLOCK_SPECS: WallBlockSpec[] = [
   },
   {
     id: "stepoc-25",
-    label: tr("wallspecs.stepoc25", "Bloc à bancher (Stepoc) 25"),
+    label: tr("wallspecs.stepoc25", "Shuttering block (Stepoc) 25"),
     family: "stepoc",
     thicknessCm: 25,
     dimsCm: { l: 50, h: 20, p: 25 },

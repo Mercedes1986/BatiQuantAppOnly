@@ -6,6 +6,9 @@ import {
   CalculatorType,
 } from "../types";
 import { SOIL_PROPERTIES } from "../constants";
+import i18next from "i18next";
+
+const tr = (key: string, fallbackEn: string) => i18next.t(key, { defaultValue: fallbackEn });
 
 interface FoundationsResult {
   volumes: {
@@ -162,14 +165,14 @@ export const calculateFoundations = (
     const cost = volConcrete * p("CONC_M3");
     materials.push({
       id: "conc",
-      name: "Béton de fondation (C25/30)",
+      name: tr("calc.foundations.mat.foundation_concrete", "Foundation concrete (C25/30)"),
       quantity: r2(volConcrete),
       quantityRaw: volConcrete,
       unit: Unit.M3,
       unitPrice: p("CONC_M3"),
       totalPrice: r2(cost),
       category: CalculatorType.FOUNDATIONS,
-      details: "Dosage standard structure",
+      details: tr("calc.foundations.mat.foundation_concrete_note", "Standard structural mix"),
     });
   }
 
@@ -178,7 +181,7 @@ export const calculateFoundations = (
     const cost = steelKg * p("STEEL_KG");
     materials.push({
       id: "steel",
-      name: "Acier (Ratio moyen)",
+      name: tr("calc.foundations.mat.steel", "Steel (average ratio)"),
       quantity: Math.ceil(steelKg),
       quantityRaw: steelKg,
       unit: Unit.KG,
@@ -194,7 +197,7 @@ export const calculateFoundations = (
     const cost = volExcavation * p("EXCAV_M3");
     materials.push({
       id: "excav",
-      name: "Terrassement (Fouilles)",
+      name: tr("calc.foundations.mat.excavation", "Excavation"),
       quantity: r2(volExcavation),
       quantityRaw: volExcavation,
       unit: Unit.M3,
@@ -209,7 +212,7 @@ export const calculateFoundations = (
     const cost = volCleanConcrete * p("LEANCONC_M3");
     materials.push({
       id: "clean_conc",
-      name: "Béton de propreté",
+      name: tr("calc.foundations.mat.clean_concrete", "Blinding concrete"),
       quantity: r2(volCleanConcrete),
       quantityRaw: volCleanConcrete,
       unit: Unit.M3,
@@ -240,14 +243,14 @@ export const calculateFoundations = (
     const cost = volEvac * p("WASTE_M3");
     materials.push({
       id: "evac",
-      name: "Évacuation des terres",
+      name: tr("calc.foundations.mat.evac", "Soil disposal"),
       quantity: r2(volEvac),
       quantityRaw: volEvac,
       unit: Unit.M3,
       unitPrice: p("WASTE_M3"),
       totalPrice: r2(cost),
       category: CalculatorType.GROUNDWORK,
-      details: `Foisonnement x${n0(soilProp.bulkingFactor)}`,
+      details: tr("calc.foundations.mat.evac_swell", `Bulking factor ×${n0(soilProp.bulkingFactor)}`),
     });
   }
 
@@ -304,11 +307,11 @@ export const calculateFoundations = (
   // --- 5. Warnings ---
   if (n0(inputs.frostDepthCm) > 0 && n0(inputs.excavationDepthCm) < n0(inputs.frostDepthCm)) {
     warnings.push(
-      `Profondeur de fouille (${n0(inputs.excavationDepthCm)}cm) < hors-gel (${n0(inputs.frostDepthCm)}cm).`
+      tr("calc.foundations.warn_depth_lt_frost", `Excavation depth (${n0(inputs.excavationDepthCm)} cm) is below frost depth (${n0(inputs.frostDepthCm)} cm).`)
     );
   }
   if (inputs.soilType === "clay") {
-    warnings.push("Sol argileux : risque de retrait-gonflement. Étude de sol recommandée.");
+    warnings.push(tr("calc.foundations.warn_clay_risk", "Clay soil: shrink–swell risk. A soil study is recommended."));
   }
   if (inputs.groundwater && !inputs.drainage) {
     warnings.push("Nappe possible : drainage fortement recommandé.");

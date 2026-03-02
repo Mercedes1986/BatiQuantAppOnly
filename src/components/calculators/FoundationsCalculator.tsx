@@ -153,7 +153,7 @@ export const FoundationsCalculator: React.FC<Props> = ({ onCalculate, initialMod
     ft === "strip"
       ? t("struct.fd.strip", { defaultValue: "Filantes" })
       : ft === "pad"
-      ? t("struct.fd.pads", { defaultValue: "Isolées" })
+      ? t("struct.fd.pads", { defaultValue: "Pads" })
       : t("struct.fd.grade_beam", { defaultValue: "Longrines" });
 
   // --- CALCULATE ---
@@ -226,9 +226,9 @@ export const FoundationsCalculator: React.FC<Props> = ({ onCalculate, initialMod
       summary: `${(results.volumes?.concrete ?? 0).toFixed(1)} m³`,
       details: [
         { label: t("common.type", { defaultValue: "Type" }), value: foundationTypeLabel(type), unit: "" },
-        { label: t("struct.fd.total_concrete", { defaultValue: "Béton" }), value: (results.volumes?.concrete ?? 0).toFixed(1), unit: "m³" },
+        { label: t("struct.fd.total_concrete", { defaultValue: "Concrete" }), value: (results.volumes?.concrete ?? 0).toFixed(1), unit: "m³" },
         { label: t("struct.walls.chainage_steel", { defaultValue: "Acier" }), value: (results.quantities?.steel ?? 0).toFixed(0), unit: "kg" },
-        { label: t("struct.fd.excav", { defaultValue: "Terrassement" }), value: (results.volumes?.excavation ?? 0).toFixed(1), unit: "m³" },
+        { label: t("struct.fd.excav", { defaultValue: "Excavation" }), value: (results.volumes?.excavation ?? 0).toFixed(1), unit: "m³" },
       ],
       materials: results.materials || [],
       totalCost: total,
@@ -259,7 +259,7 @@ export const FoundationsCalculator: React.FC<Props> = ({ onCalculate, initialMod
               {s === 1
                 ? t("common.type", { defaultValue: "Type" })
                 : s === 2
-                ? t("struct.common.geometry", { defaultValue: "Géo." })
+                ? t("struct.common.geometry", { defaultValue: "Geom." })
                 : s === 3
                 ? t("struct.fd.soil", { defaultValue: "Sol" })
                 : s === 4
@@ -282,7 +282,7 @@ export const FoundationsCalculator: React.FC<Props> = ({ onCalculate, initialMod
               <p className="font-bold">{t("struct.fd.title", { defaultValue: "Fondations" })}</p>
               <p className="opacity-80 mt-1">
                 {t("struct.fd.subtitle", {
-                  defaultValue: "Béton, acier, terrassement et évacuation en une seule estimation.",
+                  defaultValue: "Concrete, steel, excavation and disposal in one estimate.",
                 })}
               </p>
             </div>
@@ -302,7 +302,7 @@ export const FoundationsCalculator: React.FC<Props> = ({ onCalculate, initialMod
                 </div>
                 <div>
                   <span className="block font-bold text-slate-800">{t("struct.fd.strip", { defaultValue: "Semelles filantes" })}</span>
-                  <span className="text-xs text-slate-500">{t("struct.fd.strip_hint", { defaultValue: "Pour murs porteurs linéaires" })}</span>
+                  <span className="text-xs text-slate-500">{t("struct.fd.strip_hint", { defaultValue: "Under load-bearing walls" })}</span>
                 </div>
               </div>
             </button>
@@ -319,7 +319,7 @@ export const FoundationsCalculator: React.FC<Props> = ({ onCalculate, initialMod
                   <BoxSelect size={24} />
                 </div>
                 <div>
-                  <span className="block font-bold text-slate-800">{t("struct.fd.pads", { defaultValue: "Semelles isolées" })}</span>
+                  <span className="block font-bold text-slate-800">{t("struct.fd.pads", { defaultValue: "Pad footings" })}</span>
                   <span className="text-xs text-slate-500">{t("struct.fd.pads_hint", { defaultValue: "Pour poteaux ponctuels" })}</span>
                 </div>
               </div>
@@ -392,7 +392,7 @@ export const FoundationsCalculator: React.FC<Props> = ({ onCalculate, initialMod
 
                     <div className="grid grid-cols-2 gap-3 mb-2">
                       <div>
-                        <label className={labelClass}>{t("struct.common.qty", { defaultValue: "Quantité" })}</label>
+                        <label className={labelClass}>{t("struct.common.qty", { defaultValue: "Quantity" })}</label>
                         <input type="number" value={pad.count} onChange={(e) => updatePad(pad.id, "count", Number(e.target.value))} className={inputClass} />
                       </div>
                       <div>
@@ -476,7 +476,7 @@ export const FoundationsCalculator: React.FC<Props> = ({ onCalculate, initialMod
             {soilObj?.id === "clay" && (
               <div className="flex items-start text-xs text-amber-700 bg-amber-50 p-3 rounded-lg mt-2 border border-amber-100">
                 <AlertTriangle size={16} className="mr-2 shrink-0" />
-                {t("struct.fd.warn_clay", { defaultValue: "Sol argileux : risque retrait-gonflement. Étude de sol recommandée." })}
+                {t("struct.fd.warn_clay", { defaultValue: "Clay soil: shrink–swell risk. A soil study is recommended." })}
               </div>
             )}
           </div>
@@ -493,7 +493,7 @@ export const FoundationsCalculator: React.FC<Props> = ({ onCalculate, initialMod
               <div className="flex items-center pt-6">
                 <label className="flex items-center cursor-pointer">
                   <input type="checkbox" checked={groundwater} onChange={(e) => setGroundwater(e.target.checked)} className="h-5 w-5 text-blue-600 rounded mr-3" />
-                  <span className="text-sm font-medium text-slate-700">{t("struct.fd.groundwater", { defaultValue: "Nappe phréatique" })}</span>
+                  <span className="text-sm font-medium text-slate-700">{t("struct.fd.groundwater", { defaultValue: "Groundwater" })}</span>
                 </label>
               </div>
             </div>
@@ -530,7 +530,7 @@ export const FoundationsCalculator: React.FC<Props> = ({ onCalculate, initialMod
 
             <div>
               <div className="flex justify-between mb-1">
-                <label className={labelClass}>{t("struct.fd.steel_ratio", { defaultValue: "Densité acier (kg/m³)" })}</label>
+                <label className={labelClass}>{t("struct.fd.steel_ratio", { defaultValue: "Steel ratio (kg/m³)" })}</label>
                 <span className="text-xs font-bold text-blue-600 bg-blue-50 px-2 rounded">{steelRatio} kg/m³</span>
               </div>
 
@@ -566,7 +566,7 @@ export const FoundationsCalculator: React.FC<Props> = ({ onCalculate, initialMod
             <div className="space-y-3">
               <label className="flex items-center justify-between p-3 border rounded-lg hover:bg-slate-50 cursor-pointer">
                 <div>
-                  <span className="font-bold text-sm text-slate-700 block">{t("struct.fd.clean_concrete", { defaultValue: "Béton de propreté" })}</span>
+                  <span className="font-bold text-sm text-slate-700 block">{t("struct.fd.clean_concrete", { defaultValue: "Blinding concrete" })}</span>
                   <span className="text-xs text-slate-400">{t("struct.fd.clean_concrete_hint", { defaultValue: "Sous fondations (rec. 5cm)" })}</span>
                 </div>
                 <input type="checkbox" checked={cleanConcrete} onChange={(e) => setCleanConcrete(e.target.checked)} className="h-5 w-5 text-blue-600 rounded" />
@@ -575,7 +575,7 @@ export const FoundationsCalculator: React.FC<Props> = ({ onCalculate, initialMod
               {cleanConcrete && (
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className={labelClass}>{t("struct.common.thickness", { defaultValue: "Épaisseur" })} (cm)</label>
+                    <label className={labelClass}>{t("struct.common.thickness", { defaultValue: "Thickness" })} (cm)</label>
                     <input type="number" value={cleanConcreteThickCm} onChange={(e) => setCleanConcreteThickCm(e.target.value)} className={inputClass} />
                   </div>
                 </div>
@@ -583,7 +583,7 @@ export const FoundationsCalculator: React.FC<Props> = ({ onCalculate, initialMod
 
               <label className="flex items-center justify-between p-3 border rounded-lg hover:bg-slate-50 cursor-pointer">
                 <div>
-                  <span className="font-bold text-sm text-slate-700 block">{t("struct.fd.formwork", { defaultValue: "Coffrage" })}</span>
+                  <span className="font-bold text-sm text-slate-700 block">{t("struct.fd.formwork", { defaultValue: "Formwork" })}</span>
                   <span className="text-xs text-slate-400">{t("struct.fd.formwork_hint", { defaultValue: "Si terrain instable ou hors-sol" })}</span>
                 </div>
                 <input type="checkbox" checked={formwork} onChange={(e) => setFormwork(e.target.checked)} className="h-5 w-5 text-blue-600 rounded" />
@@ -591,8 +591,8 @@ export const FoundationsCalculator: React.FC<Props> = ({ onCalculate, initialMod
 
               <label className="flex items-center justify-between p-3 border rounded-lg hover:bg-slate-50 cursor-pointer">
                 <div>
-                  <span className="font-bold text-sm text-slate-700 block">{t("struct.fd.drain", { defaultValue: "Drainage périphérique" })}</span>
-                  <span className="text-xs text-slate-400">{t("struct.fd.drain_hint", { defaultValue: "Drain + gravier + géotextile" })}</span>
+                  <span className="font-bold text-sm text-slate-700 block">{t("struct.fd.drain", { defaultValue: "Perimeter drainage" })}</span>
+                  <span className="text-xs text-slate-400">{t("struct.fd.drain_hint", { defaultValue: "Drain + gravel + geotextile" })}</span>
                 </div>
                 <input type="checkbox" checked={drainage} onChange={(e) => setDrainage(e.target.checked)} className="h-5 w-5 text-blue-600 rounded" />
               </label>
@@ -600,7 +600,7 @@ export const FoundationsCalculator: React.FC<Props> = ({ onCalculate, initialMod
               {drainage && (
                 <label className="flex items-center justify-between p-3 border rounded-lg hover:bg-slate-50 cursor-pointer">
                   <div>
-                    <span className="font-bold text-sm text-slate-700 block">{t("struct.fd.drain_gravel", { defaultValue: "Gravier drainage" })}</span>
+                    <span className="font-bold text-sm text-slate-700 block">{t("struct.fd.drain_gravel", { defaultValue: "Drain gravel" })}</span>
                     <span className="text-xs text-slate-400">{t("struct.fd.drain_gravel_hint", { defaultValue: "Lit drainant autour du drain" })}</span>
                   </div>
                   <input type="checkbox" checked={drainageGravel} onChange={(e) => setDrainageGravel(e.target.checked)} className="h-5 w-5 text-blue-600 rounded" />
@@ -609,15 +609,15 @@ export const FoundationsCalculator: React.FC<Props> = ({ onCalculate, initialMod
 
               <label className="flex items-center justify-between p-3 border rounded-lg hover:bg-slate-50 cursor-pointer">
                 <div>
-                  <span className="font-bold text-sm text-slate-700 block">{t("struct.fd.evac", { defaultValue: "Évacuation des terres" })}</span>
-                  <span className="text-xs text-slate-400">{t("struct.fd.evac_hint", { defaultValue: "Mise en décharge (foisonné)" })}</span>
+                  <span className="font-bold text-sm text-slate-700 block">{t("struct.fd.evac", { defaultValue: "Soil disposal" })}</span>
+                  <span className="text-xs text-slate-400">{t("struct.fd.evac_hint", { defaultValue: "Disposal (bulked)" })}</span>
                 </div>
                 <input type="checkbox" checked={evacuateSpoil} onChange={(e) => setEvacuateSpoil(e.target.checked)} className="h-5 w-5 text-blue-600 rounded" />
               </label>
 
               <label className="flex items-center justify-between p-3 border rounded-lg hover:bg-slate-50 cursor-pointer">
                 <div>
-                  <span className="font-bold text-sm text-slate-700 block">{t("struct.fd.reuse", { defaultValue: "Réutilisation sur site" })}</span>
+                  <span className="font-bold text-sm text-slate-700 block">{t("struct.fd.reuse", { defaultValue: "Reuse on site" })}</span>
                   <span className="text-xs text-slate-400">{t("struct.fd.reuse_hint", { defaultValue: "Garder une partie pour remblai" })}</span>
                 </div>
                 <input type="checkbox" checked={reuseSpoil} onChange={(e) => setReuseSpoil(e.target.checked)} className="h-5 w-5 text-blue-600 rounded" />
@@ -647,32 +647,32 @@ export const FoundationsCalculator: React.FC<Props> = ({ onCalculate, initialMod
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className={labelClass}>{t("struct.fd.price_concrete", { defaultValue: "Béton (€/m³)" })}</label>
+                <label className={labelClass}>{t("struct.fd.price_concrete", { defaultValue: "Concrete (€/m³)" })}</label>
                 <input type="number" value={prices.CONC_M3} onChange={(e) => updatePrice("CONC_M3", e.target.value)} className={inputClass} />
               </div>
               <div>
-                <label className={labelClass}>{t("struct.fd.price_steel", { defaultValue: "Acier (€/kg)" })}</label>
+                <label className={labelClass}>{t("struct.fd.price_steel", { defaultValue: "Steel (€/kg)" })}</label>
                 <input type="number" value={prices.STEEL_KG} onChange={(e) => updatePrice("STEEL_KG", e.target.value)} className={inputClass} />
               </div>
               <div>
-                <label className={labelClass}>{t("struct.fd.price_excav", { defaultValue: "Fouilles (€/m³)" })}</label>
+                <label className={labelClass}>{t("struct.fd.price_excav", { defaultValue: "Excavation (€/m³)" })}</label>
                 <input type="number" value={prices.EXCAV_M3} onChange={(e) => updatePrice("EXCAV_M3", e.target.value)} className={inputClass} />
               </div>
               <div>
-                <label className={labelClass}>{t("struct.fd.price_evac", { defaultValue: "Évacuation (€/m³)" })}</label>
+                <label className={labelClass}>{t("struct.fd.price_evac", { defaultValue: "Disposal (€/m³)" })}</label>
                 <input type="number" value={prices.WASTE_M3} onChange={(e) => updatePrice("WASTE_M3", e.target.value)} className={inputClass} />
               </div>
 
               {cleanConcrete && (
                 <div>
-                  <label className={labelClass}>{t("struct.fd.clean_concrete", { defaultValue: "Béton propreté" })} (€/m³)</label>
+                  <label className={labelClass}>{t("struct.fd.clean_concrete", { defaultValue: "Blinding concrete" })} (€/m³)</label>
                   <input type="number" value={prices.LEANCONC_M3} onChange={(e) => updatePrice("LEANCONC_M3", e.target.value)} className={inputClass} />
                 </div>
               )}
 
               {formwork && (
                 <div>
-                  <label className={labelClass}>{t("struct.fd.formwork", { defaultValue: "Coffrage" })} (€/m²)</label>
+                  <label className={labelClass}>{t("struct.fd.formwork", { defaultValue: "Formwork" })} (€/m²)</label>
                   <input type="number" value={prices.FORMWORK_M2} onChange={(e) => updatePrice("FORMWORK_M2", e.target.value)} className={inputClass} />
                 </div>
               )}
@@ -685,7 +685,7 @@ export const FoundationsCalculator: React.FC<Props> = ({ onCalculate, initialMod
                   </div>
                   {drainageGravel && (
                     <div>
-                      <label className={labelClass}>{t("struct.fd.drain_gravel", { defaultValue: "Gravier drainage" })} (€/m³)</label>
+                      <label className={labelClass}>{t("struct.fd.drain_gravel", { defaultValue: "Drain gravel" })} (€/m³)</label>
                       <input type="number" value={prices.GRAVEL_M3} onChange={(e) => updatePrice("GRAVEL_M3", e.target.value)} className={inputClass} />
                     </div>
                   )}
@@ -709,7 +709,7 @@ export const FoundationsCalculator: React.FC<Props> = ({ onCalculate, initialMod
               <ArrowLeft />
             </button>
             <button disabled className="flex-1 py-3 bg-emerald-100 text-emerald-700 rounded-xl font-bold flex justify-center items-center">
-              <Check size={20} className="mr-2" /> {t("struct.common.calculated", { defaultValue: "Calculé" })}
+              <Check size={20} className="mr-2" /> {t("struct.common.calculated", { defaultValue: "Calculated" })}
             </button>
           </div>
         </div>

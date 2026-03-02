@@ -18,7 +18,9 @@ i18n
       fr: { translation: fr },
       en: { translation: en },
     },
-    fallbackLng: "fr",
+    // Important: when the user selects English, do NOT fall back to French.
+    // Missing keys should fall back to English defaults in code (defaultValue) instead.
+    fallbackLng: "en",
     supportedLngs: [...SUPPORTED],
     nonExplicitSupportedLngs: true,
     load: "languageOnly",
@@ -43,7 +45,7 @@ i18n
 // ✅ synchronise <html lang="...">
 const syncHtmlLang = (lng: string) => {
   try {
-    const short = String(lng || "fr").split("-")[0];
+    const short = String(lng || "en").split("-")[0];
     document.documentElement.setAttribute("lang", short);
   } catch {
     // ignore
