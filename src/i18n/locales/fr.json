@@ -238,9 +238,7 @@
       "price_truck": "Rotation camion (€/rotation)",
       "price_dump": "Décharge (€/t)",
       "labor_m3": "MO (€/m³)",
-      "summary_excavated": "{{m3}} m³ excavés",
-      "earth_mgmt": "Gestion des déblais",
-      "reuse_fill": "Réutiliser les déblais en remblai"
+      "summary_excavated": "{{m3}} m³ excavés"
     },
     "fd": {
       "steps": {
@@ -329,10 +327,7 @@
       "subtitle": "Estimez fouilles, béton et armatures pour vos fondations.",
       "title": "Calculateur de fondations",
       "warn_clay": "Sol argileux : peut nécessiter une étude spécifique (consultez un pro).",
-      "warn_frost": "Le hors-gel varie selon la région : appliquez les règles locales.",
-      "pad_rect": "Plot isolé rectangulaire",
-      "pad_cyl": "Plot isolé cylindrique",
-      "thickness_m": "Épaisseur (m)"
+      "warn_frost": "Le hors-gel varie selon la région : appliquez les règles locales."
     },
     "w": {
       "steps": {
@@ -811,9 +806,14 @@
       },
       "zone_types": {
         "terrace": "Terrasse",
-        "driveway": "Allée / accès",
+        "driveway": "Allée",
         "path": "Chemin",
         "other": "Autre"
+      },
+      "fence_types": {
+        "mesh_rigid": "Grillage rigide",
+        "mesh_soft": "Grillage souple",
+        "wood": "Bois"
       },
       "network_types": {
         "elec": "Électricité",
@@ -821,11 +821,6 @@
         "sewer": "Eaux usées",
         "drain": "Drainage",
         "light": "Éclairage"
-      },
-      "fence_types": {
-        "mesh_rigid": "Grillage rigide",
-        "mesh_soft": "Grillage souple",
-        "wood": "Clôture bois"
       }
     },
     "leveling": {
@@ -1056,7 +1051,15 @@
       "warn_openings_gt_surface": "Les ouvertures dépassent la surface.",
       "warn_surface_zero": "Surface nulle.",
       "waste_pct": "Pertes (%)",
-      "wid_m": "Largeur (m)"
+      "wid_m": "Largeur (m)",
+      "insulation": {
+        "GR32": "Laine de verre (GR32) - rouleau",
+        "ROCK": "Laine de roche - panneau",
+        "PSE": "Polystyrène expansé (PSE / EPS)",
+        "XPS": "Polystyrène extrudé (XPS)",
+        "WOOD": "Fibre de bois",
+        "HEMP": "Chanvre / coton recyclé"
+      }
     },
     "plumbing": {
       "appliance": {
@@ -1426,12 +1429,7 @@
       "warn_riser_high": "Contremarche trop haute.",
       "warn_riser_low": "Contremarche trop basse.",
       "warn_slope": "Pente trop forte.",
-      "warn_tread_short": "Giron trop court.",
-      "type": {
-        "straight": "Droit",
-        "quarter": "Quart-tournant",
-        "half": "Demi-tournant"
-      }
+      "warn_tread_short": "Giron trop court."
     },
     "substructure": {
       "detail": {
@@ -1525,12 +1523,6 @@
         "deductions_over_gross": "Les déductions dépassent la surface brute.",
         "fill_perimeter_height": "Renseignez le périmètre et la hauteur.",
         "net_zero": "Surface nette nulle."
-      },
-      "steps": {
-        "1": "1. Murs",
-        "2": "2. Étanchéité",
-        "3": "3. Drainage",
-        "4": "4. Prix"
       }
     },
     "tile": {
@@ -1630,28 +1622,21 @@
         "floor": "Sol",
         "wall": "Mur"
       },
-      "pattern": {
-        "straight": "Pose droite",
-        "staggered": "Pose décalée (1/2, 1/3)",
-        "diagonal": "Pose en diagonale"
+      "substrate": {
+        "screed": "Chape / dalle",
+        "tile": "Ancien carrelage",
+        "plaster": "Plâtre / enduit",
+        "wood": "Bois / OSB"
       },
       "joint_type": {
         "cement": "Ciment",
         "epoxy": "Époxy"
-      }
-    },
-    "foundations": {
-      "mat": {
-        "foundation_concrete": "Béton de fondation",
-        "foundation_concrete_note": "Béton structurel (dosage/consistance selon besoin).",
-        "steel": "Acier (armatures)",
-        "excavation": "Terrassement / fouilles",
-        "clean_concrete": "Béton de propreté",
-        "evac": "Évacuation des terres",
-        "evac_swell": "Évacuation des terres (foisonnement)"
       },
-      "warn_clay_risk": "Sol argileux : risque de retrait-gonflement (à vérifier).",
-      "warn_depth_lt_frost": "Profondeur faible : vérifier hors gel selon la zone."
+      "pattern": {
+        "straight": "Pose droite",
+        "staggered": "Pose décalée (1/2, 1/3)",
+        "diagonal": "Pose diagonale"
+      }
     }
   },
   "client": {
@@ -2051,9 +2036,9 @@
     "payment_date": "Date de paiement",
     "status": {
       "draft": "Brouillon",
-      "sent": "Envoyée",
+      "late": "En retard",
       "paid": "Payée",
-      "late": "En retard"
+      "sent": "Envoyée"
     }
   },
   "joinery": {
@@ -2098,8 +2083,8 @@
       "silicone_cart": "Silicone (€/cart.)"
     },
     "shutter": {
-      "rolling": "Volet roulant",
-      "swing": "Volet battant"
+      "rolling": "Roulant",
+      "swing": "Battant"
     },
     "stats": {
       "area": "Surface",
@@ -2125,9 +2110,9 @@
     },
     "supplies": {
       "compriband": "Compribande",
-      "silicone": "Silicone",
-      "foam": "Mousse expansive",
       "fixings": "Fixations",
+      "foam": "Mousse",
+      "silicone": "Silicone",
       "silicone_yield": "Rendement silicone"
     },
     "type": {
@@ -2145,135 +2130,6 @@
     }
   },
   "materials": {
-    "BACKFILL_M3": "Remblai (m³)",
-    "BATTEN_M": "Liteau (m)",
-    "BITUMEN_COATING_BUCKET_25KG": "Bitume Enduit (seau) 25 kg",
-    "BLOCK_10_UNIT": "Parpaing 10 (unité)",
-    "BLOCK_15_UNIT": "Parpaing 15 (unité)",
-    "BLOCK_20_PALLET": "Parpaing 20 (palette)",
-    "BLOCK_20_UNIT": "Parpaing 20 (unité)",
-    "BLOCK_25_UNIT": "Parpaing 25 (unité)",
-    "BLOCK_STEPOC_15_UNIT": "Parpaing Bloc à bancher 15 (unité)",
-    "BLOCK_STEPOC_20_UNIT": "Parpaing Bloc à bancher 20 (unité)",
-    "BLOCK_STEPOC_25_UNIT": "Parpaing Bloc à bancher 25 (unité)",
-    "BLOCK_STEPOC_UNIT": "Parpaing Bloc à bancher (unité)",
-    "BORDER_CONCRETE_M": "Border béton (m)",
-    "BPE_M3": "Béton prêt à l'emploi (m³)",
-    "BREAKER_UNIT": "Disjoncteur (unité)",
-    "BRICK_15_UNIT": "Brique 15 (unité)",
-    "BRICK_20_UNIT": "Brique 20 (unité)",
-    "CABLE_3G15_100M": "Câble 3G15 100 m",
-    "CABLE_3G25_100M": "Câble 3G25 100 m",
-    "CELLULAR_15_UNIT": "Béton cellulaire 15 (unité)",
-    "CELLULAR_20_UNIT": "Béton cellulaire 20 (unité)",
-    "CEMENT_BAG_25KG": "Ciment (sac 25 kg)",
-    "CEMENT_BAG_35KG": "Ciment (sac 35 kg)",
-    "CHAINAGE_3M": "Chaînage 3 m",
-    "CLEAN_CONCRETE_M3": "Nettoyage béton (m³)",
-    "COATING_EXT_BAG": "Enduit extérieur (sac)",
-    "COATING_INT_BAG": "Enduit intérieur (sac)",
-    "COMPACTOR_DAY": "Plaque vibrante (jour)",
-    "COMPOSITE_DECK_M2": "Composite Terrasse (m²)",
-    "COMPOST_M3": "Compost (m³)",
-    "COMPOUND_BAG_25KG": "Enduit (sac) 25 kg",
-    "CONDUIT_ICTA_20_100M": "Gaine Icta 20 100 m",
-    "CORNER_BEAD_3M": "Angle cornière 3 m",
-    "DECOR_GRAVEL_TON": "décoratif Gravier (tonne)",
-    "DELIVERY_FEE": "Livraison Fee",
-    "DELTA_MS_ROLL_20M": "Delta MS (rouleau) 20 m",
-    "DIGGER_DAY": "Pelle (jour)",
-    "DRAIN_PIPE_50M": "Drain Tuyau 50 m",
-    "DUMPER_DAY": "Dumper (jour)",
-    "ELECTRIC_CONDUIT_M": "Electric Gaine (m)",
-    "EVACUATION_M3": "Evacuation (m³)",
-    "EXCAVATION_M3": "Terrassement (m³)",
-    "FACADE_COATING_BAG": "Façade Enduit (sac)",
-    "FENCE_MESH_M": "Clôture Treillis (m)",
-    "FENCE_POST_UNIT": "Clôture Post (unité)",
-    "FENCE_RIGID_M": "Clôture Rigid (m)",
-    "FENCE_WOOD_M": "Clôture Wood (m)",
-    "FERTILIZER_KG": "Engrais (kg)",
-    "FORM_OIL_L": "Coffrage Oil (L)",
-    "FORM_PANEL_M2": "Coffrage (panneau) (m²)",
-    "FURRING_3M": "Fourrure 3 m",
-    "GARDEN_EDGING_M": "Garden Edging (m)",
-    "GARDEN_LIGHT_UNIT": "Garden Light (unité)",
-    "GATE_INSTALL_UNIT": "Portail Install (unité)",
-    "GATE_MOTOR_UNIT": "Portail Motor (unité)",
-    "GATE_UNIT": "Portail (unité)",
-    "GEOTEXTILE_M2": "Géotextile (m²)",
-    "GEOTEXTILE_ROLL_50M2": "Géotextile (rouleau) 50M2",
-    "GLUE_BAG_25KG": "Colle (sac) 25 kg",
-    "GLUE_MORTAR_BAG_25KG": "Colle Mortier (sac) 25 kg",
-    "GRAVEL_BIGBAG": "Gravier Bigbag",
-    "GRAVEL_FOUNDATION_TON": "Gravier Foundation (tonne)",
-    "GRAVEL_TON": "Gravier (tonne)",
-    "GROUT_BAG_5KG": "Joint (sac) 5 kg",
-    "HANGER_BOX_50": "Suspente (boîte) 50",
-    "HEDGE_PLANT_UNIT": "Haie Plante (unité)",
-    "INSULATION_M2": "Isolation (m²)",
-    "IRRIGATION_DRIP_M": "Arrosage Drip (m)",
-    "IRRIGATION_PROGRAMMER_UNIT": "Arrosage Programmer (unité)",
-    "IRRIGATION_SPRINKLER_UNIT": "Arrosage Sprinkler (unité)",
-    "JOINT_TAPE_ROLL": "Joint bande (rouleau)",
-    "LAWN_ROLL_M2": "Gazon (rouleau) (m²)",
-    "LAWN_SEED_KG": "Gazon Seed (kg)",
-    "LINTEL_PRECAST_M": "Linteau Precast (m)",
-    "MANHOLE_UNIT": "Regard (unité)",
-    "MAP_BAG_25KG": "MAP (sac) 25 kg",
-    "MESH_PANEL_ST10": "Treillis (panneau) St10",
-    "MESH_PANEL_ST25": "Treillis (panneau) St25",
-    "MESH_PANEL_ST40": "Treillis (panneau) St40",
-    "MONTANT_3M": "Montant 3 m",
-    "MORTAR_BAG_25KG": "Mortier (sac) 25 kg",
-    "MULCH_M3": "Paillage (m³)",
-    "PAINT_LITER": "Peinture murs",
-    "PAVERS_M2": "Pavés (m²)",
-    "PERIPHERAL_BAND_M": "Périphérique bande (m)",
-    "PER_PIPE_100M": "Per Tuyau 100 m",
-    "PLACO_PLATE_BA13": "Plaque de plâtre plaque BA13",
-    "PLACO_PLATE_FIRE": "Plaque de plâtre plaque feu",
-    "PLACO_PLATE_HYDRO": "Plaque de plâtre plaque hydrofuge",
-    "PLANT_UNIT": "Plante (unité)",
-    "POLYANE_ROLL_150M2": "Polyane (rouleau) 150M2",
-    "POOL_COPING_ML": "Piscine Coping Ml",
-    "POOL_INSTALL_UNIT": "Piscine Install (unité)",
-    "POOL_UNIT": "Piscine (unité)",
-    "PRIMER_FLOOR_LITER": "Sous-couche sol (L)",
-    "PRIMER_LITER": "Sous-couche universelle",
-    "PROP_UNIT": "Prop (unité)",
-    "PUMP_FEE": "Pompe Fee",
-    "PVC_PIPE_4M": "PVC Tuyau 4 m",
-    "RAGREAGE_BAG_25KG": "Ragréage (sac) 25 kg",
-    "RAGREAGE_FIBRE_25KG": "Ragréage fibré 25 kg",
-    "RAIL_3M": "Rail 3 m",
-    "REBAR_CAGE_15_35_6M": "Fer à béton Cage 15 35 6 m",
-    "REBAR_CAGE_20_20_6M": "Fer à béton Cage 20 20 6 m",
-    "REBAR_CAGE_35_15_6M": "Fer à béton Cage 35 15 6 m",
-    "REBAR_KG": "Fer à béton (kg)",
-    "SAND_BIGBAG": "Sable Bigbag",
-    "SAND_TON": "Sable (tonne)",
-    "SCREED_MORTAR_BAG": "Chape Mortier (sac)",
-    "SCREWS_BOX_1000": "Vis (boîte) 1000",
-    "SEWER_PIPE_M": "eaux usées Tuyau (m)",
-    "SHRUB_UNIT": "Arbuste (unité)",
-    "SKIP_DAY": "Benne (jour)",
-    "SKIRTING_METER": "Plinthe (m)",
-    "SOCKET_UNIT": "Prise (unité)",
-    "SPACERS_BOX": "Croisillons (boîte)",
-    "SWITCH_UNIT": "Interrupteur (unité)",
-    "TILE_M2": "Carrelage (m²)",
-    "TILE_ROOF_M2": "Carrelage Toiture (m²)",
-    "TIMBER_M": "Timber (m)",
-    "TOPSOIL_M3": "Terre végétale (m³)",
-    "TOPSOIL_STRIP_M2": "Terre végétale Strip (m²)",
-    "TRANSFORMER_UNIT": "Transformer (unité)",
-    "TREE_UNIT": "Arbre (unité)",
-    "TRENCH_EXCAVATION_M3": "Trench Terrassement (m³)",
-    "UNDERLAY_ROLL_75M2": "Écran sous-toiture (rouleau) 75M2",
-    "WALL_COPING_UNIT": "Wall Coping (unité)",
-    "WATER_PIPE_M": "eau Tuyau (m)",
-    "WOOD_DECK_M2": "Wood Terrasse (m²)",
     "all": "Tout",
     "backup_hint": "Exportez votre catalogue pour le sauvegarder.",
     "backup_restore": "Sauvegarde / restauration",
@@ -2321,7 +2177,11 @@
     "title": "Matériaux",
     "unit": "Unité",
     "unit_price_ht": "Prix unitaire HT",
-    "vat_rate": "Taux de TVA"
+    "vat_rate": "Taux de TVA",
+    "PAINT_LITER": "Peinture murs",
+    "PRIMER_LITER": "Sous-couche universelle",
+    "CEMENT_BAG_35KG": "Ciment (sac 35 kg)",
+    "CEMENT_BAG_25KG": "Ciment (sac 25 kg)"
   },
   "notfound": {
     "description": "Cette page n’existe pas.",
@@ -2618,56 +2478,6 @@
       "2": "Pour une dalle carrossable, viser 12–15 cm + treillis ST25C.",
       "3": "Rehausser le treillis avec des cales : il doit être dans le béton, pas au sol.",
       "4": "Prévoir des joints de dilatation tous les 15–20 m² pour limiter les fissures."
-    },
-    "elec": {
-      "1": "Prévoyez une marge de 10–15% pour les chutes de gaines et câbles.",
-      "2": "Vérifiez les sections de câble et protections (disjoncteurs) selon les puissances."
-    },
-    "plumbing": {
-      "1": "Ajoutez 5–10% pour les chutes et raccords (coudes, tés, manchons).",
-      "2": "Pensez aux colliers, joints, et accessoires (siphons, vannes, flexibles)."
-    },
-    "walls": {
-      "1": "Ajoutez 5% de marge pour les découpes et la casse.",
-      "2": "N’oubliez pas les linteaux, chaînages et poteaux selon le plan."
-    },
-    "foundations": {
-      "1": "Vérifiez les profondeurs hors gel selon votre zone et la nature du sol.",
-      "2": "Prévoyez les surépaisseurs et recouvrements d’armatures.",
-      "3": "Ajoutez une marge pour le béton (pertes, coffrages, irrégularités)."
-    },
-    "substructure": {
-      "1": "Prévoir une pente de drainage et un exutoire (puits perdu / réseau).",
-      "2": "Ajouter une marge sur les granulats (compactage, pertes).",
-      "3": "Vérifier l’étanchéité (enduit/bitume) selon l’humidité du terrain."
-    },
-    "roof": {
-      "1": "Ajouter 8–12% de pertes selon la complexité (noues, arêtiers, découpes).",
-      "2": "Vérifier la compatibilité couverture / pente (DTU, fabricant)."
-    },
-    "tiles": {
-      "1": "Prévoir 8–12% de pertes (découpes, casses), plus en pose diagonale.",
-      "2": "Penser aux plinthes, croisillons, colle et joint selon le support."
-    },
-    "placo": {
-      "1": "Prévoir une marge pour chutes et découpes (5–10%).",
-      "2": "Ne pas oublier bandes, enduits, vis et rails/montants."
-    },
-    "screed": {
-      "1": "Vérifier l’épaisseur minimale et le type de chape selon l’usage.",
-      "2": "Prévoir les joints de fractionnement et le treillis/renfort si nécessaire."
-    },
-    "leveling": {
-      "1": "Préparer le support (primaire) pour éviter le décollement.",
-      "2": "Respecter les temps de séchage avant revêtement."
-    },
-    "facade": {
-      "1": "Prévoir une marge sur la surface (tableaux, linteaux, retours).",
-      "2": "Adapter l’enduit/isolant au support et aux conditions météo."
-    },
-    "exterior": {
-      "1": "Prévoir une marge sur les découpes (lames, dalles, pavés).",
-      "2": "Ajouter géotextile et compactage pour la durabilité."
     }
   },
   "packaging": {
@@ -2757,8 +2567,8 @@
     "clay": "Argile / limon",
     "sand": "Sable",
     "gravel": "Gravier / cailloux",
-    "rock": "Roche (brisée)",
-    "mixed": "Tout-venant (mélangé)"
+    "rock": "Roche (massif)",
+    "mixed": "Tout-venant (mix)"
   },
   "groundwork": {
     "project": {
@@ -2782,40 +2592,5 @@
     "ST25C": "Treillis ST25C (radier)",
     "HA10": "Fer HA10 (armature)",
     "HA12": "Fer HA12 (armature)"
-  },
-  "csv": {
-    "section": "Section",
-    "type": "Type",
-    "label": "Libellé",
-    "qty": "Qté",
-    "unit": "Unité",
-    "unit_price_ht": "Prix unitaire HT",
-    "material": "Matériaux",
-    "labor": "Main-d’œuvre",
-    "margin": "Marge",
-    "vat": "TVA",
-    "total_ht": "Total HT",
-    "total_ttc": "Total TTC",
-    "total_materials": "Total matériaux",
-    "total_labor": "Total main-d’œuvre"
-  },
-  "paint": {
-    "substrates": {
-      "smooth": "Support lisse",
-      "placo": "Placo",
-      "plaster": "Plâtre",
-      "concrete": "Béton",
-      "wood": "Bois"
-    }
-  },
-  "wallspecs": {
-    "parpaing10": "Parpaing 10 (10 cm)",
-    "parpaing15": "Parpaing 15 (15 cm)",
-    "parpaing20": "Parpaing 20 (20 cm)",
-    "parpaing25": "Parpaing 25 (25 cm)",
-    "stepoc20": "Bloc à bancher (Stepoc) 20",
-    "stepoc25": "Bloc à bancher (Stepoc) 25",
-    "brick_g7": "Brique G7",
-    "cellular_60x25x20": "Béton cellulaire 60×25×20"
   }
 }

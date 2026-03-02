@@ -845,7 +845,7 @@ export const PlacoCalculator: React.FC<Props> = ({
                   >
                     {PLACO_INSULATION_TYPES.map((tt: any) => (
                       <option key={tt.id} value={tt.id}>
-                        {String(tt.label ?? tt.id)}
+                        {t(`calc.placo.insulation.${String(tt.id)}`, { defaultValue: String(tt.label ?? tt.id) })}
                       </option>
                     ))}
                   </select>

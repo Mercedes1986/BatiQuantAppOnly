@@ -132,7 +132,7 @@ export const PlumbingCalculator: React.FC<Props> = ({ onCalculate }) => {
     setPrices((prev) => ({ ...prev, [key]: toNum(val, 0) }));
   };
 
-  const roomTypeLabel = (type: PlumbRoom["type"]) => t(`calc.plumbing.room_type.${type}`);
+  const roomTypeLabel = (type: PlumbRoom["type"]) => t(`calc.plumbing.room_type.${type}`, { defaultValue: type });
 
   const getApplianceDefaults = (type: PlumbAppliance["type"]): Partial<PlumbAppliance> => {
     // On garde les valeurs techniques, mais le label vient de i18n (pas en dur)

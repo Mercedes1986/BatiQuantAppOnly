@@ -417,7 +417,7 @@ export const PaintCalculator: React.FC<Props> = ({ onCalculate }) => {
     return t("calc.paint.step_5");
   };
 
-  const paintTypeLabel = (type: string) => t(`calc.paint.paint_type.${type}`);
+  const paintTypeLabel = (type: string) => t(`calc.paint.paint_type.${type}`, { defaultValue: type });
 
   return (
     <div className="space-y-6 animate-in fade-in">

@@ -170,8 +170,8 @@ export const ScreedCalculator: React.FC<Props> = ({ onCalculate }) => {
 
   const findMesh = (id: string) => meshOptions.find((m) => m.id === id);
 
-  const screedTypeLabel = (s: ScreedType) => t(`calc.screed.type.${s}`);
-  const reinforceLabel = (r: ReinforceType) => t(`calc.screed.reinforce.${r}`);
+  const screedTypeLabel = (s: ScreedType) => t(`calc.screed.type.${s}`, { defaultValue: s });
+  const reinforceLabel = (r: ReinforceType) => t(`calc.screed.reinforce.${r}`, { defaultValue: r });
 
   const stepLabel = (s: number) => {
     if (s === 1) return t("calc.screed.step_1");
