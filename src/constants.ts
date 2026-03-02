@@ -42,7 +42,17 @@ import {
  * - defaultValue MUST be EN to avoid French showing in English when keys are missing
  * - adding keys to fr.json / en.json will override these defaults
  */
-const tr = (key: string, fallbackEn: string) => i18next.t(key, { defaultValue: fallbackEn });
+// i18next can be imported before i18n initialization finishes.
+// Ensure we always return a meaningful string (never empty), especially for UI “Pro tips”.
+const tr = (key: string, fallbackEn: string) => {
+  try {
+    const v = i18next.t(key, { defaultValue: fallbackEn });
+    if (!v || v === key) return fallbackEn;
+    return v;
+  } catch {
+    return fallbackEn;
+  }
+};
 
 /* -------------------------------------------------------
    CALCULATORS
