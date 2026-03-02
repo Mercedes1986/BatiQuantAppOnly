@@ -342,7 +342,7 @@ export const ConcreteCalculator: React.FC<Props> = ({ onCalculate, initialArea, 
         totalPrice: parseFloat(cost.toFixed(2)),
         category: CalculatorType.CONCRETE,
         details: t("calc.concrete.details.useful_area_panel", {
-          defaultValue: "≈ {{m2}}m² utiles/panneau",
+          defaultValue: "≈ {{m2}} m² usable/panel",
           m2: usefulArea.toFixed(2),
         }),
       });
@@ -605,7 +605,7 @@ export const ConcreteCalculator: React.FC<Props> = ({ onCalculate, initialArea, 
             onClick={() => setStep(2)}
             className="w-full py-3 bg-blue-600 text-white rounded-xl font-bold flex justify-center items-center"
           >
-            {t("common.next", { defaultValue: "Suivant" })} <ArrowRight size={18} className="ml-2" />
+            {t("common.next", { defaultValue: "Next" })} <ArrowRight size={18} className="ml-2" />
           </button>
         </div>
       )}
@@ -667,10 +667,10 @@ export const ConcreteCalculator: React.FC<Props> = ({ onCalculate, initialArea, 
 
           <div className="flex gap-3">
             <button type="button" onClick={() => setStep(1)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
-              {t("common.back", { defaultValue: "Retour" })}
+              {t("common.back", { defaultValue: "Back" })}
             </button>
             <button type="button" onClick={() => setStep(3)} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold">
-              {t("common.next", { defaultValue: "Suivant" })}
+              {t("common.next", { defaultValue: "Next" })}
             </button>
           </div>
         </div>
@@ -782,10 +782,10 @@ export const ConcreteCalculator: React.FC<Props> = ({ onCalculate, initialArea, 
 
           <div className="flex gap-3 pt-2">
             <button type="button" onClick={() => setStep(2)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
-              {t("common.back", { defaultValue: "Retour" })}
+              {t("common.back", { defaultValue: "Back" })}
             </button>
             <button type="button" onClick={() => setStep(4)} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold">
-              {t("common.next", { defaultValue: "Suivant" })}
+              {t("common.next", { defaultValue: "Next" })}
             </button>
           </div>
         </div>
@@ -861,7 +861,7 @@ export const ConcreteCalculator: React.FC<Props> = ({ onCalculate, initialArea, 
 
           <div className="flex gap-3 pt-4">
             <button type="button" onClick={() => setStep(3)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
-              {t("common.back", { defaultValue: "Retour" })}
+              {t("common.back", { defaultValue: "Back" })}
             </button>
             <button type="button" disabled className="flex-1 py-3 bg-emerald-100 text-emerald-700 rounded-xl font-bold flex justify-center items-center">
               <Check size={18} className="mr-2" /> {t("calc.concrete.calculated", { defaultValue: "Calculé" })}

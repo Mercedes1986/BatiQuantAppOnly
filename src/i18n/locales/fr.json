@@ -573,7 +573,7 @@
         "labor_points": "MO (points)",
         "lights": "Points lumineux",
         "network": "Points réseau",
-        "panel_named": "Tableau électrique ({{label}})",
+        "panel_named": "Tableau électrique ({{n}} rangée{{s}})",
         "sockets": "Prises",
         "special_sockets": "Prises dédiées",
         "switches": "Interrupteurs"
@@ -851,7 +851,7 @@
       "price_primer": "Primaire (€/L)",
       "prices_title": "Prix",
       "product_fallback_label": "Ragréage",
-      "product_specs": "Caractéristiques",
+      "product_specs": "Min {{min}} mm · Max {{max}} mm · Densité {{density}}",
       "product_title": "Produit",
       "step_1": "1. Zones",
       "step_2": "2. Épaisseur",
@@ -998,7 +998,17 @@
       "price": {
         "furring_3m": "Fourrure 3 m (€/pièce)",
         "hanger_unit": "Suspente (€/pièce)",
-        "labor_m2": "MO (€/m²)"
+        "labor_m2": "Main d’œuvre (€/m²)",
+        "ba13": "Plaque BA13 (€/plaque)",
+        "hydro": "Plaque hydro (€/plaque)",
+        "fire": "Plaque feu/acoustique (€/plaque)",
+        "rail_3m": "Rail 3 m (€/pièce)",
+        "stud_3m": "Montant 3 m (€/pièce)",
+        "screws_1000": "Vis (boîte 1000) (€/boîte)",
+        "tape_150": "Bande à joint (rouleau) (€/rouleau)",
+        "compound_25": "Enduit à joint 25 kg (€/sac)",
+        "membrane_m2": "Membrane pare-vapeur (€/m²)",
+        "insulation_m2": "Isolation (€/m²)"
       },
       "prices_title": "Prix",
       "ready_desc": "Votre estimation est prête.",
@@ -1117,7 +1127,12 @@
       "supply_title": "Alimentation",
       "warn_add_room": "Ajoutez au moins une pièce.",
       "warn_hot_needed_no_heater": "Eau chaude requise mais aucun chauffe-eau sélectionné.",
-      "warn_no_appliance": "Ajoutez au moins un appareil."
+      "warn_no_appliance": "Ajoutez au moins un appareil.",
+      "rooms": {
+        "types": {
+          "laundry": "Buanderie"
+        }
+      }
     },
     "roof": {
       "detail": {
@@ -1183,6 +1198,13 @@
         "flat_roof_material": "Les toits plats nécessitent des systèmes d’étanchéité spécifiques.",
         "low_slope_tiles": "Faible pente : vérifier tuiles et écran adaptés.",
         "low_slope_zinc": "Faible pente : vérifier les exigences du zinc."
+      },
+      "steps": {
+        "1": "1. Emprise",
+        "2": "2. Toit",
+        "3": "3. Postes",
+        "4": "4. Options",
+        "5": "5. Prix"
       }
     },
     "screed": {
@@ -1269,7 +1291,14 @@
       "warn_ravoirage_dosage": "Vérifiez le dosage du ravoirage.",
       "warn_small_fluid": "Petits volumes : minimum de facturation possible.",
       "zone_area_line": "{{name}} · {{m2}} m²",
-      "zone_thick_line": "{{name}} · {{cm}} cm"
+      "zone_thick_line": "{{name}} · {{cm}} cm",
+      "type": {
+        "trad": "Chape traditionnelle",
+        "fluid_cem": "Chape fluide (ciment)",
+        "fluid_anh": "Chape fluide (anhydrite)",
+        "light": "Chape allégée",
+        "ravoirage": "Ravoirage"
+      }
     },
     "stairs": {
       "detail": {

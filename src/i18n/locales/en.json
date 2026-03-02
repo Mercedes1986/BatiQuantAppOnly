@@ -6,7 +6,7 @@
     "save": "Save",
     "delete": "Delete",
     "edit": "Edit",
-    "attention": "Attention",
+    "attention": "Warning",
     "share": "Share",
     "add": "Add",
     "auto": "Auto",
@@ -573,7 +573,7 @@
         "labor_points": "Labor (points)",
         "lights": "Light points",
         "network": "Network points",
-        "panel_named": "Electrical panel ({{label}})",
+        "panel_named": "Electrical panel ({{n}} row{{s}})",
         "sockets": "Sockets",
         "special_sockets": "Dedicated sockets",
         "switches": "Switches"
@@ -851,7 +851,7 @@
       "price_primer": "Primer (€/L)",
       "prices_title": "Prices",
       "product_fallback_label": "Leveling compound",
-      "product_specs": "Specs",
+      "product_specs": "Min {{min}} mm · Max {{max}} mm · Density {{density}}",
       "product_title": "Product",
       "step_1": "1. Zones",
       "step_2": "2. Thickness",
@@ -996,9 +996,19 @@
       "ph_h": "Height (m)",
       "ph_w": "Width (m)",
       "price": {
-        "furring_3m": "Furring 3 m (€/pc)",
+        "furring_3m": "Furring 3m (€/pc)",
         "hanger_unit": "Hanger (€/pc)",
-        "labor_m2": "Labor (€/m²)"
+        "labor_m2": "Labor (€/m²)",
+        "ba13": "BA13 board (€/board)",
+        "hydro": "Moisture resistant board (€/board)",
+        "fire": "Fire-rated board (€/board)",
+        "rail_3m": "Track / rail 3m (€/pc)",
+        "stud_3m": "Stud 3m (€/pc)",
+        "screws_1000": "Screws box 1000 (€/box)",
+        "tape_150": "Joint tape roll (€/roll)",
+        "compound_25": "Joint compound 25kg (€/bag)",
+        "membrane_m2": "Vapour membrane (€/m²)",
+        "insulation_m2": "Insulation (€/m²)"
       },
       "prices_title": "Prices",
       "ready_desc": "Your estimate is ready.",
@@ -1117,7 +1127,12 @@
       "supply_title": "Supply",
       "warn_add_room": "Add at least one room.",
       "warn_hot_needed_no_heater": "Hot water needed but no heater selected.",
-      "warn_no_appliance": "Add at least one appliance."
+      "warn_no_appliance": "Add at least one appliance.",
+      "rooms": {
+        "types": {
+          "laundry": "Laundry / utility room"
+        }
+      }
     },
     "roof": {
       "detail": {
@@ -1183,6 +1198,13 @@
         "flat_roof_material": "Flat roofs require specific waterproofing systems.",
         "low_slope_tiles": "Low slopes may require special tiles and underlay.",
         "low_slope_zinc": "Low slopes: check zinc system requirements."
+      },
+      "steps": {
+        "1": "1. Footprint",
+        "2": "2. Roof",
+        "3": "3. Items",
+        "4": "4. Options",
+        "5": "5. Pricing"
       }
     },
     "screed": {
@@ -1269,7 +1291,14 @@
       "warn_ravoirage_dosage": "Check lightweight mix dosage.",
       "warn_small_fluid": "Small volumes may incur minimum charges.",
       "zone_area_line": "{{name}} · {{m2}} m²",
-      "zone_thick_line": "{{name}} · {{cm}} cm"
+      "zone_thick_line": "{{name}} · {{cm}} cm",
+      "type": {
+        "trad": "Traditional screed",
+        "fluid_cem": "Liquid screed (cement)",
+        "fluid_anh": "Liquid screed (anhydrite)",
+        "light": "Lightweight screed / ravoirage",
+        "ravoirage": "Ravoirage (light mix)"
+      }
     },
     "stairs": {
       "detail": {

@@ -19,11 +19,11 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, onChange }) =>
   const navItems: NavItem[] = useMemo(
     () => [
       { id: "menu", icon: Menu, label: t("nav.menu", { defaultValue: "Menu" }) },
-      { id: "home", icon: Home, label: t("nav.calc", { defaultValue: "Calcul" }) },
-      { id: "house", icon: Hammer, label: t("nav.site", { defaultValue: "Chantier" }) },
-      { id: "projects", icon: FolderOpen, label: t("nav.projects", { defaultValue: "Projets" }) },
+      { id: "home", icon: Home, label: t("nav.calc", { defaultValue: "Calculator" }) },
+      { id: "house", icon: Hammer, label: t("nav.site", { defaultValue: "Site" }) },
+      { id: "projects", icon: FolderOpen, label: t("nav.projects", { defaultValue: "Projects" }) },
       { id: "materials", icon: Package, label: t("nav.materials", { defaultValue: "Mat." }) },
-      { id: "settings", icon: Settings, label: t("nav.settings", { defaultValue: "Réglages" }) },
+      { id: "settings", icon: Settings, label: t("nav.settings", { defaultValue: "Settings" }) },
     ],
     [t]
   );

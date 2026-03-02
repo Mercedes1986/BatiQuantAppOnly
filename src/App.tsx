@@ -415,7 +415,7 @@ const ProjectCalculatorWrapper: React.FC = () => {
                 <div className="mt-4 bg-red-50 border border-red-200 p-3 rounded-lg text-sm text-red-700">
                   <div className="flex items-center mb-1 font-extrabold">
                     <AlertTriangle size={16} className="mr-2" />
-                    {t("common.attention", { defaultValue: "Attention" })}
+                    {t("common.attention", { defaultValue: "Warning" })}
                   </div>
                   <ul className="list-disc pl-4 space-y-1">
                     {result.warnings.map((w: string, i: number) => (
