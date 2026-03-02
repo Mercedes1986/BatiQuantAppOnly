@@ -238,7 +238,9 @@
       "price_truck": "Rotation camion (€/rotation)",
       "price_dump": "Décharge (€/t)",
       "labor_m3": "MO (€/m³)",
-      "summary_excavated": "{{m3}} m³ excavés"
+      "summary_excavated": "{{m3}} m³ excavés",
+      "earth_mgmt": "Gestion des déblais",
+      "reuse_fill": "Réutiliser les déblais en remblai"
     },
     "fd": {
       "steps": {
@@ -1205,6 +1207,13 @@
         "3": "3. Postes",
         "4": "4. Options",
         "5": "5. Prix"
+      },
+      "cover": {
+        "tile_mech": "Tuile mécanique",
+        "tile_flat": "Tuile plate",
+        "slate": "Ardoise",
+        "steel": "Bac acier",
+        "zinc": "Zinc"
       }
     },
     "screed": {
@@ -1473,6 +1482,12 @@
         "deductions_over_gross": "Les déductions dépassent la surface brute.",
         "fill_perimeter_height": "Renseignez le périmètre et la hauteur.",
         "net_zero": "Surface nette nulle."
+      },
+      "steps": {
+        "1": "1. Murs",
+        "2": "2. Étanchéité",
+        "3": "3. Drainage",
+        "4": "4. Prix"
       }
     },
     "tile": {
@@ -2623,8 +2638,8 @@
     "clay": "Argile / limon",
     "sand": "Sable",
     "gravel": "Gravier / cailloux",
-    "rock": "Roche (massif)",
-    "mixed": "Tout-venant (mix)"
+    "rock": "Roche (brisée)",
+    "mixed": "Tout-venant (mélangé)"
   },
   "groundwork": {
     "project": {
