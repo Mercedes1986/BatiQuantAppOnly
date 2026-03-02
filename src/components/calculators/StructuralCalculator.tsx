@@ -1,5 +1,5 @@
 // src/components/calculators/StructuralCalculator.tsx
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation } from "react-router-dom";
 
@@ -120,20 +120,7 @@ export const StructuralCalculator: React.FC<Props> = ({
   const location = useLocation();
 
   // Alias simple (et évite les defaultValue partout)
-  /**
-   * i18n helper
-   *
-   * Some parts of the app call `tr(key)` and other parts call `tr(key, fallbackEn)`.
-   * i18next's `t()` second argument is an options object, so passing a string
-   * triggers a TS error. We support both signatures here.
-   */
-  type TrOptions = Record<string, any> & { defaultValue?: string };
-  const tr = (key: string, fallbackEnOrOptions?: string | TrOptions, options?: Record<string, any>) => {
-    if (typeof fallbackEnOrOptions === "string") {
-      return t(key, { defaultValue: fallbackEnOrOptions, ...(options ?? {}) });
-    }
-    return t(key, fallbackEnOrOptions);
-  };
+  const tr = (key: string, options?: Record<string, any>) => t(key, options);
 
   const euro = useMemo(
     () =>
