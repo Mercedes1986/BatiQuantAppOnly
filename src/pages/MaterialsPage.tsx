@@ -354,7 +354,7 @@ export const MaterialsPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-3 max-w-5xl mx-auto">
             {filteredSystemList.map((item) => (
               <div
                 key={item.key}
@@ -365,7 +365,7 @@ export const MaterialsPage: React.FC = () => {
                 ].join(" ")}
               >
                 <div className="flex justify-between items-start mb-2">
-                  <div className="flex items-start gap-2">
+                  <div className="flex items-start gap-3 min-w-0">
                     <button
                       onClick={() => handleFavorite(item.key)}
                       className="mt-0.5"
@@ -382,8 +382,25 @@ export const MaterialsPage: React.FC = () => {
                       />
                     </button>
 
+                    {/* Product thumbnail (one dedicated image per system key) */}
+                    <div className="w-12 h-12 rounded-lg bg-white/45 border border-slate-200 overflow-hidden flex items-center justify-center shrink-0">
+                      <img
+                        src={`/images/materials/${item.key}.png`}
+                        alt={item.label}
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                        draggable={false}
+                        onError={(e) => {
+                          // If the user hasn't created the image yet, hide the img.
+                          (e.currentTarget as HTMLImageElement).style.display = "none";
+                        }}
+                      />
+                    </div>
+
                     <div>
-                      <span className="font-extrabold text-slate-900 block text-sm">{item.label}</span>
+                      <span className="font-extrabold text-slate-900 block text-sm truncate">
+                        {item.label}
+                      </span>
                       <div className="flex flex-wrap gap-1 mt-1">
                         <span className="text-[10px] uppercase font-extrabold text-slate-800 bg-white/45 px-1.5 py-0.5 rounded border border-slate-200">
                           {item.category}
@@ -422,8 +439,8 @@ export const MaterialsPage: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="flex items-center space-x-3 mt-3">
-                  <div className="flex-1 relative">
+                <div className="flex items-center gap-3 mt-3">
+                  <div className="relative w-44 sm:w-56">
                     <input
                       type="number"
                       min="0"
@@ -442,7 +459,7 @@ export const MaterialsPage: React.FC = () => {
                     <span className="absolute left-3 top-2 text-slate-500 text-xs mt-0.5">€</span>
                   </div>
 
-                  <span className="text-xs font-medium text-slate-700 w-12 text-right">
+                  <span className="text-xs font-medium text-slate-700 whitespace-nowrap">
                     {String(item.unit || "").replace("€/", "/ ")}
                   </span>
                 </div>

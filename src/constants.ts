@@ -688,7 +688,76 @@ export const getMaterialMetadata = (key: string): MaterialMetadata => {
   // Unit inference is deterministic and language-independent.
   const unit = direct?.unit || inferUnit(key);
 
-  return { label, category, unit };
+  // Light-weight illustration for UI (Materials list + calculators + saved projects).
+  // We reuse existing calculator images so no extra asset management is required.
+  const imageUrl = getMaterialImageUrl(key);
+
+  return { label, category, unit, imageUrl };
+};
+
+/* -------------------------------------------------------
+   Material images (UI)
+------------------------------------------------------- */
+
+// Reuse existing calculator thumbnails from /public/images/calculators
+const CATEGORY_IMAGE_BY_KEY: Record<string, string> = {
+  terrassement: "/images/calculators/terrassement.png",
+  foundations: "/images/calculators/fondations.png",
+  substructure: "/images/calculators/soubassement.png",
+  masonry: "/images/calculators/murs.png",
+  concrete: "/images/calculators/beton-dalle.png",
+  roofing: "/images/calculators/toiture.png",
+  waterproofing: "/images/calculators/soubassement.png",
+  electric: "/images/calculators/electricite.png",
+  plumbing: "/images/calculators/plomberie.png",
+  facade: "/images/calculators/facade.png",
+  exterior: "/images/calculators/exterieurs.png",
+  screed: "/images/calculators/ragreage.png",
+  plaster: "/images/calculators/placo-isolation.png",
+  tiling: "/images/calculators/carrelage.png",
+  insulation: "/images/calculators/placo-isolation.png",
+  garden: "/images/calculators/exterieurs.png",
+  networks: "/images/calculators/terrassement.png",
+  fencing: "/images/calculators/exterieurs.png",
+  gates: "/images/calculators/exterieurs.png",
+  pool: "/images/calculators/exterieurs.png",
+  rental: "/images/calculators/terrassement.png",
+  other: "/images/calculators/menuiseries.png",
+};
+
+/**
+ * Returns an image URL for a system material key.
+ * - Prefers more specific images for key families (blocks, concrete, electrical...)
+ * - Falls back to a category image.
+ */
+export const getMaterialImageUrl = (key: string): string => {
+  const k = String(key || "").toUpperCase();
+
+  // Specific families (more intuitive than pure categories)
+  if (k.includes("BLOCK") || k.includes("BRICK") || k.includes("MORTAR") || k.includes("CEMENT")) {
+    return "/images/calculators/murs.png";
+  }
+  if (k.includes("CONCRETE") || k.includes("REBAR") || k.includes("MESH") || k.includes("RING_BEAM")) {
+    return "/images/calculators/beton-dalle.png";
+  }
+  if (k.includes("BITUMEN") || k.includes("DELTA") || k.includes("DRAIN") || k.includes("WATERPROOF")) {
+    return "/images/calculators/soubassement.png";
+  }
+  if (k.includes("CABLE") || k.includes("BREAKER") || k.includes("SOCKET") || k.includes("SWITCH") || k.includes("CONDUIT")) {
+    return "/images/calculators/electricite.png";
+  }
+  if (k.includes("PVC") || k.includes("PER") || k.includes("PIPE") || k.includes("EVAC")) {
+    return "/images/calculators/plomberie.png";
+  }
+  if (k.includes("ROOF") || k.includes("BATTEN") || k.includes("UNDERLAY")) {
+    return "/images/calculators/toiture.png";
+  }
+  if (k.includes("PAINT") || k.includes("PRIMER")) {
+    return "/images/calculators/peinture.png";
+  }
+
+  const cKey = inferCategoryKey(key);
+  return CATEGORY_IMAGE_BY_KEY[cKey] || CATEGORY_IMAGE_BY_KEY.other;
 };
 
 /* -------------------------------------------------------

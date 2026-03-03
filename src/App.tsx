@@ -440,9 +440,27 @@ const ProjectCalculatorWrapper: React.FC = () => {
                 {Array.isArray(result.materials) &&
                   result.materials.map((m: any) => (
                     <li key={m.id} className="border-b border-slate-50 last:border-0 pb-2">
-                      <div className="flex justify-between items-start">
-                        <span className="font-medium text-slate-700">{m.name}</span>
-                        <span className="font-extrabold bg-slate-100 px-2 py-0.5 rounded text-slate-800">
+                      <div className="flex justify-between items-start gap-3">
+                        <div className="flex items-start gap-3 min-w-0">
+                          {m.refKey && (
+                            <div className="w-10 h-10 rounded-lg bg-slate-50 border border-slate-100 overflow-hidden shrink-0">
+                              <img
+                                src={`/images/materials/${m.refKey}.png`}
+                                alt={m.name}
+                                className="w-full h-full object-cover"
+                                loading="lazy"
+                                draggable={false}
+                                onError={(e) => {
+                                  (e.currentTarget as HTMLImageElement).style.display = "none";
+                                }}
+                              />
+                            </div>
+                          )}
+
+                          <span className="font-medium text-slate-700 truncate">{m.name}</span>
+                        </div>
+
+                        <span className="font-extrabold bg-slate-100 px-2 py-0.5 rounded text-slate-800 whitespace-nowrap">
                           {m.quantity} {m.unit}
                         </span>
                       </div>

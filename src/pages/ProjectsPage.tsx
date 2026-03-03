@@ -155,11 +155,28 @@ export const ProjectsPage: React.FC = () => {
                     key={item.id}
                     className="flex justify-between items-center p-3 bg-slate-50 rounded-xl border border-slate-100 print:border-slate-300"
                   >
-                    <div>
-                      <span className="font-extrabold text-slate-700 block text-sm">{item.name}</span>
+                    <div className="flex items-center gap-3 min-w-0">
+                      {item.refKey && (
+                        <div className="w-10 h-10 rounded-lg bg-white border border-slate-200 overflow-hidden shrink-0">
+                          <img
+                            src={`/images/materials/${item.refKey}.png`}
+                            alt={item.name}
+                            className="w-full h-full object-cover"
+                            loading="lazy"
+                            draggable={false}
+                            onError={(e) => {
+                              (e.currentTarget as HTMLImageElement).style.display = "none";
+                            }}
+                          />
+                        </div>
+                      )}
+
+                      <div className="min-w-0">
+                        <span className="font-extrabold text-slate-700 block text-sm truncate">{item.name}</span>
                       <span className="text-xs text-slate-500 font-medium">
                         {item.quantity} {item.unit} × {euro.format(item.unitPrice)}
                       </span>
+                      </div>
                     </div>
                     <span className="font-extrabold text-slate-800">{euro.format(item.totalPrice)}</span>
                   </li>

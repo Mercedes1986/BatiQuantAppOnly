@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { getSystemMaterialsList } from "../../services/materialsService";
 import {
   Settings,
   Download,
@@ -58,6 +59,21 @@ export const QuotePanel: React.FC<Props> = ({ project, onUpdate }) => {
       }),
     [i18n.language]
   );
+
+  // Label->image index for lines coming from calculators
+  const systemImageByLabel = useMemo(() => {
+    const map = new Map<string, string>();
+    try {
+      const list = getSystemMaterialsList();
+      list.forEach((m: any) => {
+        const k = String(m.label || "").toLowerCase().trim();
+        if (k) map.set(k, m.imageUrl || "");
+      });
+    } catch {
+      // ignore
+    }
+    return map;
+  }, [i18n.language]);
 
   const computed: ComputedQuote = useMemo(() => calculateQuote(project), [project]);
 
@@ -302,12 +318,32 @@ export const QuotePanel: React.FC<Props> = ({ project, onUpdate }) => {
                     {section.items.map((item, idx) => (
                       <tr key={`${section.id}-${idx}`} className={item.isManual ? "bg-amber-50/30" : ""}>
                         <td className="p-3 pl-4">
-                          <div className="font-medium text-slate-800">{item.label}</div>
+                          <div className="flex items-center gap-3">
+                            <div className="w-9 h-9 rounded-xl overflow-hidden border border-slate-200 bg-white flex items-center justify-center">
+                              <img
+                                src={
+                                  systemImageByLabel.get(String(item.label || "").toLowerCase().trim()) ||
+                                  "/images/calculators/menuiseries.png"
+                                }
+                                alt=""
+                                className="w-full h-full object-cover"
+                                draggable={false}
+                                loading="lazy"
+                                onError={(e) => {
+                                  (e.currentTarget as HTMLImageElement).src = "/images/calculators/menuiseries.png";
+                                }}
+                              />
+                            </div>
+
+                            <div>
+                              <div className="font-medium text-slate-800">{item.label}</div>
                           {item.type === "labor" && (
                             <span className="text-[10px] text-amber-600 bg-amber-100 px-1 rounded">
                               {t("quote.labor_tag", { defaultValue: "Main d'œuvre" })}
                             </span>
                           )}
+                            </div>
+                          </div>
                         </td>
 
                         <td className="p-3 text-center text-slate-600">
