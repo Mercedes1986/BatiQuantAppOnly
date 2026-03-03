@@ -552,7 +552,7 @@ export const HouseProjectPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-slate-50 p-4 pb-20">
       <h1 className="text-2xl font-extrabold text-slate-800 mb-6">
-        {t("house.my_sites", { defaultValue: "My sites" })}
+        {t("house.my_sites", { defaultValue: "My sites (full estimate)" })}
       </h1>
 
       {isCreating ? (

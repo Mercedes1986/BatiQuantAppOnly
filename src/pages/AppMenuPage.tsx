@@ -216,7 +216,7 @@ export const AppMenuPage: React.FC = () => {
           </div>
 
           <button
-            onClick={() => navigate("/app")}
+            onClick={() => navigate("/app/projects")}
             className="inline-flex items-center px-3 py-2 rounded-xl text-sm font-extrabold bg-slate-100 text-slate-700 hover:bg-slate-200"
             title={t("menu.back_dashboard_title", { defaultValue: "Back to dashboard" })}
             type="button"

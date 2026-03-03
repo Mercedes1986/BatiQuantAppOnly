@@ -1,6 +1,6 @@
 // ProjectsPage.tsx (updated: EN defaultValue to avoid FR fallback, keys unchanged)
 import React, { useState, useEffect, useMemo } from "react";
-import { Trash2, Printer, ChevronRight, PieChart, FileText, FolderOpen } from "lucide-react";
+import { Trash2, Printer, ChevronRight, PieChart, FileText, FolderOpen, Plus } from "lucide-react";
 import { getProjects, deleteProject } from "../services/storage";
 import { Project, ClientInfo } from "../types";
 import { PieChart as RePieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
@@ -245,6 +245,54 @@ export const ProjectsPage: React.FC = () => {
       <h1 className="text-2xl font-extrabold text-slate-800 mb-6 px-2">
         {t("projects.title", { defaultValue: "My projects (calculations)" })}
       </h1>
+
+      <p className="-mt-4 mb-6 px-2 text-sm text-slate-500 font-medium">
+        {t("projects.subtitle", {
+          defaultValue: "Saved from individual calculators (single calculations).",
+        })}
+      </p>
+
+      <div className="px-2 mb-6">
+        <button
+          onClick={() => navigate("/app/calculators")}
+          className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-transform active:scale-[0.98] hover:shadow-md w-full"
+          type="button"
+        >
+          <div className="absolute inset-0">
+            <img
+              src="/images/menu/calcul.jpg"
+              alt=""
+              className="w-full h-full object-cover"
+              draggable={false}
+              onError={(e) => {
+                (e.currentTarget as HTMLImageElement).src = "/images/menu/fallback.jpg";
+              }}
+            />
+            <div className="absolute inset-0 bg-black/25" />
+            <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/35 to-black/10" />
+          </div>
+
+          <div className="relative z-10 w-full p-5 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-11 h-11 rounded-full bg-white/90 border border-white/60 flex items-center justify-center shadow-sm">
+                <Plus className="text-blue-600" size={22} />
+              </div>
+              <div className="text-left">
+                <div className="text-white font-extrabold text-base leading-tight">
+                  {t("projects.create_new", { defaultValue: "Create a calculation" })}
+                </div>
+                <div className="text-white/80 text-xs font-semibold mt-0.5">
+                  {t("projects.create_new_hint", { defaultValue: "Choose a calculator and save the result here" })}
+                </div>
+              </div>
+            </div>
+
+            <div className="w-9 h-9 rounded-full bg-white/20 border border-white/30 flex items-center justify-center">
+              <ChevronRight className="text-white" size={18} />
+            </div>
+          </div>
+        </button>
+      </div>
 
       {projects.length === 0 ? (
         <div className="text-center py-20 opacity-50">

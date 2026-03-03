@@ -485,26 +485,25 @@ const AppLayout = () => {
       ? "settings"
       : location.pathname.includes("house") || location.pathname.includes("quotes") || location.pathname.includes("invoices")
         ? "house"
-        : location.pathname.includes("projects")
+        : location.pathname.includes("projects") || location.pathname.includes("calculators")
           ? "projects"
           : location.pathname.includes("materials")
             ? "materials"
-            : "home";
+            : "projects";
 
   const handleNavChange = (tab: string) => {
     setCurrentCalc(null);
 
     if (tab === "menu") navigate("/app/menu");
-    if (tab === "home") navigate("/app");
-    if (tab === "house") navigate("/app/house");
     if (tab === "projects") navigate("/app/projects");
+    if (tab === "house") navigate("/app/house");
     if (tab === "materials") navigate("/app/materials");
     if (tab === "settings") navigate("/app/settings");
   };
 
-  // ✅ /app?calc=... -> opens calculator (safe)
+  // ✅ /app/calculators?calc=... -> opens calculator (safe)
   useEffect(() => {
-    if (location.pathname !== "/app") return;
+    if (location.pathname !== "/app/calculators") return;
     const sp = new URLSearchParams(location.search);
     const resolved = resolveCalcFromParam(sp.get("calc"));
     if (resolved) setCurrentCalc(resolved);
@@ -550,7 +549,7 @@ const NotFoundPage: React.FC = () => {
       <p className="mt-3 text-slate-600">
         {t("notfound.description", { defaultValue: "This page doesn’t exist." })}
       </p>
-      <Link to="/app" className="inline-flex mt-6 px-4 py-2 rounded-lg bg-blue-600 text-white font-bold">
+      <Link to="/app/projects" className="inline-flex mt-6 px-4 py-2 rounded-lg bg-blue-600 text-white font-bold">
         {t("notfound.go_to_app", { defaultValue: "Go to app" })}
       </Link>
     </div>
@@ -569,7 +568,8 @@ const App: React.FC = () => {
 
           {/* App zone */}
           <Route path="/app" element={<AppLayout />}>
-            <Route index element={<DashboardOutlet />} />
+            <Route index element={<Navigate to="projects" replace />} />
+            <Route path="calculators" element={<DashboardOutlet />} />
             <Route path="menu" element={<AppMenuPage />} />
             <Route path="house" element={<HouseProjectPage />} />
             <Route path="projects" element={<ProjectsPage />} />

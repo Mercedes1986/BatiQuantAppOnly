@@ -1807,7 +1807,7 @@
     "edit_data": "Edit data",
     "generate_quote": "Generate quote",
     "levels": "Levels",
-    "my_sites": "My sites",
+    "my_sites": "My sites (full estimate)",
     "need_company_profile": "You need to complete your company profile first.",
     "new_project": "New project",
     "new_site": "New site",
@@ -2123,7 +2123,7 @@
     "confirm_delete": "Delete this project?",
     "cost_breakdown": "Cost breakdown",
     "created_on": "Created on",
-    "empty": "No projects yet.",
+    "empty": "No saved calculations.",
     "items": "Items",
     "materials_list": "Materials list",
     "need_company_profile": "Complete your company profile to generate documents.",
@@ -2132,8 +2132,11 @@
     "print_footer": "Generated with BatiQuant",
     "quote": "Quote",
     "quote_error": "Quote error",
-    "title": "Projects",
-    "total_estimated": "Total estimated"
+    "title": "My calculations",
+    "subtitle": "Saved from individual calculators (single calculations).",
+    "total_estimated": "Total estimated",
+    "create_new": "Create a calculation",
+    "create_new_hint": "Choose a calculator and save the result here"
   },
   "quote": {
     "addline": {

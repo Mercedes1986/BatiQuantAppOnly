@@ -1885,7 +1885,7 @@
     "edit_data": "Modifier les données",
     "generate_quote": "Générer un devis",
     "levels": "Niveaux",
-    "my_sites": "Mes chantiers",
+    "my_sites": "Mes chantiers (estimation complète)",
     "need_company_profile": "Complétez d’abord le profil entreprise.",
     "new_project": "Nouveau projet",
     "new_site": "Nouveau chantier",
@@ -2326,7 +2326,7 @@
     "confirm_delete": "Supprimer ce projet ?",
     "cost_breakdown": "Détail des coûts",
     "created_on": "Créé le",
-    "empty": "Aucun projet.",
+    "empty": "Aucun calcul sauvegardé.",
     "items": "Éléments",
     "materials_list": "Liste matériaux",
     "need_company_profile": "Complétez le profil entreprise pour générer des documents.",
@@ -2335,8 +2335,11 @@
     "print_footer": "Généré avec BatiQuant",
     "quote": "Devis",
     "quote_error": "Erreur devis",
-    "title": "Projets",
-    "total_estimated": "Total estimé"
+    "title": "Mes calculs",
+    "subtitle": "Sauvegardes issues des calculateurs (calculs unitaires)",
+    "total_estimated": "Total estimé",
+    "create_new": "Créer un calcul",
+    "create_new_hint": "Choisissez un calculateur et sauvegardez le résultat ici"
   },
   "quote": {
     "addline": {

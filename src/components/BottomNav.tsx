@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { Home, FolderOpen, Settings, Hammer, Package, Menu } from "lucide-react";
+import { FolderOpen, Settings, Hammer, Package, Menu } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 interface BottomNavProps {
@@ -19,9 +19,12 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, onChange }) =>
   const navItems: NavItem[] = useMemo(
     () => [
       { id: "menu", icon: Menu, label: t("nav.menu", { defaultValue: "Menu" }) },
-      { id: "home", icon: Home, label: t("nav.calc", { defaultValue: "Calculator" }) },
+      {
+        id: "projects",
+        icon: FolderOpen,
+        label: t("nav.projects", { defaultValue: "Projects" }),
+      },
       { id: "house", icon: Hammer, label: t("nav.site", { defaultValue: "Site" }) },
-      { id: "projects", icon: FolderOpen, label: t("nav.projects", { defaultValue: "Projects" }) },
       { id: "materials", icon: Package, label: t("nav.materials", { defaultValue: "Mat." }) },
       { id: "settings", icon: Settings, label: t("nav.settings", { defaultValue: "Settings" }) },
     ],
@@ -43,11 +46,10 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, onChange }) =>
               }`}
               aria-current={active ? "page" : undefined}
               aria-label={item.label}
+              type="button"
             >
               <Icon size={active ? 22 : 20} strokeWidth={active ? 2.5 : 2} />
-              <span className={`text-[10px] font-medium ${active ? "text-blue-700" : ""}`}>
-                {item.label}
-              </span>
+              <span className={`text-[10px] font-medium ${active ? "text-blue-700" : ""}`}>{item.label}</span>
             </button>
           );
         })}
