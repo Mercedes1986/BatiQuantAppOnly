@@ -276,7 +276,7 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
           th: selectedSpec.thicknessCm,
           defaultValue: `${selectedSpec.unitsPerM2.toFixed(2)} units/m² — th. ${selectedSpec.thicknessCm}cm`,
         }),
-        systemKey: blockKey,
+        refKey: blockKey,
       });
 
       // Mortar / glue
@@ -305,7 +305,7 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
           selectedSpec.mortarKind === "mortier"
             ? t("calc.substructure.mat.mortar_ratio", { defaultValue: "~1 bag / 3 m²" })
             : t("calc.substructure.mat.glue_ratio", { defaultValue: "~1 bag / 5 m²" }),
-        systemKey: mortarKey,
+        refKey: mortarKey,
       });
 
       // Stepoc: concrete infill
@@ -337,7 +337,7 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
                   lpm2: stepocFillRate,
                   defaultValue: `${stepocFillRate} L/m² (fallback)`,
                 }),
-          systemKey: KEYS.CONCRETE,
+          refKey: KEYS.CONCRETE,
         });
       }
     } else {
@@ -362,7 +362,7 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
         unitPrice: round2(concUnit),
         totalPrice: round2(costConc),
         category: CalculatorType.SUBSTRUCTURE,
-        systemKey: KEYS.CONCRETE,
+        refKey: KEYS.CONCRETE,
       });
     }
 
@@ -384,7 +384,7 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
         totalPrice: round2(costArase),
         category: CalculatorType.SUBSTRUCTURE,
         details: t("calc.substructure.mat.dpc_ratio", { defaultValue: "≈ 1 roll / 20 m" }),
-        systemKey: KEYS.ARASE_ROLL,
+        refKey: KEYS.ARASE_ROLL,
       });
     }
 
@@ -414,7 +414,7 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
           m2: treatedSurface.toFixed(1),
           defaultValue: `${kgNeeded.toFixed(1)} kg over ${treatedSurface.toFixed(1)} m²`,
         }),
-        systemKey: KEYS.BITUMEN,
+        refKey: KEYS.BITUMEN,
       });
     }
 
@@ -438,7 +438,7 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
         totalPrice: round2(costDelta),
         category: CalculatorType.SUBSTRUCTURE,
         details: t("calc.substructure.mat.delta_ms_overlap", { defaultValue: "≈ +15% overlaps" }),
-        systemKey: KEYS.DELTA_ROLL,
+        refKey: KEYS.DELTA_ROLL,
       });
 
       // Profiles: ~1 per 2m
@@ -456,7 +456,7 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
         unitPrice: round2(profUnit),
         totalPrice: round2(costProf),
         category: CalculatorType.SUBSTRUCTURE,
-        systemKey: KEYS.DELTA_PROFILE,
+        refKey: KEYS.DELTA_PROFILE,
       });
     }
 
@@ -480,7 +480,7 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
         unitPrice: round2(drainM),
         totalPrice: round2(costDrain),
         category: CalculatorType.SUBSTRUCTURE,
-        systemKey: KEYS.DRAIN_ROLL,
+        refKey: KEYS.DRAIN_ROLL,
       });
 
       // Gravel
@@ -506,7 +506,7 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
           vol: volGrav.toFixed(2),
           defaultValue: `Vol: ${volGrav.toFixed(2)} m³`,
         }),
-        systemKey: KEYS.GRAVEL_TON,
+        refKey: KEYS.GRAVEL_TON,
       });
 
       // Geotextile
@@ -527,7 +527,7 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
           unitPrice: round2(geoUnit),
           totalPrice: round2(costGeo),
           category: CalculatorType.SUBSTRUCTURE,
-          systemKey: KEYS.GEO_M2,
+          refKey: KEYS.GEO_M2,
         });
       }
 
@@ -547,7 +547,7 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
           unitPrice: round2(manUnit),
           totalPrice: round2(costMan),
           category: CalculatorType.SUBSTRUCTURE,
-          systemKey: KEYS.MANHOLE,
+          refKey: KEYS.MANHOLE,
         });
       }
     }

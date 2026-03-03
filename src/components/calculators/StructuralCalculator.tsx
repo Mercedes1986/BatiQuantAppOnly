@@ -91,7 +91,7 @@ type GroundworkPrices = {
 };
 
 type WallPrices = {
-  // ✅ Price overrides by systemKey (ex: BLOCK_20_UNIT, BRICK_15_UNIT...)
+  // ✅ Price overrides by refKey (ex: BLOCK_20_UNIT, BRICK_15_UNIT...)
   unitOverrides: Record<string, number>;
 
   mortarBag: number;
@@ -723,7 +723,7 @@ export const StructuralCalculator: React.FC<Props> = ({
           unitPrice: fdPrices.concrete,
           totalPrice: costConc,
           category: CalculatorType.FOUNDATIONS,
-          systemKey: "BPE_M3",
+          refKey: "BPE_M3",
         });
 
         const cages = Math.ceil(L / 6);
@@ -738,7 +738,7 @@ export const StructuralCalculator: React.FC<Props> = ({
           unitPrice: fdPrices.rebarCage,
           totalPrice: costRebar,
           category: CalculatorType.FOUNDATIONS,
-          systemKey: "REBAR_CAGE_35_15_6M",
+          refKey: "REBAR_CAGE_35_15_6M",
           details: tr("struct.fd.rebar_ratio"),
         });
       }
@@ -766,7 +766,7 @@ export const StructuralCalculator: React.FC<Props> = ({
           unitPrice: fdPrices.concrete,
           totalPrice: costPadsConc,
           category: CalculatorType.FOUNDATIONS,
-          systemKey: "BPE_M3",
+          refKey: "BPE_M3",
         });
       }
 
@@ -786,7 +786,7 @@ export const StructuralCalculator: React.FC<Props> = ({
           unitPrice: fdPrices.concrete,
           totalPrice: costRaftConc,
           category: CalculatorType.FOUNDATIONS,
-          systemKey: "BPE_M3",
+          refKey: "BPE_M3",
         });
 
         const panelCover = 14.4;
@@ -802,7 +802,7 @@ export const StructuralCalculator: React.FC<Props> = ({
           unitPrice: fdPrices.meshPanel,
           totalPrice: costMesh,
           category: CalculatorType.FOUNDATIONS,
-          systemKey: "MESH_PANEL_ST25",
+          refKey: "MESH_PANEL_ST25",
           details: tr("struct.fd.mesh_ratio"),
         });
       }
@@ -843,7 +843,7 @@ export const StructuralCalculator: React.FC<Props> = ({
           unitPrice: fdPrices.cleanConcrete,
           totalPrice: costClean,
           category: CalculatorType.FOUNDATIONS,
-          systemKey: "CLEAN_CONCRETE_M3",
+          refKey: "CLEAN_CONCRETE_M3",
         });
       }
 
@@ -887,7 +887,7 @@ export const StructuralCalculator: React.FC<Props> = ({
           unitPrice: fdPrices.excavation,
           totalPrice: costExcav,
           category: CalculatorType.FOUNDATIONS,
-          systemKey: "EXCAVATION_M3",
+          refKey: "EXCAVATION_M3",
           details: tr("struct.common.multiplier", { x: swellCoef }),
         });
 
@@ -923,7 +923,7 @@ export const StructuralCalculator: React.FC<Props> = ({
           unitPrice: fdPrices.formwork,
           totalPrice: costForm,
           category: CalculatorType.FOUNDATIONS,
-          systemKey: "FORM_PANEL_M2",
+          refKey: "FORM_PANEL_M2",
         });
       }
 
@@ -1065,7 +1065,7 @@ export const StructuralCalculator: React.FC<Props> = ({
         unitPrice,
         totalPrice: costUnits,
         category: CalculatorType.WALLS,
-        systemKey: priceKey,
+        refKey: priceKey,
       });
 
       // Stepoc fill
@@ -1087,7 +1087,7 @@ export const StructuralCalculator: React.FC<Props> = ({
           unitPrice: concreteUnit,
           totalPrice: costFill,
           category: CalculatorType.WALLS,
-          systemKey: concreteKey,
+          refKey: concreteKey,
           details: tr("struct.walls.stepoc_fill_details", { lpm2: (fillM3PerM2 * 1000).toFixed(0) }),
         });
       } else {
@@ -1107,7 +1107,7 @@ export const StructuralCalculator: React.FC<Props> = ({
             unitPrice: glueUnit,
             totalPrice: costGlue,
             category: CalculatorType.WALLS,
-            systemKey: glueKey,
+            refKey: glueKey,
             details: tr("struct.walls.glue_ratio"),
           });
         } else {
@@ -1126,7 +1126,7 @@ export const StructuralCalculator: React.FC<Props> = ({
             unitPrice: mortarUnit,
             totalPrice: costMortar,
             category: CalculatorType.WALLS,
-            systemKey: mortarKey,
+            refKey: mortarKey,
             details: tr("struct.walls.mortar_ratio"),
           });
         }
@@ -1152,7 +1152,7 @@ export const StructuralCalculator: React.FC<Props> = ({
           unitPrice: lintelUnit,
           totalPrice: costLintel,
           category: CalculatorType.WALLS,
-          systemKey: lintelKey,
+          refKey: lintelKey,
         });
       }
 
@@ -1177,7 +1177,7 @@ export const StructuralCalculator: React.FC<Props> = ({
           unitPrice: concreteUnit,
           totalPrice: costChConc,
           category: CalculatorType.WALLS,
-          systemKey: concreteKey,
+          refKey: concreteKey,
         });
 
         const steelKg = lenCh * 2;
@@ -1197,7 +1197,7 @@ export const StructuralCalculator: React.FC<Props> = ({
           unitPrice: steelUnit,
           totalPrice: costSteel,
           category: CalculatorType.WALLS,
-          systemKey: steelKey,
+          refKey: steelKey,
         });
       }
 
@@ -1222,7 +1222,7 @@ export const StructuralCalculator: React.FC<Props> = ({
           unitPrice: concreteUnit,
           totalPrice: costVertConc,
           category: CalculatorType.WALLS,
-          systemKey: concreteKey,
+          refKey: concreteKey,
         });
 
         const steelVertKg = totalH_vert * 2;
@@ -1242,7 +1242,7 @@ export const StructuralCalculator: React.FC<Props> = ({
           unitPrice: steelUnit,
           totalPrice: costVertSteel,
           category: CalculatorType.WALLS,
-          systemKey: steelKey,
+          refKey: steelKey,
         });
       }
 
@@ -1263,7 +1263,7 @@ export const StructuralCalculator: React.FC<Props> = ({
           unitPrice: coatExtUnit,
           totalPrice: costCoat,
           category: CalculatorType.WALLS,
-          systemKey: coatExtKey,
+          refKey: coatExtKey,
         });
       }
 
@@ -1285,7 +1285,7 @@ export const StructuralCalculator: React.FC<Props> = ({
           unitPrice: coatIntUnit,
           totalPrice: costPlaster,
           category: CalculatorType.WALLS,
-          systemKey: coatIntKey,
+          refKey: coatIntKey,
         });
       }
 

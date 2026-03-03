@@ -70,7 +70,7 @@ interface ExtItem {
   type: string;
   label: string;
   quantity: number; // ml or u
-  systemKey: string;
+  refKey: string;
   optionKey?: string;
   optionQty?: number;
   height?: number;
@@ -94,7 +94,7 @@ interface ExtGardenItem {
   label: string;
   quantity: number;
   unit: Unit;
-  systemKey: string;
+  refKey: string;
   meta?: any;
 }
 
@@ -263,7 +263,7 @@ export const ExteriorCalculator: React.FC<Props> = ({ onCalculate }) => {
         type: fenceType,
         label: t("calc.exterior.items.fence", { defaultValue: "Fence" }),
         quantity: L,
-        systemKey: key,
+        refKey: key,
       },
     ]);
 
@@ -279,7 +279,7 @@ export const ExteriorCalculator: React.FC<Props> = ({ onCalculate }) => {
         type: "standard",
         label: t("calc.exterior.items.gate", { defaultValue: "Portail" }),
         quantity: 1,
-        systemKey: "GATE_UNIT",
+        refKey: "GATE_UNIT",
         optionKey: "GATE_MOTOR_UNIT",
         optionQty: 0,
       },
@@ -295,7 +295,7 @@ export const ExteriorCalculator: React.FC<Props> = ({ onCalculate }) => {
         type: "standard",
         label: t("calc.exterior.items.pool", { defaultValue: "Piscine" }),
         quantity: 1,
-        systemKey: "POOL_UNIT",
+        refKey: "POOL_UNIT",
         optionKey: "POOL_INSTALL_UNIT",
         optionQty: 1,
       },
@@ -334,7 +334,7 @@ export const ExteriorCalculator: React.FC<Props> = ({ onCalculate }) => {
         id: Date.now().toString(),
         category: cat,
         label,
-        systemKey: key,
+        refKey: key,
         quantity: qty,
         unit,
       },
@@ -372,7 +372,7 @@ export const ExteriorCalculator: React.FC<Props> = ({ onCalculate }) => {
         totalPrice: fmt2(total),
         category: cat,
         details,
-        systemKey: key,
+        refKey: key,
       });
 
       return total;
@@ -572,7 +572,7 @@ export const ExteriorCalculator: React.FC<Props> = ({ onCalculate }) => {
         it.label,
         it.quantity,
         it.category === "fence" ? Unit.METER : Unit.PIECE,
-        it.systemKey,
+        it.refKey,
         CalculatorType.EXTERIOR
       );
 
@@ -677,7 +677,7 @@ export const ExteriorCalculator: React.FC<Props> = ({ onCalculate }) => {
 
     // 5) GARDEN
     gardenItems.forEach((g) => {
-      totalCost += addMat(g.id, g.label, g.quantity, g.unit, g.systemKey, CalculatorType.EXTERIOR);
+      totalCost += addMat(g.id, g.label, g.quantity, g.unit, g.refKey, CalculatorType.EXTERIOR);
     });
 
     return {
