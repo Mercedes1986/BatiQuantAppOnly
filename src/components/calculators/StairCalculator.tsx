@@ -134,7 +134,7 @@ export const StairCalculator: React.FC<Props> = ({ onCalculate }) => {
     setNumSteps((n) => n + 1);
   };
 
-  const stairTypeLabel = (tp: StairType) => t(`calc.stairs.type.${tp}`, { defaultValue: tp });
+  const stairTypeLabel = (tp: StairType) => t(`calc.stairs.shape.${tp}`, { defaultValue: tp });
   const calcModeLabel = (m: CalcMode) => t(`calc.stairs.calc_mode.${m}`, { defaultValue: m });
 
   const stepLabel = (s: number) => {

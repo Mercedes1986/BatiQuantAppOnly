@@ -1429,7 +1429,16 @@
       "warn_riser_high": "Contremarche trop haute.",
       "warn_riser_low": "Contremarche trop basse.",
       "warn_slope": "Pente trop forte.",
-      "warn_tread_short": "Giron trop court."
+      "warn_tread_short": "Giron trop court.",
+      "shape": {
+        "straight": "Droit",
+        "quarter": "Quart-tournant",
+        "half": "Demi-tournant"
+      },
+      "calc_mode": {
+        "auto": "Auto",
+        "fixed_N": "Fixé"
+      }
     },
     "substructure": {
       "detail": {
