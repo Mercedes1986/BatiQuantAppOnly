@@ -150,7 +150,7 @@ export const SettingsPage: React.FC = () => {
   };
 
   return (
-    <div className="p-4 pb-20 bg-slate-50 min-h-screen">
+    <div className="p-4 pb-20 bg-transparent min-h-screen">
       <h1 className="text-2xl font-extrabold text-slate-800 mb-6 px-2">
         {t("settings.title", { defaultValue: "Settings" })}
       </h1>

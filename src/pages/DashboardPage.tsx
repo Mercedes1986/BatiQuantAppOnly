@@ -14,7 +14,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onSelectCalc }) =>
   const { t } = useTranslation();
 
   return (
-    <div className="min-h-screen bg-slate-50 animate-in fade-in">
+    <div className="min-h-screen bg-transparent animate-in fade-in">
       <div className="max-w-7xl mx-auto p-4 pb-24">
         <header className="mb-6 mt-2 px-2">
           <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">

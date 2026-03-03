@@ -245,7 +245,7 @@ export const MaterialsPage: React.FC = () => {
       : t("materials.tabs.data", { defaultValue: "Data" });
 
   return (
-    <div className="pb-20 min-h-screen bg-slate-50">
+    <div className="pb-20 min-h-screen bg-transparent">
       <div className="bg-white sticky top-0 z-20 border-b border-slate-200 shadow-sm">
         <div className="p-4">
           <div className="flex justify-between items-center mb-4">

@@ -479,6 +479,26 @@ const AppLayout = () => {
   const location = useLocation();
   const [currentCalc, setCurrentCalc] = useState<CalculatorType | null>(null);
 
+  // Background image per section (served from /public/backgrounds)
+  const bgUrl = useMemo(() => {
+    // IMPORTANT: ensure absolute URLs in dev/prod.
+    // If BASE_URL is empty (common in dev), we still want `/backgrounds/...` (not `backgrounds/...`).
+    const rawBase = (import.meta.env.BASE_URL ?? "/") || "/";
+    const base = rawBase.replace(/\/+$/, "");
+    const p = location.pathname;
+
+    const pick = (name: string) => `${base}/backgrounds/${name}`;
+
+    if (p.includes("/app/house")) return pick("bg-house.png");
+    if (p.includes("/app/materials")) return pick("bg-materials.png");
+    if (p.includes("/app/settings")) return pick("bg-settings.png");
+    if (p.includes("/app/quotes") || p.includes("/app/invoices") || p.includes("/app/print")) return pick("bg-docs.png");
+    if (p.includes("/app/menu")) return pick("bg-menu.png");
+    // projects + calculators + calculator wrapper
+    if (p.includes("/app/projects") || p.includes("/app/calculators") || p.includes("/app/calculator")) return pick("bg-projects.png");
+    return pick("bg-menu.png");
+  }, [location.pathname]);
+
   const currentTab = location.pathname.startsWith("/app/menu")
     ? "menu"
     : location.pathname.includes("settings")
@@ -531,10 +551,18 @@ const AppLayout = () => {
   }
 
   return (
-    <>
-      <Outlet context={{ setCurrentCalc }} />
+    <div className="app-bg min-h-screen relative">
+      {/* background layers */}
+      <div className="app-bg__image" style={{ backgroundImage: `url('${bgUrl}')` }} aria-hidden="true" />
+      <div className="app-bg__veil" aria-hidden="true" />
+
+      {/* content */}
+      <div className="relative z-10">
+        <Outlet context={{ setCurrentCalc }} />
+      </div>
+
       <BottomNav currentTab={currentTab} onChange={handleNavChange} />
-    </>
+    </div>
   );
 };
 

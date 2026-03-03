@@ -36,6 +36,7 @@ import { useTranslation } from "react-i18next";
  * - Keep the same i18n keys (house.*, common.*)
  * - Replace ALL defaultValue FR -> EN to avoid FR fallback when EN key is missing (prevents "Franglais")
  * - Do not change logic / routing / data model
+ * - Make "House" list page visually consistent with "Projects" (hero CTA + same list cards)
  */
 export const HouseProjectPage: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -57,7 +58,8 @@ export const HouseProjectPage: React.FC = () => {
 
   const [showClientModal, setShowClientModal] = useState(false);
 
-  const createCardImageSrc = "/images/chantiers/creer-chantier.png";
+  // Hero image (same spirit as Projects page)
+  const heroImageSrc = "/images/chantiers/creer-chantier.png";
 
   const euro = useMemo(
     () =>
@@ -178,8 +180,7 @@ export const HouseProjectPage: React.FC = () => {
     if (!profile || !profile.name) {
       const ok = window.confirm(
         t("house.need_company_profile", {
-          defaultValue:
-            "You must first set up your company profile in Settings. Go there now?",
+          defaultValue: "You must first set up your company profile in Settings. Go there now?",
         })
       );
       if (ok) navigate("/app/settings");
@@ -208,14 +209,15 @@ export const HouseProjectPage: React.FC = () => {
     }
   };
 
+  const getProjectTotal = (p: HouseProject) => {
+    return (Object.values(p.steps) as any[]).reduce((sum, s) => sum + (s?.cost || 0), 0);
+  };
+
   if (currentProject) {
-    const totalBudget = (Object.values(currentProject.steps) as any[]).reduce(
-      (sum, s) => sum + (s?.cost || 0),
-      0
-    );
+    const totalBudget = getProjectTotal(currentProject);
 
     return (
-      <div className="min-h-screen bg-slate-50 pb-20">
+      <div className="min-h-screen bg-transparent pb-20">
         <div className="bg-white border-b border-slate-200 sticky top-0 z-10 shadow-sm">
           <div className="p-4 flex items-center justify-between">
             <button
@@ -359,7 +361,7 @@ export const HouseProjectPage: React.FC = () => {
                         {t("house.perimeter_label", { defaultValue: "Perimeter" })}
                       </span>
                       <span className="font-extrabold text-slate-800 text-lg">
-                        {currentProject.params.perimeter.toFixed(1)} m
+                        {Number(currentProject.params.perimeter || 0).toFixed(1)} m
                       </span>
                     </div>
 
@@ -516,7 +518,9 @@ export const HouseProjectPage: React.FC = () => {
                           </div>
                         </div>
 
-                        <span className="font-extrabold text-slate-700">{euro.format(q.totalTTC)}</span>
+                        <span className="font-extrabold text-slate-700">
+                          {euro.format(q.totalTTC)}
+                        </span>
                       </div>
                     ))}
                   </div>
@@ -549,11 +553,61 @@ export const HouseProjectPage: React.FC = () => {
     );
   }
 
+  // ===== LIST PAGE (same aesthetic as Projects) =====
   return (
-    <div className="min-h-screen bg-slate-50 p-4 pb-20">
-      <h1 className="text-2xl font-extrabold text-slate-800 mb-6">
-        {t("house.my_sites", { defaultValue: "My sites (full estimate)" })}
-      </h1>
+    <div className="min-h-screen bg-transparent p-4 pb-20">
+      <div className="mb-3">
+        <h1 className="text-2xl font-extrabold text-slate-800">
+          {t("house.my_sites", { defaultValue: "My sites (full estimate)" })}
+        </h1>
+        <p className="text-sm text-slate-500 mt-1">
+          {t("house.my_sites_subtitle", {
+            defaultValue: "Create a site and save results step by step (complete tracking).",
+          })}
+        </p>
+      </div>
+
+      {/* HERO CTA (like Projects) */}
+      {!isCreating && (
+        <button
+          onClick={() => setIsCreating(true)}
+          className="w-full mb-5 group relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm hover:shadow-md active:scale-[0.99] transition-transform"
+          type="button"
+        >
+          <div className="relative h-[110px] sm:h-[120px]">
+            <img
+              src={heroImageSrc}
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover"
+              draggable={false}
+              onError={(e) => {
+                (e.currentTarget as HTMLImageElement).src = "/images/menu/fallback.jpg";
+              }}
+            />
+            <div className="absolute inset-0 bg-black/35" />
+            <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/35 to-transparent" />
+            <div className="relative z-10 h-full w-full p-4 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-11 h-11 rounded-full bg-white/90 border border-white/60 flex items-center justify-center shadow-sm">
+                  <Plus className="text-blue-600" size={22} />
+                </div>
+                <div className="text-left">
+                  <div className="text-white font-extrabold text-base leading-tight">
+                    {t("house.create_site", { defaultValue: "Create a site" })}
+                  </div>
+                  <div className="text-white/80 text-xs font-semibold mt-0.5">
+                    {t("house.new_project", { defaultValue: "New project" })}
+                  </div>
+                </div>
+              </div>
+
+              <div className="w-9 h-9 rounded-full bg-white/20 border border-white/30 flex items-center justify-center">
+                <ChevronRight className="text-white" size={18} />
+              </div>
+            </div>
+          </div>
+        </button>
+      )}
 
       {isCreating ? (
         <div className="bg-white p-4 rounded-xl shadow-lg border border-blue-100 animate-in zoom-in-95">
@@ -609,87 +663,50 @@ export const HouseProjectPage: React.FC = () => {
           </div>
         </div>
       ) : (
-        <div className="grid gap-4">
-          {projects.map((p) => (
-            <div
-              key={p.id}
-              onClick={() => selectProject(p)}
-              className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex justify-between items-center cursor-pointer active:scale-[0.98] transition-transform"
-            >
-              <div className="flex items-center space-x-4">
-                <div className="bg-blue-100 p-3 rounded-full text-blue-600">
-                  <Home size={24} />
-                </div>
-                <div>
-                  <h3 className="font-extrabold text-slate-800">{p.name}</h3>
-                  <p className="text-xs text-slate-500">
-                    {p.params.surfaceArea} m² •{" "}
-                    {new Date(p.date).toLocaleDateString(i18n.language || undefined)}
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-center">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDelete(p.id);
-                  }}
-                  className="p-2 text-slate-300 hover:text-red-400"
-                  type="button"
-                  aria-label={t("common.delete", { defaultValue: "Delete" })}
-                >
-                  <Trash2 size={18} />
-                </button>
-                <ChevronRight className="text-slate-300" size={20} />
-              </div>
-            </div>
-          ))}
-
-          <div className="flex justify-center">
-            <button
-              onClick={() => setIsCreating(true)}
-              className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-transform active:scale-[0.98] hover:shadow-md
-                         w-[220px] h-[220px] sm:w-[260px] sm:h-[260px]"
-              type="button"
-            >
-              <div className="absolute inset-0">
-                <img
-                  src={createCardImageSrc}
-                  alt=""
-                  className="w-full h-full object-cover"
-                  draggable={false}
-                  onError={(e) => {
-                    (e.currentTarget as HTMLImageElement).src = "/images/menu/fallback.jpg";
-                  }}
-                />
-                <div className="absolute inset-0 bg-black/25" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/25 to-transparent" />
-              </div>
-
-              <div className="relative z-10 h-full w-full p-4 flex flex-col justify-end items-start text-left">
-                <div className="flex items-center gap-3">
-                  <div className="w-11 h-11 rounded-full bg-white/90 border border-white/60 flex items-center justify-center shadow-sm">
-                    <Plus className="text-blue-600" size={22} />
+        <div className="space-y-3">
+          {projects.map((p) => {
+            const total = getProjectTotal(p);
+            return (
+              <div
+                key={p.id}
+                onClick={() => selectProject(p)}
+                className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex justify-between items-center cursor-pointer active:scale-[0.98] transition-transform"
+              >
+                <div className="flex items-center space-x-4">
+                  <div className="bg-blue-100 p-3 rounded-full text-blue-600">
+                    <Home size={24} />
                   </div>
                   <div>
-                    <div className="text-white font-extrabold text-base leading-tight">
-                      {t("house.create_site", { defaultValue: "Create a site" })}
-                    </div>
-                    <div className="text-white/80 text-xs font-semibold mt-0.5">
-                      {t("house.new_project", { defaultValue: "New project" })}
-                    </div>
+                    <h3 className="font-extrabold text-slate-800">{p.name}</h3>
+                    <p className="text-xs text-slate-500">
+                      {p.params.surfaceArea} m² •{" "}
+                      {new Date(p.date).toLocaleDateString(i18n.language || undefined)}
+                    </p>
                   </div>
                 </div>
 
-                <div className="mt-3 w-full flex justify-end">
-                  <div className="w-9 h-9 rounded-full bg-white/20 border border-white/30 flex items-center justify-center">
-                    <ChevronRight className="text-white" size={18} />
-                  </div>
+                <div className="flex items-center gap-2">
+                  <span className="font-extrabold text-slate-700 bg-slate-50 border border-slate-200 px-3 py-1 rounded-lg">
+                    {euro.format(total)}
+                  </span>
+
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete(p.id);
+                    }}
+                    className="p-2 text-slate-300 hover:text-red-400"
+                    type="button"
+                    aria-label={t("common.delete", { defaultValue: "Delete" })}
+                  >
+                    <Trash2 size={18} />
+                  </button>
+
+                  <ChevronRight className="text-slate-300" size={20} />
                 </div>
               </div>
-            </button>
-          </div>
+            );
+          })}
         </div>
       )}
     </div>

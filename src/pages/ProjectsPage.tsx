@@ -93,7 +93,7 @@ export const ProjectsPage: React.FC = () => {
     }));
 
     return (
-      <div className="pb-20 bg-white min-h-screen relative">
+      <div className="pb-20 bg-transparent min-h-screen relative">
         <div className="sticky top-0 bg-white/95 backdrop-blur z-30 border-b border-slate-100 p-4 flex items-center justify-between no-print shadow-sm">
           <button
             onClick={() => setSelectedProject(null)}
@@ -241,7 +241,7 @@ export const ProjectsPage: React.FC = () => {
   }
 
   return (
-    <div className="p-4 pb-24 bg-slate-50 min-h-screen">
+    <div className="p-4 pb-24 bg-transparent min-h-screen">
       <h1 className="text-2xl font-extrabold text-slate-800 mb-6 px-2">
         {t("projects.title", { defaultValue: "My projects (calculations)" })}
       </h1>

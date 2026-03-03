@@ -72,7 +72,7 @@ export const CalculatorPage: React.FC<Props> = ({ type, onBack, onNavigateProjec
 
   if (!config) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6 text-center text-slate-600">
+      <div className="min-h-screen bg-transparent flex items-center justify-center p-6 text-center text-slate-600">
         {t("calculator.missing_config", { defaultValue: "Calculator unavailable." })}
       </div>
     );
