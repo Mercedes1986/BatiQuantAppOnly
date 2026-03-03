@@ -56,12 +56,16 @@ export interface MaterialItem {
   category: CalculatorType;
   details?: string; // e.g. "2 pots de 10L + 1 pot de 2.5L"
   stepId?: string; // Linked to a specific construction step
+
   /**
-   * Optional reference to a system catalog material key (DEFAULT_PRICES).
-   * Enables showing a dedicated image everywhere the material appears.
-   * Example: "BLOCK_20_UNIT" -> "/images/materials/BLOCK_20_UNIT.png"
+   * Optional reference key to a system catalog item (DEFAULT_PRICES key).
+   * If present, UI can display the matching catalog image and metadata.
+   * Example: "BLOCK_20_UNIT"
    */
   refKey?: string;
+
+  /** Optional direct image URL override for this line item */
+  imageUrl?: string;
 }
 
 export interface CalculationResult {
@@ -190,6 +194,9 @@ export interface MaterialMetadata {
   label: string;
   category: string;
   unit: string;
+
+  /** Optional UI illustration URL (Materials list, calculators, saved projects) */
+  imageUrl?: string;
 }
 
 export interface CustomMaterial {
