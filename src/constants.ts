@@ -447,7 +447,7 @@ export const DEFAULT_PRICES: Record<string, number> = {
 ------------------------------------------------------- */
 
 const cat = (key: string, fallbackEn: string) => tr(`categories.${key}`, fallbackEn);
-const mat = (key: string, fallbackEn: string) => tr(`materials.${key}`, fallbackEn);
+const mat = (key: string, fallbackEn: string) => tr(`materials.${key}`, tr(`materials.${key.toLowerCase()}`, fallbackEn));
 
 export const MATERIAL_METADATA: Record<string, MaterialMetadata> = (() => {
   // IMPORTANT: do NOT call i18n at import time here.
