@@ -562,7 +562,7 @@ export const HouseProjectPage: React.FC = () => {
         </h1>
         <p className="text-sm text-slate-500 mt-1">
           {t("house.my_sites_subtitle", {
-            defaultValue: "Create a site and save results step by step (complete tracking).",
+            defaultValue: "Créez un chantier et enregistrez les résultats étape par étape (suivi complet).",
           })}
         </p>
       </div>

@@ -22,16 +22,19 @@ body { margin: 0; }
   background-position: center;
   background-repeat: no-repeat;
   transform: translateZ(0);
+  /* Un peu plus “présent” */
+  filter: saturate(1.10) contrast(1.10);
 }
 
-/* Soft veil to keep content readable */
+/* Soft veil to keep content readable (slightly LESS opaque => background more visible) */
 .app-bg__veil {
   position: fixed;
   inset: 0;
   z-index: 1;
-  background: radial-gradient(1200px 600px at 20% 10%, rgba(255, 255, 255, 0.90), rgba(255, 255, 255, 0.62)),
-    radial-gradient(900px 500px at 80% 20%, rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0.55)),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.75));
+  background:
+    radial-gradient(1200px 600px at 20% 10%, rgba(255, 255, 255, 0.58), rgba(255, 255, 255, 0.22)),
+    radial-gradient(900px 500px at 80% 20%, rgba(255, 255, 255, 0.54), rgba(255, 255, 255, 0.20)),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.34));
   pointer-events: none;
 }
 
@@ -58,8 +61,4 @@ input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
 input:-webkit-autofill:active {
   -webkit-box-shadow: 0 0 0 30px white inset !important;
-  -webkit-text-fill-color: #0f172a !important;
 }
-
-/* Safe area iOS */
-.pb-safe { padding-bottom: env(safe-area-inset-bottom); }
