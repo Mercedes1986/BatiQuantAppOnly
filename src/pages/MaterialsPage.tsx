@@ -395,13 +395,13 @@ export const MaterialsPage: React.FC = () => {
                       {/* Bigger image */}
                       <div className="w-20 h-20 rounded-2xl bg-white border border-slate-200 overflow-hidden flex items-center justify-center shrink-0">
                         <img
-                          src={`/images/materials/${item.key}.png`}
-                          alt={item.label}
+                          src={item.imageUrl || `/images/materials/${String(item.key || '').toUpperCase()}.png`}
+                          alt={item.label || String(item.key || "") }
                           className="w-full h-full object-cover"
                           loading="lazy"
                           draggable={false}
                           onError={(e) => {
-                            (e.currentTarget as HTMLImageElement).style.display = "none";
+                            (e.currentTarget as HTMLImageElement).src = "/images/materials/_missing.png";
                           }}
                         />
                       </div>

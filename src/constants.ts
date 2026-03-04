@@ -688,7 +688,49 @@ export const getMaterialMetadata = (key: string): MaterialMetadata => {
   // Unit inference is deterministic and language-independent.
   const unit = direct?.unit || inferUnit(key);
 
-  return { label, category, unit };
+    const imageUrl = getMaterialImageUrl(key);
+
+  return { label, category, unit, imageUrl };
+};
+
+
+/* -------------------------------------------------------
+   Material images (UI)
+------------------------------------------------------- */
+
+// Default: each system material key uses a dedicated image stored at:
+//   /public/images/materials/<KEY>.png
+// Served as:
+//   /images/materials/<KEY>.png
+//
+// Some keys in DEFAULT_PRICES historically differ from the file names you created.
+// Keep keys stable (used in data) but point to the correct image filename.
+const MATERIAL_IMAGE_OVERRIDES: Record<string, string> = {
+  // Blocks à bancher (you use STEP_BLOCK_*.png files)
+  BLOCK_STEPOC_UNIT: "STEP_BLOCK_UNIT",
+  BLOCK_STEPOC_15_UNIT: "STEP_BLOCK_15_UNIT",
+  BLOCK_STEPOC_20_UNIT: "STEP_BLOCK_20_UNIT",
+  BLOCK_STEPOC_25_UNIT: "STEP_BLOCK_25_UNIT",
+
+  // Electrical naming
+  BREAKER_UNIT: "CIRCUIT_BREAKER_UNIT",
+
+  // Formwork oil naming
+  FORM_OIL_L: "RELEASE_OIL_L",
+
+  // Rental naming (your existing images)
+  COMPACTOR_DAY: "PLATE_COMPACTOR_DAY",
+  DIGGER_DAY: "MINI_EXCAVATOR_DAY",
+};
+
+const resolveMaterialImageKey = (key: string): string => {
+  const k = String(key || "").toUpperCase().trim();
+  return MATERIAL_IMAGE_OVERRIDES[k] || k;
+};
+
+export const getMaterialImageUrl = (key: string): string => {
+  const imgKey = resolveMaterialImageKey(key);
+  return `/images/materials/${imgKey}.png`;
 };
 
 /* -------------------------------------------------------
