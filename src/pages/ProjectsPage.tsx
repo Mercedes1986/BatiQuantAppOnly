@@ -1,16 +1,31 @@
-// ProjectsPage.tsx (updated: EN defaultValue to avoid FR fallback, keys unchanged)
 import React, { useState, useEffect, useMemo } from "react";
 import { Trash2, Printer, ChevronRight, PieChart, FileText, FolderOpen, Plus } from "lucide-react";
 import { getProjects, deleteProject } from "../services/storage";
-import { Project, ClientInfo } from "../types";
+import { Project, ClientInfo, MaterialItem } from "../types";
 import { PieChart as RePieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import { createQuoteFromSimpleProject } from "../services/documentLogic";
 import { getCompanyProfile } from "../services/documentsStorage";
 import { useNavigate } from "react-router-dom";
 import { ClientModal } from "../components/documents/ClientModal";
 import { useTranslation } from "react-i18next";
+import { getMaterialImageUrl } from "../constants";
 
 const CHART_COLORS = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6"] as const;
+
+function getImageKeyFromItem(item: Partial<MaterialItem> & Record<string, unknown>): string | null {
+  const candidates = [
+    (item as any).refKey,
+    (item as any).imageKey,
+    (item as any).sku,
+    (item as any).code,
+    (item as any).id,
+  ]
+    .map((x) => (typeof x === "string" ? x.trim() : ""))
+    .filter(Boolean);
+
+  if (candidates.length === 0) return null;
+  return candidates[0];
+}
 
 export const ProjectsPage: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -150,37 +165,41 @@ export const ProjectsPage: React.FC = () => {
               </h2>
 
               <ul className="space-y-3">
-                {selectedProject.items.map((item) => (
-                  <li
-                    key={item.id}
-                    className="flex justify-between items-center p-3 bg-slate-50 rounded-xl border border-slate-100 print:border-slate-300"
-                  >
-                    <div className="flex items-center gap-3 min-w-0">
-                      {item.refKey && (
+                {selectedProject.items.map((item) => {
+                  const imageKey = getImageKeyFromItem(item as any);
+                  const imgSrc = imageKey ? getMaterialImageUrl(String(imageKey)) : "/images/materials/_missing.png";
+
+                  return (
+                    <li
+                      key={item.id}
+                      className="flex justify-between items-center p-3 bg-slate-50 rounded-xl border border-slate-100 print:border-slate-300"
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
                         <div className="w-10 h-10 rounded-lg bg-white border border-slate-200 overflow-hidden shrink-0">
                           <img
-                            src={`/images/materials/${item.refKey}.png`}
+                            src={imgSrc}
                             alt={item.name}
                             className="w-full h-full object-cover"
                             loading="lazy"
                             draggable={false}
                             onError={(e) => {
-                              (e.currentTarget as HTMLImageElement).style.display = "none";
+                              (e.currentTarget as HTMLImageElement).src = "/images/materials/_missing.png";
                             }}
                           />
                         </div>
-                      )}
 
-                      <div className="min-w-0">
-                        <span className="font-extrabold text-slate-700 block text-sm truncate">{item.name}</span>
-                      <span className="text-xs text-slate-500 font-medium">
-                        {item.quantity} {item.unit} × {euro.format(item.unitPrice)}
-                      </span>
+                        <div className="min-w-0">
+                          <span className="font-extrabold text-slate-700 block text-sm truncate">{item.name}</span>
+                          <span className="text-xs text-slate-500 font-medium">
+                            {item.quantity} {item.unit} × {euro.format(item.unitPrice)}
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                    <span className="font-extrabold text-slate-800">{euro.format(item.totalPrice)}</span>
-                  </li>
-                ))}
+
+                      <span className="font-extrabold text-slate-800">{euro.format(item.totalPrice)}</span>
+                    </li>
+                  );
+                })}
               </ul>
 
               <div className="mt-6 p-5 bg-blue-50 rounded-2xl flex justify-between items-center print:bg-transparent print:border-t-2 print:border-slate-900">

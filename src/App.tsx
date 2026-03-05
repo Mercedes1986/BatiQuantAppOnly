@@ -35,6 +35,9 @@ import { PrintDocumentPage } from "@/pages/documents/PrintDocumentPage";
 // Storage
 import { getHouseProjects, saveHouseProject } from "@/services/storage";
 
+// Materials
+import { getMaterialImageUrl } from "@/constants";
+
 // Types
 import { CalculatorType, ConstructionStepId } from "@/types";
 import type { HouseProject } from "@/types";
@@ -442,16 +445,17 @@ const ProjectCalculatorWrapper: React.FC = () => {
                     <li key={m.id} className="border-b border-slate-50 last:border-0 pb-2">
                       <div className="flex justify-between items-start gap-3">
                         <div className="flex items-start gap-3 min-w-0">
-                          {m.refKey && (
+                          {(m.refKey || m.key) && (
                             <div className="w-10 h-10 rounded-lg bg-slate-50 border border-slate-100 overflow-hidden shrink-0">
                               <img
-                                src={`/images/materials/${m.refKey}.png`}
+                                src={getMaterialImageUrl(String(m.refKey || m.key))}
                                 alt={m.name}
                                 className="w-full h-full object-cover"
                                 loading="lazy"
                                 draggable={false}
                                 onError={(e) => {
-                                  (e.currentTarget as HTMLImageElement).style.display = "none";
+                                  (e.currentTarget as HTMLImageElement).src =
+                                    "/images/materials/_missing.png";
                                 }}
                               />
                             </div>

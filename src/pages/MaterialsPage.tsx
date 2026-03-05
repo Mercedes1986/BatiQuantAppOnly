@@ -1,7 +1,7 @@
 // MaterialsPage.tsx (updated: sizing + aesthetics for Categories & Products, keys unchanged)
 import React, { useEffect, useRef, useMemo, useState, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
-import { getMaterialMetadata } from "../constants";
+import { getMaterialImageUrl, getMaterialMetadata } from "../constants";
 import {
   Search,
   RotateCcw,
@@ -395,7 +395,7 @@ export const MaterialsPage: React.FC = () => {
                       {/* Bigger image */}
                       <div className="w-20 h-20 rounded-2xl bg-white border border-slate-200 overflow-hidden flex items-center justify-center shrink-0">
                         <img
-                          src={item.imageUrl || `/images/materials/${String(item.key || '').toUpperCase()}.png`}
+                          src={item.imageUrl || getMaterialImageUrl(String(item.key || ""))}
                           alt={item.label || String(item.key || "") }
                           className="w-full h-full object-cover"
                           loading="lazy"
