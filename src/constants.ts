@@ -715,10 +715,81 @@ const MATERIAL_IMAGE_OVERRIDES: Record<string, string> = {
   // Electrical naming
   BREAKER_UNIT: "CIRCUIT_BREAKER_UNIT",
 
+  // Electrical / plumbing / misc naming
+  ELECTRIC_CONDUIT_M: "CONDUIT_ELEC_M",
+  CONDUIT_ICTA_20_100M: "ICTA_20_100M",
+  CABLE_3G1_5_100M: "CABLE_3G15_100M",
+  CABLE_3G2_5_100M: "CABLE_3G25_100M",
+  OUTLET_UNIT: "SOCKET_UNIT",
+  SEWER_PIPE_M: "EVAC_PIPE_M",
+  MANHOLE_UNIT: "REGARD_UNIT",
+
+  // Concrete / masonry naming
+  CHAINAGE_3M: "CHAINING_3M",
+  CORNER_BEAD_3M: "ANGLE_BEAD_3M",
+  LINTEL_PRECAST_M: "LINTEL_M",
+  GLUE_MORTAR_BAG_25KG: "MORTAR_GLUE_BAG_25KG",
+
+  // Mesh panels naming
+  MESH_PANEL_ST10: "MESH_ST10_PANEL",
+  MESH_PANEL_ST25: "MESH_ST25_PANEL",
+  MESH_PANEL_ST40: "MESH_ST40_PANEL",
+
+  // Reinforcement cages: 15_35 -> 15X35 (file naming)
+  REBAR_CAGE_15_35_6M: "REBAR_CAGE_15X35_6M",
+  REBAR_CAGE_20_20_6M: "REBAR_CAGE_20X20_6M",
+  REBAR_CAGE_35_15_6M: "REBAR_CAGE_35X15_6M",
+
+  // Fence / exterior naming
+  FENCE_MESH_M: "GRILLAGE_M",
+  FENCE_RIGID_M: "RIGID_MESH_M",
+  FENCE_WOOD_M: "WOOD_FENCE_M",
+  GARDEN_EDGING_M: "GARDEN_BORDER_M",
+  DECOR_GRAVEL_TON: "GRAVEL_DECOR_TON",
+  COMPOSITE_DECK_M2: "TERRACE_COMPOSITE_M2",
+  WOOD_DECK_M2: "TERRACE_WOOD_M2",
+
+  // Gate naming
+  GATE_UNIT: "PORTAL_UNIT",
+  GATE_MOTOR_UNIT: "PORTAL_MOTOR_UNIT",
+  GATE_INSTALL_UNIT: "PORTAL_INSTALL_UNIT",
+
+  // Plaster / coating naming
+  FACADE_PLASTER_BAG_25KG: "FACADE_COATING_BAG",
+  EXT_PLASTER_BAG_25KG: "COATING_EXT_BAG",
+  INT_PLASTER_BAG_25KG: "COATING_INT_BAG",
+  COMPOUND_BAG_25KG: "COATING_INT_BAG",
+  PRIMER_COAT_L: "PRIMER_LITER",
+  PRIMER_FLOOR_L: "PRIMER_FLOOR_LITER",
+
+  // Flooring / misc naming
+  SCREED_MORTAR_BAG_25KG: "SCREED_MORTAR_BAG",
+  UNDERROOF_SCREEN_75M2: "UNDERROOF_SCREEN_ROLL_75M2",
+  TOPSOIL_STRIP_M2: "STRIP_TOPSOIL_M2",
+  TILE_ROOF_M2: "ROOF_TILES_M2",
+  TIMBER_M: "WOOD_M",
+
+  // Earthworks naming
+  EXCAVATION_M3: "EXCAVATION_TRENCH_M3",
+
+  // Formwork panels naming
+  FORM_PANEL_M2: "FORMWORK_PANEL_M2",
+
+  // Props naming
+  PROP_UNIT: "PROPS_UNIT",
+
+  // Transport / concrete fees naming
+  PUMP_FEE: "PUMP_FLAT_FEE",
+  DELIVERY_FEE: "DELIVERY_FEE",
+
+  // Ready-mix concrete naming
+  CONCRETE_READY_M3: "BPE_M3",
+
   // Formwork oil naming
   FORM_OIL_L: "RELEASE_OIL_L",
 
   // Rental naming (your existing images)
+  HANGER_BOX_50: "HANGERS_BOX_50",
   COMPACTOR_DAY: "PLATE_COMPACTOR_DAY",
   DIGGER_DAY: "MINI_EXCAVATOR_DAY",
 };
@@ -730,7 +801,9 @@ const resolveMaterialImageKey = (key: string): string => {
 
 export const getMaterialImageUrl = (key: string): string => {
   const imgKey = resolveMaterialImageKey(key);
-  return `/images/materials/${imgKey}.png`;
+  // Support hosting under a sub-path (e.g. /app/) via Vite's BASE_URL.
+  const base = (import.meta as any)?.env?.BASE_URL || "/";
+  return `${base}images/materials/${imgKey}.png`;
 };
 
 /* -------------------------------------------------------
