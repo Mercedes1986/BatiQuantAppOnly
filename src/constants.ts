@@ -808,6 +808,72 @@ const MATERIAL_IMAGE_OVERRIDES: Record<string, string> = {
   // Map them to real catalog/image keys so "Matériaux estimés" shows
   // proper pictures instead of the red missing icon.
   // ------------------------------------------------------------------
+  // Generic/common ids
+  BAND: "PERIPHERAL_BAND_M",
+  STRIP: "PERIPHERAL_BAND_M",
+  SAND: "SAND_TON",
+  GRAVEL: "GRAVEL_TON",
+  CEMENT: "CEMENT_BAG_35KG",
+  MESH: "MESH_PANEL_ST25",
+  FORMWORK: "FORM_PANEL_M2",
+  JOINTS: "JOINT_TAPE_ROLL",
+  COMPOUND: "COATING_INT_BAG",
+  COAT_INT: "COATING_INT_BAG",
+  COAT_EXT: "COATING_EXT_BAG",
+  MEMBRANE: "DELTA_MS_ROLL_20M",
+  PIPE_SUPPLY: "WATER_PIPE_M",
+  FITTINGS: "PVC_PIPE_4M",
+  BLOCKS_SUB: "BLOCK_20_UNIT",
+  WALL_UNITS: "BLOCK_20_UNIT",
+  WALL_MORTAR: "CEMENT_BAG_35KG",
+  WALL_GLUE: "GLUE_MORTAR_BAG_25KG",
+  CHAIN_STEEL: "CHAINAGE_3M",
+  CHAIN_CONC: "BPE_M3",
+  STEPOC_FILL: "BPE_M3",
+  VERT_CONC: "BPE_M3",
+  VERT_STEEL: "REBAR_KG",
+  SMOOTH: "RAGREAGE_BAG_25KG",
+  FIBER: "RAGREAGE_FIBRE_25KG",
+  FILLER: "COATING_INT_BAG",
+  LIGHT_MIX: "BPE_M3",
+
+  // Rentals / earthworks ids
+  DUMP: "DUMPER_DAY",
+  EXCAV: "EXCAVATION_M3",
+  SCAFFOLD: "_missing",
+  TOOLS: "_missing",
+  TARP: "_missing",
+  CONSUMABLES: "_missing",
+
+  // Foundations ids
+  FD_EXCAV: "EXCAVATION_M3",
+  FD_EVAC: "EVACUATION_M3",
+  FD_CLEAN: "CLEAN_CONCRETE_M3",
+  FD_STRIP_CONC: "BPE_M3",
+  FD_PADS_CONC: "BPE_M3",
+  FD_RAFT_CONC: "BPE_M3",
+  FD_FORM: "FORM_PANEL_M2",
+  FD_DRAIN: "DRAIN_PIPE_50M",
+  FD_POLY: "POLYANE_ROLL_150M2",
+  FD_MO: "_missing",
+
+  // Labor ids (display placeholder icon)
+  LABOR: "_missing",
+  LABOR_PIPES: "_missing",
+  LABOR_PTS: "_missing",
+  LABOR_WALL: "_missing",
+  LAB_APP: "_missing",
+  LAB_PREP: "_missing",
+  LAB_PAINT: "_missing",
+
+  // Misc ids
+  GENERATOR: "TRANSFORMER_UNIT",
+  HEATER_MISC: "_missing",
+  MANIFOLDS: "_missing",
+  SAFETY_GROUP: "_missing",
+  SIPHONS: "_missing",
+  VMC_BOX: "_missing",
+
   POLYANE: "POLYANE_ROLL_150M2",
   BPE: "BPE_M3",
   PUMP: "PUMP_FLAT_FEE",
@@ -839,8 +905,15 @@ const MATERIAL_IMAGE_OVERRIDES: Record<string, string> = {
 };
 
 const resolveMaterialImageKey = (key: string): string => {
-  const k = String(key || "").toUpperCase().trim();
-  return MATERIAL_IMAGE_OVERRIDES[k] || k;
+  // Some legacy / UI ids map to other legacy keys (which themselves map to real filenames).
+  // Resolve transitively until we reach a stable key.
+  let k = String(key || "").toUpperCase().trim();
+  const seen = new Set<string>();
+  while (MATERIAL_IMAGE_OVERRIDES[k] && !seen.has(k)) {
+    seen.add(k);
+    k = MATERIAL_IMAGE_OVERRIDES[k];
+  }
+  return k;
 };
 
 export const getMaterialImageUrl = (key: string): string => {
