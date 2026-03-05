@@ -706,7 +706,7 @@ export const getMaterialMetadata = (key: string): MaterialMetadata => {
 // Some keys in DEFAULT_PRICES historically differ from the file names you created.
 // Keep keys stable (used in data) but point to the correct image filename.
 const MATERIAL_IMAGE_OVERRIDES: Record<string, string> = {
-  // Blocks à bancher (you use STEP_BLOCK_*.png files)
+  // Blocks à bancher (file naming)
   BLOCK_STEPOC_UNIT: "STEP_BLOCK_UNIT",
   BLOCK_STEPOC_15_UNIT: "STEP_BLOCK_15_UNIT",
   BLOCK_STEPOC_20_UNIT: "STEP_BLOCK_20_UNIT",
@@ -759,14 +759,11 @@ const MATERIAL_IMAGE_OVERRIDES: Record<string, string> = {
   EXT_PLASTER_BAG_25KG: "COATING_EXT_BAG",
   INT_PLASTER_BAG_25KG: "COATING_INT_BAG",
   COMPOUND_BAG_25KG: "COATING_INT_BAG",
-  COATING_EXT_BAG: "EXTERIOR_COATING_BAG",
-  COATING_INT_BAG: "INTERIOR_COATING_BAG",
   PRIMER_COAT_L: "PRIMER_LITER",
   PRIMER_FLOOR_L: "PRIMER_FLOOR_LITER",
 
   // Flooring / misc naming
   SCREED_MORTAR_BAG_25KG: "SCREED_MORTAR_BAG",
-  UNDERROOF_SCREEN_75M2: "UNDERROOF_SCREEN_ROLL_75M2",
   TOPSOIL_STRIP_M2: "STRIP_TOPSOIL_M2",
   TILE_ROOF_M2: "ROOF_TILES_M2",
   TIMBER_M: "WOOD_M",
@@ -787,15 +784,16 @@ const MATERIAL_IMAGE_OVERRIDES: Record<string, string> = {
   // Ready-mix concrete naming
   CONCRETE_READY_M3: "BPE_M3",
 
-  // Cellular concrete naming
-  CELLULAR_15_UNIT: "AAC_BLOCK_15_UNIT",
-  CELLULAR_20_UNIT: "AAC_BLOCK_20_UNIT",
+  // Cellular concrete naming (legacy -> current)
+  AAC_BLOCK_15_UNIT: "CELLULAR_15_UNIT",
+  AAC_BLOCK_20_UNIT: "CELLULAR_20_UNIT",
 
-  // Wall coping naming
-  WALL_COPING_UNIT: "WALL_CAP_UNIT",
+  // Wall coping naming (legacy -> current)
+  WALL_CAP_UNIT: "WALL_COPING_UNIT",
 
-  // Underlay naming
-  UNDERLAY_ROLL_75M2: "UNDERROOF_SCREEN_ROLL_75M2",
+  // Underlay naming (legacy -> current)
+  UNDERROOF_SCREEN_75M2: "UNDERLAY_ROLL_75M2",
+  UNDERROOF_SCREEN_ROLL_75M2: "UNDERLAY_ROLL_75M2",
 
   // Formwork oil naming
   FORM_OIL_L: "RELEASE_OIL_L",
