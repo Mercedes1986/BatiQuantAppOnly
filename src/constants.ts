@@ -802,6 +802,40 @@ const MATERIAL_IMAGE_OVERRIDES: Record<string, string> = {
   HANGER_BOX_50: "HANGERS_BOX_50",
   COMPACTOR_DAY: "PLATE_COMPACTOR_DAY",
   DIGGER_DAY: "MINI_EXCAVATOR_DAY",
+
+  // ------------------------------------------------------------------
+  // UI material item ids (calculators often use short ids in results)
+  // Map them to real catalog/image keys so "Matériaux estimés" shows
+  // proper pictures instead of the red missing icon.
+  // ------------------------------------------------------------------
+  POLYANE: "POLYANE_ROLL_150M2",
+  BPE: "BPE_M3",
+  PUMP: "PUMP_FLAT_FEE",
+
+  PAINT_WALL: "PAINT_LITER",
+  PAINT_CEIL: "PAINT_LITER",
+  PAINT_WOOD: "PAINT_LITER",
+  PRIMER: "PRIMER_LITER",
+
+  RAILS: "RAIL_3M",
+  STUDS: "MONTANT_3M",
+  FURRING: "FURRING_3M",
+  HANGERS: "HANGERS_BOX_50",
+  SCREWS: "SCREWS_BOX_1000",
+  TAPE: "JOINT_TAPE_ROLL",
+  ANGLES: "ANGLE_BEAD_3M",
+  INSUL: "INSULATION_M2",
+
+  DIGGER: "MINI_EXCAVATOR_DAY",
+  COMPACTOR: "PLATE_COMPACTOR_DAY",
+
+  // Roof calculator ids
+  COVER: "TILE_ROOF_M2",
+  RIDGE: "TILE_ROOF_M2",
+  VERGE: "TILE_ROOF_M2",
+  HIP: "TILE_ROOF_M2",
+  VALLEY: "TILE_ROOF_M2",
+  SCREEN: "UNDERLAY_ROLL_75M2",
 };
 
 const resolveMaterialImageKey = (key: string): string => {

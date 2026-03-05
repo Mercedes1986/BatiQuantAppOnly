@@ -323,6 +323,9 @@ export const StructuralCalculator: React.FC<Props> = ({
     laborScaffold: 15.0,
   }));
 
+  // Mortar mode (for non-stepoc walls): ready-mix bags vs. raw materials (cement + sand)
+  const [wUseReadyMortar, setWUseReadyMortar] = useState<boolean>(true);
+
   // -------------------------
   // Pricing helpers (walls)
   // -------------------------
@@ -1114,21 +1117,63 @@ export const StructuralCalculator: React.FC<Props> = ({
           const mortarKey = "MORTAR_BAG_25KG";
           const mortarUnit = getPrice(mortarKey, Number(DEFAULT_PRICES.MORTAR_BAG_25KG));
           const bagsMortar = Math.ceil(masonryArea / 3);
-          const costMortar = bagsMortar * mortarUnit;
+          if (wUseReadyMortar) {
+            const costMortar = bagsMortar * mortarUnit;
+            totalCost += costMortar;
 
-          totalCost += costMortar;
+            materialsList.push({
+              id: "wall_mortar",
+              name: tr("struct.walls.mortar"),
+              quantity: bagsMortar,
+              unit: Unit.BAG,
+              unitPrice: mortarUnit,
+              totalPrice: costMortar,
+              category: CalculatorType.WALLS,
+              refKey: mortarKey,
+              details: tr("struct.walls.mortar_ratio"),
+            });
+          } else {
+            // Approximation: a 25kg mortar bag ≈ 5kg cement + 20kg sand (1:4).
+            // This avoids hiding the sand/cement needs when the user mixes on site.
+            const cementKey = "CEMENT_BAG_35KG";
+            const sandKey = "SAND_TON";
 
-          materialsList.push({
-            id: "wall_mortar",
-            name: tr("struct.walls.mortar"),
-            quantity: bagsMortar,
-            unit: Unit.BAG,
-            unitPrice: mortarUnit,
-            totalPrice: costMortar,
-            category: CalculatorType.WALLS,
-            refKey: mortarKey,
-            details: tr("struct.walls.mortar_ratio"),
-          });
+            const cementUnit = getPrice(cementKey, Number(DEFAULT_PRICES.CEMENT_BAG_35KG));
+            const sandUnit = getPrice(sandKey, Number(DEFAULT_PRICES.SAND_TON));
+
+            const cementKg = bagsMortar * 5;
+            const sandKg = bagsMortar * 20;
+
+            const cementBags = Math.max(1, Math.ceil(cementKg / 35));
+            const sandTon = sandKg / 1000;
+
+            const costCement = cementBags * cementUnit;
+            const costSand = sandTon * sandUnit;
+            totalCost += costCement + costSand;
+
+            materialsList.push({
+              id: "wall_cement",
+              name: tr("materials.cement", { defaultValue: "Cement" }),
+              quantity: cementBags,
+              unit: Unit.BAG,
+              unitPrice: cementUnit,
+              totalPrice: costCement,
+              category: CalculatorType.WALLS,
+              refKey: cementKey,
+              details: tr("struct.walls.mortar_mix_details", { defaultValue: "Mortar mixed on site (cement + sand)" }),
+            });
+
+            materialsList.push({
+              id: "wall_sand",
+              name: tr("materials.sand", { defaultValue: "Sand" }),
+              quantity: parseFloat(sandTon.toFixed(2)),
+              unit: Unit.TON,
+              unitPrice: sandUnit,
+              totalPrice: costSand,
+              category: CalculatorType.WALLS,
+              refKey: sandKey,
+            });
+          }
         }
       }
 
@@ -2934,6 +2979,17 @@ export const StructuralCalculator: React.FC<Props> = ({
                       }}
                       className="w-full p-1.5 border border-slate-300 rounded text-sm bg-white text-slate-900"
                     />
+
+                    {wallBinderKind === "mortier" && (
+                      <label className="mt-2 flex items-center gap-2 text-[11px] text-slate-600 select-none">
+                        <input
+                          type="checkbox"
+                          checked={wUseReadyMortar}
+                          onChange={(e) => setWUseReadyMortar(e.target.checked)}
+                        />
+                        {tr("struct.w.use_ready_mortar", { defaultValue: "Use ready-mix mortar bags" })}
+                      </label>
+                    )}
                   </div>
 
                   <div>
