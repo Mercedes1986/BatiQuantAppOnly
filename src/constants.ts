@@ -479,7 +479,8 @@ export const MATERIAL_METADATA: Record<string, MaterialMetadata> = (() => {
     key
       .toLowerCase()
       .replace(/_/g, " ")
-      .replace(/\w/g, (m) => m.toUpperCase());
+      // FIX: the previous file had a corrupted \b (word boundary)
+      .replace(/\b\w/g, (m) => m.toUpperCase());
 
   const base: Record<string, MaterialMetadata> = {};
 
@@ -688,11 +689,10 @@ export const getMaterialMetadata = (key: string): MaterialMetadata => {
   // Unit inference is deterministic and language-independent.
   const unit = direct?.unit || inferUnit(key);
 
-    const imageUrl = getMaterialImageUrl(key);
+  const imageUrl = getMaterialImageUrl(key);
 
   return { label, category, unit, imageUrl };
 };
-
 
 /* -------------------------------------------------------
    Material images (UI)
@@ -705,6 +705,11 @@ export const getMaterialMetadata = (key: string): MaterialMetadata => {
 //
 // Some keys in DEFAULT_PRICES historically differ from the file names you created.
 // Keep keys stable (used in data) but point to the correct image filename.
+//
+// IMPORTANT:
+// - Many calculators push "short ids" in results (ex: "RIDGE", "SILICONE", "FD_MO"...)
+// - Here we map those ids to a REAL key that already has an image (a known catalog key)
+// - We also resolve transitively (A -> B -> C) so chained mappings always end on a stable real image key.
 const MATERIAL_IMAGE_OVERRIDES: Record<string, string> = {
   // Blocks à bancher (file naming)
   BLOCK_STEPOC_UNIT: "STEP_BLOCK_UNIT",
@@ -718,8 +723,13 @@ const MATERIAL_IMAGE_OVERRIDES: Record<string, string> = {
   // Electrical / plumbing / misc naming
   ELECTRIC_CONDUIT_M: "CONDUIT_ELEC_M",
   CONDUIT_ICTA_20_100M: "ICTA_20_100M",
+
+  // Legacy cable keys (support both spellings)
   CABLE_3G1_5_100M: "CABLE_3G15_100M",
   CABLE_3G2_5_100M: "CABLE_3G25_100M",
+  CABLE_3G15_100M: "CABLE_3G15_100M",
+  CABLE_3G25_100M: "CABLE_3G25_100M",
+
   OUTLET_UNIT: "SOCKET_UNIT",
   SEWER_PIPE_M: "EVAC_PIPE_M",
   MANHOLE_UNIT: "REGARD_UNIT",
@@ -808,42 +818,52 @@ const MATERIAL_IMAGE_OVERRIDES: Record<string, string> = {
   // Map them to real catalog/image keys so "Matériaux estimés" shows
   // proper pictures instead of the red missing icon.
   // ------------------------------------------------------------------
+
   // Generic/common ids
   BAND: "PERIPHERAL_BAND_M",
   STRIP: "PERIPHERAL_BAND_M",
+
   SAND: "SAND_TON",
   GRAVEL: "GRAVEL_TON",
   CEMENT: "CEMENT_BAG_35KG",
+
   MESH: "MESH_PANEL_ST25",
   FORMWORK: "FORM_PANEL_M2",
+
   JOINTS: "JOINT_TAPE_ROLL",
-  COMPOUND: "COATING_INT_BAG",
+  COMPOUND: "COMPOUND_BAG_25KG",
+
   COAT_INT: "COATING_INT_BAG",
   COAT_EXT: "COATING_EXT_BAG",
+
   MEMBRANE: "DELTA_MS_ROLL_20M",
   PIPE_SUPPLY: "WATER_PIPE_M",
   FITTINGS: "PVC_PIPE_4M",
+
   BLOCKS_SUB: "BLOCK_20_UNIT",
   WALL_UNITS: "BLOCK_20_UNIT",
-  WALL_MORTAR: "CEMENT_BAG_35KG",
+  WALL_MORTAR: "MORTAR_BAG_25KG",
   WALL_GLUE: "GLUE_MORTAR_BAG_25KG",
+
   CHAIN_STEEL: "CHAINAGE_3M",
   CHAIN_CONC: "BPE_M3",
+
   STEPOC_FILL: "BPE_M3",
   VERT_CONC: "BPE_M3",
   VERT_STEEL: "REBAR_KG",
+
   SMOOTH: "RAGREAGE_BAG_25KG",
   FIBER: "RAGREAGE_FIBRE_25KG",
   FILLER: "COATING_INT_BAG",
   LIGHT_MIX: "BPE_M3",
 
-  // Rentals / earthworks ids
+  // Rentals / earthworks ids (map to existing images, avoid "_missing")
   DUMP: "DUMPER_DAY",
   EXCAV: "EXCAVATION_M3",
-  SCAFFOLD: "_missing",
-  TOOLS: "_missing",
-  TARP: "_missing",
-  CONSUMABLES: "_missing",
+  SCAFFOLD: "FORM_PANEL_M2",
+  TOOLS: "SCREWS_BOX_1000",
+  TARP: "POLYANE_ROLL_150M2",
+  CONSUMABLES: "SCREWS_BOX_1000",
 
   // Foundations ids
   FD_EXCAV: "EXCAVATION_M3",
@@ -855,28 +875,31 @@ const MATERIAL_IMAGE_OVERRIDES: Record<string, string> = {
   FD_FORM: "FORM_PANEL_M2",
   FD_DRAIN: "DRAIN_PIPE_50M",
   FD_POLY: "POLYANE_ROLL_150M2",
-  FD_MO: "_missing",
+  FD_MO: "SCREWS_BOX_1000",
 
-  // Labor ids (display placeholder icon)
-  LABOR: "_missing",
-  LABOR_PIPES: "_missing",
-  LABOR_PTS: "_missing",
-  LABOR_WALL: "_missing",
-  LAB_APP: "_missing",
-  LAB_PREP: "_missing",
-  LAB_PAINT: "_missing",
+  // Labor ids (map to an existing generic image to avoid the red missing icon)
+  LABOR: "SCREWS_BOX_1000",
+  LABOR_PIPES: "SCREWS_BOX_1000",
+  LABOR_PTS: "SCREWS_BOX_1000",
+  LABOR_WALL: "SCREWS_BOX_1000",
+  LAB_APP: "SCREWS_BOX_1000",
+  LAB_PREP: "SCREWS_BOX_1000",
+  LAB_PAINT: "SCREWS_BOX_1000",
+  LABOR_SKIRT: "SCREWS_BOX_1000",
+  LABOR_SPEC: "SCREWS_BOX_1000",
+  LABOR_TILING: "SCREWS_BOX_1000",
 
-  // Misc ids
+  // Misc ids (avoid "_missing")
   GENERATOR: "TRANSFORMER_UNIT",
-  HEATER_MISC: "_missing",
-  MANIFOLDS: "_missing",
-  SAFETY_GROUP: "_missing",
-  SIPHONS: "_missing",
-  VMC_BOX: "_missing",
+  HEATER_MISC: "SCREWS_BOX_1000",
+  MANIFOLDS: "PVC_PIPE_4M",
+  SAFETY_GROUP: "PVC_PIPE_4M",
+  SIPHONS: "PVC_PIPE_4M",
+  VMC_BOX: "PVC_PIPE_4M",
 
   POLYANE: "POLYANE_ROLL_150M2",
   BPE: "BPE_M3",
-  PUMP: "PUMP_FLAT_FEE",
+  PUMP: "PUMP_FEE",
 
   PAINT_WALL: "PAINT_LITER",
   PAINT_CEIL: "PAINT_LITER",
@@ -886,14 +909,14 @@ const MATERIAL_IMAGE_OVERRIDES: Record<string, string> = {
   RAILS: "RAIL_3M",
   STUDS: "MONTANT_3M",
   FURRING: "FURRING_3M",
-  HANGERS: "HANGERS_BOX_50",
+  HANGERS: "HANGER_BOX_50",
   SCREWS: "SCREWS_BOX_1000",
   TAPE: "JOINT_TAPE_ROLL",
-  ANGLES: "ANGLE_BEAD_3M",
+  ANGLES: "CORNER_BEAD_3M",
   INSUL: "INSULATION_M2",
 
-  DIGGER: "MINI_EXCAVATOR_DAY",
-  COMPACTOR: "PLATE_COMPACTOR_DAY",
+  DIGGER: "DIGGER_DAY",
+  COMPACTOR: "COMPACTOR_DAY",
 
   // Roof calculator ids
   COVER: "TILE_ROOF_M2",
@@ -902,6 +925,54 @@ const MATERIAL_IMAGE_OVERRIDES: Record<string, string> = {
   HIP: "TILE_ROOF_M2",
   VALLEY: "TILE_ROOF_M2",
   SCREEN: "UNDERLAY_ROLL_75M2",
+
+  // ------------------------------------------------------------------
+  // Extra “missing keys” you showed in screenshots: map them to existing images
+  // ------------------------------------------------------------------
+  ARASE: "BITUMEN_COATING_BUCKET_25KG",
+  BITUMEN: "BITUMEN_COATING_BUCKET_25KG",
+  COATING: "BITUMEN_COATING_BUCKET_25KG",
+
+  CONCRETE: "BPE_M3",
+  CONCRETE_FILL: "BPE_M3",
+  CONCRETE_WALL: "BPE_M3",
+
+  COUNTER_BATTEN: "BATTEN_M",
+
+  DELTAMS: "DELTA_MS_ROLL_20M",
+  DELTA_PROFILE: "DELTA_MS_ROLL_20M",
+
+  GUTTER: "DRAIN_PIPE_50M",
+  DOWNSPOUTS: "DRAIN_PIPE_50M",
+  DRAIN_PIPE: "DRAIN_PIPE_50M",
+
+  FORMWORK_LAB: "FORM_PANEL_M2",
+  FORMWORK_MAT: "FORM_PANEL_M2",
+
+  GEO_DRAIN: "GEOTEXTILE_M2",
+  GLUE: "GLUE_BAG_25KG",
+  GRAVEL_DRAIN: "GRAVEL_FOUNDATION_TON",
+
+  GROUT_CEM: "GROUT_BAG_5KG",
+  GROUT_EPOXY: "GROUT_BAG_5KG",
+
+  INSULATION: "INSULATION_M2",
+  LEVELING: "RAGREAGE_BAG_25KG",
+  MANHOLE: "MANHOLE_UNIT",
+  MORTAR: "MORTAR_BAG_25KG",
+
+  PROPS: "PROP_UNIT",
+  RAILING: "RAIL_3M",
+
+  SKIRTING: "SKIRTING_METER",
+  STEEL: "REBAR_KG",
+
+  TILES: "TILE_M2",
+  TILING: "TILE_M2",
+
+  VAPOR: "POLYANE_ROLL_150M2",
+
+  SPEC: "SCREWS_BOX_1000",
 };
 
 const resolveMaterialImageKey = (key: string): string => {
