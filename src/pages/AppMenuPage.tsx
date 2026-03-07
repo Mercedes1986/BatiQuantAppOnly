@@ -125,6 +125,16 @@ export const AppMenuPage: React.FC = () => {
         imageSrc: "/images/menu/chantier.jpg",
       },
       {
+        title: t("menu.cards.quick_tools.title", { defaultValue: "Quick tools" }),
+        desc: t("menu.cards.quick_tools.desc", {
+          defaultValue: "Dedicated quick calculators: conversions, slopes, packaging and other fast checks.",
+        }),
+        path: "/app/quick-tools",
+        icon: <Sparkles size={18} />,
+        imageSrc: "/images/menu/calcul.jpg",
+        badge: t("menu.cards.quick_tools.badge", { defaultValue: "FAST" }),
+      },
+      {
         title: t("menu.cards.projects.title", { defaultValue: "Projects" }),
         desc: t("menu.cards.projects.desc", {
           defaultValue: "Find your saved calculations (estimates, materials, costs).",
@@ -264,7 +274,7 @@ export const AppMenuPage: React.FC = () => {
           </p>
 
           <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {getCalculators().map((calc) => (
+            {getCalculators().filter((calc) => calc.id !== CalculatorType.QUICK_TOOLS).map((calc) => (
               <CalculatorCard key={calc.id} config={calc} onClick={() => setSelectedCalc(calc.id)} />
             ))}
           </div>

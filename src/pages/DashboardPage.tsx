@@ -27,7 +27,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onSelectCalc }) =>
         </header>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-10">
-          {getCalculators().map((calc) => (
+          {getCalculators().filter((calc) => calc.id !== CalculatorType.QUICK_TOOLS).map((calc) => (
             <CalculatorCard key={calc.id} config={calc} onClick={() => onSelectCalc(calc.id)} />
           ))}
         </div>

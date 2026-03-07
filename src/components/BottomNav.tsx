@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { FolderOpen, Settings, Hammer, Package, Menu } from "lucide-react";
+import { FolderOpen, Settings, Hammer, Package, Menu, Calculator } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 interface BottomNavProps {
@@ -19,6 +19,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, onChange }) =>
   const navItems: NavItem[] = useMemo(
     () => [
       { id: "menu", icon: Menu, label: t("nav.menu", { defaultValue: "Menu" }) },
+      { id: "quick-tools", icon: Calculator, label: t("nav.quick_tools", { defaultValue: "Rapides" }) },
       {
         id: "projects",
         icon: FolderOpen,

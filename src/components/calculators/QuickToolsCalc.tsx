@@ -5,13 +5,15 @@ import { Input } from "../ui/Input";
 import { Select } from "../ui/Select";
 import { ArrowRightLeft, Ruler, Package2, TrendingUp, Cable } from "lucide-react";
 
+export type ToolKey = "convert" | "netArea" | "packaging" | "slope" | "linear" | "voltageDrop";
+
 interface Props {
   onCalculate: (result: CalculationResult) => void;
   initialArea?: number;
   initialPerimeter?: number;
+  forcedTool?: ToolKey;
+  hideToolSelector?: boolean;
 }
-
-type ToolKey = "convert" | "netArea" | "packaging" | "slope" | "linear" | "voltageDrop";
 
 const round2 = (n: number) => Math.round((n + Number.EPSILON) * 100) / 100;
 const ceil2 = (n: number) => Math.ceil((n - Number.EPSILON) * 100) / 100;
@@ -41,13 +43,17 @@ const makeMaterial = (
   details,
 });
 
-export const QuickToolsCalculator: React.FC<Props> = ({ onCalculate, initialArea, initialPerimeter }) => {
+export const QuickToolsCalculator: React.FC<Props> = ({ onCalculate, initialArea, initialPerimeter, forcedTool, hideToolSelector = false }) => {
   const { t } = useTranslation();
-  const [tool, setTool] = useState<ToolKey>("convert");
+  const [tool, setTool] = useState<ToolKey>(forcedTool ?? "convert");
+
+  useEffect(() => {
+    if (forcedTool) setTool(forcedTool);
+  }, [forcedTool]);
 
   const [area, setArea] = useState(String(initialArea ?? 50));
   const [thicknessCm, setThicknessCm] = useState("10");
-  const [liters, setLiters] = useState("1000");
+  const [liters, setLiters] = useState("200");
   const [bagYieldM3, setBagYieldM3] = useState("0.015");
 
   const [wallLength, setWallLength] = useState("8");
@@ -347,19 +353,21 @@ export const QuickToolsCalculator: React.FC<Props> = ({ onCalculate, initialArea
         </p>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-        {toolButtons.map(({ key, label, icon: Icon }) => (
-          <button
-            key={key}
-            type="button"
-            onClick={() => setTool(key)}
-            className={`rounded-xl border px-3 py-3 text-left transition-all ${tool === key ? "border-blue-600 bg-blue-50 text-blue-900" : "border-slate-200 bg-white text-slate-700 hover:border-slate-300"}`}
-          >
-            <Icon size={16} className="mb-2" />
-            <div className="text-sm font-bold leading-tight">{label}</div>
-          </button>
-        ))}
-      </div>
+      {!hideToolSelector && (
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+          {toolButtons.map(({ key, label, icon: Icon }) => (
+            <button
+              key={key}
+              type="button"
+              onClick={() => setTool(key)}
+              className={`rounded-xl border px-3 py-3 text-left transition-all ${tool === key ? "border-blue-600 bg-blue-50 text-blue-900" : "border-slate-200 bg-white text-slate-700 hover:border-slate-300"}`}
+            >
+              <Icon size={16} className="mb-2" />
+              <div className="text-sm font-bold leading-tight">{label}</div>
+            </button>
+          ))}
+        </div>
+      )}
 
       {tool === "convert" && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">

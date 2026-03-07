@@ -26,6 +26,7 @@ import { SettingsPage } from "@/pages/SettingsPage";
 import { HouseProjectPage } from "@/pages/HouseProjectPage";
 import { MaterialsPage } from "@/pages/MaterialsPage";
 import { AppMenuPage } from "@/pages/AppMenuPage";
+import { QuickToolsPage } from "@/pages/QuickToolsPage";
 
 // Documents
 import { QuoteEditorPage } from "@/pages/documents/QuoteEditorPage";
@@ -502,6 +503,7 @@ const AppLayout = () => {
     if (p.includes("/app/settings")) return pick("bg-settings.png");
     if (p.includes("/app/quotes") || p.includes("/app/invoices") || p.includes("/app/print")) return pick("bg-docs.png");
     if (p.includes("/app/menu")) return pick("bg-menu.png");
+    if (p.includes("/app/quick-tools")) return pick("bg-menu.png");
     // projects + calculators + calculator wrapper
     if (p.includes("/app/projects") || p.includes("/app/calculators") || p.includes("/app/calculator")) return pick("bg-projects.png");
     return pick("bg-menu.png");
@@ -509,7 +511,9 @@ const AppLayout = () => {
 
   const currentTab = location.pathname.startsWith("/app/menu")
     ? "menu"
-    : location.pathname.includes("settings")
+    : location.pathname.includes("quick-tools")
+      ? "quick-tools"
+      : location.pathname.includes("settings")
       ? "settings"
       : location.pathname.includes("house") || location.pathname.includes("quotes") || location.pathname.includes("invoices")
         ? "house"
@@ -523,6 +527,7 @@ const AppLayout = () => {
     setCurrentCalc(null);
 
     if (tab === "menu") navigate("/app/menu");
+    if (tab === "quick-tools") navigate("/app/quick-tools");
     if (tab === "projects") navigate("/app/projects");
     if (tab === "house") navigate("/app/house");
     if (tab === "materials") navigate("/app/materials");
@@ -607,6 +612,8 @@ const App: React.FC = () => {
             <Route index element={<Navigate to="projects" replace />} />
             <Route path="calculators" element={<DashboardOutlet />} />
             <Route path="menu" element={<AppMenuPage />} />
+            <Route path="quick-tools" element={<QuickToolsPage />} />
+            <Route path="quick-tools/:tool" element={<QuickToolsPage />} />
             <Route path="house" element={<HouseProjectPage />} />
             <Route path="projects" element={<ProjectsPage />} />
             <Route path="materials" element={<MaterialsPage />} />
