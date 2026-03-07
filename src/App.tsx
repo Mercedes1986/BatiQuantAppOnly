@@ -35,18 +35,6 @@ import { PrintDocumentPage } from "@/pages/documents/PrintDocumentPage";
 // Storage
 import { getHouseProjects, saveHouseProject } from "@/services/storage";
 
-// Materials
-import { getMaterialImageUrl } from "@/constants";
-
-// Robust image key resolver for result items (some calculators only return `id`).
-// Priority: refKey > imageKey > sku > code > id
-const getImageKeyFromResultItem = (item: Record<string, any>): string | null => {
-  const candidates = [item?.refKey, item?.imageKey, item?.sku, item?.code, item?.id]
-    .map((x) => (typeof x === "string" ? x.trim() : ""))
-    .filter(Boolean);
-  return candidates.length ? candidates[0] : null;
-};
-
 // Types
 import { CalculatorType, ConstructionStepId } from "@/types";
 import type { HouseProject } from "@/types";
@@ -454,25 +442,6 @@ const ProjectCalculatorWrapper: React.FC = () => {
                     <li key={m.id} className="border-b border-slate-50 last:border-0 pb-2">
                       <div className="flex justify-between items-start gap-3">
                         <div className="flex items-start gap-3 min-w-0">
-                          {(() => {
-                            const imageKey = getImageKeyFromResultItem(m);
-                            const imgSrc = imageKey ? getMaterialImageUrl(String(imageKey)) : "/images/materials/_missing.png";
-                            return (
-                              <div className="w-10 h-10 rounded-lg bg-slate-50 border border-slate-100 overflow-hidden shrink-0">
-                                <img
-                                  src={imgSrc}
-                                  alt={m.name}
-                                  className="w-full h-full object-cover"
-                                  loading="lazy"
-                                  draggable={false}
-                                  onError={(e) => {
-                                    (e.currentTarget as HTMLImageElement).src = "/images/materials/_missing.png";
-                                  }}
-                                />
-                              </div>
-                            );
-                          })()}
-
                           <span className="font-medium text-slate-700 truncate">{m.name}</span>
                         </div>
 
