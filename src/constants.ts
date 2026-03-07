@@ -439,6 +439,24 @@ export const DEFAULT_PRICES: Record<string, number> = {
   PLANT_UNIT: 10.0,
   SHRUB_UNIT: 25.0,
   HEDGE_PLANT_UNIT: 12.0,
+
+  FOUNDATION_CONCRETE: 135.0,
+  DELIVERY: 120.0,
+  TABLEAU_ELECTRIQUE: 350.0,
+  INTERRUPTEURS_DIFFERENTIELS: 85.0,
+  CHAUFFE_EAU: 450.0,
+  GROUPE_SECURITE: 35.0,
+  RADIATEURS_EAU: 180.0,
+  HYDRAULIQUE: 12.0,
+  TRAITEMENT_MOUSSE: 9.0,
+  PEINTURE_SILO: 145.0,
+  ITE_120_PSE: 18.0,
+  BARDAGE_BOIS: 45.0,
+  BARDAGE_SUR_TASSEAUX: 12.0,
+  COMPRIBAND: 8.5,
+  SILICONE: 7.0,
+  FOAM: 9.0,
+  FIXINGS: 18.0,
   TREE_UNIT: 150.0,
 };
 
@@ -616,7 +634,7 @@ const inferCategoryKey = (key: string): keyof typeof categoryFallbackEn => {
     k === "MAP_BAG_25KG"
   )
     return "drywall";
-  if (k.includes("INSULATION") || k.includes("ISOL")) return "insulation";
+  if (k.includes("INSULATION") || k.includes("ISOL") || k.includes("ITE_120_PSE")) return "insulation";
 
   if (k.includes("REBAR") || k.includes("MESH") || k.includes("CHAINAGE") || k.includes("STEEL")) return "reinforcement";
 
@@ -634,15 +652,45 @@ const inferCategoryKey = (key: string): keyof typeof categoryFallbackEn => {
   if (k.includes("BITUMEN") || k.includes("DELTA_MS") || k.includes("DRAIN") || k.includes("DPC") || k.includes("GEOTEXTILE") || k.includes("POLYANE"))
     return "waterproofing";
 
-  if (k.includes("ROOF") || k.includes("BATTEN") || k.includes("UNDERLAY") || k.includes("GUTTER")) return "roofing";
+  if (k.includes("ROOF") || k.includes("BATTEN") || k.includes("UNDERLAY") || k.includes("GUTTER") || k.includes("TRAITEMENT_MOUSSE")) return "roofing";
 
-  if (k.includes("CABLE") || k.includes("CONDUIT") || k.includes("SOCKET") || k.includes("SWITCH") || k.includes("BREAKER") || k.includes("PANEL"))
+  if (
+    k.includes("CABLE") ||
+    k.includes("CONDUIT") ||
+    k.includes("SOCKET") ||
+    k.includes("SWITCH") ||
+    k.includes("BREAKER") ||
+    k.includes("PANEL") ||
+    k.includes("TABLEAU_ELECTRIQUE") ||
+    k.includes("INTERRUPTEURS_DIFFERENTIELS")
+  )
     return "electricity";
 
-  if (k.includes("PVC_PIPE") || k.includes("PER_PIPE") || k.includes("WATER_PIPE") || k.includes("SEWER_PIPE")) return "plumbing";
+  if (
+    k.includes("CHAUFFE_EAU") ||
+    k.includes("GROUPE_SECURITE") ||
+    k.includes("HYDRAULIQUE") ||
+    k.includes("PVC_PIPE") ||
+    k.includes("PER_PIPE") ||
+    k.includes("WATER_PIPE") ||
+    k.includes("SEWER_PIPE") ||
+    k.includes("RADIATEURS_EAU")
+  )
+    return "plumbing";
   if (k.includes("MANHOLE") || k.includes("ELECTRIC_CONDUIT")) return "networks";
 
-  if (k.includes("FACADE") || k.includes("COATING_EXT") || (k.includes("COATING_") && !k.includes("BITUMEN_COATING"))) return "facade";
+  if (
+    k.includes("FACADE") ||
+    k.includes("COATING_EXT") ||
+    (k.includes("COATING_") && !k.includes("BITUMEN_COATING")) ||
+    k.includes("PEINTURE_SILO") ||
+    k.includes("BARDAGE") ||
+    k.includes("COMPRIBAND") ||
+    k.includes("FIXINGS") ||
+    k.includes("SILICONE") ||
+    k.includes("FOAM")
+  )
+    return "facade";
 
   if (k.includes("FENCE") || k.includes("BORDER") || k.includes("WALL_COPING")) return "fencing";
   if (k.includes("PAVERS") || k.includes("DECK")) return "exterior";
