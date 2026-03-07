@@ -20,7 +20,8 @@ export enum CalculatorType {
   PLUMBING = 'PLUMBING',
   HVAC = 'HVAC', // Chauffage / VMC
   FACADE = 'FACADE', // Enduit / Bardage
-  EXTERIOR = 'EXTERIOR' // Terrasse / Clôture
+  EXTERIOR = 'EXTERIOR', // Terrasse / Clôture
+  QUICK_TOOLS = 'QUICK_TOOLS' // Calculs rapides chantier
 }
 
 export enum Unit {

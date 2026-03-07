@@ -35,6 +35,7 @@ import {
   Fence,
   PaintRoller,
   TrendingUp,
+  Calculator,
 } from "lucide-react";
 
 /**
@@ -223,6 +224,15 @@ export const getCalculators = (): CalculatorConfig[] => [
     description: tr("calculators.exterior.desc", "Terrace, fencing, paths"),
     imageSrc: "/images/calculators/exterieurs.png",
     imageAlt: tr("calculators.exterior.alt", "Exteriors: terrace, fencing and paths"),
+  },
+  {
+    id: CalculatorType.QUICK_TOOLS,
+    name: tr("calculators.quick_tools.name", "Quick site tools"),
+    icon: "Calculator",
+    color: "bg-blue-700",
+    description: tr("calculators.quick_tools.desc", "Conversions, net area, packaging, slope, linear runs, voltage drop"),
+    imageSrc: "/backgrounds/bg-menu.png",
+    imageAlt: tr("calculators.quick_tools.alt", "Quick site tools: conversions, net area, packaging and voltage drop"),
   },
 ];
 
@@ -1151,6 +1161,11 @@ export const getStaticTips = (): Record<string, string[]> => ({
   [CalculatorType.EXTERIOR]: [
     tr("tips.exterior.1", "Compact in layers: most outdoor failures come from insufficient base preparation."),
     tr("tips.exterior.2", "Add drainage considerations (slope away from buildings, permeable layers)."),
+  ],
+  [CalculatorType.QUICK_TOOLS]: [
+    tr("tips.quick.1", "Use these tools for fast field estimates, then validate the final sizing for procurement or compliance."),
+    tr("tips.quick.2", "Keep a practical waste allowance: cuts, overlaps and site constraints often add 5 to 15%."),
+    tr("tips.quick.3", "For electrical sizing, always cross-check applicable standards and installation conditions."),
   ],
 });
 

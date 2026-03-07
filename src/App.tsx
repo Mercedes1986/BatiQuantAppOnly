@@ -135,6 +135,9 @@ const StairCalculator = lazyNamed(() =>
 const FoundationsCalculator = lazyNamed(() =>
   import("@/components/calculators/FoundationsCalculator").then((m) => ({ default: m.FoundationsCalculator }))
 );
+const QuickToolsCalculator = lazyNamed(() =>
+  import("./components/calculators/QuickToolsCalculator").then((m) => ({ default: m.QuickToolsCalculator }))
+);
 
 // Loading Component
 const PageLoader: React.FC = () => {
@@ -349,6 +352,8 @@ const ProjectCalculatorWrapper: React.FC = () => {
         return <ExteriorCalculator {...props} />;
       case CalculatorType.STAIRS:
         return <StairCalculator {...props} />;
+      case CalculatorType.QUICK_TOOLS:
+        return <QuickToolsCalculator {...props} />;
       default:
         return <div>{t("common.unknown", { defaultValue: "Unknown" })}</div>;
     }
