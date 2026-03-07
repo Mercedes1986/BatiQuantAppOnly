@@ -136,7 +136,7 @@ const FoundationsCalculator = lazyNamed(() =>
   import("@/components/calculators/FoundationsCalculator").then((m) => ({ default: m.FoundationsCalculator }))
 );
 const QuickToolsCalculator = lazyNamed(() =>
-  import("./components/calculators/QuickToolsCalculator").then((m) => ({ default: m.QuickToolsCalculator }))
+  import("./components/calculators/QuickToolsCalc").then((m) => ({ default: m.QuickToolsCalculator }))
 );
 
 // Loading Component

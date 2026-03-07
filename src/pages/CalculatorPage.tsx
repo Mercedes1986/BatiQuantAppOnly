@@ -34,7 +34,7 @@ import { FacadeCalculator } from "../components/calculators/FacadeCalculator";
 import { ExteriorCalculator } from "../components/calculators/ExteriorCalculator";
 import { StairCalculator } from "../components/calculators/StairCalculator";
 import { FoundationsCalculator } from "../components/calculators/FoundationsCalculator";
-import { QuickToolsCalculator } from "../components/calculators/QuickToolsCalculator";
+import { QuickToolsCalculator } from "../components/calculators/QuickToolsCalc";
 
 import { AdSlot } from "../components/ads/AdSlot";
 import { saveProject, generateId } from "../services/storage";
