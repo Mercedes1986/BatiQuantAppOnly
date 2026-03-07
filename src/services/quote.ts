@@ -1,5 +1,5 @@
 import { HouseProject, QuoteManualLine, Unit } from "../types";
-import { CONSTRUCTION_STEPS } from "../constants";
+import { getConstructionSteps, type ConstructionStepDef, type ConstructionStepGroup } from "../constants";
 
 export interface QuoteSection {
   id: string;
@@ -49,8 +49,10 @@ export const calculateQuote = (project: HouseProject): ComputedQuote => {
   let totalLaborHT = 0;
   const sections: QuoteSection[] = [];
 
-  CONSTRUCTION_STEPS.forEach((group) => {
-    group.steps.forEach((step) => {
+  const constructionSteps = getConstructionSteps();
+
+  constructionSteps.forEach((group: ConstructionStepGroup) => {
+    group.steps.forEach((step: ConstructionStepDef) => {
       const stepId = step.id;
       const stepData = project.steps[stepId];
       const stepManualLines = manualLines.filter((l) => l.stepId === stepId);

@@ -235,7 +235,7 @@ export const CALCULATORS: CalculatorConfig[] = getCalculators();
    CONSTRUCTION STEPS
 ------------------------------------------------------- */
 
-export const CONSTRUCTION_STEPS = [
+export const getConstructionSteps = () => [
   {
     id: "group_go",
     label: tr("steps.groups.go", "Structural work"),
@@ -273,7 +273,13 @@ export const CONSTRUCTION_STEPS = [
       { id: ConstructionStepId.EXTERIOR, label: tr("steps.fin.exterior", "Exteriors"), icon: Fence, calc: CalculatorType.EXTERIOR },
     ],
   },
-];
+ ] as const;
+
+// Backward-compatible alias. Prefer getConstructionSteps() in pages/services that must react to language changes.
+export const CONSTRUCTION_STEPS = getConstructionSteps();
+
+export type ConstructionStepGroup = ReturnType<typeof getConstructionSteps>[number];
+export type ConstructionStepDef = ConstructionStepGroup["steps"][number];
 
 /* -------------------------------------------------------
    DEFAULT PRICES
@@ -1221,19 +1227,19 @@ export const LEVELING_PRODUCTS = [
   { id: "exterior", label: tr("leveling.products.exterior", "Exterior"), density: 1.8, minThick: 3, maxThick: 20, priceRef: "RAGREAGE_BAG_25KG" },
 ];
 
-export const PLACO_BOARD_TYPES = [
+export const getPlacoBoardTypes = () => [
   { id: "BA13", label: tr("placo.boards.ba13", "BA13 standard"), width: 1.2, height: 2.5, area: 3.0, priceRef: "PLACO_PLATE_BA13" },
   { id: "HYDRO", label: tr("placo.boards.hydro", "Moisture resistant (H1)"), width: 1.2, height: 2.5, area: 3.0, priceRef: "PLACO_PLATE_HYDRO" },
   { id: "FIRE", label: tr("placo.boards.fire", "Fire-rated / acoustic"), width: 1.2, height: 2.5, area: 3.0, priceRef: "PLACO_PLATE_FIRE" },
 ];
 
-export const PLACO_PROFILES = [
+export const getPlacoProfiles = () => [
   { id: "M48", label: tr("placo.profiles.m48", "Stud M48 / Track R48 (standard)") },
   { id: "M70", label: tr("placo.profiles.m70", "Stud M70 / Track R70 (enhanced insulation)") },
   { id: "M90", label: tr("placo.profiles.m90", "Stud M90 (large volumes)") },
 ];
 
-export const PLACO_INSULATION_TYPES = [
+export const getPlacoInsulationTypes = () => [
   { id: "GR32", label: tr("placo.insulation.gr32", "Glass wool (GR32) - roll") },
   { id: "ROCK", label: tr("placo.insulation.rock", "Rock wool - panel") },
   { id: "PSE", label: tr("placo.insulation.pse", "Expanded polystyrene (EPS)") },
@@ -1242,7 +1248,7 @@ export const PLACO_INSULATION_TYPES = [
   { id: "BIO", label: tr("placo.insulation.bio", "Hemp / recycled cotton") },
 ];
 
-export const OPENING_PRESETS = {
+export const getOpeningPresets = () => ({
   DOORS: [
     { label: tr("openings.doors.63", "Door 63 cm"), width: 0.63, height: 2.04 },
     { label: tr("openings.doors.73", "Door 73 cm (standard)"), width: 0.73, height: 2.04 },
@@ -1259,14 +1265,19 @@ export const OPENING_PRESETS = {
     { label: tr("openings.windows.120x215", "French door 120×215"), width: 1.2, height: 2.15 },
     { label: tr("openings.windows.215x240", "Sliding bay 215×240"), width: 2.4, height: 2.15 },
   ],
-} as const;
+}) as const;
+
+export const PLACO_BOARD_TYPES = getPlacoBoardTypes();
+export const PLACO_PROFILES = getPlacoProfiles();
+export const PLACO_INSULATION_TYPES = getPlacoInsulationTypes();
+export const OPENING_PRESETS = getOpeningPresets();
 
 /**
  * Mesh:
  * - coverM2 = covered area by 1 panel
  * - priceRef = DEFAULT_PRICES key (price per panel)
  */
-export const MESH_TYPES: (MeshType & { width: number; height: number })[] = [
+export const getMeshTypes = (): (MeshType & { width: number; height: number })[] => [
   {
     id: "ST10",
     label: tr("mesh.ST10", "ST10 (light - terrace)"),
@@ -1295,6 +1306,8 @@ export const MESH_TYPES: (MeshType & { width: number; height: number })[] = [
     priceRef: "MESH_PANEL_ST40",
   },
 ];
+
+export const MESH_TYPES = getMeshTypes();
 
 export const REBAR_WEIGHTS: Record<number, number> = {
   6: 0.222,

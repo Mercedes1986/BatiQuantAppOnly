@@ -1473,6 +1473,22 @@
         "deductions_over_gross": "Deductions exceed gross surface.",
         "fill_perimeter_height": "Please fill perimeter and height.",
         "net_zero": "Net surface is zero."
+      },
+      "steps": {
+        "1": "1. Walls",
+        "2": "2. Waterproof",
+        "3": "3. Drainage",
+        "4": "4. Prices"
+      },
+      "wall_mode": {
+        "masonry": "Masonry (blocks)",
+        "poured": "Poured concrete"
+      },
+      "wall_family": {
+        "parpaing": "Concrete block",
+        "brique": "Brick",
+        "cellulaire": "AAC block",
+        "stepoc": "Shuttering block"
       }
     },
     "tile": {
@@ -2059,7 +2075,8 @@
       "high_waste": "High waste percentage.",
       "low_override": "Override price is low.",
       "no_items": "Add at least one item."
-    }
+    },
+    "supplies_title": "Installation supplies"
   },
   "materials": {
     "all": "All",

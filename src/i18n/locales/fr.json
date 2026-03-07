@@ -1532,6 +1532,22 @@
         "deductions_over_gross": "Les déductions dépassent la surface brute.",
         "fill_perimeter_height": "Renseignez le périmètre et la hauteur.",
         "net_zero": "Surface nette nulle."
+      },
+      "steps": {
+        "1": "1. Murs",
+        "2": "2. Étanchéité",
+        "3": "3. Drainage",
+        "4": "4. Prix"
+      },
+      "wall_mode": {
+        "masonry": "Maçonnerie (blocs)",
+        "poured": "Béton coulé"
+      },
+      "wall_family": {
+        "parpaing": "Bloc béton",
+        "brique": "Brique",
+        "cellulaire": "Bloc cellulaire",
+        "stepoc": "Bloc à bancher"
       }
     },
     "tile": {
@@ -2137,7 +2153,8 @@
       "high_waste": "Pertes élevées.",
       "low_override": "Surcharge de prix faible.",
       "no_items": "Ajoutez au moins un élément."
-    }
+    },
+    "supplies_title": "Fournitures de pose"
   },
   "materials": {
     "all": "Tout",

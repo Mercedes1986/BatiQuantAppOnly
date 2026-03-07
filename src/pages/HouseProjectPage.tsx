@@ -22,7 +22,7 @@ import {
   generateId,
 } from "../services/storage";
 import { HouseProject, ConstructionStepId, ClientInfo } from "../types";
-import { CONSTRUCTION_STEPS } from "../constants";
+import { getConstructionSteps, type ConstructionStepDef, type ConstructionStepGroup } from "../constants";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { QuotePanel } from "../components/quote/QuotePanel";
 import { calculateQuote } from "../services/quote";
@@ -60,6 +60,8 @@ export const HouseProjectPage: React.FC = () => {
 
   // Hero image (same spirit as Projects page)
   const heroImageSrc = "/images/chantiers/creer-chantier.png";
+
+  const constructionSteps = useMemo<readonly ConstructionStepGroup[]>(() => getConstructionSteps(), [i18n.language]);
 
   const euro = useMemo(
     () =>
@@ -393,13 +395,13 @@ export const HouseProjectPage: React.FC = () => {
               )}
 
               <div className="rounded-[28px] border border-slate-200/80 bg-white/60 backdrop-blur-sm shadow-sm p-4 md:p-5"><div className="space-y-6">
-                {CONSTRUCTION_STEPS.map((group) => (
+                {constructionSteps.map((group: ConstructionStepGroup) => (
                   <div key={group.id}>
                     <h3 className="text-sm font-extrabold text-slate-900 mb-3 px-1">
                       {group.label}
                     </h3>
                     <div className="space-y-2">
-                      {group.steps.map((step) => {
+                      {group.steps.map((step: ConstructionStepDef) => {
                         const stepData = currentProject.steps[step.id];
                         const isDone = stepData?.status === "done";
                         const Icon = step.icon;

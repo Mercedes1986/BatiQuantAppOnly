@@ -250,7 +250,8 @@ export const calculateFoundations = (
       unitPrice: p("WASTE_M3"),
       totalPrice: r2(cost),
       category: CalculatorType.GROUNDWORK,
-      details: tr("calc.foundations.mat.evac_swell", `Bulking factor ×${n0(soilProp.bulkingFactor)}`),
+      details: tr("calc.foundations.mat.evac_swell", "Bulking factor ×{{factor}}")
+        .replace("{{factor}}", String(n0(soilProp.bulkingFactor))),
     });
   }
 

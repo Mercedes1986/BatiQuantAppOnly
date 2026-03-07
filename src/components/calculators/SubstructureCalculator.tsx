@@ -191,19 +191,19 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
 
   const wallModeLabel = (m: WallMode) =>
     t(`calc.substructure.wall_mode.${m}`, {
-      defaultValue: m === "masonry" ? "Masonry (blocks)" : "Poured concrete",
+      defaultValue: m === "masonry" ? "Maçonnerie (blocs)" : "Béton coulé",
     });
 
   const wallFamilyLabel = (fam: WallFamily) =>
     t(`calc.substructure.wall_family.${fam}`, {
       defaultValue:
         fam === "parpaing"
-          ? "Concrete block"
+          ? "Bloc béton"
           : fam === "brique"
-          ? "Brick"
+          ? "Brique"
           : fam === "cellulaire"
-          ? "AAC block"
-          : "Shuttering block",
+          ? "Bloc cellulaire"
+          : "Bloc à bancher",
     });
 
   // --- CALC ENGINE ---
@@ -649,7 +649,7 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
 
   const stepLabel = (s: number) =>
     t(`calc.substructure.steps.${s}`, {
-      defaultValue: s === 1 ? "1. Walls" : s === 2 ? "2. Waterproof" : s === 3 ? "3. Drainage" : "4. Prices",
+      defaultValue: s === 1 ? "1. Murs" : s === 2 ? "2. Étanchéité" : s === 3 ? "3. Drainage" : "4. Prix",
     });
 
   return (

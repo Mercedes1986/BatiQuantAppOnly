@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { CalculatorType, CalculationResult, Unit } from "../../../types";
-import { DEFAULT_PRICES, PLACO_BOARD_TYPES, PLACO_INSULATION_TYPES } from "../../constants";
+import { DEFAULT_PRICES, getPlacoBoardTypes, getPlacoInsulationTypes } from "../../constants";
 import { getUnitPrice } from "../../services/materialsService";
 import {
   ArrowRightLeft,
@@ -52,7 +52,10 @@ export const PlacoCalculator: React.FC<Props> = ({
   initialMode = "partition",
   hideTabs = false,
 }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+
+  const PLACO_BOARD_TYPES = useMemo(() => getPlacoBoardTypes(), [i18n.language]);
+  const PLACO_INSULATION_TYPES = useMemo(() => getPlacoInsulationTypes(), [i18n.language]);
 
   const [step, setStep] = useState(1);
   const [proMode, setProMode] = useState(false);

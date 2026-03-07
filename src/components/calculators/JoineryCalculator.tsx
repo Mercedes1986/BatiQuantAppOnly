@@ -3,7 +3,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { CalculatorType, CalculationResult, Unit } from "../../../types";
-import { DEFAULT_PRICES, OPENING_PRESETS } from "../../constants";
+import { DEFAULT_PRICES, getOpeningPresets } from "../../constants";
 import { getUnitPrice } from "../../services/materialsService";
 
 import {
@@ -71,7 +71,9 @@ const getTypeLabel = (t: TFn, type: JoineryType) => {
 };
 
 export const JoineryCalculator: React.FC<Props> = ({ onCalculate }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+
+  const OPENING_PRESETS = useMemo(() => getOpeningPresets(), [i18n.language]);
 
   const [step, setStep] = useState(1);
   const [proMode, setProMode] = useState(false);
@@ -864,7 +866,7 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate }) => {
 
           <div className="bg-white p-3 rounded-xl border border-slate-200">
             <h4 className="text-xs font-bold text-slate-500 uppercase mb-3">
-              {t("joinery.supplies", { defaultValue: "Installation supplies" })}
+              {t("joinery.supplies_title", { defaultValue: "Installation supplies" })}
             </h4>
 
             <div className="space-y-2">
