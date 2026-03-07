@@ -1,5 +1,18 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { User, Shield, HelpCircle, HardDrive, Download, Upload, AlertTriangle, Languages } from "lucide-react";
+import {
+  User,
+  Shield,
+  HelpCircle,
+  HardDrive,
+  Download,
+  Upload,
+  AlertTriangle,
+  Languages,
+  Building2,
+  ChevronRight,
+  Globe,
+  Coins,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { exportAppData, importAppData } from "../services/materialsService";
 import { CompanyProfileForm } from "../components/documents/CompanyProfileForm";
@@ -39,10 +52,8 @@ export const SettingsPage: React.FC = () => {
   useEffect(() => {
     try {
       const s = getSettings();
-      // ton UserSettings actuel stocke currency comme symbole ("€") => on remappe en code
       const sym = s.currency || "€";
-      const code: Currency =
-        sym === "€" ? "EUR" : sym === "CHF" ? "CHF" : sym === "$" ? "EUR" : "EUR";
+      const code: Currency = sym === "€" ? "EUR" : sym === "CHF" ? "CHF" : sym === "$" ? "EUR" : "EUR";
       setCurrency(code);
     } catch {
       // ignore
@@ -149,152 +160,181 @@ export const SettingsPage: React.FC = () => {
     }
   };
 
+  const tabButton = (tab: SettingsTab, label: string, icon: React.ReactNode) => (
+    <button
+      type="button"
+      onClick={() => setActiveTab(tab)}
+      className={[
+        "px-4 py-2 text-sm font-extrabold rounded-xl whitespace-nowrap transition-colors flex items-center gap-2",
+        activeTab === tab ? "bg-white text-slate-900 shadow" : "text-slate-700 hover:bg-white/70",
+      ].join(" ")}
+    >
+      {icon}
+      {label}
+    </button>
+  );
+
+  const rowClass =
+    "w-full p-4 flex items-center justify-between gap-3 text-left hover:bg-white/70 transition-colors";
+
   return (
     <div className="p-4 pb-20 bg-transparent min-h-screen">
-      <h1 className="text-2xl font-extrabold text-slate-800 mb-6 px-2">
-        {t("settings.title", { defaultValue: "Settings" })}
-      </h1>
-
-      <div className="flex space-x-2 mb-6 px-2">
-        <button
-          type="button"
-          onClick={() => setActiveTab("app")}
-          className={`flex-1 py-2 text-sm font-extrabold rounded-lg ${
-            activeTab === "app" ? "bg-blue-600 text-white" : "bg-white text-slate-600 border border-slate-200"
-          }`}
-        >
-          {t("settings.tabs.app", { defaultValue: "Application" })}
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setActiveTab("company")}
-          className={`flex-1 py-2 text-sm font-extrabold rounded-lg ${
-            activeTab === "company" ? "bg-blue-600 text-white" : "bg-white text-slate-600 border border-slate-200"
-          }`}
-        >
-          {t("settings.tabs.company", { defaultValue: "Entreprise & Facturation" })}
-        </button>
-      </div>
-
-      {activeTab === "company" ? (
-        <CompanyProfileForm />
-      ) : (
-        <div className="space-y-6">
-          <section className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
-            <div className="p-4 border-b border-slate-50 flex items-center">
-              <div className="bg-emerald-100 p-2 rounded-full mr-3 text-emerald-600">
-                <User size={20} />
-              </div>
-              <div className="flex-1">
-                <h3 className="font-extrabold text-slate-800">{t("settings.pro.title", { defaultValue: "Version Pro" })}</h3>
-                <p className="text-xs text-slate-500">{t("settings.pro.subtitle", { defaultValue: "Licence active • Mode Hors-ligne" })}</p>
-              </div>
+      <div className="max-w-6xl mx-auto space-y-4">
+        <section className="rounded-[28px] border border-slate-200/80 bg-white/72 backdrop-blur-md shadow-sm p-5 md:p-6">
+          <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
+            <div>
+              <h1 className="text-2xl font-extrabold text-slate-800">
+                {t("settings.title", { defaultValue: "Settings" })}
+              </h1>
             </div>
-          </section>
-
-          <section className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
-            <h3 className="px-4 pt-4 text-xs font-extrabold text-slate-400 uppercase tracking-wider flex items-center">
-              <HardDrive size={12} className="mr-2" /> {t("settings.data.title", { defaultValue: "Données & Sauvegarde" })}
-            </h3>
-
-            <div className="p-4 grid grid-cols-2 gap-3">
-              <button
-                type="button"
-                onClick={handleExport}
-                className="flex flex-col items-center justify-center p-4 border border-slate-200 rounded-xl hover:bg-blue-50 hover:border-blue-200 transition-colors group"
-              >
-                <Download size={24} className="text-blue-600 mb-2 group-hover:scale-110 transition-transform" />
-                <span className="text-sm font-extrabold text-slate-700">{t("settings.data.backup", { defaultValue: "Sauvegarder" })}</span>
-                <span className="text-[10px] text-slate-400">{t("settings.data.export_json", { defaultValue: "Exporter JSON" })}</span>
-              </button>
-
-              <label
-                className={`flex flex-col items-center justify-center p-4 border border-slate-200 rounded-xl transition-colors cursor-pointer group ${
-                  isImporting ? "opacity-60 pointer-events-none" : "hover:bg-emerald-50 hover:border-emerald-200"
-                }`}
-                title={isImporting ? t("settings.data.importing", { defaultValue: "Import en cours…" }) : t("settings.data.import_title", { defaultValue: "Importer une sauvegarde" })}
-              >
-                <Upload size={24} className="text-emerald-600 mb-2 group-hover:scale-110 transition-transform" />
-                <span className="text-sm font-extrabold text-slate-700">
-                  {isImporting ? t("settings.data.importing_short", { defaultValue: "Import..." }) : t("settings.data.restore", { defaultValue: "Restaurer" })}
-                </span>
-                <span className="text-[10px] text-slate-400">{t("settings.data.import_json", { defaultValue: "Importer JSON" })}</span>
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  className="hidden"
-                  accept="application/json,.json"
-                  onChange={handleImport}
-                />
-              </label>
-            </div>
-
-            <div className="px-4 pb-4">
-              <div className="bg-amber-50 text-amber-700 text-xs p-3 rounded-lg flex items-start">
-                <AlertTriangle size={14} className="mr-2 mt-0.5 shrink-0" />
-                <p>{t("settings.data.warning", { defaultValue: "Important : Vos données sont stockées dans le navigateur. Pensez à faire une sauvegarde régulière." })}</p>
-              </div>
-            </div>
-          </section>
-
-          <section className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
-            <h3 className="px-4 pt-4 text-xs font-extrabold text-slate-400 uppercase tracking-wider">
-              {t("settings.app.title", { defaultValue: "Application" })}
-            </h3>
-
-            <div className="divide-y divide-slate-50">
-              <div className="p-4 flex justify-between items-center">
-                <span className="text-sm font-medium">{t("settings.app.currency", { defaultValue: "Devise" })}</span>
-                <select
-                  value={currency}
-                  onChange={(e) => onCurrencyChange(e.target.value as Currency)}
-                  className="bg-slate-50 border-none rounded text-sm text-slate-600 p-1 focus:ring-0"
-                >
-                  <option value="EUR">EUR (€)</option>
-                  <option value="USD">USD ($)</option>
-                  <option value="CAD">CAD ($)</option>
-                  <option value="CHF">CHF</option>
-                </select>
-              </div>
-
-              <div className="p-4 flex justify-between items-center">
-                <span className="text-sm font-medium flex items-center gap-2">
-                  <Languages size={16} className="text-slate-400" />
-                  {t("settings.app.language", { defaultValue: "Langue" })}
-                </span>
-
-                <select
-                  value={(i18n.language || "fr").split("-")[0]}
-                  onChange={(e) => changeLanguage(e.target.value)}
-                  className="bg-slate-50 border-none rounded text-sm text-slate-600 p-1 focus:ring-0"
-                >
-                  <option value="fr">Français</option>
-                  <option value="en">English</option>
-                </select>
-              </div>
-            </div>
-          </section>
-
-          <section className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
-            <div className="divide-y divide-slate-50">
-              <button type="button" className="w-full p-4 flex items-center text-left hover:bg-slate-50">
-                <HelpCircle size={18} className="text-slate-400 mr-3" />
-                <span className="text-sm font-medium text-slate-700">{t("settings.support.help", { defaultValue: "Aide & FAQ" })}</span>
-              </button>
-              <button type="button" className="w-full p-4 flex items-center text-left hover:bg-slate-50">
-                <Shield size={18} className="text-slate-400 mr-3" />
-                <span className="text-sm font-medium text-slate-700">{t("settings.support.privacy", { defaultValue: "Politique de confidentialité" })}</span>
-              </button>
-            </div>
-          </section>
-
-          <div className="text-center pt-8">
-            <p className="text-xs text-slate-400">{versionLabel}</p>
-            <p className="text-[10px] text-slate-300 mt-2">{t("settings.footer", { defaultValue: "Aucune donnée n'est collectée." })}</p>
           </div>
-        </div>
-      )}
+
+          <div className="mx-auto w-fit max-w-full mt-4">
+            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar rounded-xl bg-slate-200/80 p-1.5 shadow-sm border border-slate-200">
+              {tabButton(
+                "app",
+                t("settings.tabs.app", { defaultValue: "Application" }),
+                <Globe size={16} />
+              )}
+              {tabButton(
+                "company",
+                t("settings.tabs.company", { defaultValue: "Entreprise & Facturation" }),
+                <Building2 size={16} />
+              )}
+            </div>
+          </div>
+        </section>
+
+        {activeTab === "company" ? (
+          <div className="rounded-[28px] border border-slate-200/80 bg-white/72 backdrop-blur-md shadow-sm p-1 md:p-2">
+            <CompanyProfileForm />
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <section className="bg-white/72 backdrop-blur-md rounded-[28px] shadow-sm border border-slate-200/80 overflow-hidden">
+              <div className="p-5 flex items-center">
+                <div className="bg-emerald-100 p-3 rounded-2xl mr-3 text-emerald-600">
+                  <User size={20} />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-extrabold text-slate-800">{t("settings.pro.title", { defaultValue: "Version Pro" })}</h3>
+                  <p className="text-xs text-slate-500">{t("settings.pro.subtitle", { defaultValue: "Licence active • Mode Hors-ligne" })}</p>
+                </div>
+              </div>
+            </section>
+
+            <section className="bg-white/72 backdrop-blur-md rounded-[28px] shadow-sm border border-slate-200/80 overflow-hidden">
+              <h3 className="px-5 pt-5 text-xs font-extrabold text-slate-400 uppercase tracking-wider flex items-center">
+                <HardDrive size={12} className="mr-2" /> {t("settings.data.title", { defaultValue: "Données & Sauvegarde" })}
+              </h3>
+
+              <div className="p-5 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={handleExport}
+                  className="flex flex-col items-center justify-center p-5 border border-slate-200 rounded-2xl hover:bg-blue-50/70 hover:border-blue-200 transition-colors group bg-white/70"
+                >
+                  <Download size={24} className="text-blue-600 mb-2 group-hover:scale-110 transition-transform" />
+                  <span className="text-sm font-extrabold text-slate-700">{t("settings.data.backup", { defaultValue: "Sauvegarder" })}</span>
+                  <span className="text-[10px] text-slate-400">{t("settings.data.export_json", { defaultValue: "Exporter JSON" })}</span>
+                </button>
+
+                <label
+                  className={`flex flex-col items-center justify-center p-5 border border-slate-200 rounded-2xl transition-colors cursor-pointer group bg-white/70 ${
+                    isImporting ? "opacity-60 pointer-events-none" : "hover:bg-emerald-50/70 hover:border-emerald-200"
+                  }`}
+                  title={
+                    isImporting
+                      ? t("settings.data.importing", { defaultValue: "Import en cours…" })
+                      : t("settings.data.import_title", { defaultValue: "Importer une sauvegarde" })
+                  }
+                >
+                  <Upload size={24} className="text-emerald-600 mb-2 group-hover:scale-110 transition-transform" />
+                  <span className="text-sm font-extrabold text-slate-700">
+                    {isImporting
+                      ? t("settings.data.importing_short", { defaultValue: "Import..." })
+                      : t("settings.data.restore", { defaultValue: "Restaurer" })}
+                  </span>
+                  <span className="text-[10px] text-slate-400">{t("settings.data.import_json", { defaultValue: "Importer JSON" })}</span>
+                  <input type="file" ref={fileInputRef} className="hidden" accept="application/json,.json" onChange={handleImport} />
+                </label>
+              </div>
+
+              <div className="px-5 pb-5">
+                <div className="bg-amber-50 text-amber-700 text-xs p-3 rounded-xl flex items-start border border-amber-100">
+                  <AlertTriangle size={14} className="mr-2 mt-0.5 shrink-0" />
+                  <p>{t("settings.data.warning", { defaultValue: "Important : Vos données sont stockées dans le navigateur. Pensez à faire une sauvegarde régulière." })}</p>
+                </div>
+              </div>
+            </section>
+
+            <section className="bg-white/72 backdrop-blur-md rounded-[28px] shadow-sm border border-slate-200/80 overflow-hidden">
+              <h3 className="px-5 pt-5 text-xs font-extrabold text-slate-400 uppercase tracking-wider">
+                {t("settings.app.title", { defaultValue: "Application" })}
+              </h3>
+
+              <div className="divide-y divide-slate-100">
+                <div className={rowClass}>
+                  <span className="text-sm font-medium flex items-center gap-2 text-slate-700">
+                    <Coins size={16} className="text-slate-400" />
+                    {t("settings.app.currency", { defaultValue: "Devise" })}
+                  </span>
+                  <select
+                    value={currency}
+                    onChange={(e) => onCurrencyChange(e.target.value as Currency)}
+                    className="bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-600 px-3 py-2 focus:ring-0"
+                  >
+                    <option value="EUR">EUR (€)</option>
+                    <option value="USD">USD ($)</option>
+                    <option value="CAD">CAD ($)</option>
+                    <option value="CHF">CHF</option>
+                  </select>
+                </div>
+
+                <div className={rowClass}>
+                  <span className="text-sm font-medium flex items-center gap-2 text-slate-700">
+                    <Languages size={16} className="text-slate-400" />
+                    {t("settings.app.language", { defaultValue: "Langue" })}
+                  </span>
+
+                  <select
+                    value={(i18n.language || "fr").split("-")[0]}
+                    onChange={(e) => changeLanguage(e.target.value)}
+                    className="bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-600 px-3 py-2 focus:ring-0"
+                  >
+                    <option value="fr">Français</option>
+                    <option value="en">English</option>
+                  </select>
+                </div>
+              </div>
+            </section>
+
+            <section className="bg-white/72 backdrop-blur-md rounded-[28px] shadow-sm border border-slate-200/80 overflow-hidden">
+              <div className="divide-y divide-slate-100">
+                <button type="button" className={rowClass}>
+                  <div className="flex items-center gap-3">
+                    <HelpCircle size={18} className="text-slate-400" />
+                    <span className="text-sm font-medium text-slate-700">{t("settings.support.help", { defaultValue: "Aide & FAQ" })}</span>
+                  </div>
+                  <ChevronRight size={18} className="text-slate-300" />
+                </button>
+                <button type="button" className={rowClass}>
+                  <div className="flex items-center gap-3">
+                    <Shield size={18} className="text-slate-400" />
+                    <span className="text-sm font-medium text-slate-700">{t("settings.support.privacy", { defaultValue: "Politique de confidentialité" })}</span>
+                  </div>
+                  <ChevronRight size={18} className="text-slate-300" />
+                </button>
+              </div>
+            </section>
+
+            <div className="text-center pt-4">
+              <p className="text-xs text-slate-400">{versionLabel}</p>
+              <p className="text-[10px] text-slate-300 mt-2">{t("settings.footer", { defaultValue: "Aucune donnée n'est collectée." })}</p>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

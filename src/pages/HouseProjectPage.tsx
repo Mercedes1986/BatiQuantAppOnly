@@ -218,7 +218,7 @@ export const HouseProjectPage: React.FC = () => {
 
     return (
       <div className="min-h-screen bg-transparent pb-20">
-        <div className="bg-white border-b border-slate-200 sticky top-0 z-10 shadow-sm">
+        <div className="sticky top-0 z-20 border-b border-slate-200/80 bg-white/80 backdrop-blur-xl shadow-sm">
           <div className="p-4 flex items-center justify-between">
             <button
               onClick={closeProject}
@@ -238,13 +238,15 @@ export const HouseProjectPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="flex px-4 space-x-6 border-t border-slate-100">
+          <div className="px-4 pb-4">
+            <div className="mx-auto w-fit max-w-full">
+              <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar rounded-xl bg-slate-200/80 p-1.5 shadow-sm border border-slate-200">
             <button
               onClick={() => setActiveTab("steps")}
-              className={`py-3 text-sm font-extrabold flex items-center border-b-2 transition-colors ${
+              className={`px-4 py-2 text-sm font-extrabold rounded-xl whitespace-nowrap transition-colors flex items-center ${
                 activeTab === "steps"
-                  ? "border-blue-600 text-blue-600"
-                  : "border-transparent text-slate-500 hover:text-slate-700"
+                  ? "bg-white text-slate-900 shadow"
+                  : "text-slate-700 hover:bg-white/70"
               }`}
               type="button"
             >
@@ -254,24 +256,26 @@ export const HouseProjectPage: React.FC = () => {
 
             <button
               onClick={() => setActiveTab("quote")}
-              className={`py-3 text-sm font-extrabold flex items-center border-b-2 transition-colors ${
+              className={`px-4 py-2 text-sm font-extrabold rounded-xl whitespace-nowrap transition-colors flex items-center ${
                 activeTab === "quote"
-                  ? "border-blue-600 text-blue-600"
-                  : "border-transparent text-slate-500 hover:text-slate-700"
+                  ? "bg-white text-slate-900 shadow"
+                  : "text-slate-700 hover:bg-white/70"
               }`}
               type="button"
             >
               <FileText size={18} className="mr-2" />{" "}
               {t("house.tabs.quote", { defaultValue: "Quote" })}
             </button>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div className="p-4">
+        <div className="max-w-6xl mx-auto p-4 space-y-4">
           {activeTab === "steps" && (
             <>
               {isEditingParams ? (
-                <div className="bg-white rounded-xl shadow-md border-2 border-blue-100 p-4 mb-6 animate-in fade-in">
+                <div className="bg-white/72 backdrop-blur-md rounded-[28px] shadow-sm border border-blue-100 p-5 mb-4 animate-in fade-in">
                   <div className="flex justify-between items-center mb-4">
                     <h2 className="text-sm font-extrabold text-blue-600 uppercase">
                       {t("house.edit_data", { defaultValue: "Edit data" })}
@@ -330,7 +334,7 @@ export const HouseProjectPage: React.FC = () => {
                   </button>
                 </div>
               ) : (
-                <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-4 mb-6 relative group">
+                <div className="bg-white/72 backdrop-blur-md rounded-[28px] shadow-sm border border-slate-200/80 p-5 mb-4 relative group">
                   <div className="flex justify-between items-start mb-3">
                     <h2 className="text-sm font-extrabold text-slate-400 uppercase flex items-center">
                       <Ruler size={16} className="mr-2" />{" "}
@@ -388,7 +392,7 @@ export const HouseProjectPage: React.FC = () => {
                 </div>
               )}
 
-              <div className="space-y-6">
+              <div className="rounded-[28px] border border-slate-200/80 bg-white/60 backdrop-blur-sm shadow-sm p-4 md:p-5"><div className="space-y-6">
                 {CONSTRUCTION_STEPS.map((group) => (
                   <div key={group.id}>
                     <h3 className="text-sm font-extrabold text-slate-900 mb-3 px-1">
@@ -459,7 +463,7 @@ export const HouseProjectPage: React.FC = () => {
                     </div>
                   </div>
                 ))}
-              </div>
+              </div></div>
             </>
           )}
 
@@ -488,7 +492,7 @@ export const HouseProjectPage: React.FC = () => {
                       <div
                         key={q.id}
                         onClick={() => navigate(`/app/quotes/${q.id}`)}
-                        className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex justify-between items-center cursor-pointer hover:border-blue-300"
+                        className="bg-white/85 p-4 rounded-2xl border border-slate-200 shadow-sm flex justify-between items-center cursor-pointer hover:border-blue-300"
                       >
                         <div>
                           <div className="flex items-center space-x-2">
@@ -525,7 +529,7 @@ export const HouseProjectPage: React.FC = () => {
                     ))}
                   </div>
                 ) : (
-                  <div className="bg-slate-50 border border-dashed border-slate-300 rounded-xl p-6 text-center text-slate-400 text-sm">
+                  <div className="bg-white/70 border border-dashed border-slate-300 rounded-2xl p-6 text-center text-slate-400 text-sm">
                     {t("house.no_official_docs", { defaultValue: "No official document created." })}
                   </div>
                 )}
@@ -556,6 +560,8 @@ export const HouseProjectPage: React.FC = () => {
   // ===== LIST PAGE (same aesthetic as Projects) =====
   return (
     <div className="min-h-screen bg-transparent p-4 pb-20">
+      <div className="max-w-6xl mx-auto space-y-4">
+      <section className="rounded-[28px] border border-slate-200/80 bg-white/72 backdrop-blur-md shadow-sm p-5 md:p-6">
       <div className="mb-3">
         <h1 className="text-2xl font-extrabold text-slate-800">
           {t("house.my_sites", { defaultValue: "My sites (full estimate)" })}
@@ -571,46 +577,49 @@ export const HouseProjectPage: React.FC = () => {
       {!isCreating && (
         <button
           onClick={() => setIsCreating(true)}
-          className="w-full mb-5 group relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm hover:shadow-md active:scale-[0.99] transition-transform"
+          className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-transform active:scale-[0.98] hover:shadow-md w-full mb-5"
           type="button"
         >
-          <div className="relative h-[110px] sm:h-[120px]">
+          <div className="absolute inset-0">
             <img
               src={heroImageSrc}
               alt=""
-              className="absolute inset-0 w-full h-full object-cover"
+              className="w-full h-full object-cover"
               draggable={false}
               onError={(e) => {
                 (e.currentTarget as HTMLImageElement).src = "/images/menu/fallback.jpg";
               }}
             />
-            <div className="absolute inset-0 bg-black/35" />
-            <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/35 to-transparent" />
-            <div className="relative z-10 h-full w-full p-4 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-11 h-11 rounded-full bg-white/90 border border-white/60 flex items-center justify-center shadow-sm">
-                  <Plus className="text-blue-600" size={22} />
-                </div>
-                <div className="text-left">
-                  <div className="text-white font-extrabold text-base leading-tight">
-                    {t("house.create_site", { defaultValue: "Create a site" })}
-                  </div>
-                  <div className="text-white/80 text-xs font-semibold mt-0.5">
-                    {t("house.new_project", { defaultValue: "New project" })}
-                  </div>
-                </div>
-              </div>
+            <div className="absolute inset-0 bg-black/25" />
+            <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/35 to-black/10" />
+          </div>
 
-              <div className="w-9 h-9 rounded-full bg-white/20 border border-white/30 flex items-center justify-center">
-                <ChevronRight className="text-white" size={18} />
+          <div className="relative z-10 w-full p-5 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-11 h-11 rounded-full bg-white/90 border border-white/60 flex items-center justify-center shadow-sm">
+                <Plus className="text-blue-600" size={22} />
               </div>
+              <div className="text-left">
+                <div className="text-white font-extrabold text-base leading-tight">
+                  {t("house.create_site", { defaultValue: "Create a site" })}
+                </div>
+                <div className="text-white/80 text-xs font-semibold mt-0.5">
+                  {t("house.new_project", { defaultValue: "New project" })}
+                </div>
+              </div>
+            </div>
+
+            <div className="w-9 h-9 rounded-full bg-white/20 border border-white/30 flex items-center justify-center">
+              <ChevronRight className="text-white" size={18} />
             </div>
           </div>
         </button>
       )}
 
+      </section>
+
       {isCreating ? (
-        <div className="bg-white p-4 rounded-xl shadow-lg border border-blue-100 animate-in zoom-in-95">
+        <div className="bg-white/72 backdrop-blur-md p-5 rounded-[28px] shadow-sm border border-blue-100 animate-in zoom-in-95">
           <h2 className="font-extrabold text-lg mb-4">
             {t("house.new_site", { defaultValue: "New site" })}
           </h2>
@@ -670,7 +679,7 @@ export const HouseProjectPage: React.FC = () => {
               <div
                 key={p.id}
                 onClick={() => selectProject(p)}
-                className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex justify-between items-center cursor-pointer active:scale-[0.98] transition-transform"
+                className="bg-white/72 backdrop-blur-sm p-4 rounded-[24px] shadow-sm border border-slate-200/80 flex justify-between items-center cursor-pointer active:scale-[0.98] transition-transform hover:border-blue-200"
               >
                 <div className="flex items-center space-x-4">
                   <div className="bg-blue-100 p-3 rounded-full text-blue-600">
@@ -709,6 +718,7 @@ export const HouseProjectPage: React.FC = () => {
           })}
         </div>
       )}
+      </div>
     </div>
   );
 };
