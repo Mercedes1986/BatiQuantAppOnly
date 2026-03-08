@@ -1,7 +1,20 @@
 import React from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { ArrowLeft, ArrowRightLeft, Ruler, Package2, TrendingUp, Cable, ChevronRight } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRightLeft,
+  Cable,
+  ChevronRight,
+  Grid2x2,
+  Home,
+  LayoutGrid,
+  Package2,
+  PaintBucket,
+  PanelsTopLeft,
+  Ruler,
+  TrendingUp,
+} from "lucide-react";
 
 import { QuickToolsCalculator, type ToolKey } from "@/components/calculators/QuickToolsCalc";
 import type { CalculationResult } from "@/types";
@@ -50,6 +63,36 @@ const getToolConfigs = (t: ReturnType<typeof useTranslation>["t"]): ToolConfig[]
     description: t("quick.cards.voltage_drop", { defaultValue: "Estimation rapide de section et chute." }),
     icon: Cable,
   },
+  {
+    key: "decking",
+    title: t("quick.tools.decking", { defaultValue: "Terrasse bois" }),
+    description: t("quick.cards.decking", { defaultValue: "Lames, lambourdes, plots et vis inox." }),
+    icon: LayoutGrid,
+  },
+  {
+    key: "drywallFrame",
+    title: t("quick.tools.drywall_frame", { defaultValue: "Placo détaillé" }),
+    description: t("quick.cards.drywall_frame", { defaultValue: "Cloison, doublage, plafond, rails et montants." }),
+    icon: PanelsTopLeft,
+  },
+  {
+    key: "tileDetailed",
+    title: t("quick.tools.tile_detailed", { defaultValue: "Carrelage détaillé" }),
+    description: t("quick.cards.tile_detailed", { defaultValue: "Carreaux, colle, joint, plinthes et primaire." }),
+    icon: Grid2x2,
+  },
+  {
+    key: "packagingAdvanced",
+    title: t("quick.tools.packaging_advanced", { defaultValue: "Sacs / seaux / cartouches" }),
+    description: t("quick.cards.packaging_advanced", { defaultValue: "Préréglages produits avec couches, pertes et coût." }),
+    icon: PaintBucket,
+  },
+  {
+    key: "roofFrame",
+    title: t("quick.tools.roof_frame", { defaultValue: "Toiture / chevrons / liteaux" }),
+    description: t("quick.cards.roof_frame", { defaultValue: "Pente, surface de toiture, chevrons, liteaux et couverture." }),
+    icon: Home,
+  },
 ];
 
 const ToolCard: React.FC<{ title: string; description: string; icon: React.ElementType; onClick: () => void }> = ({
@@ -75,13 +118,21 @@ const ToolCard: React.FC<{ title: string; description: string; icon: React.Eleme
 );
 
 export const QuickToolsPage: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const { tool } = useParams<{ tool?: string }>();
   const [result, setResult] = React.useState<CalculationResult | null>(null);
 
   const tools = React.useMemo(() => getToolConfigs(t), [t]);
   const activeTool = tools.find((item) => item.key === tool);
+  const euro = React.useMemo(
+    () =>
+      new Intl.NumberFormat(i18n.language || undefined, {
+        style: "currency",
+        currency: "EUR",
+      }),
+    [i18n.language]
+  );
 
   React.useEffect(() => {
     setResult(null);
@@ -147,7 +198,7 @@ export const QuickToolsPage: React.FC = () => {
                     <h3 className="font-extrabold text-slate-800">
                       {t("calculator.materials_estimated", { defaultValue: "Estimated materials" })}
                     </h3>
-                    <span className="text-lg font-extrabold text-emerald-600">~ {result.totalCost.toFixed(2)} €</span>
+                    <span className="text-lg font-extrabold text-emerald-600">~ {euro.format(Number(result.totalCost || 0))}</span>
                   </div>
 
                   <ul className="space-y-4 text-sm">
@@ -190,7 +241,7 @@ export const QuickToolsPage: React.FC = () => {
               <p className="mt-1 max-w-3xl text-sm leading-relaxed text-slate-600">
                 {t("quick.page_subtitle", {
                   defaultValue:
-                    "Outils séparés pour les conversions, surfaces nettes, conditionnements, pentes, linéaires et chutes de tension.",
+                    "Outils séparés pour les conversions, surfaces nettes, conditionnements, terrasse bois, placo détaillé, carrelage détaillé et toiture.",
                 })}
               </p>
             </div>
