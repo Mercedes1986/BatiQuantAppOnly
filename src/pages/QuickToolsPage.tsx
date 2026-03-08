@@ -88,6 +88,24 @@ const getToolConfigs = (t: ReturnType<typeof useTranslation>["t"]): ToolConfig[]
     icon: PaintBucket,
   },
   {
+    key: "fence",
+    title: t("quick.tools.fence", { defaultValue: "Clôture / grillage" }),
+    description: t("quick.cards.fence", { defaultValue: "Panneaux, poteaux et béton de scellement." }),
+    icon: Ruler,
+  },
+  {
+    key: "bulkFill",
+    title: t("quick.tools.bulk_fill", { defaultValue: "Gravier / remblai / sable" }),
+    description: t("quick.cards.bulk_fill", { defaultValue: "Volume, tonnage, big bags et géotextile." }),
+    icon: Package2,
+  },
+  {
+    key: "insulation",
+    title: t("quick.tools.insulation", { defaultValue: "Isolation murs / combles" }),
+    description: t("quick.cards.insulation", { defaultValue: "Surface, épaisseur, R et rouleaux d’isolant." }),
+    icon: PanelsTopLeft,
+  },
+  {
     key: "roofFrame",
     title: t("quick.tools.roof_frame", { defaultValue: "Toiture / chevrons / liteaux" }),
     description: t("quick.cards.roof_frame", { defaultValue: "Pente, surface de toiture, chevrons, liteaux et couverture." }),
@@ -241,7 +259,7 @@ export const QuickToolsPage: React.FC = () => {
               <p className="mt-1 max-w-3xl text-sm leading-relaxed text-slate-600">
                 {t("quick.page_subtitle", {
                   defaultValue:
-                    "Outils séparés pour les conversions, surfaces nettes, conditionnements, terrasse bois, placo détaillé, carrelage détaillé et toiture.",
+                    "Outils séparés pour les conversions, surfaces nettes, conditionnements, terrasse bois, placo détaillé, carrelage détaillé, toiture, clôture, gravier / remblai et isolation.",
                 })}
               </p>
             </div>
