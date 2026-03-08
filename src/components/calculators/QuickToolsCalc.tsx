@@ -678,7 +678,9 @@ export const QuickToolsCalculator: React.FC<Props> = ({
         details = [
           {
             label: t("quick.detail.phase", { defaultValue: "Réseau" }),
-            value: phase === "mono" ? "Monophasé" : "Triphasé",
+            value: phase === "mono"
+                ? t("quick.option.phase_mono_short", { defaultValue: "Single-phase" })
+                : t("quick.option.phase_tri_short", { defaultValue: "Three-phase" }),
           },
           {
             label: t("quick.detail.current", {
@@ -1617,8 +1619,8 @@ export const QuickToolsCalculator: React.FC<Props> = ({
           >
             <option value="kg">kg</option>
             <option value="L">L</option>
-            <option value="cartouche">cartouche</option>
-            <option value="sac">sac</option>
+            <option value="cartouche">{t("quick.option.cartridge", { defaultValue: "cartridge" })}</option>
+            <option value="sac">{t("quick.option.bag_lower", { defaultValue: "bag" })}</option>
           </Select>
           <Input
             label={t("quick.field.pack_size", {
@@ -1635,11 +1637,11 @@ export const QuickToolsCalculator: React.FC<Props> = ({
             value={packageUnit}
             onChange={(e) => setPackageUnit(e.target.value as Unit)}
           >
-            <option value={Unit.BAG}>Sac</option>
-            <option value={Unit.BUCKET}>Seau</option>
-            <option value={Unit.BOX}>Boîte</option>
-            <option value={Unit.ROLL}>Rouleau</option>
-            <option value={Unit.PIECE}>Pièce</option>
+            <option value={Unit.BAG}>{t("quick.option.pack_bag", { defaultValue: "Bag" })}</option>
+            <option value={Unit.BUCKET}>{t("quick.option.pack_bucket", { defaultValue: "Bucket" })}</option>
+            <option value={Unit.BOX}>{t("quick.option.pack_box", { defaultValue: "Box" })}</option>
+            <option value={Unit.ROLL}>{t("quick.option.pack_roll", { defaultValue: "Roll" })}</option>
+            <option value={Unit.PIECE}>{t("quick.option.pack_piece", { defaultValue: "Piece" })}</option>
           </Select>
           <Input
             label={t("quick.field.package_price", {
@@ -1721,8 +1723,8 @@ export const QuickToolsCalculator: React.FC<Props> = ({
               setVoltage(next === "mono" ? "230" : "400");
             }}
           >
-            <option value="mono">Monophasé 230 V</option>
-            <option value="tri">Triphasé 400 V</option>
+            <option value="mono">{t("quick.option.phase_mono", { defaultValue: "Single-phase 230 V" })}</option>
+            <option value="tri">{t("quick.option.phase_tri", { defaultValue: "Three-phase 400 V" })}</option>
           </Select>
           <Select
             label={t("quick.field.conductor", { defaultValue: "Conducteur" })}
@@ -1731,8 +1733,8 @@ export const QuickToolsCalculator: React.FC<Props> = ({
               setConductor(e.target.value as "copper" | "aluminium")
             }
           >
-            <option value="copper">Cuivre</option>
-            <option value="aluminium">Aluminium</option>
+            <option value="copper">{t("quick.option.conductor_copper", { defaultValue: "Copper" })}</option>
+            <option value="aluminium">{t("quick.option.conductor_aluminium", { defaultValue: "Aluminium" })}</option>
           </Select>
           <Input
             label={t("quick.field.power", { defaultValue: "Puissance (W)" })}
@@ -2031,8 +2033,8 @@ export const QuickToolsCalculator: React.FC<Props> = ({
           >
             <option value="kg">kg</option>
             <option value="L">L</option>
-            <option value="cartouche">cartouche</option>
-            <option value="sac">sac</option>
+            <option value="cartouche">{t("quick.option.cartridge", { defaultValue: "cartridge" })}</option>
+            <option value="sac">{t("quick.option.bag_lower", { defaultValue: "bag" })}</option>
           </Select>
           <Input
             label="Taille d'un conditionnement"
@@ -2045,11 +2047,11 @@ export const QuickToolsCalculator: React.FC<Props> = ({
             value={advPackUnit}
             onChange={(e) => setAdvPackUnit(e.target.value as Unit)}
           >
-            <option value={Unit.BAG}>Sac</option>
-            <option value={Unit.BUCKET}>Seau</option>
-            <option value={Unit.BOX}>Boîte</option>
-            <option value={Unit.ROLL}>Rouleau</option>
-            <option value={Unit.PIECE}>Pièce</option>
+            <option value={Unit.BAG}>{t("quick.option.pack_bag", { defaultValue: "Bag" })}</option>
+            <option value={Unit.BUCKET}>{t("quick.option.pack_bucket", { defaultValue: "Bucket" })}</option>
+            <option value={Unit.BOX}>{t("quick.option.pack_box", { defaultValue: "Box" })}</option>
+            <option value={Unit.ROLL}>{t("quick.option.pack_roll", { defaultValue: "Roll" })}</option>
+            <option value={Unit.PIECE}>{t("quick.option.pack_piece", { defaultValue: "Piece" })}</option>
           </Select>
           <Input
             label="Prix unitaire (€)"

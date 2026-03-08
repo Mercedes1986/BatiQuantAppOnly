@@ -118,7 +118,10 @@ const ToolCard: React.FC<{ title: string; description: string; icon: React.Eleme
   description,
   icon: Icon,
   onClick,
-}) => (
+}) => {
+  const { t } = useTranslation();
+
+  return (
   <button
     type="button"
     onClick={onClick}
@@ -130,10 +133,11 @@ const ToolCard: React.FC<{ title: string; description: string; icon: React.Eleme
     <div className="text-lg font-extrabold text-slate-900">{title}</div>
     <p className="mt-2 text-sm leading-relaxed text-slate-600">{description}</p>
     <div className="mt-4 inline-flex items-center text-sm font-extrabold text-blue-700">
-      Ouvrir <ChevronRight size={18} className="ml-1" />
+      {t("menu.open", { defaultValue: "Open" })} <ChevronRight size={18} className="ml-1" />
     </div>
   </button>
-);
+  );
+};
 
 export const QuickToolsPage: React.FC = () => {
   const { t, i18n } = useTranslation();

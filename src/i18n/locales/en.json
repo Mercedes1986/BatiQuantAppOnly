@@ -425,6 +425,11 @@
         "title": "Quick tools",
         "desc": "Dedicated quick calculators: conversions, slopes, packaging and other fast checks.",
         "badge": "FAST"
+      },
+      "quick_tools": {
+        "title": "Quick tools",
+        "desc": "Dedicated quick calculators: conversions, slopes, packaging and other fast checks.",
+        "badge": "FAST"
       }
     },
     "tools": {
@@ -2582,7 +2587,10 @@
       "drywall_frame": "Detailed drywall",
       "tile_detailed": "Detailed tiling",
       "packaging_advanced": "Bags / buckets / cartridges",
-      "roof_frame": "Roof / rafters / battens"
+      "roof_frame": "Roof / rafters / battens",
+      "fence": "Fence / mesh",
+      "bulk_fill": "Gravel / fill / sand",
+      "insulation": "Wall / attic insulation"
     },
     "cards": {
       "convert": "Area, volume, litres and estimated bags.",
@@ -2595,7 +2603,10 @@
       "drywall_frame": "Partitions, linings, ceilings, tracks and studs.",
       "tile_detailed": "Tiles, adhesive, grout, skirting and primer.",
       "packaging_advanced": "Multi-coat products and detailed packaging.",
-      "roof_frame": "Pitch, roof area, rafters, battens and tiles."
+      "roof_frame": "Pitch, roof area, rafters, battens and tiles.",
+      "fence": "Fence panels, posts and anchoring concrete.",
+      "bulk_fill": "Volume, tonnage, big bags and geotextile.",
+      "insulation": "Area, thickness, R-value and insulation rolls."
     },
     "warn_thickness": "Thickness must be strictly greater than 0.",
     "warn_openings": "Openings area is greater than the gross area.",
@@ -2653,6 +2664,53 @@
       "linear_pieces": "Linear pieces"
     },
     "note_title": "Important",
-    "note": "These tools give quick estimates only. Always cross-check with standards, manufacturer data and applicable regulations before carrying out the works."
+    "note": "These tools give quick estimates only. Always cross-check with standards, manufacturer data and applicable regulations before carrying out the works.",
+    "title": "Quick site tools",
+    "subtitle": "Standalone tools for conversions, net areas, packaging, timber decking, detailed drywall, detailed tiling and roofing.",
+    "field": {
+      "area": "Area (m²)",
+      "thickness_cm": "Thickness (cm)",
+      "liters": "Litres",
+      "bag_yield": "Yield per bag (m³)",
+      "length": "Length (m)",
+      "height": "Height (m)",
+      "openings_count": "Number of openings",
+      "opening_area": "Average opening area (m²)",
+      "waste_percent": "Wastage (%)",
+      "base_quantity": "Base quantity",
+      "base_unit": "Base unit",
+      "consumption_rate": "Unit consumption",
+      "consumption_unit": "Consumption unit",
+      "pack_size": "Pack size",
+      "package_type": "Pack type",
+      "package_price": "Price per pack (€)",
+      "horizontal_length": "Horizontal length (m)",
+      "vertical_drop": "Vertical rise/drop (m)",
+      "total_length": "Total length to cover (m)",
+      "piece_length": "Single piece length (m)",
+      "overlap_cm": "Overlap per joint (cm)",
+      "linear_waste": "Wastage (%)",
+      "phase": "Network type",
+      "conductor": "Conductor",
+      "power": "Power (W)",
+      "voltage": "Voltage (V)",
+      "cable_length": "Cable length (m)",
+      "section_mm2": "Section (mm²)"
+    },
+    "option": {
+      "phase_mono": "Single-phase 230 V",
+      "phase_tri": "Three-phase 400 V",
+      "phase_mono_short": "Single-phase",
+      "phase_tri_short": "Three-phase",
+      "conductor_copper": "Copper",
+      "conductor_aluminium": "Aluminium",
+      "cartridge": "cartridge",
+      "bag_lower": "bag",
+      "pack_bag": "Bag",
+      "pack_bucket": "Bucket",
+      "pack_box": "Box",
+      "pack_roll": "Roll",
+      "pack_piece": "Piece"
+    }
   }
 }

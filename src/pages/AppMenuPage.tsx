@@ -125,14 +125,14 @@ export const AppMenuPage: React.FC = () => {
         imageSrc: "/images/menu/chantier.jpg",
       },
       {
-        title: t("menu.cards.quick_tools.title", { defaultValue: "Quick tools" }),
-        desc: t("menu.cards.quick_tools.desc", {
+        title: t("menu.cards.quicktools.title", { defaultValue: "Quick tools" }),
+        desc: t("menu.cards.quicktools.desc", {
           defaultValue: "Dedicated quick calculators: conversions, slopes, packaging and other fast checks.",
         }),
         path: "/app/quick-tools",
         icon: <Sparkles size={18} />,
         imageSrc: "/images/menu/calcul.jpg",
-        badge: t("menu.cards.quick_tools.badge", { defaultValue: "FAST" }),
+        badge: t("menu.cards.quicktools.badge", { defaultValue: "FAST" }),
       },
       {
         title: t("menu.cards.projects.title", { defaultValue: "Projects" }),
