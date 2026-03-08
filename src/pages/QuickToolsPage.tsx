@@ -71,7 +71,7 @@ const getToolConfigs = (t: ReturnType<typeof useTranslation>["t"]): ToolConfig[]
   },
   {
     key: "drywallFrame",
-    title: t("quick.tools.drywall_frame", { defaultValue: "Placo détaillé" }),
+    title: t("quick.tools.drywall_frame", { defaultValue: "Placo détaillé ossature" }),
     description: t("quick.cards.drywall_frame", { defaultValue: "Cloison, doublage, plafond, rails et montants." }),
     icon: PanelsTopLeft,
   },
