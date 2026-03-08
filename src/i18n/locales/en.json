@@ -420,6 +420,11 @@
         "title": "JSON backup",
         "desc": "Export/import your data to avoid any loss (recommended).",
         "badge": "RECOMMENDED"
+      },
+      "quicktools": {
+        "title": "Quick tools",
+        "desc": "Dedicated quick calculators: conversions, slopes, packaging and other fast checks.",
+        "badge": "FAST"
       }
     },
     "tools": {
@@ -2561,5 +2566,93 @@
     "ST25C": "ST25C mesh (raft)",
     "HA10": "Rebar HA10 (reinforcement)",
     "HA12": "Rebar HA12 (reinforcement)"
+  },
+  "quick": {
+    "page_title": "Quick site tools",
+    "page_subtitle": "Standalone tools for conversions, net areas, packaging, timber decking, detailed drywall, detailed tiling and roofing.",
+    "page_precision": "Dedicated quick calculator",
+    "tools": {
+      "convert": "Converter",
+      "net_area": "Net area",
+      "packaging": "Packaging",
+      "slope": "Slope",
+      "linear": "Linears",
+      "voltage_drop": "Voltage drop",
+      "decking": "Timber deck",
+      "drywall_frame": "Detailed drywall",
+      "tile_detailed": "Detailed tiling",
+      "packaging_advanced": "Bags / buckets / cartridges",
+      "roof_frame": "Roof / rafters / battens"
+    },
+    "cards": {
+      "convert": "Area, volume, litres and estimated bags.",
+      "net_area": "Openings deduction and net area.",
+      "packaging": "Consumption, packs and theoretical cost.",
+      "slope": "Slope in %, cm/m, angle and real length.",
+      "linear": "Overlaps, wastage and number of linear pieces.",
+      "voltage_drop": "Cable section, voltage drop and recommendation.",
+      "decking": "Boards, joists, pedestals and stainless screws.",
+      "drywall_frame": "Partitions, linings, ceilings, tracks and studs.",
+      "tile_detailed": "Tiles, adhesive, grout, skirting and primer.",
+      "packaging_advanced": "Multi-coat products and detailed packaging.",
+      "roof_frame": "Pitch, roof area, rafters, battens and tiles."
+    },
+    "warn_thickness": "Thickness must be strictly greater than 0.",
+    "warn_openings": "Openings area is greater than the gross area.",
+    "warn_voltage_high": "High voltage drop: review cable section or length.",
+    "warn_voltage_medium": "Voltage drop is above 3%; check whether it is acceptable.",
+    "summary": {
+      "convert": "{{area}} m² at {{thickness}} cm gives around {{volume}} m³.",
+      "net_area": "Net area {{net}} m², {{withWaste}} m² including wastage.",
+      "packaging": "{{raw}} {{unit}} needed, i.e. {{packs}} packs.",
+      "slope": "Slope {{percent}} %, i.e. {{cm}} cm/m and {{angle}}°.",
+      "linear": "{{pieces}} pieces needed to cover {{total}} m of length.",
+      "voltage": "Current ≈ {{current}} A, drop ≈ {{dropVolts}} V ({{dropPercent}} %)."
+    },
+    "detail": {
+      "area": "Area",
+      "thickness": "Thickness",
+      "volume": "Volume",
+      "liters_to_m3": "Litres → m³ conversion",
+      "bags_needed": "Bags needed",
+      "gross_area": "Gross area",
+      "openings": "Openings deduction",
+      "net_area": "Net area",
+      "loss": "Wastage",
+      "with_waste": "Area incl. wastage",
+      "base_quantity": "Base quantity",
+      "consumption": "Unit consumption",
+      "total_need": "Total need",
+      "pack_size": "Pack size",
+      "pack_count": "Number of packs",
+      "horizontal": "Horizontal length",
+      "vertical": "Height difference",
+      "percent": "Slope",
+      "cm_per_m": "Centimetres per metre",
+      "angle": "Angle",
+      "ramp_length": "Real length",
+      "linear_total": "Useful length",
+      "linear_overlap": "Overlap",
+      "linear_effective": "Useful length per piece",
+      "linear_with_waste": "Length incl. wastage",
+      "linear_pieces": "Number of pieces",
+      "linear_offcut": "Estimated offcuts",
+      "phase": "Phase",
+      "current": "Estimated current",
+      "length": "Cable length",
+      "section": "Cable section",
+      "drop_volts": "Voltage drop (V)",
+      "drop_percent": "Voltage drop (%)",
+      "section_recommended": "Recommended section"
+    },
+    "material": {
+      "bags": "Theoretical bags",
+      "bags_detail": "Based on the entered yield.",
+      "net_area": "Usable area",
+      "packaging": "Required packs",
+      "linear_pieces": "Linear pieces"
+    },
+    "note_title": "Important",
+    "note": "These tools give quick estimates only. Always cross-check with standards, manufacturer data and applicable regulations before carrying out the works."
   }
 }
