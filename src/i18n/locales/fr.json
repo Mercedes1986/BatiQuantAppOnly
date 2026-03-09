@@ -2790,10 +2790,7 @@
       "drywall_frame": "Placo détaillé",
       "tile_detailed": "Carrelage détaillé",
       "packaging_advanced": "Sacs / seaux / cartouches",
-      "roof_frame": "Toiture / chevrons / liteaux",
-      "fence": "Clôture / grillage",
-      "bulk_fill": "Gravier / remblai / sable",
-      "insulation": "Isolation murs / combles"
+      "roof_frame": "Toiture / chevrons / liteaux"
     },
     "cards": {
       "convert": "Surface, volume, litres et estimation de sacs.",
@@ -2806,10 +2803,7 @@
       "drywall_frame": "Cloisons, doublages, plafonds, rails et montants.",
       "tile_detailed": "Carreaux, colle, joints, plinthes et primaire.",
       "packaging_advanced": "Produits multi-couches et conditionnements détaillés.",
-      "roof_frame": "Pente, surface de toiture, chevrons, liteaux et couverture.",
-      "fence": "Clôture, panneaux, poteaux et béton de scellement.",
-      "bulk_fill": "Volume, tonnage, big bags et géotextile.",
-      "insulation": "Surface, épaisseur, R et rouleaux d’isolant."
+      "roof_frame": "Pente, surface de toiture, chevrons, liteaux et couverture."
     },
     "warn_thickness": "L’épaisseur doit être strictement supérieure à 0.",
     "warn_openings": "La surface des ouvertures dépasse la surface brute.",
@@ -2867,53 +2861,6 @@
       "linear_pieces": "Pièces linéaires"
     },
     "note_title": "Rappel pratique",
-    "note": "Ces outils donnent des ordres de grandeur. Vérifiez toujours avec les DTU, les notices fabricants et la réglementation en vigueur avant d’exécuter les travaux.",
-    "title": "Calculs rapides chantier",
-    "subtitle": "Outils unitaires pour les conversions, surfaces nettes, conditionnements, terrasse bois, placo détaillé, carrelage détaillé et toiture.",
-    "field": {
-      "area": "Surface (m²)",
-      "thickness_cm": "Épaisseur (cm)",
-      "liters": "Litres",
-      "bag_yield": "Rendement d'un sac (m³)",
-      "length": "Longueur (m)",
-      "height": "Hauteur (m)",
-      "openings_count": "Nombre d'ouvertures",
-      "opening_area": "Surface moyenne d'une ouverture (m²)",
-      "waste_percent": "Pertes (%)",
-      "base_quantity": "Quantité de base",
-      "base_unit": "Unité de base",
-      "consumption_rate": "Consommation unitaire",
-      "consumption_unit": "Unité consommée",
-      "pack_size": "Taille d'un conditionnement",
-      "package_type": "Type de conditionnement",
-      "package_price": "Prix par conditionnement (€)",
-      "horizontal_length": "Longueur horizontale (m)",
-      "vertical_drop": "Dénivelé (m)",
-      "total_length": "Longueur totale à couvrir (m)",
-      "piece_length": "Longueur d'une pièce (m)",
-      "overlap_cm": "Recouvrement par jonction (cm)",
-      "linear_waste": "Pertes (%)",
-      "phase": "Type de réseau",
-      "conductor": "Conducteur",
-      "power": "Puissance (W)",
-      "voltage": "Tension (V)",
-      "cable_length": "Longueur de câble (m)",
-      "section_mm2": "Section (mm²)"
-    },
-    "option": {
-      "phase_mono": "Monophasé 230 V",
-      "phase_tri": "Triphasé 400 V",
-      "phase_mono_short": "Monophasé",
-      "phase_tri_short": "Triphasé",
-      "conductor_copper": "Cuivre",
-      "conductor_aluminium": "Aluminium",
-      "cartridge": "cartouche",
-      "bag_lower": "sac",
-      "pack_bag": "Sac",
-      "pack_bucket": "Seau",
-      "pack_box": "Boîte",
-      "pack_roll": "Rouleau",
-      "pack_piece": "Pièce"
-    }
+    "note": "Ces outils donnent des ordres de grandeur. Vérifiez toujours avec les DTU, les notices fabricants et la réglementation en vigueur avant d’exécuter les travaux."
   }
 }

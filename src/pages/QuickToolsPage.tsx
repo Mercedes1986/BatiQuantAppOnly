@@ -29,31 +29,31 @@ type ToolConfig = {
 const getToolConfigs = (t: ReturnType<typeof useTranslation>["t"]): ToolConfig[] => [
   {
     key: "convert",
-    title: t("quick.tools.convert", { defaultValue: "Convertisseur" }),
+    title: t("quick.tools.convert", { defaultValue: "Converter" }),
     description: t("quick.cards.convert", { defaultValue: "Surface, volume, litres et sacs théoriques." }),
     icon: ArrowRightLeft,
   },
   {
     key: "netArea",
-    title: t("quick.tools.net_area", { defaultValue: "Surface nette" }),
+    title: t("quick.tools.net_area", { defaultValue: "Net area" }),
     description: t("quick.cards.net_area", { defaultValue: "Déductions d'ouvertures et pertes." }),
     icon: Ruler,
   },
   {
     key: "packaging",
-    title: t("quick.tools.packaging", { defaultValue: "Conditionnements" }),
+    title: t("quick.tools.packaging", { defaultValue: "Packaging" }),
     description: t("quick.cards.packaging", { defaultValue: "Consommation, packs et coût estimé." }),
     icon: Package2,
   },
   {
     key: "slope",
-    title: t("quick.tools.slope", { defaultValue: "Pente" }),
+    title: t("quick.tools.slope", { defaultValue: "Slope" }),
     description: t("quick.cards.slope", { defaultValue: "Pourcentage, angle, cm par mètre." }),
     icon: TrendingUp,
   },
   {
     key: "linear",
-    title: t("quick.tools.linear", { defaultValue: "Linéaires" }),
+    title: t("quick.tools.linear", { defaultValue: "Linear runs" }),
     description: t("quick.cards.linear", { defaultValue: "Recouvrements, pertes et nombre de pièces." }),
     icon: Ruler,
   },
@@ -65,49 +65,49 @@ const getToolConfigs = (t: ReturnType<typeof useTranslation>["t"]): ToolConfig[]
   },
   {
     key: "decking",
-    title: t("quick.tools.decking", { defaultValue: "Terrasse bois" }),
+    title: t("quick.tools.decking", { defaultValue: "Timber deck" }),
     description: t("quick.cards.decking", { defaultValue: "Lames, lambourdes, plots et vis inox." }),
     icon: LayoutGrid,
   },
   {
     key: "drywallFrame",
-    title: t("quick.tools.drywall_frame", { defaultValue: "Placo détaillé ossature" }),
+    title: t("quick.tools.drywall_frame", { defaultValue: "Detailed drywall" }),
     description: t("quick.cards.drywall_frame", { defaultValue: "Cloison, doublage, plafond, rails et montants." }),
     icon: PanelsTopLeft,
   },
   {
     key: "tileDetailed",
-    title: t("quick.tools.tile_detailed", { defaultValue: "Carrelage détaillé" }),
+    title: t("quick.tools.tile_detailed", { defaultValue: "Detailed tiling" }),
     description: t("quick.cards.tile_detailed", { defaultValue: "Carreaux, colle, joint, plinthes et primaire." }),
     icon: Grid2x2,
   },
   {
     key: "packagingAdvanced",
-    title: t("quick.tools.packaging_advanced", { defaultValue: "Sacs / seaux / cartouches" }),
+    title: t("quick.tools.packaging_advanced", { defaultValue: "Bags / buckets / cartridges" }),
     description: t("quick.cards.packaging_advanced", { defaultValue: "Préréglages produits avec couches, pertes et coût." }),
     icon: PaintBucket,
   },
   {
     key: "fence",
-    title: t("quick.tools.fence", { defaultValue: "Clôture / grillage" }),
+    title: t("quick.tools.fence", { defaultValue: "Fence / mesh" }),
     description: t("quick.cards.fence", { defaultValue: "Panneaux, poteaux et béton de scellement." }),
     icon: Ruler,
   },
   {
     key: "bulkFill",
-    title: t("quick.tools.bulk_fill", { defaultValue: "Gravier / remblai / sable" }),
+    title: t("quick.tools.bulk_fill", { defaultValue: "Gravel / fill / sand" }),
     description: t("quick.cards.bulk_fill", { defaultValue: "Volume, tonnage, big bags et géotextile." }),
     icon: Package2,
   },
   {
     key: "insulation",
-    title: t("quick.tools.insulation", { defaultValue: "Isolation murs / combles" }),
+    title: t("quick.tools.insulation", { defaultValue: "Wall / attic insulation" }),
     description: t("quick.cards.insulation", { defaultValue: "Surface, épaisseur, R et rouleaux d’isolant." }),
     icon: PanelsTopLeft,
   },
   {
     key: "roofFrame",
-    title: t("quick.tools.roof_frame", { defaultValue: "Toiture / chevrons / liteaux" }),
+    title: t("quick.tools.roof_frame", { defaultValue: "Roof / rafters / battens" }),
     description: t("quick.cards.roof_frame", { defaultValue: "Pente, surface de toiture, chevrons, liteaux et couverture." }),
     icon: Home,
   },
@@ -118,10 +118,7 @@ const ToolCard: React.FC<{ title: string; description: string; icon: React.Eleme
   description,
   icon: Icon,
   onClick,
-}) => {
-  const { t } = useTranslation();
-
-  return (
+}) => (
   <button
     type="button"
     onClick={onClick}
@@ -133,11 +130,10 @@ const ToolCard: React.FC<{ title: string; description: string; icon: React.Eleme
     <div className="text-lg font-extrabold text-slate-900">{title}</div>
     <p className="mt-2 text-sm leading-relaxed text-slate-600">{description}</p>
     <div className="mt-4 inline-flex items-center text-sm font-extrabold text-blue-700">
-      {t("menu.open", { defaultValue: "Open" })} <ChevronRight size={18} className="ml-1" />
+      Ouvrir <ChevronRight size={18} className="ml-1" />
     </div>
   </button>
-  );
-};
+);
 
 export const QuickToolsPage: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -181,7 +177,7 @@ export const QuickToolsPage: React.FC = () => {
 
           <div className="flex-1">
             <h1 className="text-xl font-extrabold">{activeTool.title}</h1>
-            <p className="text-xs opacity-90">{t("quick.page_precision", { defaultValue: "Calcul rapide dédié" })}</p>
+            <p className="text-xs opacity-90">{t("quick.page_precision", { defaultValue: "Dedicated quick calculator" })}</p>
           </div>
 
           <div className="ml-3 hidden h-10 w-10 items-center justify-center rounded-2xl bg-white/15 md:flex">
@@ -258,12 +254,12 @@ export const QuickToolsPage: React.FC = () => {
             </div>
             <div>
               <h1 className="text-2xl font-extrabold text-slate-900">
-                {t("quick.page_title", { defaultValue: "Calculs rapides chantier" })}
+                {t("quick.page_title", { defaultValue: "Quick site tools" })}
               </h1>
               <p className="mt-1 max-w-3xl text-sm leading-relaxed text-slate-600">
                 {t("quick.page_subtitle", {
                   defaultValue:
-                    "Outils séparés pour les conversions, surfaces nettes, conditionnements, terrasse bois, placo détaillé, carrelage détaillé, toiture, clôture, gravier / remblai et isolation.",
+                    "Standalone tools for conversions, net areas, packaging, timber decking, detailed drywall, detailed tiling, roofing, fencing, gravel / fill and insulation.",
                 })}
               </p>
             </div>

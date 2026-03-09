@@ -154,7 +154,8 @@ export const QuickToolsCalculator: React.FC<Props> = ({
   forcedTool,
   hideToolSelector = false,
 }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const tr = (fr: string, en: string) => (i18n.language?.startsWith("fr") ? fr : en);
   const [tool, setTool] = useState<ToolKey>(forcedTool ?? "convert");
 
   useEffect(() => {
@@ -294,10 +295,10 @@ export const QuickToolsCalculator: React.FC<Props> = ({
     drywallFrame: t("quick.tools.drywall_frame", { defaultValue: "Placo détaillé ossature" }),
     tileDetailed: t("quick.tools.tile_detailed", { defaultValue: "Carrelage détaillé" }),
     packagingAdvanced: t("quick.tools.packaging_advanced", { defaultValue: "Sacs / seaux / cartouches" }),
-    roofFrame: t("quick.tools.roof_frame", { defaultValue: "Toiture / chevrons / liteaux" }),
+    roofFrame: t("quick.tools.roof_frame", { defaultValue: "Roof / rafters / battens" }),
     fence: t("quick.tools.fence", { defaultValue: "Clôture / grillage" }),
     bulkFill: t("quick.tools.bulk_fill", { defaultValue: "Gravier / remblai / sable" }),
-    insulation: t("quick.tools.insulation", { defaultValue: "Isolation murs / combles" }),
+    insulation: t("quick.tools.insulation", { defaultValue: "Wall / attic insulation" }),
   };
 
   const toolButtons = toolButtonMeta.map(({ key, icon }) => ({
@@ -678,9 +679,7 @@ export const QuickToolsCalculator: React.FC<Props> = ({
         details = [
           {
             label: t("quick.detail.phase", { defaultValue: "Réseau" }),
-            value: phase === "mono"
-                ? t("quick.option.phase_mono_short", { defaultValue: "Single-phase" })
-                : t("quick.option.phase_tri_short", { defaultValue: "Three-phase" }),
+            value: phase === "mono" ? "Monophasé" : "Triphasé",
           },
           {
             label: t("quick.detail.current", {
@@ -1619,8 +1618,8 @@ export const QuickToolsCalculator: React.FC<Props> = ({
           >
             <option value="kg">kg</option>
             <option value="L">L</option>
-            <option value="cartouche">{t("quick.option.cartridge", { defaultValue: "cartridge" })}</option>
-            <option value="sac">{t("quick.option.bag_lower", { defaultValue: "bag" })}</option>
+            <option value="cartouche">cartouche</option>
+            <option value="sac">sac</option>
           </Select>
           <Input
             label={t("quick.field.pack_size", {
@@ -1637,11 +1636,11 @@ export const QuickToolsCalculator: React.FC<Props> = ({
             value={packageUnit}
             onChange={(e) => setPackageUnit(e.target.value as Unit)}
           >
-            <option value={Unit.BAG}>{t("quick.option.pack_bag", { defaultValue: "Bag" })}</option>
-            <option value={Unit.BUCKET}>{t("quick.option.pack_bucket", { defaultValue: "Bucket" })}</option>
-            <option value={Unit.BOX}>{t("quick.option.pack_box", { defaultValue: "Box" })}</option>
-            <option value={Unit.ROLL}>{t("quick.option.pack_roll", { defaultValue: "Roll" })}</option>
-            <option value={Unit.PIECE}>{t("quick.option.pack_piece", { defaultValue: "Piece" })}</option>
+            <option value={Unit.BAG}>Sac</option>
+            <option value={Unit.BUCKET}>Seau</option>
+            <option value={Unit.BOX}>Boîte</option>
+            <option value={Unit.ROLL}>Rouleau</option>
+            <option value={Unit.PIECE}>Pièce</option>
           </Select>
           <Input
             label={t("quick.field.package_price", {
@@ -1723,8 +1722,8 @@ export const QuickToolsCalculator: React.FC<Props> = ({
               setVoltage(next === "mono" ? "230" : "400");
             }}
           >
-            <option value="mono">{t("quick.option.phase_mono", { defaultValue: "Single-phase 230 V" })}</option>
-            <option value="tri">{t("quick.option.phase_tri", { defaultValue: "Three-phase 400 V" })}</option>
+            <option value="mono">Monophasé 230 V</option>
+            <option value="tri">Triphasé 400 V</option>
           </Select>
           <Select
             label={t("quick.field.conductor", { defaultValue: "Conducteur" })}
@@ -1733,8 +1732,8 @@ export const QuickToolsCalculator: React.FC<Props> = ({
               setConductor(e.target.value as "copper" | "aluminium")
             }
           >
-            <option value="copper">{t("quick.option.conductor_copper", { defaultValue: "Copper" })}</option>
-            <option value="aluminium">{t("quick.option.conductor_aluminium", { defaultValue: "Aluminium" })}</option>
+            <option value="copper">Cuivre</option>
+            <option value="aluminium">Aluminium</option>
           </Select>
           <Input
             label={t("quick.field.power", { defaultValue: "Puissance (W)" })}
@@ -1770,43 +1769,43 @@ export const QuickToolsCalculator: React.FC<Props> = ({
       {tool === "decking" && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <Input
-            label="Longueur terrasse (m)"
+            label={tr("Longueur terrasse (m)", "Deck length (m)")}
             value={deckLength}
             onChange={(e) => setDeckLength(e.target.value)}
             inputMode="decimal"
           />
           <Input
-            label="Largeur terrasse (m)"
+            label={tr("Largeur terrasse (m)", "Deck width (m)")}
             value={deckWidth}
             onChange={(e) => setDeckWidth(e.target.value)}
             inputMode="decimal"
           />
           <Input
-            label="Largeur lame (mm)"
+            label={tr("Largeur lame (mm)", "Board width (mm)")}
             value={boardWidthMm}
             onChange={(e) => setBoardWidthMm(e.target.value)}
             inputMode="decimal"
           />
           <Input
-            label="Jeu entre lames (mm)"
+            label={tr("Jeu entre lames (mm)", "Gap between boards (mm)")}
             value={boardGapMm}
             onChange={(e) => setBoardGapMm(e.target.value)}
             inputMode="decimal"
           />
           <Input
-            label="Longueur d'une lame (m)"
+            label={tr("Longueur d'une lame (m)", "Board length (m)")}
             value={boardLengthM}
             onChange={(e) => setBoardLengthM(e.target.value)}
             inputMode="decimal"
           />
           <Input
-            label="Entraxe lambourdes (cm)"
+            label={tr("Entraxe lambourdes (cm)", "Joist spacing (cm)")}
             value={joistSpacingCm}
             onChange={(e) => setJoistSpacingCm(e.target.value)}
             inputMode="decimal"
           />
           <Input
-            label="Longueur lambourde (m)"
+            label={tr("Longueur lambourde (m)", "Joist length (m)")}
             value={joistLengthM}
             onChange={(e) => setJoistLengthM(e.target.value)}
             inputMode="decimal"
@@ -1871,19 +1870,19 @@ export const QuickToolsCalculator: React.FC<Props> = ({
             </>
           )}
           <Input
-            label="Entraxe montants / fourrures (cm)"
+            label={tr("Entraxe montants / fourrures (cm)", "Stud / furring spacing (cm)")}
             value={studSpacingCm}
             onChange={(e) => setStudSpacingCm(e.target.value)}
             inputMode="decimal"
           />
           <Input
-            label="Largeur plaque (m)"
+            label={tr("Largeur plaque (m)", "Board width (m)")}
             value={boardWidthM}
             onChange={(e) => setBoardWidthM(e.target.value)}
             inputMode="decimal"
           />
           <Input
-            label="Hauteur plaque (m)"
+            label={tr("Hauteur plaque (m)", "Board height (m)")}
             value={boardHeightM}
             onChange={(e) => setBoardHeightM(e.target.value)}
             inputMode="decimal"
@@ -1895,19 +1894,19 @@ export const QuickToolsCalculator: React.FC<Props> = ({
             inputMode="numeric"
           />
           <Input
-            label="Longueur rail / fourrure (m)"
+            label={tr("Longueur rail / fourrure (m)", "Rail / furring length (m)")}
             value={railLengthM}
             onChange={(e) => setRailLengthM(e.target.value)}
             inputMode="decimal"
           />
           <Input
-            label="Longueur montant (m)"
+            label={tr("Longueur montant (m)", "Stud length (m)")}
             value={studLengthM}
             onChange={(e) => setStudLengthM(e.target.value)}
             inputMode="decimal"
           />
           <Input
-            label="Vis par plaque"
+            label={tr("Vis par plaque", "Screws per board")}
             value={screwsPerBoard}
             onChange={(e) => setScrewsPerBoard(e.target.value)}
             inputMode="numeric"
@@ -1918,13 +1917,13 @@ export const QuickToolsCalculator: React.FC<Props> = ({
       {tool === "tileDetailed" && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <Input
-            label="Longueur pièce (m)"
+            label={tr("Longueur pièce (m)", "Room length (m)")}
             value={tileLength}
             onChange={(e) => setTileLength(e.target.value)}
             inputMode="decimal"
           />
           <Input
-            label="Largeur pièce (m)"
+            label={tr("Largeur pièce (m)", "Room width (m)")}
             value={tileWidth}
             onChange={(e) => setTileWidth(e.target.value)}
             inputMode="decimal"
@@ -1946,7 +1945,7 @@ export const QuickToolsCalculator: React.FC<Props> = ({
             <option value="diagonal">Diagonale</option>
           </Select>
           <Input
-            label="Longueur carreau (cm)"
+            label={tr("Longueur carreau (cm)", "Tile length (cm)")}
             value={tileLenCm}
             onChange={(e) => setTileLenCm(e.target.value)}
             inputMode="decimal"
@@ -1991,12 +1990,12 @@ export const QuickToolsCalculator: React.FC<Props> = ({
             value={packPreset}
             onChange={(e) => setPackPreset(e.target.value as PackagingPresetKey)}
           >
-            <option value="tileAdhesive">Colle carrelage</option>
-            <option value="grout">Joint poudre</option>
-            <option value="paint">Peinture finition</option>
-            <option value="primer">Primaire</option>
+            <option value="tileAdhesive">{tr("Colle carrelage", "Tile adhesive")}</option>
+            <option value="grout">{tr("Joint poudre", "Powder grout")}</option>
+            <option value="paint">{tr("Peinture finition", "Finish paint")}</option>
+            <option value="primer">{tr("Primaire", "Primer")}</option>
             <option value="silicone">Silicone</option>
-            <option value="foam">Mousse PU</option>
+            <option value="foam">{tr("Mousse PU", "PU foam")}</option>
           </Select>
           <Input
             label="Quantité de base"
@@ -2033,8 +2032,8 @@ export const QuickToolsCalculator: React.FC<Props> = ({
           >
             <option value="kg">kg</option>
             <option value="L">L</option>
-            <option value="cartouche">{t("quick.option.cartridge", { defaultValue: "cartridge" })}</option>
-            <option value="sac">{t("quick.option.bag_lower", { defaultValue: "bag" })}</option>
+            <option value="cartouche">cartouche</option>
+            <option value="sac">sac</option>
           </Select>
           <Input
             label="Taille d'un conditionnement"
@@ -2047,11 +2046,11 @@ export const QuickToolsCalculator: React.FC<Props> = ({
             value={advPackUnit}
             onChange={(e) => setAdvPackUnit(e.target.value as Unit)}
           >
-            <option value={Unit.BAG}>{t("quick.option.pack_bag", { defaultValue: "Bag" })}</option>
-            <option value={Unit.BUCKET}>{t("quick.option.pack_bucket", { defaultValue: "Bucket" })}</option>
-            <option value={Unit.BOX}>{t("quick.option.pack_box", { defaultValue: "Box" })}</option>
-            <option value={Unit.ROLL}>{t("quick.option.pack_roll", { defaultValue: "Roll" })}</option>
-            <option value={Unit.PIECE}>{t("quick.option.pack_piece", { defaultValue: "Piece" })}</option>
+            <option value={Unit.BAG}>Sac</option>
+            <option value={Unit.BUCKET}>Seau</option>
+            <option value={Unit.BOX}>Boîte</option>
+            <option value={Unit.ROLL}>Rouleau</option>
+            <option value={Unit.PIECE}>Pièce</option>
           </Select>
           <Input
             label="Prix unitaire (€)"
@@ -2077,13 +2076,13 @@ export const QuickToolsCalculator: React.FC<Props> = ({
       {tool === "fence" && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <Input
-            label="Longueur de clôture (m)"
+            label={tr("Longueur de clôture (m)", "Fence length (m)")}
             value={fenceLength}
             onChange={(e) => setFenceLength(e.target.value)}
             inputMode="decimal"
           />
           <Input
-            label="Hauteur de clôture (m)"
+            label={tr("Hauteur de clôture (m)", "Fence height (m)")}
             value={fenceHeight}
             onChange={(e) => setFenceHeight(e.target.value)}
             inputMode="decimal"
@@ -2112,7 +2111,7 @@ export const QuickToolsCalculator: React.FC<Props> = ({
       {tool === "bulkFill" && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <Input
-            label="Longueur de la zone (m)"
+            label={tr("Longueur de la zone (m)", "Zone length (m)")}
             value={bulkLength}
             onChange={(e) => setBulkLength(e.target.value)}
             inputMode="decimal"
@@ -2148,7 +2147,7 @@ export const QuickToolsCalculator: React.FC<Props> = ({
             inputMode="decimal"
           />
           <Input
-            label="Pertes / recouvrements géotextile (%)"
+            label={tr("Pertes / recouvrements géotextile (%)", "Geotextile overlaps / waste (%)")}
             value={geoOverlapPercent}
             onChange={(e) => setGeoOverlapPercent(e.target.value)}
             inputMode="decimal"
@@ -2210,7 +2209,7 @@ export const QuickToolsCalculator: React.FC<Props> = ({
             inputMode="decimal"
           />
           <Input
-            label="Longueur bâtiment (m)"
+            label={tr("Longueur bâtiment (m)", "Building length (m)")}
             value={roofLengthM}
             onChange={(e) => setRoofLengthM(e.target.value)}
             inputMode="decimal"
@@ -2228,7 +2227,7 @@ export const QuickToolsCalculator: React.FC<Props> = ({
             inputMode="decimal"
           />
           <Input
-            label="Entraxe chevrons (cm)"
+            label={tr("Entraxe chevrons (cm)", "Rafter spacing (cm)")}
             value={rafterSpacingCm}
             onChange={(e) => setRafterSpacingCm(e.target.value)}
             inputMode="decimal"
@@ -2240,13 +2239,13 @@ export const QuickToolsCalculator: React.FC<Props> = ({
             inputMode="decimal"
           />
           <Input
-            label="Longueur liteau (m)"
+            label={tr("Longueur liteau (m)", "Batten length (m)")}
             value={battenLengthM}
             onChange={(e) => setBattenLengthM(e.target.value)}
             inputMode="decimal"
           />
           <Input
-            label="Écran sous-toiture par rouleau (m²)"
+            label={tr("Écran sous-toiture par rouleau (m²)", "Roof underlay per roll (m²)")}
             value={underlayRollM2}
             onChange={(e) => setUnderlayRollM2(e.target.value)}
             inputMode="decimal"
