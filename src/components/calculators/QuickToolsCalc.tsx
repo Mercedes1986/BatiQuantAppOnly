@@ -49,18 +49,6 @@ const toNum = (v: string | number, fallback = 0) => {
 const ceilUnits = new Set<Unit>([Unit.PIECE, Unit.BAG, Unit.BUCKET, Unit.BOX, Unit.ROLL, Unit.PALLET]);
 const formatQty = (value: number, unit: Unit) => (ceilUnits.has(unit) ? Math.ceil(value) : round2(value));
 
-const getLang = () => {
-  try {
-    const stored = typeof window !== "undefined" ? window.localStorage?.getItem("i18nextLng") : "";
-    if (stored) return stored;
-  } catch {}
-  try {
-    if (typeof navigator !== "undefined" && navigator.language) return navigator.language;
-  } catch {}
-  return "fr";
-};
-const tr = (fr: string, en: string) => (getLang().toLowerCase().startsWith("fr") ? fr : en);
-
 const makeMaterial = (
   id: string,
   name: string,
@@ -82,6 +70,21 @@ const makeMaterial = (
     details,
   };
 };
+
+
+const getLang = () => {
+  try {
+    const stored = typeof window !== "undefined" ? window.localStorage?.getItem("i18nextLng") : "";
+    if (stored) return stored;
+  } catch {}
+  try {
+    if (typeof navigator !== "undefined" && navigator.language) return navigator.language;
+  } catch {}
+  return "fr";
+};
+
+const tr = (fr: string, en: string) => (getLang().toLowerCase().startsWith("fr") ? fr : en);
+const trText = (fr: string, en: string) => tr(fr, en);
 
 const toolButtonMeta = [
   { key: "convert" as const, icon: ArrowRightLeft },
@@ -166,8 +169,7 @@ export const QuickToolsCalculator: React.FC<Props> = ({
   forcedTool,
   hideToolSelector = false,
 }) => {
-  const { t, i18n } = useTranslation();
-  const trText = (fr: string, en: string) => (i18n.language?.startsWith("fr") ? fr : en);
+  const { t } = useTranslation();
   const [tool, setTool] = useState<ToolKey>(forcedTool ?? "convert");
 
   useEffect(() => {
