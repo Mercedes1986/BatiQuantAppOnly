@@ -118,22 +118,28 @@ const ToolCard: React.FC<{ title: string; description: string; icon: React.Eleme
   description,
   icon: Icon,
   onClick,
-}) => (
-  <button
-    type="button"
-    onClick={onClick}
-    className="group w-full rounded-2xl border border-slate-200 bg-white p-5 text-left shadow-sm transition-all hover:border-blue-200 hover:shadow-md"
-  >
-    <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-50 text-blue-700">
-      <Icon size={20} />
-    </div>
-    <div className="text-lg font-extrabold text-slate-900">{title}</div>
-    <p className="mt-2 text-sm leading-relaxed text-slate-600">{description}</p>
-    <div className="mt-4 inline-flex items-center text-sm font-extrabold text-blue-700">
-      Ouvrir <ChevronRight size={18} className="ml-1" />
-    </div>
-  </button>
-);
+}) => {
+  const { i18n } = useTranslation();
+  const isFr = !!i18n.language?.startsWith("fr");
+  const trText = (fr: string, en: string) => (isFr ? fr : en);
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="group w-full rounded-2xl border border-slate-200 bg-white p-5 text-left shadow-sm transition-all hover:border-blue-200 hover:shadow-md"
+    >
+      <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-50 text-blue-700">
+        <Icon size={20} />
+      </div>
+      <div className="text-lg font-extrabold text-slate-900">{title}</div>
+      <p className="mt-2 text-sm leading-relaxed text-slate-600">{description}</p>
+      <div className="mt-4 inline-flex items-center text-sm font-extrabold text-blue-700">
+        {trText("Ouvrir", "Open")} <ChevronRight size={18} className="ml-1" />
+      </div>
+    </button>
+  );
+};
 
 export const QuickToolsPage: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -142,6 +148,33 @@ export const QuickToolsPage: React.FC = () => {
   const [result, setResult] = React.useState<CalculationResult | null>(null);
 
   const isFr = !!i18n.language?.startsWith("fr");
+  const trText = (fr: string, en: string) => (isFr ? fr : en);
+  const formatDisplayUnit = (unit?: string) => {
+    switch (unit) {
+      case "unit":
+        return trText("unité", "unit");
+      case "sac":
+        return trText("sac", "bag");
+      case "boîte":
+        return trText("boîte", "box");
+      case "pot":
+        return trText("pot", "bucket");
+      case "plaque":
+        return trText("plaque", "board");
+      case "panneau":
+        return trText("panneau", "panel");
+      case "palette":
+        return trText("palette", "pallet");
+      case "rlx":
+        return trText("rouleau", "roll");
+      case "j":
+        return trText("j", "day");
+      case "forfait":
+        return trText("forfait", "package");
+      default:
+        return unit || "";
+    }
+  };
   const tools = React.useMemo(() => getToolConfigs(t, isFr), [t, isFr]);
   const activeTool = tools.find((item) => item.key === tool);
   const euro = React.useMemo(
@@ -204,7 +237,7 @@ export const QuickToolsPage: React.FC = () => {
                     <div key={i}>
                       <span className="block text-slate-500">{d.label}</span>
                       <span className="font-semibold text-slate-800">
-                        {d.value} {d.unit}
+                        {d.value} {formatDisplayUnit(String(d.unit || ""))}
                       </span>
                     </div>
                   ))}
@@ -226,7 +259,7 @@ export const QuickToolsPage: React.FC = () => {
                         <div className="flex items-start justify-between gap-3">
                           <span className="min-w-0 truncate font-medium text-slate-700">{m.name}</span>
                           <span className="whitespace-nowrap rounded bg-slate-100 px-2 py-0.5 font-extrabold text-slate-800">
-                            {m.quantity} {m.unit}
+                            {m.quantity} {formatDisplayUnit(String(m.unit || ""))}
                           </span>
                         </div>
 
