@@ -26,99 +26,13 @@ type ToolConfig = {
   icon: React.ElementType;
 };
 
-const getToolConfigs = (t: ReturnType<typeof useTranslation>["t"]): ToolConfig[] => [
-  {
-    key: "convert",
-    title: t("quick.tools.convert", { defaultValue: "Converter" }),
-    description: t("quick.cards.convert", { defaultValue: "Surface, volume, litres et sacs théoriques." }),
-    icon: ArrowRightLeft,
-  },
-  {
-    key: "netArea",
-    title: t("quick.tools.net_area", { defaultValue: "Net area" }),
-    description: t("quick.cards.net_area", { defaultValue: "Déductions d'ouvertures et pertes." }),
-    icon: Ruler,
-  },
-  {
-    key: "packaging",
-    title: t("quick.tools.packaging", { defaultValue: "Packaging" }),
-    description: t("quick.cards.packaging", { defaultValue: "Consommation, packs et coût estimé." }),
-    icon: Package2,
-  },
-  {
-    key: "slope",
-    title: t("quick.tools.slope", { defaultValue: "Slope" }),
-    description: t("quick.cards.slope", { defaultValue: "Pourcentage, angle, cm par mètre." }),
-    icon: TrendingUp,
-  },
-  {
-    key: "linear",
-    title: t("quick.tools.linear", { defaultValue: "Linear runs" }),
-    description: t("quick.cards.linear", { defaultValue: "Recouvrements, pertes et nombre de pièces." }),
-    icon: Ruler,
-  },
-  {
-    key: "voltageDrop",
-    title: t("quick.tools.voltage_drop", { defaultValue: "Chute de tension" }),
-    description: t("quick.cards.voltage_drop", { defaultValue: "Estimation rapide de section et chute." }),
-    icon: Cable,
-  },
-  {
-    key: "decking",
-    title: t("quick.tools.decking", { defaultValue: "Timber deck" }),
-    description: t("quick.cards.decking", { defaultValue: "Lames, lambourdes, plots et vis inox." }),
-    icon: LayoutGrid,
-  },
-  {
-    key: "drywallFrame",
-    title: t("quick.tools.drywall_frame", { defaultValue: "Detailed drywall" }),
-    description: t("quick.cards.drywall_frame", { defaultValue: "Cloison, doublage, plafond, rails et montants." }),
-    icon: PanelsTopLeft,
-  },
-  {
-    key: "tileDetailed",
-    title: t("quick.tools.tile_detailed", { defaultValue: "Detailed tiling" }),
-    description: t("quick.cards.tile_detailed", { defaultValue: "Carreaux, colle, joint, plinthes et primaire." }),
-    icon: Grid2x2,
-  },
-  {
-    key: "packagingAdvanced",
-    title: t("quick.tools.packaging_advanced", { defaultValue: "Bags / buckets / cartridges" }),
-    description: t("quick.cards.packaging_advanced", { defaultValue: "Préréglages produits avec couches, pertes et coût." }),
-    icon: PaintBucket,
-  },
-  {
-    key: "fence",
-    title: t("quick.tools.fence", { defaultValue: "Fence / mesh" }),
-    description: t("quick.cards.fence", { defaultValue: "Panneaux, poteaux et béton de scellement." }),
-    icon: Ruler,
-  },
-  {
-    key: "bulkFill",
-    title: t("quick.tools.bulk_fill", { defaultValue: "Gravel / fill / sand" }),
-    description: t("quick.cards.bulk_fill", { defaultValue: "Volume, tonnage, big bags et géotextile." }),
-    icon: Package2,
-  },
-  {
-    key: "insulation",
-    title: t("quick.tools.insulation", { defaultValue: "Wall / attic insulation" }),
-    description: t("quick.cards.insulation", { defaultValue: "Surface, épaisseur, R et rouleaux d’isolant." }),
-    icon: PanelsTopLeft,
-  },
-  {
-    key: "roofFrame",
-    title: t("quick.tools.roof_frame", { defaultValue: "Roof / rafters / battens" }),
-    description: t("quick.cards.roof_frame", { defaultValue: "Pente, surface de toiture, chevrons, liteaux et couverture." }),
-    icon: Home,
-  },
-];
-
-const ToolCard: React.FC<{ title: string; description: string; icon: React.ElementType; onClick: () => void }> = ({
-  title,
-  description,
-  icon: Icon,
-  onClick,
-}) => (
+const ToolCard: React.FC<{
+  title: string;
+  description: string;
+  icon: React.ElementType;
+  openLabel: string;
+  onClick: () => void;
+}> = ({ title, description, icon: Icon, openLabel, onClick }) => (
   <button
     type="button"
     onClick={onClick}
@@ -130,7 +44,7 @@ const ToolCard: React.FC<{ title: string; description: string; icon: React.Eleme
     <div className="text-lg font-extrabold text-slate-900">{title}</div>
     <p className="mt-2 text-sm leading-relaxed text-slate-600">{description}</p>
     <div className="mt-4 inline-flex items-center text-sm font-extrabold text-blue-700">
-      Ouvrir <ChevronRight size={18} className="ml-1" />
+      {openLabel} <ChevronRight size={18} className="ml-1" />
     </div>
   </button>
 );
@@ -141,7 +55,105 @@ export const QuickToolsPage: React.FC = () => {
   const { tool } = useParams<{ tool?: string }>();
   const [result, setResult] = React.useState<CalculationResult | null>(null);
 
-  const tools = React.useMemo(() => getToolConfigs(t), [t]);
+  const tr = React.useCallback(
+    (fr: string, en: string) => (i18n.language?.startsWith("fr") ? fr : en),
+    [i18n.language]
+  );
+  const tt = React.useCallback(
+    (key: string, fr: string, en: string) => t(key, { defaultValue: tr(fr, en) }),
+    [t, tr]
+  );
+
+  const tools = React.useMemo<ToolConfig[]>(
+    () => [
+      {
+        key: "convert",
+        title: tt("quick.tools.convert", "Convertisseur", "Converter"),
+        description: tt("quick.cards.convert", "Surface, volume, litres et sacs théoriques.", "Surface, volume, liters and theoretical bags."),
+        icon: ArrowRightLeft,
+      },
+      {
+        key: "netArea",
+        title: tt("quick.tools.net_area", "Surface nette", "Net area"),
+        description: tt("quick.cards.net_area", "Déductions d'ouvertures et pertes.", "Opening deductions and waste."),
+        icon: Ruler,
+      },
+      {
+        key: "packaging",
+        title: tt("quick.tools.packaging", "Conditionnements", "Packaging"),
+        description: tt("quick.cards.packaging", "Consommation, conditionnements et coût estimé.", "Consumption, packages and estimated cost."),
+        icon: Package2,
+      },
+      {
+        key: "slope",
+        title: tt("quick.tools.slope", "Pente", "Slope"),
+        description: tt("quick.cards.slope", "Pourcentage, angle, cm par mètre.", "Percent, angle, cm per meter."),
+        icon: TrendingUp,
+      },
+      {
+        key: "linear",
+        title: tt("quick.tools.linear", "Linéaires", "Linear runs"),
+        description: tt("quick.cards.linear", "Recouvrements, pertes et nombre de pièces.", "Overlaps, waste and number of pieces."),
+        icon: Ruler,
+      },
+      {
+        key: "voltageDrop",
+        title: tt("quick.tools.voltage_drop", "Chute de tension", "Voltage drop"),
+        description: tt("quick.cards.voltage_drop", "Estimation rapide de section et chute de tension.", "Quick estimate of section and voltage drop."),
+        icon: Cable,
+      },
+      {
+        key: "decking",
+        title: tt("quick.tools.decking", "Terrasse bois", "Timber deck"),
+        description: tt("quick.cards.decking", "Lames, lambourdes, plots et vis inox.", "Boards, joists, pedestals and stainless screws."),
+        icon: LayoutGrid,
+      },
+      {
+        key: "drywallFrame",
+        title: tt("quick.tools.drywall_frame", "Placo détaillé ossature", "Detailed drywall"),
+        description: tt("quick.cards.drywall_frame", "Cloison, doublage, plafond, rails et montants.", "Partition, lining, ceiling, tracks and studs."),
+        icon: PanelsTopLeft,
+      },
+      {
+        key: "tileDetailed",
+        title: tt("quick.tools.tile_detailed", "Carrelage détaillé", "Detailed tiling"),
+        description: tt("quick.cards.tile_detailed", "Carreaux, colle, joint, plinthes et primaire.", "Tiles, adhesive, grout, skirtings and primer."),
+        icon: Grid2x2,
+      },
+      {
+        key: "packagingAdvanced",
+        title: tt("quick.tools.packaging_advanced", "Sacs / seaux / cartouches", "Bags / buckets / cartridges"),
+        description: tt("quick.cards.packaging_advanced", "Préréglages produits avec couches, pertes et coût.", "Product presets with coats, waste and cost."),
+        icon: PaintBucket,
+      },
+      {
+        key: "fence",
+        title: tt("quick.tools.fence", "Clôture / grillage", "Fence / mesh"),
+        description: tt("quick.cards.fence", "Panneaux, poteaux et béton de scellement.", "Panels, posts and post concrete."),
+        icon: Ruler,
+      },
+      {
+        key: "bulkFill",
+        title: tt("quick.tools.bulk_fill", "Gravier / remblai / sable", "Gravel / fill / sand"),
+        description: tt("quick.cards.bulk_fill", "Volume, tonnage, big bags et géotextile.", "Volume, tonnage, big bags and geotextile."),
+        icon: Package2,
+      },
+      {
+        key: "insulation",
+        title: tt("quick.tools.insulation", "Isolation murs / combles", "Wall / attic insulation"),
+        description: tt("quick.cards.insulation", "Surface, épaisseur, R et rouleaux d’isolant.", "Area, thickness, R-value and insulation rolls."),
+        icon: PanelsTopLeft,
+      },
+      {
+        key: "roofFrame",
+        title: tt("quick.tools.roof_frame", "Toiture / chevrons / liteaux", "Roof / rafters / battens"),
+        description: tt("quick.cards.roof_frame", "Pente, surface de toiture, chevrons, liteaux et couverture.", "Slope, roof area, rafters, battens and covering."),
+        icon: Home,
+      },
+    ],
+    [tt]
+  );
+
   const activeTool = tools.find((item) => item.key === tool);
   const euro = React.useMemo(
     () =>
@@ -170,14 +182,14 @@ export const QuickToolsPage: React.FC = () => {
             onClick={() => navigate("/app/quick-tools")}
             className="mr-4 rounded-full p-2 transition-colors hover:bg-white/20"
             type="button"
-            aria-label={t("common.back", { defaultValue: "Back" })}
+            aria-label={t("common.back", { defaultValue: tr("Retour", "Back") })}
           >
             <ArrowLeft size={24} />
           </button>
 
           <div className="flex-1">
             <h1 className="text-xl font-extrabold">{activeTool.title}</h1>
-            <p className="text-xs opacity-90">{t("quick.page_precision", { defaultValue: "Dedicated quick calculator" })}</p>
+            <p className="text-xs opacity-90">{tt("quick.page_precision", "Calcul rapide dédié", "Dedicated quick calculator")}</p>
           </div>
 
           <div className="ml-3 hidden h-10 w-10 items-center justify-center rounded-2xl bg-white/15 md:flex">
@@ -185,16 +197,16 @@ export const QuickToolsPage: React.FC = () => {
           </div>
         </div>
 
-        <div className="p-4 space-y-6">
+        <div className="space-y-6 p-4">
           <div className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm">
             <QuickToolsCalculator onCalculate={setResult} forcedTool={activeTool.key} hideToolSelector />
           </div>
 
           {result && (
-            <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="animate-in fade-in slide-in-from-bottom-4 space-y-4 duration-500">
               <div className="relative overflow-hidden rounded-2xl border-2 border-blue-600 bg-white p-6 shadow-lg">
                 <h2 className="mb-1 text-sm uppercase tracking-wider text-slate-500">
-                  {t("calculator.result_estimated", { defaultValue: "Estimated result" })}
+                  {t("calculator.result_estimated", { defaultValue: tr("Résultat estimé", "Estimated result") })}
                 </h2>
                 <p className="mb-4 text-4xl font-extrabold text-blue-600">{result.summary}</p>
 
@@ -214,7 +226,7 @@ export const QuickToolsPage: React.FC = () => {
                 <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
                   <div className="mb-4 flex items-center justify-between">
                     <h3 className="font-extrabold text-slate-800">
-                      {t("calculator.materials_estimated", { defaultValue: "Estimated materials" })}
+                      {t("calculator.materials_estimated", { defaultValue: tr("Matériaux estimés", "Estimated materials") })}
                     </h3>
                     <span className="text-lg font-extrabold text-emerald-600">~ {euro.format(Number(result.totalCost || 0))}</span>
                   </div>
@@ -253,14 +265,13 @@ export const QuickToolsPage: React.FC = () => {
               <ArrowRightLeft size={20} />
             </div>
             <div>
-              <h1 className="text-2xl font-extrabold text-slate-900">
-                {t("quick.page_title", { defaultValue: "Quick site tools" })}
-              </h1>
+              <h1 className="text-2xl font-extrabold text-slate-900">{tt("quick.page_title", "Calculs rapides chantier", "Quick site tools")}</h1>
               <p className="mt-1 max-w-3xl text-sm leading-relaxed text-slate-600">
-                {t("quick.page_subtitle", {
-                  defaultValue:
-                    "Standalone tools for conversions, net areas, packaging, timber decking, detailed drywall, detailed tiling, roofing, fencing, gravel / fill and insulation.",
-                })}
+                {tt(
+                  "quick.page_subtitle",
+                  "Outils autonomes pour conversions, surfaces nettes, conditionnements, terrasse bois, placo détaillé, carrelage détaillé, toiture, clôture, gravier / remblai et isolation.",
+                  "Standalone tools for conversions, net areas, packaging, timber decking, detailed drywall, detailed tiling, roofing, fencing, gravel / fill and insulation."
+                )}
               </p>
             </div>
           </div>
@@ -273,6 +284,7 @@ export const QuickToolsPage: React.FC = () => {
               title={item.title}
               description={item.description}
               icon={item.icon}
+              openLabel={t("menu.open", { defaultValue: tr("Ouvrir", "Open") })}
               onClick={() => navigate(`/app/quick-tools/${item.key}`)}
             />
           ))}
