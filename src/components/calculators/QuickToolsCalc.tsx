@@ -1639,11 +1639,11 @@ export const QuickToolsCalculator: React.FC<Props> = ({
             value={packageUnit}
             onChange={(e) => setPackageUnit(e.target.value as Unit)}
           >
-            <option value={Unit.BAG}>Sac</option>
-            <option value={Unit.BUCKET}>Seau</option>
-            <option value={Unit.BOX}>Boîte</option>
-            <option value={Unit.ROLL}>Rouleau</option>
-            <option value={Unit.PIECE}>Pièce</option>
+            <option value={Unit.BAG}>{trText("Sac","Bag")}</option>
+            <option value={Unit.BUCKET}>{trText("Seau","Bucket")}</option>
+            <option value={Unit.BOX}>{trText("Boîte","Box")}</option>
+            <option value={Unit.ROLL}>{trText("Rouleau","Roll")}</option>
+            <option value={Unit.PIECE}>{trText("Pièce","Piece")}</option>
           </Select>
           <Input
             label={t("quick.field.package_price", {
@@ -1725,8 +1725,8 @@ export const QuickToolsCalculator: React.FC<Props> = ({
               setVoltage(next === "mono" ? "230" : "400");
             }}
           >
-            <option value="mono">Monophasé 230 V</option>
-            <option value="tri">Triphasé 400 V</option>
+            <option value="mono">{trText("Monophasé 230 V","Single-phase 230 V")}</option>
+            <option value="tri">{trText("Triphasé 400 V","Three-phase 400 V")}</option>
           </Select>
           <Select
             label={t("quick.field.conductor", { defaultValue: "Conducteur" })}
@@ -1735,8 +1735,8 @@ export const QuickToolsCalculator: React.FC<Props> = ({
               setConductor(e.target.value as "copper" | "aluminium")
             }
           >
-            <option value="copper">Cuivre</option>
-            <option value="aluminium">Aluminium</option>
+            <option value="copper">{trText("Cuivre","Copper")}</option>
+            <option value="aluminium">{trText("Aluminium","Aluminium")}</option>
           </Select>
           <Input
             label={t("quick.field.power", { defaultValue: "Puissance (W)" })}
@@ -1845,9 +1845,9 @@ export const QuickToolsCalculator: React.FC<Props> = ({
               )
             }
           >
-            <option value="partition">Cloison</option>
-            <option value="lining">Doublage</option>
-            <option value="ceiling">Plafond</option>
+            <option value="partition">{trText("Cloison","Partition")}</option>
+            <option value="lining">{trText("Doublage","Lining")}</option>
+            <option value="ceiling">{trText("Plafond","Ceiling")}</option>
           </Select>
           {drywallMode === "ceiling" ? (
             <Input
@@ -1944,8 +1944,8 @@ export const QuickToolsCalculator: React.FC<Props> = ({
               setPoseType(e.target.value as "straight" | "diagonal")
             }
           >
-            <option value="straight">Droite</option>
-            <option value="diagonal">Diagonale</option>
+            <option value="straight">{trText("Droite","Straight")}</option>
+            <option value="diagonal">{trText("Diagonale","Diagonal")}</option>
           </Select>
           <Input
             label={trText("Longueur carreau (cm)", "Tile length (cm)")}
@@ -2016,7 +2016,7 @@ export const QuickToolsCalculator: React.FC<Props> = ({
             <option value="m²">m²</option>
             <option value="m³">m³</option>
             <option value="m">m</option>
-            <option value="unit">unité</option>
+            <option value="unit">{trText("unité","unit")}</option>
           </Select>
           <Input
             label={trText("Consommation unitaire", "Unit consumption")}
@@ -2049,11 +2049,11 @@ export const QuickToolsCalculator: React.FC<Props> = ({
             value={advPackUnit}
             onChange={(e) => setAdvPackUnit(e.target.value as Unit)}
           >
-            <option value={Unit.BAG}>Sac</option>
-            <option value={Unit.BUCKET}>Seau</option>
-            <option value={Unit.BOX}>Boîte</option>
-            <option value={Unit.ROLL}>Rouleau</option>
-            <option value={Unit.PIECE}>Pièce</option>
+            <option value={Unit.BAG}>{trText("Sac","Bag")}</option>
+            <option value={Unit.BUCKET}>{trText("Seau","Bucket")}</option>
+            <option value={Unit.BOX}>{trText("Boîte","Box")}</option>
+            <option value={Unit.ROLL}>{trText("Rouleau","Roll")}</option>
+            <option value={Unit.PIECE}>{trText("Pièce","Piece")}</option>
           </Select>
           <Input
             label={trText("Prix unitaire (€)", "Unit price (€)")}
@@ -2167,8 +2167,8 @@ export const QuickToolsCalculator: React.FC<Props> = ({
               setInsulationMode(e.target.value as "wall" | "attic")
             }
           >
-            <option value="wall">Murs</option>
-            <option value="attic">Combles</option>
+            <option value="wall">{trText("Murs","Walls")}</option>
+            <option value="attic">{trText("Combles","Attic")}</option>
           </Select>
           <Input
             label={trText("Surface à isoler (m²)", "Area to insulate (m²)")}
