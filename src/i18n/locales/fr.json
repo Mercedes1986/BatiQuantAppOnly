@@ -444,7 +444,9 @@
       "only": "Dev only",
       "title": "Debug pubs"
     },
-    "label": "Publicité"
+    "label": "Publicité",
+    "placeholder_title": "Emplacement publicitaire mobile réservé",
+    "placeholder_text": "La publicité web est désactivée dans cette base. Branche AdMob à intégrer dans la couche Android/iOS native."
   },
   "app": {
     "name": "BatiQuant",

@@ -1,21 +1,73 @@
 <div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+  <img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
 </div>
 
-# Run and deploy your AI Studio app
+# BatiQuant
 
-This contains everything you need to run your app locally.
+Base front-end Vite/React de l’application BatiQuant.
 
-View your app in AI Studio: https://ai.studio/apps/drive/1wN87kgZ7csUxVeV0X5jZLHjKIXhTLsWU
+Cette version a été nettoyée pour préparer une intégration **AdMob mobile** côté Android/iOS natif :
+- la logique **AdSense web** a été retirée ;
+- les emplacements pub React restent présents comme **placeholders techniques** ;
+- le consentement reste géré côté application, sans chargement GTM/AdSense ;
+- l’intégration réelle d’**AdMob** devra être faite dans la couche native Android/iOS.
 
-## Run Locally
+## Prérequis
 
-**Prerequisites:**  Node.js
+- Node.js 20+
+- npm
 
+## Installation locale
 
-1. Install dependencies:
+1. Installer les dépendances :
    `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
+2. Lancer le serveur de développement :
    `npm run dev`
- 
+3. Vérifier le typage :
+   `npm run typecheck`
+4. Générer le build :
+   `npm run build`
+
+## Variables d’environnement utiles
+
+Créer un fichier `.env.local` si nécessaire.
+
+Exemples :
+
+```env
+VITE_BUILD_ID=local
+VITE_APP_VERSION=0.1.0
+VITE_AD_PLATFORM=mobile
+VITE_ENABLE_WEB_AD_PLACEHOLDERS=true
+VITE_ENABLE_AD_DEBUG=true
+VITE_ADMOB_APP_ID_ANDROID=
+VITE_ADMOB_APP_ID_IOS=
+VITE_ADMOB_BANNER_HOME=
+VITE_ADMOB_BANNER_RESULT=
+VITE_ADMOB_INTERSTITIAL_CALC_DONE=
+```
+
+## Publicité
+
+Le front web n’embarque plus AdSense.
+
+Les composants `AdSlot` servent maintenant à :
+- réserver les emplacements d’affichage dans l’UI ;
+- conserver les points d’insertion pub dans le produit ;
+- préparer le branchement futur vers AdMob dans la couche native.
+
+## Intégration AdMob à faire côté mobile
+
+À prévoir dans le projet Android/iOS natif :
+- ajout du SDK Google Mobile Ads ;
+- déclaration de l’App ID AdMob ;
+- intégration du consentement natif (UMP) ;
+- mapping des bannières/interstitiels avec les slots front.
+
+## Scripts npm
+
+- `npm run dev` : développement local
+- `npm run typecheck` : contrôle TypeScript
+- `npm run build` : build production
+- `npm run preview` : aperçu local du build
+- `npm run ci` : typecheck + build + audit

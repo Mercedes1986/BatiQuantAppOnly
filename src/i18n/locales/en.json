@@ -444,7 +444,9 @@
       "only": "Dev only",
       "title": "Ad debug"
     },
-    "label": "Advertisement"
+    "label": "Advertisement",
+    "placeholder_title": "Reserved mobile ad slot",
+    "placeholder_text": "Web ads are disabled in this codebase. AdMob must be wired in the native Android/iOS layer."
   },
   "app": {
     "name": "BatiQuant",

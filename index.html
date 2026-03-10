@@ -3,7 +3,6 @@
   <head>
     <meta charset="utf-8" />
     <meta http-equiv="x-ua-compatible" content="ie=edge" />
-
     <meta
       name="viewport"
       content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"
@@ -17,7 +16,6 @@
       content="BatiQuant : calculez vos quantités de matériaux et votre budget chantier (béton, placo, peinture, carrelage, électricité, plomberie, toiture…)."
     />
 
-    <!-- Canonical / OG / Twitter : ne pas hardcoder un domaine -->
     <link rel="canonical" href="/" />
     <meta property="og:site_name" content="BatiQuant" />
     <meta property="og:type" content="website" />
@@ -37,176 +35,20 @@
     />
     <meta name="twitter:image" content="/landing/hero-bg.png" />
 
-    <!-- ✅ Favicons / PWA -->
     <link rel="icon" href="/favicon.ico" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
     <meta name="theme-color" content="#2563eb" />
-
     <meta name="robots" content="index,follow" />
 
-    <!-- ✅ Perf -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-
-    <!-- ✅ Perf LCP : preload du visuel hero (si utilisé en homepage) -->
     <link rel="preload" as="image" href="/landing/hero-bg.png" imagesrcset="/landing/hero-bg.png" />
-
-    <!--
-      ✅ Runtime env (optionnel)
-      Ton hébergeur peut servir /env.js qui définit: window.__BQ_ENV__ = { ADSENSE_CLIENT: "...", GTM_ID: "...", SITE_URL: "..." }
-      - En local, ce fichier peut ne pas exister.
-    -->
-    <script>
-      (function () {
-        var s = document.createElement("script");
-        s.src = "/env.js";
-        s.async = true;
-        s.onerror = function () {
-          // ignore
-        };
-        document.head.appendChild(s);
-      })();
-    </script>
-
-    <!-- ✅ dataLayer + Consent "default denied" + loaders AdSense/GTM conditionnels -->
-    <script>
-      (function () {
-        window.dataLayer = window.dataLayer || [];
-        function gtag() {
-          window.dataLayer.push(arguments);
-        }
-        window.gtag = window.gtag || gtag;
-
-        // Default (opt-in)
-        try {
-          window.dataLayer.push({
-            event: "default_consent",
-            ad_storage: "denied",
-            analytics_storage: "denied",
-            ad_user_data: "denied",
-            ad_personalization: "denied",
-          });
-        } catch {}
-
-        // Helpers runtime env
-        function getEnv() {
-          return (window.__BQ_ENV__ && typeof window.__BQ_ENV__ === "object")
-            ? window.__BQ_ENV__
-            : {};
-        }
-
-        function getAdsenseClient() {
-          var env = getEnv();
-          return env.ADSENSE_CLIENT || "";
-        }
-
-        function ensureAdsenseLoaded(client) {
-          try {
-            if (!client) return;
-            if (window.__bqAdsenseLoaded) return;
-            window.__bqAdsenseLoaded = true;
-
-            // meta google-adsense-account (optionnel mais utile)
-            var meta = document.querySelector('meta[name="google-adsense-account"]');
-            if (!meta) {
-              meta = document.createElement("meta");
-              meta.setAttribute("name", "google-adsense-account");
-              document.head.appendChild(meta);
-            }
-            meta.setAttribute("content", client);
-
-            // script AdSense
-            var sc = document.createElement("script");
-            sc.id = "adsense-script";
-            sc.async = true;
-            sc.src =
-              "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=" +
-              encodeURIComponent(client);
-            sc.crossOrigin = "anonymous";
-            document.head.appendChild(sc);
-
-            // preconnect utiles si AdSense activé
-            var hosts = [
-              "https://pagead2.googlesyndication.com",
-              "https://tpc.googlesyndication.com",
-              "https://googleads.g.doubleclick.net",
-            ];
-            hosts.forEach(function (href) {
-              var l = document.createElement("link");
-              l.rel = "preconnect";
-              l.href = href;
-              document.head.appendChild(l);
-            });
-          } catch {}
-        }
-
-        // Loader GTM (appelé uniquement après consentement "accepted")
-        window.__bqLoadGTM =
-          window.__bqLoadGTM ||
-          function (gtmId) {
-            try {
-              if (!gtmId) return;
-              if (window.__bqGtmLoaded) return;
-              window.__bqGtmLoaded = true;
-
-              // preconnect GTM/GA si activé
-              ["https://www.googletagmanager.com", "https://www.google-analytics.com"].forEach(function (href) {
-                var l = document.createElement("link");
-                l.rel = "preconnect";
-                l.href = href;
-                document.head.appendChild(l);
-              });
-
-              window.dataLayer = window.dataLayer || [];
-              window.dataLayer.push({
-                "gtm.start": new Date().getTime(),
-                event: "gtm.js",
-              });
-
-              var f = document.getElementsByTagName("script")[0];
-              var j = document.createElement("script");
-              j.async = true;
-              j.src =
-                "https://www.googletagmanager.com/gtm.js?id=" +
-                encodeURIComponent(gtmId);
-              f.parentNode.insertBefore(j, f);
-
-              // Noscript iframe (injection dynamique)
-              var ns = document.getElementById("gtm-noscript");
-              if (ns && !ns.dataset.loaded) {
-                ns.dataset.loaded = "true";
-                var ifr = document.createElement("iframe");
-                ifr.src =
-                  "https://www.googletagmanager.com/ns.html?id=" +
-                  encodeURIComponent(gtmId);
-                ifr.height = "0";
-                ifr.width = "0";
-                ifr.style.display = "none";
-                ifr.style.visibility = "hidden";
-                ns.appendChild(ifr);
-              }
-            } catch (e) {
-              try {
-                window.__bqGtmLoaded = false;
-              } catch {}
-            }
-          };
-
-        // AdSense: on le charge si env disponible (indépendant du consentement - tu gères la personnalisation via requestNonPersonalizedAds)
-        // Si tu veux le charger seulement après un choix (accepted/refused), déclenche ensureAdsenseLoaded depuis ton code React après initConsent().
-        setTimeout(function () {
-          var client = getAdsenseClient();
-          ensureAdsenseLoaded(client);
-        }, 0);
-      })();
-    </script>
   </head>
 
   <body class="bg-slate-50 text-slate-900 font-sans antialiased selection:bg-blue-100 pb-safe">
-    <div id="gtm-noscript" aria-hidden="true"></div>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
