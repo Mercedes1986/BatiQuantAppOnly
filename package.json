@@ -1,7 +1,7 @@
 {
-  "name": "batiquant-app-shell",
+  "name": "batiquant-mobile-ready",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -13,7 +13,8 @@
     "ci": "npm run typecheck && npm run build && npm run audit",
     "i18n:extract": "node scripts/i18n-extract.mjs",
     "i18n:merge": "node scripts/i18n-merge.mjs",
-    "i18n:check": "npm run i18n:extract && npm run i18n:merge"
+    "i18n:check": "npm run i18n:extract && npm run i18n:merge",
+    "lint:types": "tsc -p . --noEmit"
   },
   "dependencies": {
     "i18next": "^25.8.13",

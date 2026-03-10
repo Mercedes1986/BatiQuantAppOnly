@@ -2472,13 +2472,23 @@
     "restore_ok": "Restauration réussie",
     "support": {
       "help": "Aide",
-      "privacy": "Confidentialité"
+      "privacy": "Politique de confidentialité"
     },
     "tabs": {
       "app": "App",
       "company": "Entreprise"
     },
-    "title": "Réglages"
+    "title": "Réglages",
+    "privacy": {
+      "title": "Confidentialité & publicité",
+      "current_status": "Statut actuel",
+      "accepted": "Personnalisation et stockage autorisés.",
+      "refused": "Annonces limitées / non personnalisées.",
+      "unknown": "Choix non encore défini.",
+      "ads_mode": "Mode annonces",
+      "manage": "Gérer mes préférences",
+      "reset": "Réinitialiser le consentement"
+    }
   },
   "tutorial_auth": {
     "access_code": "Code d’accès",

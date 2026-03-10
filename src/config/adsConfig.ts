@@ -15,8 +15,10 @@ const truthy = (value: unknown): boolean => {
 
 export const AD_CONFIG = {
   PLATFORM: (env.VITE_AD_PLATFORM as AdPlatform | undefined) || "mobile",
-  ENABLE_WEB_PLACEHOLDERS: truthy(env.VITE_ENABLE_WEB_AD_PLACEHOLDERS),
+  ENABLE_ADS: truthy(env.VITE_ADS_ENABLED ?? "true"),
+  ENABLE_WEB_PLACEHOLDERS: truthy(env.VITE_ENABLE_WEB_AD_PLACEHOLDERS ?? "true"),
   ENABLE_DEBUG_LABELS: truthy(env.DEV) || truthy(env.VITE_ENABLE_AD_DEBUG),
+  PRIVACY_POLICY_URL: String(env.VITE_PRIVACY_POLICY_URL || "").trim(),
   MOBILE_APP_ID_ANDROID: String(env.VITE_ADMOB_APP_ID_ANDROID || "").trim(),
   MOBILE_APP_ID_IOS: String(env.VITE_ADMOB_APP_ID_IOS || "").trim(),
   BANNER_HOME: String(env.VITE_ADMOB_BANNER_HOME || "APP_DASHBOARD_SLOT").trim(),
@@ -39,6 +41,7 @@ export const getAdPermission = (
   pathname: string,
   variant: AdPlacementVariant = "content"
 ): AdPermission => {
+  if (!AD_CONFIG.ENABLE_ADS) return "deny";
   if (startsWithAny(pathname, AD_CONFIG.DENY_LIST)) return "deny";
   if (!startsWithAny(pathname, AD_CONFIG.SAFE_ROUTES)) return "deny";
 

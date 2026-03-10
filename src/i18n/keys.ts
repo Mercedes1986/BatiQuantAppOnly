@@ -34,6 +34,9 @@ export const I18N_KEYS = {
     title: "settings.title",
     languageTitle: "settings.languageTitle",
     languageHelp: "settings.languageHelp",
+    privacyTitle: "settings.privacy.title",
+    privacyManage: "settings.privacy.manage",
+    privacyReset: "settings.privacy.reset",
   },
 
   language: {
@@ -48,6 +51,12 @@ export const I18N_KEYS = {
     refuse: "cookie.refuse",
     manage: "cookie.manage",
   },
+
+  ads: {
+    label: "ads.label",
+    placeholderTitle: "ads.placeholder_title",
+    placeholderText: "ads.placeholder_text",
+  },
 } as const;
 
 export type I18nKey =
@@ -56,7 +65,7 @@ export type I18nKey =
   | (typeof I18N_KEYS.nav)[keyof typeof I18N_KEYS.nav]
   | (typeof I18N_KEYS.settings)[keyof typeof I18N_KEYS.settings]
   | (typeof I18N_KEYS.language)[keyof typeof I18N_KEYS.language]
-  | (typeof I18N_KEYS.cookie)[keyof typeof I18N_KEYS.cookie];
+  | (typeof I18N_KEYS.cookie)[keyof typeof I18N_KEYS.cookie]
+  | (typeof I18N_KEYS.ads)[keyof typeof I18N_KEYS.ads];
 
-// Helper optionnel si tu veux :
 export const tKey = <T extends I18nKey>(k: T) => k;

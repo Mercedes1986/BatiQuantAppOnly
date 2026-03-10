@@ -21,13 +21,15 @@ const DEFAULT_STATE: ConsentState = {
   ad_personalization: "denied",
   choice: "unknown",
   timestamp: 0,
-  v: 3,
+  v: 4,
 };
 
 const isBrowser = () =>
-  typeof window !== "undefined" && typeof localStorage !== "undefined";
+  typeof window !== "undefined" &&
+  typeof document !== "undefined" &&
+  typeof localStorage !== "undefined";
 
-const safeParse = (raw: string | null): any => {
+const safeParse = (raw: string | null): unknown => {
   if (!raw) return null;
   try {
     return JSON.parse(raw);
@@ -36,58 +38,57 @@ const safeParse = (raw: string | null): any => {
   }
 };
 
-function normalize(parsed: any): ConsentState {
+function normalize(parsed: unknown): ConsentState {
   if (!parsed || typeof parsed !== "object") return { ...DEFAULT_STATE };
+  const value = parsed as Partial<ConsentState> & { timestamp?: number };
 
   const choice: ConsentChoice =
-    parsed.choice === "accepted" || parsed.choice === "refused" || parsed.choice === "unknown"
-      ? parsed.choice
-      : typeof parsed.timestamp === "number" && parsed.timestamp > 0
-        ? parsed.ad_storage === "granted"
+    value.choice === "accepted" || value.choice === "refused" || value.choice === "unknown"
+      ? value.choice
+      : typeof value.timestamp === "number" && value.timestamp > 0
+        ? value.ad_storage === "granted"
           ? "accepted"
           : "refused"
         : "unknown";
 
   const accepted = choice === "accepted";
-  const ad_storage = parsed.ad_storage === "granted" || parsed.ad_storage === "denied"
-    ? parsed.ad_storage
-    : accepted
-      ? "granted"
-      : "denied";
-  const analytics_storage = parsed.analytics_storage === "granted" || parsed.analytics_storage === "denied"
-    ? parsed.analytics_storage
-    : accepted
-      ? "granted"
-      : "denied";
-  const ad_user_data = parsed.ad_user_data === "granted" || parsed.ad_user_data === "denied"
-    ? parsed.ad_user_data
-    : accepted
-      ? "granted"
-      : "denied";
-  const ad_personalization = parsed.ad_personalization === "granted" || parsed.ad_personalization === "denied"
-    ? parsed.ad_personalization
-    : accepted
-      ? "granted"
-      : "denied";
 
   return {
-    ad_storage,
-    analytics_storage,
-    ad_user_data,
-    ad_personalization,
+    ad_storage:
+      value.ad_storage === "granted" || value.ad_storage === "denied"
+        ? value.ad_storage
+        : accepted
+          ? "granted"
+          : "denied",
+    analytics_storage:
+      value.analytics_storage === "granted" || value.analytics_storage === "denied"
+        ? value.analytics_storage
+        : accepted
+          ? "granted"
+          : "denied",
+    ad_user_data:
+      value.ad_user_data === "granted" || value.ad_user_data === "denied"
+        ? value.ad_user_data
+        : accepted
+          ? "granted"
+          : "denied",
+    ad_personalization:
+      value.ad_personalization === "granted" || value.ad_personalization === "denied"
+        ? value.ad_personalization
+        : accepted
+          ? "granted"
+          : "denied",
     choice,
-    timestamp: typeof parsed.timestamp === "number" ? parsed.timestamp : 0,
-    v: typeof parsed.v === "number" ? Math.max(parsed.v, 3) : 3,
+    timestamp: typeof value.timestamp === "number" ? value.timestamp : 0,
+    v: typeof value.v === "number" ? Math.max(value.v, 4) : 4,
   };
 }
 
-function readRawStoredState(): any {
+function readRawStoredState(): unknown {
   if (!isBrowser()) return null;
   const next = safeParse(localStorage.getItem(CONSENT_KEY_NEW));
   if (next) return next;
-  const legacy = safeParse(localStorage.getItem(CONSENT_KEY_OLD));
-  if (legacy) return legacy;
-  return null;
+  return safeParse(localStorage.getItem(CONSENT_KEY_OLD));
 }
 
 function writeStoredState(state: ConsentState) {
@@ -103,9 +104,9 @@ function writeStoredState(state: ConsentState) {
 function emitConsentUpdated(state: ConsentState) {
   if (!isBrowser()) return;
   try {
-    window.dispatchEvent(new CustomEvent("consent-updated", { detail: state }));
+    window.dispatchEvent(new CustomEvent<ConsentState>("consent-updated", { detail: state }));
   } catch {
-    // ignore
+    // ignore event failures
   }
 }
 
@@ -158,7 +159,7 @@ export const setConsentChoice = (
     ad_personalization: accepted ? "granted" : "denied",
     choice,
     timestamp: Date.now(),
-    v: 3,
+    v: 4,
   };
 
   writeStoredState(state);
@@ -171,18 +172,32 @@ export const setConsent = (ads: boolean, analytics: boolean): ConsentState => {
   return setConsentChoice(ads ? "accepted" : "refused");
 };
 
-export const resetConsent = () => {
-  if (!isBrowser()) return;
-  try {
-    localStorage.removeItem(CONSENT_KEY_NEW);
-    localStorage.removeItem(CONSENT_KEY_OLD);
-  } catch {
-    // ignore
+export const resetConsent = (): ConsentState => {
+  if (isBrowser()) {
+    try {
+      localStorage.removeItem(CONSENT_KEY_NEW);
+      localStorage.removeItem(CONSENT_KEY_OLD);
+    } catch {
+      // ignore
+    }
   }
 
   const state = { ...DEFAULT_STATE };
   emitConsentUpdated(state);
 
+  if (isBrowser()) {
+    try {
+      window.dispatchEvent(new Event("consent-open"));
+    } catch {
+      // ignore
+    }
+  }
+
+  return state;
+};
+
+export const openConsent = (): void => {
+  if (!isBrowser()) return;
   try {
     window.dispatchEvent(new Event("consent-open"));
   } catch {
@@ -190,11 +205,14 @@ export const resetConsent = () => {
   }
 };
 
-export const openConsent = () => {
-  if (!isBrowser()) return;
-  try {
-    window.dispatchEvent(new Event("consent-open"));
-  } catch {
-    // ignore
-  }
+export const subscribeToConsent = (callback: (state: ConsentState) => void): (() => void) => {
+  if (!isBrowser()) return () => undefined;
+
+  const handler = (event: Event) => {
+    const detail = (event as CustomEvent<ConsentState>).detail;
+    callback(detail || getConsent());
+  };
+
+  window.addEventListener("consent-updated", handler);
+  return () => window.removeEventListener("consent-updated", handler);
 };
