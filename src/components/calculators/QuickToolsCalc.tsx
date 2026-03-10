@@ -112,9 +112,26 @@ const toolButtonMeta = [
   { key: "insulation" as const, icon: PanelsTopLeft },
 ];
 
-const packagingPresets = {
+type PackagingBaseUnit = "m²" | "m³" | "m";
+type PackagingAdvBaseUnit = PackagingBaseUnit | "unit";
+type PackagingConsumptionUnit = "kg" | "L" | "cartouche" | "sac";
+
+type PackagingPreset = {
+  label: string;
+  baseUnit: PackagingBaseUnit;
+  consumptionUnit: PackagingConsumptionUnit;
+  packageUnit: Unit;
+  rate: number;
+  packSize: number;
+  unitPrice: number;
+};
+
+const packagingPresets: Record<
+  "tileAdhesive" | "grout" | "paint" | "primer" | "silicone" | "foam",
+  PackagingPreset
+> = {
   tileAdhesive: {
-    label: tr(trText("Colle carrelage", "Tile adhesive"), "Tile adhesive"),
+    label: trText("Colle carrelage", "Tile adhesive"),
     baseUnit: "m²",
     consumptionUnit: "kg",
     packageUnit: Unit.BAG,
@@ -123,7 +140,7 @@ const packagingPresets = {
     unitPrice: 18,
   },
   grout: {
-    label: tr("Joint poudre", "Powder grout"),
+    label: trText("Joint poudre", "Powder grout"),
     baseUnit: "m²",
     consumptionUnit: "kg",
     packageUnit: Unit.BAG,
@@ -132,7 +149,7 @@ const packagingPresets = {
     unitPrice: 9,
   },
   paint: {
-    label: tr("Peinture finition", "Finish paint"),
+    label: trText("Peinture finition", "Finish paint"),
     baseUnit: "m²",
     consumptionUnit: "L",
     packageUnit: Unit.BUCKET,
@@ -141,7 +158,7 @@ const packagingPresets = {
     unitPrice: 85,
   },
   primer: {
-    label: tr("Primaire", "Primer"),
+    label: trText("Primaire", "Primer"),
     baseUnit: "m²",
     consumptionUnit: "L",
     packageUnit: Unit.BUCKET,
@@ -150,24 +167,24 @@ const packagingPresets = {
     unitPrice: 35,
   },
   silicone: {
-    label: tr("Silicone", "Silicone"),
+    label: trText("Silicone", "Silicone"),
     baseUnit: "m",
-    consumptionUnit: tr("cartouche", "cartridge"),
+    consumptionUnit: "cartouche",
     packageUnit: Unit.PIECE,
     rate: 1 / 12,
     packSize: 1,
     unitPrice: 7.5,
   },
   foam: {
-    label: tr("Mousse PU", "PU foam"),
+    label: trText("Mousse PU", "PU foam"),
     baseUnit: "m",
-    consumptionUnit: tr("cartouche", "cartridge"),
+    consumptionUnit: "cartouche",
     packageUnit: Unit.PIECE,
     rate: 0.45,
     packSize: 1,
     unitPrice: 9.9,
   },
-} as const;
+};
 
 type PackagingPresetKey = keyof typeof packagingPresets;
 
@@ -201,8 +218,8 @@ export const QuickToolsCalculator: React.FC<Props> = ({
   const [consumptionRate, setConsumptionRate] = useState("1.7");
   const [packSize, setPackSize] = useState("25");
   const [packUnitPrice, setPackUnitPrice] = useState("18");
-  const [baseUnit, setBaseUnit] = useState<"m²" | "m³" | "m">("m²");
-  const [consumptionUnit, setConsumptionUnit] = useState<"kg" | "L" | "cartouche" | "sac">("kg");
+  const [baseUnit, setBaseUnit] = useState<PackagingBaseUnit>("m²");
+  const [consumptionUnit, setConsumptionUnit] = useState<PackagingConsumptionUnit>("kg");
   const [packageUnit, setPackageUnit] = useState<Unit>(Unit.BAG);
 
   const [run, setRun] = useState("4");
@@ -257,9 +274,9 @@ export const QuickToolsCalculator: React.FC<Props> = ({
 
   const [packPreset, setPackPreset] = useState<PackagingPresetKey>("tileAdhesive");
   const [advBaseQty, setAdvBaseQty] = useState("35");
-  const [advBaseUnit, setAdvBaseUnit] = useState<"m²" | "m³" | "m" | "unit">("m²");
+  const [advBaseUnit, setAdvBaseUnit] = useState<PackagingAdvBaseUnit>("m²");
   const [advConsumptionRate, setAdvConsumptionRate] = useState("4.5");
-  const [advConsumptionUnit, setAdvConsumptionUnit] = useState<"kg" | "L" | "cartouche" | "sac">("kg");
+  const [advConsumptionUnit, setAdvConsumptionUnit] = useState<PackagingConsumptionUnit>("kg");
   const [advPackSize, setAdvPackSize] = useState("25");
   const [advPackUnit, setAdvPackUnit] = useState<Unit>(Unit.BAG);
   const [advUnitPrice, setAdvUnitPrice] = useState("18");
@@ -299,7 +316,7 @@ export const QuickToolsCalculator: React.FC<Props> = ({
 
   useEffect(() => {
     const preset = packagingPresets[packPreset];
-    setAdvBaseUnit(preset.baseUnit as "m²" | "m³" | "m");
+    setAdvBaseUnit(preset.baseUnit);
     setAdvConsumptionUnit(preset.consumptionUnit);
     setAdvPackUnit(preset.packageUnit);
     setAdvConsumptionRate(String(preset.rate));
@@ -1576,7 +1593,7 @@ export const QuickToolsCalculator: React.FC<Props> = ({
             label={t("quick.field.base_unit", { defaultValue: "Unité de base" })}
             value={baseUnit}
             onChange={(e) =>
-              setBaseUnit(e.target.value as "m²" | "m³" | "m")
+              setBaseUnit(e.target.value as PackagingBaseUnit)
             }
           >
             <option value="m²">m²</option>
@@ -1598,7 +1615,7 @@ export const QuickToolsCalculator: React.FC<Props> = ({
             value={consumptionUnit}
             onChange={(e) =>
               setConsumptionUnit(
-                e.target.value as "kg" | "L" | "cartouche" | "sac"
+                e.target.value as PackagingConsumptionUnit
               )
             }
           >
@@ -1993,7 +2010,7 @@ export const QuickToolsCalculator: React.FC<Props> = ({
             label={trText("Unité de base", "Base unit")}
             value={advBaseUnit}
             onChange={(e) =>
-              setAdvBaseUnit(e.target.value as "m²" | "m³" | "m" | "unit")
+              setAdvBaseUnit(e.target.value as PackagingAdvBaseUnit)
             }
           >
             <option value="m²">m²</option>
@@ -2012,7 +2029,7 @@ export const QuickToolsCalculator: React.FC<Props> = ({
             value={advConsumptionUnit}
             onChange={(e) =>
               setAdvConsumptionUnit(
-                e.target.value as "kg" | "L" | "cartouche" | "sac"
+                e.target.value as PackagingConsumptionUnit
               )
             }
           >
