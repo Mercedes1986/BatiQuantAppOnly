@@ -11,7 +11,6 @@ type NavItem = {
   id: string;
   label: string;
   icon: React.ElementType;
-  activeClass: string;
 };
 
 export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, onChange }) => {
@@ -19,40 +18,41 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, onChange }) =>
 
   const navItems: NavItem[] = useMemo(
     () => [
-      { id: "menu", icon: Menu, label: t("nav.menu", { defaultValue: "Menu" }), activeClass: "text-blue-700" },
-      { id: "quick-tools", icon: Calculator, label: t("nav.quick_tools", { defaultValue: "Rapides" }), activeClass: "text-cyan-700" },
-      { id: "projects", icon: FolderOpen, label: t("nav.projects", { defaultValue: "Projets" }), activeClass: "text-indigo-700" },
-      { id: "house", icon: Hammer, label: t("nav.site", { defaultValue: "Chantier" }), activeClass: "text-amber-700" },
-      { id: "materials", icon: Package, label: t("nav.materials", { defaultValue: "Matériaux" }), activeClass: "text-emerald-700" },
-      { id: "settings", icon: Settings, label: t("nav.settings", { defaultValue: "Réglages" }), activeClass: "text-violet-700" },
+      { id: "menu", icon: Menu, label: t("nav.menu", { defaultValue: "Menu" }) },
+      { id: "quick-tools", icon: Calculator, label: t("nav.quick_tools", { defaultValue: "Rapides" }) },
+      { id: "projects", icon: FolderOpen, label: t("nav.projects", { defaultValue: "Projets" }) },
+      { id: "house", icon: Hammer, label: t("nav.site", { defaultValue: "Chantier" }) },
+      { id: "materials", icon: Package, label: t("nav.materials", { defaultValue: "Matériaux" }) },
+      { id: "settings", icon: Settings, label: t("nav.settings", { defaultValue: "Réglages" }) },
     ],
     [t]
   );
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 no-print px-2 pb-2">
-      <div className="mx-auto max-w-6xl overflow-hidden rounded-t-3xl border border-white/70 bg-white/84 backdrop-blur-xl shadow-[0_-10px_35px_rgba(15,23,42,0.08)] safe-area-pb">
-        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-blue-200 via-cyan-200 to-emerald-200" />
-        <div className="flex justify-between items-center h-16 min-w-full px-2">
+    <div className="no-print fixed bottom-3 left-1/2 z-50 w-[min(94vw,720px)] -translate-x-1/2">
+      <div className="rounded-[26px] border border-white/65 bg-white/72 p-1.5 shadow-[0_22px_60px_rgba(15,23,42,0.20)] backdrop-blur-2xl">
+        <div className="grid h-[68px] grid-cols-6 gap-1">
           {navItems.map((item) => {
             const Icon = item.icon;
             const active = currentTab === item.id;
+
             return (
               <button
                 key={item.id}
+                type="button"
                 onClick={() => onChange(item.id)}
-                className={`relative flex flex-col items-center justify-center min-w-[52px] flex-1 h-full space-y-1 transition-all ${
-                  active ? item.activeClass : "text-slate-400 hover:text-slate-600"
-                }`}
                 aria-current={active ? "page" : undefined}
                 aria-label={item.label}
-                type="button"
+                className={`flex h-full flex-col items-center justify-center rounded-[20px] transition-all duration-200 ${
+                  active
+                    ? "bg-gradient-to-b from-blue-600 to-blue-500 text-white shadow-[0_10px_24px_rgba(37,99,235,0.35)]"
+                    : "text-slate-500 hover:bg-white/70 hover:text-slate-700"
+                }`}
               >
-                {active && <span className="absolute top-1 h-1.5 w-8 rounded-full bg-current/80" />}
-                <span className={`flex h-9 w-9 items-center justify-center rounded-2xl transition-all ${active ? "bg-current/10 shadow-sm" : ""}`}>
-                  <Icon size={active ? 21 : 19} strokeWidth={active ? 2.5 : 2} />
+                <Icon size={active ? 21 : 19} strokeWidth={active ? 2.4 : 2.1} />
+                <span className={`mt-1 text-[10px] font-bold leading-none ${active ? "text-white" : ""}`}>
+                  {item.label}
                 </span>
-                <span className={`text-[10px] font-semibold ${active ? "text-current" : ""}`}>{item.label}</span>
               </button>
             );
           })}
