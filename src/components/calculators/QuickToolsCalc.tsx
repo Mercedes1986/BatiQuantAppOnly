@@ -105,7 +105,7 @@ const toolButtonMeta = [
 
 const packagingPresets = {
   tileAdhesive: {
-    label: tr("Colle carrelage", "Tile adhesive"),
+    label: "Colle carrelage",
     baseUnit: "m²",
     consumptionUnit: "kg",
     packageUnit: Unit.BAG,
@@ -114,7 +114,7 @@ const packagingPresets = {
     unitPrice: 18,
   },
   grout: {
-    label: tr("Joint poudre", "Powder grout"),
+    label: "Joint poudre",
     baseUnit: "m²",
     consumptionUnit: "kg",
     packageUnit: Unit.BAG,
@@ -123,7 +123,7 @@ const packagingPresets = {
     unitPrice: 9,
   },
   paint: {
-    label: tr("Peinture finition", "Finish paint"),
+    label: "Peinture finition",
     baseUnit: "m²",
     consumptionUnit: "L",
     packageUnit: Unit.BUCKET,
@@ -132,7 +132,7 @@ const packagingPresets = {
     unitPrice: 85,
   },
   primer: {
-    label: tr("Primaire", "Primer"),
+    label: "Primaire",
     baseUnit: "m²",
     consumptionUnit: "L",
     packageUnit: Unit.BUCKET,
@@ -150,7 +150,7 @@ const packagingPresets = {
     unitPrice: 7.5,
   },
   foam: {
-    label: tr("Mousse PU", "PU foam"),
+    label: "Mousse PU",
     baseUnit: "m",
     consumptionUnit: "cartouche",
     packageUnit: Unit.PIECE,
@@ -299,20 +299,20 @@ export const QuickToolsCalculator: React.FC<Props> = ({
   }, [packPreset]);
 
   const toolLabels: Record<ToolKey, string> = {
-    convert: t("quick.tools.convert", { defaultValue: tr("Convertisseur", "Converter") }),
-    netArea: t("quick.tools.net_area", { defaultValue: tr("Surface nette", "Net area") }),
-    packaging: t("quick.tools.packaging", { defaultValue: tr(tr("Conditionnements", "Packages"), "Packaging") }),
-    slope: t("quick.tools.slope", { defaultValue: tr(tr("Pente", "Pitch"), "Slope") }),
-    linear: t("quick.tools.linear", { defaultValue: tr("Linéaires", "Linears") }),
-    voltageDrop: t("quick.tools.voltage_drop", { defaultValue: tr("Chute de tension", "Voltage drop") }),
-    decking: t("quick.tools.decking", { defaultValue: tr("Terrasse bois", "Wood decking") }),
-    drywallFrame: t("quick.tools.drywall_frame", { defaultValue: tr("Placo détaillé ossature", "Detailed drywall framing") }),
-    tileDetailed: t("quick.tools.tile_detailed", { defaultValue: tr("Carrelage détaillé", "Detailed tiling") }),
-    packagingAdvanced: t("quick.tools.packaging_advanced", { defaultValue: tr("Sacs / seaux / cartouches", "Bags / buckets / cartridges") }),
-    roofFrame: t("quick.tools.roof_frame", { defaultValue: tr("Toiture / chevrons / liteaux", "Roof / rafters / battens") }),
-    fence: t("quick.tools.fence", { defaultValue: tr("Clôture / grillage", "Fence / mesh") }),
-    bulkFill: t("quick.tools.bulk_fill", { defaultValue: tr("Gravier / remblai / sable", "Gravel / backfill / sand") }),
-    insulation: t("quick.tools.insulation", { defaultValue: tr("Isolation murs / combles", "Wall / attic insulation") }),
+    convert: t("quick.tools.convert", { defaultValue: "Convertisseur" }),
+    netArea: t("quick.tools.net_area", { defaultValue: "Surface nette" }),
+    packaging: t("quick.tools.packaging", { defaultValue: "Conditionnements" }),
+    slope: t("quick.tools.slope", { defaultValue: "Pente" }),
+    linear: t("quick.tools.linear", { defaultValue: "Linéaires" }),
+    voltageDrop: t("quick.tools.voltage_drop", { defaultValue: "Chute de tension" }),
+    decking: t("quick.tools.decking", { defaultValue: "Terrasse bois" }),
+    drywallFrame: t("quick.tools.drywall_frame", { defaultValue: "Placo détaillé ossature" }),
+    tileDetailed: t("quick.tools.tile_detailed", { defaultValue: "Carrelage détaillé" }),
+    packagingAdvanced: t("quick.tools.packaging_advanced", { defaultValue: "Sacs / seaux / cartouches" }),
+    roofFrame: t("quick.tools.roof_frame", { defaultValue: "Toiture / chevrons / liteaux" }),
+    fence: t("quick.tools.fence", { defaultValue: "Clôture / grillage" }),
+    bulkFill: t("quick.tools.bulk_fill", { defaultValue: "Gravier / remblai / sable" }),
+    insulation: t("quick.tools.insulation", { defaultValue: "Isolation murs / combles" }),
   };
 
   const toolButtons = toolButtonMeta.map(({ key, icon }) => ({
@@ -340,7 +340,7 @@ export const QuickToolsCalculator: React.FC<Props> = ({
 
         if (tCm <= 0)
           warnings.push(
-            t("quick.warn_thickness", { defaultValue: tr("L'épaisseur doit être supérieure à 0.", "Thickness must be greater than 0.") })
+            t("quick.warn_thickness", { defaultValue: "L'épaisseur doit être supérieure à 0." })
           );
 
         summary = t("quick.summary.convert", {
@@ -352,29 +352,29 @@ export const QuickToolsCalculator: React.FC<Props> = ({
 
         details = [
           {
-            label: t("quick.detail.area", { defaultValue: tr("Surface", "Area") }),
+            label: t("quick.detail.area", { defaultValue: "Surface" }),
             value: round2(a),
             unit: "m²",
           },
           {
-            label: t("quick.detail.thickness", { defaultValue: tr("Épaisseur", "Thickness") }),
+            label: t("quick.detail.thickness", { defaultValue: "Épaisseur" }),
             value: round2(tCm),
             unit: "cm",
           },
           {
-            label: t("quick.detail.volume", { defaultValue: tr("Volume", "Volume") }),
+            label: t("quick.detail.volume", { defaultValue: "Volume" }),
             value: round2(volume),
             unit: "m³",
           },
           {
             label: t("quick.detail.liters_to_m3", {
-              defaultValue: tr("Conversion litres → m³", "Liters → m³"),
+              defaultValue: "Conversion litres → m³",
             }),
             value: round2(m3FromLiters),
             unit: "m³",
           },
           {
-            label: t("quick.detail.bags_needed", { defaultValue: tr("Sacs nécessaires", "Bags needed") }),
+            label: t("quick.detail.bags_needed", { defaultValue: "Sacs nécessaires" }),
             value: Math.ceil(bags),
             unit: Unit.BAG,
           },
@@ -383,10 +383,10 @@ export const QuickToolsCalculator: React.FC<Props> = ({
         materials = [
           makeMaterial(
             "bags",
-            t("quick.material.bags", { defaultValue: tr("Sacs théoriques", "Theoretical bags") }),
+            t("quick.material.bags", { defaultValue: "Sacs théoriques" }),
             bags,
             Unit.BAG,
-            t("quick.material.bags_detail", { defaultValue: tr("Basé sur le rendement saisi", "Based on entered yield") })
+            t("quick.material.bags_detail", { defaultValue: "Basé sur le rendement saisi" })
           ),
         ];
         break;
@@ -407,7 +407,7 @@ export const QuickToolsCalculator: React.FC<Props> = ({
         if (openings > gross)
           warnings.push(
             t("quick.warn_openings", {
-              defaultValue: tr("La surface des ouvertures dépasse la surface brute.", "Openings area exceeds gross area."),
+              defaultValue: "La surface des ouvertures dépasse la surface brute.",
             })
           );
 
@@ -419,27 +419,27 @@ export const QuickToolsCalculator: React.FC<Props> = ({
 
         details = [
           {
-            label: t("quick.detail.gross_area", { defaultValue: tr("Surface brute", "Gross area") }),
+            label: t("quick.detail.gross_area", { defaultValue: "Surface brute" }),
             value: round2(gross),
             unit: "m²",
           },
           {
-            label: t("quick.detail.openings", { defaultValue: tr("Déduction ouvertures", "Opening deduction") }),
+            label: t("quick.detail.openings", { defaultValue: "Déduction ouvertures" }),
             value: round2(openings),
             unit: "m²",
           },
           {
-            label: t("quick.detail.net_area", { defaultValue: tr(tr("Surface nette", "Net area"), "Net area") }),
+            label: t("quick.detail.net_area", { defaultValue: "Surface nette" }),
             value: round2(net),
             unit: "m²",
           },
           {
-            label: t("quick.detail.loss", { defaultValue: tr("Pertes", "Waste") }),
+            label: t("quick.detail.loss", { defaultValue: "Pertes" }),
             value: round2(waste),
             unit: "%",
           },
           {
-            label: t("quick.detail.with_waste", { defaultValue: tr("Surface avec pertes", "Area with waste") }),
+            label: t("quick.detail.with_waste", { defaultValue: "Surface avec pertes" }),
             value: round2(withWaste),
             unit: "m²",
           },
@@ -448,7 +448,7 @@ export const QuickToolsCalculator: React.FC<Props> = ({
         materials = [
           makeMaterial(
             "net-area",
-            t("quick.material.net_area", { defaultValue: tr("Surface exploitable", "Usable area") }),
+            t("quick.material.net_area", { defaultValue: "Surface exploitable" }),
             withWaste,
             Unit.M2
           ),
@@ -479,12 +479,12 @@ export const QuickToolsCalculator: React.FC<Props> = ({
             unit: baseUnit,
           },
           {
-            label: t("quick.detail.consumption", { defaultValue: tr("Consommation unitaire", "Unit consumption") }),
+            label: t("quick.detail.consumption", { defaultValue: "Consommation unitaire" }),
             value: round2(rate),
             unit: `${consumptionUnit}/${baseUnit}`,
           },
           {
-            label: t("quick.detail.total_need", { defaultValue: tr("Besoin total", "Total need") }),
+            label: t("quick.detail.total_need", { defaultValue: "Besoin total" }),
             value: round2(rawQty),
             unit: consumptionUnit,
           },
@@ -544,7 +544,7 @@ export const QuickToolsCalculator: React.FC<Props> = ({
             unit: "m",
           },
           {
-            label: t("quick.detail.percent", { defaultValue: tr(tr("Pente", "Pitch"), "Slope") }),
+            label: t("quick.detail.percent", { defaultValue: "Pente" }),
             value: round2(percent),
             unit: "%",
           },
@@ -556,7 +556,7 @@ export const QuickToolsCalculator: React.FC<Props> = ({
             unit: "cm/m",
           },
           {
-            label: t("quick.detail.angle", { defaultValue: tr("Angle", "Angle") }),
+            label: t("quick.detail.angle", { defaultValue: "Angle" }),
             value: round2(angle),
             unit: "°",
           },
@@ -591,39 +591,39 @@ export const QuickToolsCalculator: React.FC<Props> = ({
 
         details = [
           {
-            label: t("quick.detail.linear_total", { defaultValue: tr("Longueur utile", "Useful length") }),
+            label: t("quick.detail.linear_total", { defaultValue: "Longueur utile" }),
             value: round2(total),
             unit: "m",
           },
           {
-            label: t("quick.detail.linear_overlap", { defaultValue: tr("Recouvrement", "Overlap") }),
+            label: t("quick.detail.linear_overlap", { defaultValue: "Recouvrement" }),
             value: round2(overlap * 100),
             unit: "cm",
           },
           {
             label: t("quick.detail.linear_effective", {
-              defaultValue: tr("Longueur utile par pièce", "Useful length per piece"),
+              defaultValue: "Longueur utile par pièce",
             }),
             value: round2(effectivePiece),
             unit: "m",
           },
           {
             label: t("quick.detail.linear_with_waste", {
-              defaultValue: tr("Longueur avec pertes", "Length with waste"),
+              defaultValue: "Longueur avec pertes",
             }),
             value: round2(adjustedTotal),
             unit: "m",
           },
           {
             label: t("quick.detail.linear_pieces", {
-              defaultValue: tr("Nombre de pièces", "Number of pieces"),
+              defaultValue: "Nombre de pièces",
             }),
             value: Math.ceil(pieces),
             unit: Unit.PIECE,
           },
           {
             label: t("quick.detail.linear_offcut", {
-              defaultValue: tr("Chutes estimées", "Estimated offcuts"),
+              defaultValue: "Chutes estimées",
             }),
             value: round2(offcut),
             unit: "m",
@@ -633,7 +633,7 @@ export const QuickToolsCalculator: React.FC<Props> = ({
         materials = [
           makeMaterial(
             "linear-pieces",
-            t("quick.material.linear_pieces", { defaultValue: tr("Pièces linéaires", "Linear pieces") }),
+            t("quick.material.linear_pieces", { defaultValue: "Pièces linéaires" }),
             pieces,
             Unit.PIECE,
             `${round2(piece)} m par pièce`
@@ -692,43 +692,43 @@ export const QuickToolsCalculator: React.FC<Props> = ({
 
         details = [
           {
-            label: t("quick.detail.phase", { defaultValue: tr("Réseau", "Supply") }),
-            value: phase === "mono" ? tr("Monophasé", "Single-phase") : tr("Triphasé", "Three-phase"),
+            label: t("quick.detail.phase", { defaultValue: "Réseau" }),
+            value: phase === "mono" ? "Monophasé" : "Triphasé",
           },
           {
             label: t("quick.detail.current", {
-              defaultValue: tr("Intensité estimée", "Estimated current"),
+              defaultValue: "Intensité estimée",
             }),
             value: round2(current),
             unit: "A",
           },
           {
-            label: t("quick.detail.length", { defaultValue: tr(tr("Longueur", "Length"), "Length") }),
+            label: t("quick.detail.length", { defaultValue: "Longueur" }),
             value: round2(l),
             unit: "m",
           },
           {
-            label: t("quick.detail.section", { defaultValue: tr("Section utilisée", "Used section") }),
+            label: t("quick.detail.section", { defaultValue: "Section utilisée" }),
             value: round2(s),
             unit: "mm²",
           },
           {
             label: t("quick.detail.drop_volts", {
-              defaultValue: tr("Chute de tension", "Voltage drop"),
+              defaultValue: "Chute de tension",
             }),
             value: round2(dropVolts),
             unit: "V",
           },
           {
             label: t("quick.detail.drop_percent", {
-              defaultValue: tr("Chute de tension", "Voltage drop"),
+              defaultValue: "Chute de tension",
             }),
             value: round2(dropPercent),
             unit: "%",
           },
           {
             label: t("quick.detail.section_recommended", {
-              defaultValue: tr("Section indicative recommandée", "Indicative recommended section"),
+              defaultValue: "Section indicative recommandée",
             }),
             value: recommended,
             unit: "mm²",
@@ -763,44 +763,40 @@ export const QuickToolsCalculator: React.FC<Props> = ({
         const screws = rows * joistLines * screwRate;
 
         if (boardLen <= 0 || joistPieceLen <= 0)
-          warnings.push(tr("Renseigner des longueurs de pièces supérieures à 0.", "Enter piece lengths greater than 0."));
+          warnings.push("Renseigner des longueurs de pièces supérieures à 0.");
 
-        summary = tr(`${round2(areaVal)} m² de terrasse ≈ ${Math.ceil(
+        summary = `${round2(areaVal)} m² de terrasse ≈ ${Math.ceil(
           boardPieces
         )} lames, ${Math.ceil(joistPieces)} lambourdes et ${Math.ceil(
           pedestals
-        )} plots.`, `${round2(areaVal)} m² deck ≈ ${Math.ceil(
-          boardPieces
-        )} boards, ${Math.ceil(joistPieces)} joists and ${Math.ceil(
-          pedestals
-        )} pedestals.`);
+        )} plots.`;
         details = [
-          { label: tr("Surface terrasse", "Deck area"), value: round2(areaVal), unit: "m²" },
-          { label: tr("Nombre de rangs", "Number of rows"), value: rows, unit: tr("rangs", "rows") },
-          { label: tr("ML de lames", "Board LM"), value: round2(totalBoardLinear), unit: "m" },
-          { label: tr("Lames", "Boards"), value: Math.ceil(boardPieces), unit: Unit.PIECE },
-          { label: tr("ML de lambourdes", "Joist LM"), value: round2(joistLinear), unit: "m" },
-          { label: tr("Lambourdes", "Joists"), value: Math.ceil(joistPieces), unit: Unit.PIECE },
-          { label: tr("Plots", "Pedestals"), value: Math.ceil(pedestals), unit: Unit.PIECE },
-          { label: tr("Vis inox", "Stainless screws"), value: Math.ceil(screws), unit: Unit.PIECE },
+          { label: "Surface terrasse", value: round2(areaVal), unit: "m²" },
+          { label: "Nombre de rangs", value: rows, unit: "rangs" },
+          { label: "ML de lames", value: round2(totalBoardLinear), unit: "m" },
+          { label: "Lames", value: Math.ceil(boardPieces), unit: Unit.PIECE },
+          { label: "ML de lambourdes", value: round2(joistLinear), unit: "m" },
+          { label: "Lambourdes", value: Math.ceil(joistPieces), unit: Unit.PIECE },
+          { label: "Plots", value: Math.ceil(pedestals), unit: Unit.PIECE },
+          { label: "Vis inox", value: Math.ceil(screws), unit: Unit.PIECE },
         ];
         materials = [
           makeMaterial(
             "deck-boards",
-            tr("Lames de terrasse", "Deck boards"),
+            "Lames de terrasse",
             boardPieces,
             Unit.PIECE,
             `${round2(boardLen)} m par lame`
           ),
           makeMaterial(
             "deck-joists",
-            tr("Lambourdes", "Joists"),
+            "Lambourdes",
             joistPieces,
             Unit.PIECE,
             `${round2(joistPieceLen)} m par lambourde`
           ),
-          makeMaterial("deck-pedestals", tr("Plots", "Pedestals"), pedestals, Unit.PIECE),
-          makeMaterial("deck-screws", tr("Vis inox", "Stainless screws"), screws, Unit.PIECE),
+          makeMaterial("deck-pedestals", "Plots", pedestals, Unit.PIECE),
+          makeMaterial("deck-screws", "Vis inox", screws, Unit.PIECE),
         ];
         break;
       }
@@ -854,76 +850,68 @@ export const QuickToolsCalculator: React.FC<Props> = ({
 
         summary =
           mode === "ceiling"
-            ? tr(`${round2(baseArea)} m² de plafond ≈ ${Math.ceil(
+            ? `${round2(baseArea)} m² de plafond ≈ ${Math.ceil(
                 boards
               )} plaques, ${Math.ceil(
                 furringPieces
-              )} fourrures et ${Math.ceil(hangerCount)} suspentes.`, `${round2(baseArea)} m² ceiling ≈ ${Math.ceil(
-                boards
-              )} boards, ${Math.ceil(
-                furringPieces
-              )} furring channels and ${Math.ceil(hangerCount)} hangers.`)
-            : tr(`${round2(baseArea)} m² de ${
-                mode === "partition" ? tr("cloison", "partition wall") : tr("doublage", "lining")
+              )} fourrures et ${Math.ceil(hangerCount)} suspentes.`
+            : `${round2(baseArea)} m² de ${
+                mode === "partition" ? "cloison" : "doublage"
               } ≈ ${Math.ceil(boards)} plaques, ${Math.ceil(
                 railPieces
-              )} rails et ${Math.ceil(studPieces)} montants.`, `${round2(baseArea)} m² of ${
-                mode === "partition" ? "partition wall" : "lining"
-              } ≈ ${Math.ceil(boards)} boards, ${Math.ceil(
-                railPieces
-              )} tracks and ${Math.ceil(studPieces)} studs.`);
+              )} rails et ${Math.ceil(studPieces)} montants.`;
 
         details = [
           {
-            label: tr("Mode", "Mode"),
+            label: "Mode",
             value:
               mode === "partition"
-                ? tr("Cloison", "Partition")
+                ? "Cloison"
                 : mode === "lining"
-                ? tr("Doublage", "Lining")
-                : tr("Plafond", "Ceiling"),
+                ? "Doublage"
+                : "Plafond",
           },
-          { label: tr("Surface utile", "Useful area"), value: round2(baseArea), unit: "m²" },
-          { label: tr("Plaques", "Boards"), value: Math.ceil(boards), unit: Unit.PLATE },
+          { label: "Surface utile", value: round2(baseArea), unit: "m²" },
+          { label: "Plaques", value: Math.ceil(boards), unit: Unit.PLATE },
           ...(mode === "ceiling"
             ? [
                 {
-                  label: tr("ML de fourrures", "Furring LM"),
+                  label: "ML de fourrures",
                   value: round2(furringLinear),
                   unit: "m",
                 },
                 {
-                  label: tr("Fourrures", "Furring channels"),
+                  label: "Fourrures",
                   value: Math.ceil(furringPieces),
                   unit: Unit.PIECE,
                 },
                 {
-                  label: tr("Suspentes", "Hangers"),
+                  label: "Suspentes",
                   value: Math.ceil(hangerCount),
                   unit: Unit.PIECE,
                 },
               ]
             : [
                 {
-                  label: tr("ML de rails", "Track LM"),
+                  label: "ML de rails",
                   value: round2(railsLinear),
                   unit: "m",
                 },
                 {
-                  label: tr("Rails", "Tracks"),
+                  label: "Rails",
                   value: Math.ceil(railPieces),
                   unit: Unit.PIECE,
                 },
                 {
-                  label: tr("Montants", "Studs"),
+                  label: "Montants",
                   value: Math.ceil(studPieces),
                   unit: Unit.PIECE,
                 },
               ]),
-          { label: tr("Vis placo", "Drywall screws"), value: Math.ceil(screws), unit: Unit.PIECE },
-          { label: tr("Bande à joint", "Joint tape"), value: round2(tapeMl), unit: "m" },
+          { label: "Vis placo", value: Math.ceil(screws), unit: Unit.PIECE },
+          { label: "Bande à joint", value: round2(tapeMl), unit: "m" },
           {
-            label: tr("Enduit à joint", "Joint compound"),
+            label: "Enduit à joint",
             value: round2(jointCompoundKg),
             unit: "kg",
           },
@@ -932,7 +920,7 @@ export const QuickToolsCalculator: React.FC<Props> = ({
         materials = [
           makeMaterial(
             "drywall-boards",
-            tr("Plaques de plâtre", "Plasterboards"),
+            "Plaques de plâtre",
             boards,
             Unit.PLATE,
             `${round2(toNum(boardWidthM))} × ${round2(toNum(boardHeightM))} m`
@@ -941,14 +929,14 @@ export const QuickToolsCalculator: React.FC<Props> = ({
             ? [
                 makeMaterial(
                   "drywall-furrings",
-                  tr("Fourrures", "Furring channels"),
+                  "Fourrures",
                   furringPieces,
                   Unit.PIECE,
                   `${round2(railLen)} m par fourrure`
                 ),
                 makeMaterial(
                   "drywall-hangers",
-                  tr("Suspentes", "Hangers"),
+                  "Suspentes",
                   hangerCount,
                   Unit.PIECE
                 ),
@@ -956,24 +944,24 @@ export const QuickToolsCalculator: React.FC<Props> = ({
             : [
                 makeMaterial(
                   "drywall-rails",
-                  tr("Rails", "Tracks"),
+                  "Rails",
                   railPieces,
                   Unit.PIECE,
                   `${round2(railLen)} m par rail`
                 ),
                 makeMaterial(
                   "drywall-studs",
-                  tr("Montants", "Studs"),
+                  "Montants",
                   studPieces,
                   Unit.PIECE,
                   `${round2(studLen)} m par montant`
                 ),
               ]),
-          makeMaterial("drywall-screws", tr("Vis placo", "Drywall screws"), screws, Unit.PIECE),
-          makeMaterial("drywall-tape", tr("Bande à joint", "Joint tape"), tapeMl, Unit.METER),
+          makeMaterial("drywall-screws", "Vis placo", screws, Unit.PIECE),
+          makeMaterial("drywall-tape", "Bande à joint", tapeMl, Unit.METER),
           makeMaterial(
             "drywall-joint",
-            tr("Enduit à joint", "Joint compound"),
+            "Enduit à joint",
             jointCompoundKg / 25,
             Unit.BAG,
             `${round2(jointCompoundKg)} kg au total`
@@ -1000,34 +988,30 @@ export const QuickToolsCalculator: React.FC<Props> = ({
           (skirtingMl * 100) / Math.max(1, toNum(tileLenCm));
         const primer = baseArea * 0.15;
 
-        summary = tr(`${round2(
+        summary = `${round2(
           baseArea
         )} m² à carreler ≈ ${Math.ceil(tiles)} carreaux, ${Math.ceil(
           adhesive / 25
-        )} sacs de colle et ${Math.ceil(grout / 5)} sacs de joint.`, `${round2(
-          baseArea
-        )} m² to tile ≈ ${Math.ceil(tiles)} tiles, ${Math.ceil(
-          adhesive / 25
-        )} adhesive bags and ${Math.ceil(grout / 5)} grout bags.`);
+        )} sacs de colle et ${Math.ceil(grout / 5)} sacs de joint.`;
         details = [
-          { label: tr("Surface nette", "Net area"), value: round2(baseArea), unit: "m²" },
-          { label: tr("Pose", "Layout"), value: poseType === "straight" ? tr("Droite", "Straight") : tr("Diagonale", "Diagonal") },
-          { label: tr("Pertes retenues", "Applied waste"), value: round2(poseWaste), unit: "%" },
+          { label: "Surface nette", value: round2(baseArea), unit: "m²" },
+          { label: "Pose", value: poseType === "straight" ? "Droite" : "Diagonale" },
+          { label: "Pertes retenues", value: round2(poseWaste), unit: "%" },
           {
             label: "Surface avec pertes",
             value: round2(withWaste),
             unit: "m²",
           },
-          { label: tr("Carreaux", "Tiles"), value: Math.ceil(tiles), unit: Unit.PIECE },
-          { label: tr("Colle", "Adhesive"), value: round2(adhesive), unit: "kg" },
-          { label: tr("Joint", "Grout"), value: round2(grout), unit: "kg" },
-          { label: tr("Plinthes", "Skirtings"), value: Math.ceil(skirtingPieces), unit: Unit.PIECE },
-          { label: tr("Primaire", "Primer"), value: round2(primer), unit: "L" },
+          { label: "Carreaux", value: Math.ceil(tiles), unit: Unit.PIECE },
+          { label: "Colle", value: round2(adhesive), unit: "kg" },
+          { label: "Joint", value: round2(grout), unit: "kg" },
+          { label: "Plinthes", value: Math.ceil(skirtingPieces), unit: Unit.PIECE },
+          { label: "Primaire", value: round2(primer), unit: "L" },
         ];
         materials = [
           makeMaterial(
             "tile-tiles",
-            tr("Carreaux", "Tiles"),
+            "Carreaux",
             tiles,
             Unit.PIECE,
             `${round2(toNum(tileLenCm))} × ${round2(toNum(tileWidCm))} cm`
@@ -1076,36 +1060,32 @@ export const QuickToolsCalculator: React.FC<Props> = ({
         const packs = size > 0 ? rawNeed / size : 0;
         totalCost = Math.ceil(packs) * price;
 
-        summary = tr(`${round2(
+        summary = `${round2(
           rawNeed
         )} ${advConsumptionUnit} de ${preset.label.toLowerCase()} ≈ ${Math.ceil(
           packs
-        )} ${advPackUnit}.`, `${round2(
-          rawNeed
-        )} ${advConsumptionUnit} of ${preset.label.toLowerCase()} ≈ ${Math.ceil(
-          packs
-        )} ${advPackUnit}.`);
+        )} ${advPackUnit}.`;
         details = [
-          { label: tr("Produit", "Product"), value: preset.label },
-          { label: tr("Base", "Base"), value: round2(base), unit: advBaseUnit },
+          { label: "Produit", value: preset.label },
+          { label: "Base", value: round2(base), unit: advBaseUnit },
           {
             label: "Consommation unitaire",
             value: round2(rate),
             unit: `${advConsumptionUnit}/${advBaseUnit}`,
           },
-          { label: tr("Couches / passes", "Coats / passes"), value: round2(coats), unit: "x" },
+          { label: "Couches / passes", value: round2(coats), unit: "x" },
           { label: "Pertes", value: round2(waste), unit: "%" },
           {
-            label: tr("Besoin total", "Total need"),
+            label: "Besoin total",
             value: round2(rawNeed),
             unit: advConsumptionUnit,
           },
           {
-            label: tr("Conditionnements", "Packages"),
+            label: "Conditionnements",
             value: Math.ceil(packs),
             unit: advPackUnit,
           },
-          { label: tr("Coût estimé", "Estimated cost"), value: round2(totalCost), unit: "€" },
+          { label: "Coût estimé", value: round2(totalCost), unit: "€" },
         ];
         materials = [
           makeMaterial(
@@ -1145,64 +1125,60 @@ export const QuickToolsCalculator: React.FC<Props> = ({
         const underlayRolls = underlayRoll > 0 ? (roofArea * 1.08) / underlayRoll : 0;
         const tiles = roofArea * tileRate * 1.08;
 
-        summary = tr(`${round2(
+        summary = `${round2(
           roofArea
         )} m² de toiture ≈ ${rafters} chevrons, ${Math.ceil(
           battenPieces
-        )} liteaux et ${Math.ceil(tiles)} tuiles.`, `${round2(
-          roofArea
-        )} m² roof area ≈ ${rafters} rafters, ${Math.ceil(
-          battenPieces
-        )} battens and ${Math.ceil(tiles)} tiles.`);
+        )} liteaux et ${Math.ceil(tiles)} tuiles.`;
         details = [
-          { label: tr("Pente", "Pitch"), value: round2(pitchPercent), unit: "%" },
-          { label: tr("Angle", "Angle"), value: round2(pitchAngle), unit: "°" },
-          { label: tr("Longueur chevron", "Rafter length"), value: round2(rafterLength), unit: "m" },
-          { label: tr("Surface de toiture", "Roof area"), value: round2(roofArea), unit: "m²" },
-          { label: tr("Chevrons", "Rafters"), value: rafters, unit: Unit.PIECE },
+          { label: "Pente", value: round2(pitchPercent), unit: "%" },
+          { label: "Angle", value: round2(pitchAngle), unit: "°" },
+          { label: "Longueur chevron", value: round2(rafterLength), unit: "m" },
+          { label: "Surface de toiture", value: round2(roofArea), unit: "m²" },
+          { label: "Chevrons", value: rafters, unit: Unit.PIECE },
           {
-            label: tr("Contre-liteaux", "Counter-battens"),
+            label: "Contre-liteaux",
             value: round2(counterBattensMl),
             unit: "m",
           },
-          { label: tr("Liteaux", "Battens"), value: Math.ceil(battenPieces), unit: Unit.PIECE },
+          { label: "Liteaux", value: Math.ceil(battenPieces), unit: Unit.PIECE },
           {
-            label: tr("Écran sous-toiture", "Underlay"),
+            label: "Écran sous-toiture",
             value: Math.ceil(underlayRolls),
             unit: Unit.ROLL,
           },
-          { label: tr("Couverture", "Covering"), value: Math.ceil(tiles), unit: Unit.PIECE },
+          { label: "Couverture", value: Math.ceil(tiles), unit: Unit.PIECE },
         ];
         materials = [
           makeMaterial(
             "roof-rafters",
-            tr("Chevrons", "Rafters"),
+            "Chevrons",
             rafters,
             Unit.PIECE,
             `${round2(rafterLength)} m par chevron`
           ),
           makeMaterial(
             "roof-counter-battens",
-            tr("Contre-liteaux", "Counter-battens"),
+            "Contre-liteaux",
             counterBattensMl / battenPiece,
             Unit.PIECE,
             `${round2(counterBattensMl)} ml au total`
           ),
           makeMaterial(
             "roof-battens",
-            tr("Liteaux", "Battens"),
+            "Liteaux",
             battenPieces,
             Unit.PIECE,
             `${round2(battenPiece)} m par liteau`
           ),
           makeMaterial(
             "roof-underlay",
-            tr("Écran sous-toiture", "Underlay"),
+            "Écran sous-toiture",
             underlayRolls,
             Unit.ROLL,
             `${round2(underlayRoll)} m² par rouleau`
           ),
-          makeMaterial("roof-tiles", tr("Tuiles / ardoises", "Tiles / slates"), tiles, Unit.PIECE),
+          makeMaterial("roof-tiles", "Tuiles / ardoises", tiles, Unit.PIECE),
         ];
         break;
       }
@@ -1222,37 +1198,33 @@ export const QuickToolsCalculator: React.FC<Props> = ({
         const bagVolumeM3 = 0.012; // ~12L pour un sac de 25kg
         const concreteBags = bagVolumeM3 > 0 ? concreteVolume / bagVolumeM3 : 0;
 
-        summary = tr(`${round2(
+        summary = `${round2(
           length
         )} m de clôture ≈ ${panels} panneaux, ${posts} poteaux et ${Math.ceil(
           concreteBags
-        )} sacs de béton.`, `${round2(
-          length
-        )} m fence ≈ ${panels} panels, ${posts} posts and ${Math.ceil(
-          concreteBags
-        )} concrete bags.`);
+        )} sacs de béton.`;
         details = [
           {
-            label: tr("Longueur de clôture", "Fence length"),
+            label: "Longueur de clôture",
             value: round2(length),
             unit: "m",
           },
-          { label: tr("Hauteur", "Height"), value: round2(height), unit: "m" },
+          { label: "Hauteur", value: round2(height), unit: "m" },
           {
-            label: tr("Surface de grillage", "Mesh area"),
+            label: "Surface de grillage",
             value: round2(meshArea),
             unit: "m²",
           },
           { label: "Pertes", value: round2(waste), unit: "%" },
-          { label: tr("Panneaux", "Panels"), value: panels, unit: Unit.PIECE },
-          { label: tr("Poteaux", "Posts"), value: posts, unit: Unit.PIECE },
+          { label: "Panneaux", value: panels, unit: Unit.PIECE },
+          { label: "Poteaux", value: posts, unit: Unit.PIECE },
           {
-            label: tr("Volume béton", "Concrete volume"),
+            label: "Volume béton",
             value: round2(concreteVolume),
             unit: "m³",
           },
           {
-            label: tr("Sacs béton (25 kg)", "Concrete bags (25 kg)"),
+            label: "Sacs béton (25 kg)",
             value: Math.ceil(concreteBags),
             unit: Unit.BAG,
           },
@@ -1260,15 +1232,15 @@ export const QuickToolsCalculator: React.FC<Props> = ({
         materials = [
           makeMaterial(
             "fence-panels",
-            tr("Panneaux de clôture", "Fence panels"),
+            "Panneaux de clôture",
             panels,
             Unit.PIECE,
             `${round2(height)} m de haut × ${round2(panelW)} m de large`
           ),
-          makeMaterial("fence-posts", tr("Poteaux", "Posts"), posts, Unit.PIECE),
+          makeMaterial("fence-posts", "Poteaux", posts, Unit.PIECE),
           makeMaterial(
             "fence-concrete",
-            tr("Béton de scellement 25 kg", "25 kg post concrete"),
+            "Béton de scellement 25 kg",
             concreteBags,
             Unit.BAG,
             `${round2(concreteVolume)} m³ de béton`
@@ -1294,34 +1266,30 @@ export const QuickToolsCalculator: React.FC<Props> = ({
         const geoRollM2 = 75;
         const geoRolls = geoRollM2 > 0 ? geoArea / geoRollM2 : 0;
 
-        summary = tr(`${round2(
+        summary = `${round2(
           volumeWithWaste
         )} m³ ≈ ${round2(tons)} t, soit ${Math.ceil(
           bigBags
-        )} big bags et ${Math.ceil(geoRolls)} rouleaux de géotextile.`, `${round2(
-          volumeWithWaste
-        )} m³ ≈ ${round2(tons)} t, i.e. ${Math.ceil(
-          bigBags
-        )} bulk bags and ${Math.ceil(geoRolls)} geotextile rolls.`);
+        )} big bags et ${Math.ceil(geoRolls)} rouleaux de géotextile.`;
         details = [
-          { label: tr("Longueur", "Length"), value: round2(length), unit: "m" },
-          { label: tr("Largeur", "Width"), value: round2(width), unit: "m" },
+          { label: "Longueur", value: round2(length), unit: "m" },
+          { label: "Largeur", value: round2(width), unit: "m" },
           { label: "Épaisseur", value: round2(depthM * 100), unit: "cm" },
           {
-            label: tr("Volume avec pertes", "Volume with waste"),
+            label: "Volume avec pertes",
             value: round2(volumeWithWaste),
             unit: "m³",
           },
-          { label: tr("Densité", "Density"), value: round2(density), unit: "t/m³" },
-          { label: tr("Tonnage", "Tonnage"), value: round2(tons), unit: "t" },
-          { label: tr("Big bags", "Bulk bags"), value: Math.ceil(bigBags), unit: Unit.BAG },
+          { label: "Densité", value: round2(density), unit: "t/m³" },
+          { label: "Tonnage", value: round2(tons), unit: "t" },
+          { label: "Big bags", value: Math.ceil(bigBags), unit: Unit.BAG },
           {
-            label: tr("Surface géotextile", "Geotextile area"),
+            label: "Surface géotextile",
             value: round2(geoArea),
             unit: "m²",
           },
           {
-            label: tr("Rouleaux géotextile", "Geotextile rolls"),
+            label: "Rouleaux géotextile",
             value: Math.ceil(geoRolls),
             unit: Unit.ROLL,
           },
@@ -1329,14 +1297,14 @@ export const QuickToolsCalculator: React.FC<Props> = ({
         materials = [
           makeMaterial(
             "bulk-fill",
-            tr("Granulat (gravier / remblai / sable)", "Aggregate (gravel / backfill / sand)"),
+            "Granulat (gravier / remblai / sable)",
             bigBags,
             Unit.BAG,
             `${round2(volumeWithWaste)} m³ ≈ ${round2(tons)} t`
           ),
           makeMaterial(
             "bulk-geotextile",
-            tr("Géotextile", "Geotextile"),
+            "Géotextile",
             geoRolls,
             Unit.ROLL,
             `${round2(geoArea)} m² environ`
@@ -1357,17 +1325,15 @@ export const QuickToolsCalculator: React.FC<Props> = ({
         const volume = areaVal * thickM;
         const rolls = covRoll > 0 ? areaWithWaste / covRoll : 0;
 
-        summary = tr(`Isolation ${
-          mode === "wall" ? tr("murs", "walls") : tr("combles", "attic")
+        summary = `Isolation ${
+          mode === "wall" ? "murs" : "combles"
         } : ${round2(areaVal)} m² en ${insulationThicknessMm} mm (R ≈ ${round2(
           R
-        )} m².K/W) ≈ ${Math.ceil(rolls)} rouleaux.`, `${mode === "wall" ? "Wall" : "Attic"} insulation: ${round2(areaVal)} m² at ${insulationThicknessMm} mm (R ≈ ${round2(
-          R
-        )} m².K/W) ≈ ${Math.ceil(rolls)} rolls.`);
+        )} m².K/W) ≈ ${Math.ceil(rolls)} rouleaux.`;
         details = [
-          { label: tr("Zone", "Area"), value: mode === "wall" ? tr("Murs", "Walls") : tr("Combles", "Attic") },
+          { label: "Zone", value: mode === "wall" ? "Murs" : "Combles" },
           {
-            label: tr("Surface utile", "Useful area"),
+            label: "Surface utile",
             value: round2(areaVal),
             unit: "m²",
           },
@@ -1376,14 +1342,14 @@ export const QuickToolsCalculator: React.FC<Props> = ({
             value: round2(thickM * 1000),
             unit: "mm",
           },
-          { label: tr("Lambda", "Lambda"), value: round2(lambda), unit: "W/m.K" },
+          { label: "Lambda", value: round2(lambda), unit: "W/m.K" },
           {
-            label: tr("Résistance R", "R-value"),
+            label: "Résistance R",
             value: round2(R),
             unit: "m².K/W",
           },
           {
-            label: tr("Volume isolant", "Insulation volume"),
+            label: "Volume isolant",
             value: round2(volume),
             unit: "m³",
           },
@@ -1393,12 +1359,12 @@ export const QuickToolsCalculator: React.FC<Props> = ({
             value: round2(areaWithWaste),
             unit: "m²",
           },
-          { label: tr("Rouleaux", "Rolls"), value: Math.ceil(rolls), unit: Unit.ROLL },
+          { label: "Rouleaux", value: Math.ceil(rolls), unit: Unit.ROLL },
         ];
         materials = [
           makeMaterial(
             "insulation-rolls",
-            mode === "wall" ? tr("Rouleaux isolant murs", "Wall insulation rolls") : tr("Rouleaux isolant combles", "Attic insulation rolls"),
+            mode === "wall" ? "Rouleaux isolant murs" : "Rouleaux isolant combles",
             rolls,
             Unit.ROLL,
             `${round2(areaWithWaste)} m² à couvrir, couverture ${round2(
@@ -1520,15 +1486,12 @@ export const QuickToolsCalculator: React.FC<Props> = ({
     <div className="space-y-5">
       <div>
         <h3 className="text-lg font-extrabold text-slate-900">
-          {t("quick.title", { defaultValue: tr("Calculs rapides chantier", "Quick site tools") })}
+          {t("quick.title", { defaultValue: "Calculs rapides chantier" })}
         </h3>
         <p className="text-sm text-slate-500">
           {t("quick.subtitle", {
             defaultValue:
-              tr(
-                "Micro-outils pour conversions, surfaces, quantités, terrasse bois, ossature placo, carrelage détaillé, toiture, clôture, gravier / remblai et isolation.",
-                "Micro-tools for conversions, areas, quantities, timber decking, drywall framing, detailed tiling, roofing, fencing, gravel / backfill and insulation."
-              ),
+              "Micro-outils pour conversions, surfaces, quantités, terrasse bois, ossature placo, carrelage détaillé, toiture, clôture, gravier / remblai et isolation.",
           })}
         </p>
       </div>
@@ -1556,28 +1519,28 @@ export const QuickToolsCalculator: React.FC<Props> = ({
       {tool === "convert" && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <Input
-            label={t("quick.field.area", { defaultValue: tr("Surface (m²)", "Area (m²)") })}
+            label={t("quick.field.area", { defaultValue: "Surface (m²)" })}
             value={area}
             onChange={(e) => setArea(e.target.value)}
             inputMode="decimal"
           />
           <Input
             label={t("quick.field.thickness_cm", {
-              defaultValue: tr("Épaisseur (cm)", "Thickness (cm)"),
+              defaultValue: "Épaisseur (cm)",
             })}
             value={thicknessCm}
             onChange={(e) => setThicknessCm(e.target.value)}
             inputMode="decimal"
           />
           <Input
-            label={t("quick.field.liters", { defaultValue: tr("Litres", "Liters") })}
+            label={t("quick.field.liters", { defaultValue: "Litres" })}
             value={liters}
             onChange={(e) => setLiters(e.target.value)}
             inputMode="decimal"
           />
           <Input
             label={t("quick.field.bag_yield", {
-              defaultValue: tr("Rendement d'un sac (m³)", "Bag yield (m³)"),
+              defaultValue: "Rendement d'un sac (m³)",
             })}
             value={bagYieldM3}
             onChange={(e) => setBagYieldM3(e.target.value)}
@@ -1589,20 +1552,20 @@ export const QuickToolsCalculator: React.FC<Props> = ({
       {tool === "netArea" && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <Input
-            label={t("quick.field.length", { defaultValue: tr("Longueur (m)", "Length (m)") })}
+            label={t("quick.field.length", { defaultValue: "Longueur (m)" })}
             value={wallLength}
             onChange={(e) => setWallLength(e.target.value)}
             inputMode="decimal"
           />
           <Input
-            label={t("quick.field.height", { defaultValue: tr("Hauteur (m)", "Height (m)") })}
+            label={t("quick.field.height", { defaultValue: "Hauteur (m)" })}
             value={wallHeight}
             onChange={(e) => setWallHeight(e.target.value)}
             inputMode="decimal"
           />
           <Input
             label={t("quick.field.openings_count", {
-              defaultValue: tr("Nombre d'ouvertures", "Number of openings"),
+              defaultValue: "Nombre d'ouvertures",
             })}
             value={openingsCount}
             onChange={(e) => setOpeningsCount(e.target.value)}
@@ -1610,7 +1573,7 @@ export const QuickToolsCalculator: React.FC<Props> = ({
           />
           <Input
             label={t("quick.field.opening_area", {
-              defaultValue: tr("Surface moyenne d'une ouverture (m²)", "Average opening area (m²)"),
+              defaultValue: "Surface moyenne d'une ouverture (m²)",
             })}
             value={openingArea}
             onChange={(e) => setOpeningArea(e.target.value)}
@@ -1618,7 +1581,7 @@ export const QuickToolsCalculator: React.FC<Props> = ({
           />
           <Input
             label={t("quick.field.waste_percent", {
-              defaultValue: tr("Pertes (%)", "Waste (%)"),
+              defaultValue: "Pertes (%)",
             })}
             value={wastePercent}
             onChange={(e) => setWastePercent(e.target.value)}
@@ -1631,14 +1594,14 @@ export const QuickToolsCalculator: React.FC<Props> = ({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <Input
             label={t("quick.field.base_quantity", {
-              defaultValue: tr("Quantité de base", "Base quantity"),
+              defaultValue: "Quantité de base",
             })}
             value={consumptionBase}
             onChange={(e) => setConsumptionBase(e.target.value)}
             inputMode="decimal"
           />
           <Select
-            label={t("quick.field.base_unit", { defaultValue: tr("Unité de base", "Base unit") })}
+            label={t("quick.field.base_unit", { defaultValue: "Unité de base" })}
             value={baseUnit}
             onChange={(e) =>
               setBaseUnit(e.target.value as "m²" | "m³" | "m")
@@ -1650,7 +1613,7 @@ export const QuickToolsCalculator: React.FC<Props> = ({
           </Select>
           <Input
             label={t("quick.field.consumption_rate", {
-              defaultValue: tr("Consommation unitaire", "Unit consumption"),
+              defaultValue: "Consommation unitaire",
             })}
             value={consumptionRate}
             onChange={(e) => setConsumptionRate(e.target.value)}
@@ -1658,7 +1621,7 @@ export const QuickToolsCalculator: React.FC<Props> = ({
           />
           <Select
             label={t("quick.field.consumption_unit", {
-              defaultValue: tr("Unité consommée", "Consumed unit"),
+              defaultValue: "Unité consommée",
             })}
             value={consumptionUnit}
             onChange={(e) =>
@@ -1669,12 +1632,12 @@ export const QuickToolsCalculator: React.FC<Props> = ({
           >
             <option value="kg">kg</option>
             <option value="L">L</option>
-            <option value="cartouche">{tr("cartouche", "cartridge")}</option>
-            <option value="sac">{tr("sac", "bag")}</option>
+            <option value="cartouche">cartouche</option>
+            <option value="sac">sac</option>
           </Select>
           <Input
             label={t("quick.field.pack_size", {
-              defaultValue: tr("Taille d'un conditionnement", "Package size"),
+              defaultValue: "Taille d'un conditionnement",
             })}
             value={packSize}
             onChange={(e) => setPackSize(e.target.value)}
@@ -1682,20 +1645,20 @@ export const QuickToolsCalculator: React.FC<Props> = ({
           />
           <Select
             label={t("quick.field.package_type", {
-              defaultValue: tr("Type de conditionnement", "Package type"),
+              defaultValue: "Type de conditionnement",
             })}
             value={packageUnit}
             onChange={(e) => setPackageUnit(e.target.value as Unit)}
           >
-            <option value={Unit.BAG}>{tr("Sac", "Bag")}</option>
-            <option value={Unit.BUCKET}>{tr("Seau", "Bucket")}</option>
-            <option value={Unit.BOX}>{tr("Boîte", "Box")}</option>
-            <option value={Unit.ROLL}>{tr("Rouleau", "Roll")}</option>
-            <option value={Unit.PIECE}>{tr("Pièce", "Piece")}</option>
+            <option value={Unit.BAG}>Sac</option>
+            <option value={Unit.BUCKET}>Seau</option>
+            <option value={Unit.BOX}>Boîte</option>
+            <option value={Unit.ROLL}>Rouleau</option>
+            <option value={Unit.PIECE}>Pièce</option>
           </Select>
           <Input
             label={t("quick.field.package_price", {
-              defaultValue: tr("Prix par conditionnement (€)", "Price per package (€)"),
+              defaultValue: "Prix par conditionnement (€)",
             })}
             value={packUnitPrice}
             onChange={(e) => setPackUnitPrice(e.target.value)}
@@ -1708,7 +1671,7 @@ export const QuickToolsCalculator: React.FC<Props> = ({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <Input
             label={t("quick.field.horizontal_length", {
-              defaultValue: tr("Longueur horizontale (m)", "Horizontal length (m)"),
+              defaultValue: "Longueur horizontale (m)",
             })}
             value={run}
             onChange={(e) => setRun(e.target.value)}
@@ -1716,7 +1679,7 @@ export const QuickToolsCalculator: React.FC<Props> = ({
           />
           <Input
             label={t("quick.field.vertical_drop", {
-              defaultValue: tr("Dénivelé (m)", "Rise (m)"),
+              defaultValue: "Dénivelé (m)",
             })}
             value={rise}
             onChange={(e) => setRise(e.target.value)}
@@ -1729,7 +1692,7 @@ export const QuickToolsCalculator: React.FC<Props> = ({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <Input
             label={t("quick.field.total_length", {
-              defaultValue: tr("Longueur totale à couvrir (m)", "Total length to cover (m)"),
+              defaultValue: "Longueur totale à couvrir (m)",
             })}
             value={totalLength}
             onChange={(e) => setTotalLength(e.target.value)}
@@ -1737,7 +1700,7 @@ export const QuickToolsCalculator: React.FC<Props> = ({
           />
           <Input
             label={t("quick.field.piece_length", {
-              defaultValue: tr("Longueur d'une pièce (m)", "Piece length (m)"),
+              defaultValue: "Longueur d'une pièce (m)",
             })}
             value={pieceLength}
             onChange={(e) => setPieceLength(e.target.value)}
@@ -1745,7 +1708,7 @@ export const QuickToolsCalculator: React.FC<Props> = ({
           />
           <Input
             label={t("quick.field.overlap_cm", {
-              defaultValue: tr("Recouvrement par jonction (cm)", "Overlap per joint (cm)"),
+              defaultValue: "Recouvrement par jonction (cm)",
             })}
             value={overlapCm}
             onChange={(e) => setOverlapCm(e.target.value)}
@@ -1753,7 +1716,7 @@ export const QuickToolsCalculator: React.FC<Props> = ({
           />
           <Input
             label={t("quick.field.linear_waste", {
-              defaultValue: tr("Pertes (%)", "Waste (%)"),
+              defaultValue: "Pertes (%)",
             })}
             value={linearWastePercent}
             onChange={(e) => setLinearWastePercent(e.target.value)}
@@ -1765,7 +1728,7 @@ export const QuickToolsCalculator: React.FC<Props> = ({
       {tool === "voltageDrop" && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <Select
-            label={t("quick.field.phase", { defaultValue: tr("Type de réseau", "Supply type") })}
+            label={t("quick.field.phase", { defaultValue: "Type de réseau" })}
             value={phase}
             onChange={(e) => {
               const next = e.target.value as "mono" | "tri";
@@ -1773,34 +1736,34 @@ export const QuickToolsCalculator: React.FC<Props> = ({
               setVoltage(next === "mono" ? "230" : "400");
             }}
           >
-            <option value="mono">{tr("Monophasé 230 V", "Single-phase 230 V")}</option>
-            <option value="tri">{tr("Triphasé 400 V", "Three-phase 400 V")}</option>
+            <option value="mono">Monophasé 230 V</option>
+            <option value="tri">Triphasé 400 V</option>
           </Select>
           <Select
-            label={t("quick.field.conductor", { defaultValue: tr("Conducteur", "Conductor") })}
+            label={t("quick.field.conductor", { defaultValue: "Conducteur" })}
             value={conductor}
             onChange={(e) =>
               setConductor(e.target.value as "copper" | "aluminium")
             }
           >
-            <option value="copper">{tr("Cuivre", "Copper")}</option>
-            <option value="aluminium">{tr("Aluminium", "Aluminium")}</option>
+            <option value="copper">Cuivre</option>
+            <option value="aluminium">Aluminium</option>
           </Select>
           <Input
-            label={t("quick.field.power", { defaultValue: tr("Puissance (W)", "Power (W)") })}
+            label={t("quick.field.power", { defaultValue: "Puissance (W)" })}
             value={power}
             onChange={(e) => setPower(e.target.value)}
             inputMode="decimal"
           />
           <Input
-            label={t("quick.field.voltage", { defaultValue: tr("Tension (V)", "Voltage (V)") })}
+            label={t("quick.field.voltage", { defaultValue: "Tension (V)" })}
             value={voltage}
             onChange={(e) => setVoltage(e.target.value)}
             inputMode="decimal"
           />
           <Input
             label={t("quick.field.cable_length", {
-              defaultValue: tr("Longueur de câble (m)", "Cable length (m)"),
+              defaultValue: "Longueur de câble (m)",
             })}
             value={cableLength}
             onChange={(e) => setCableLength(e.target.value)}
@@ -1808,7 +1771,7 @@ export const QuickToolsCalculator: React.FC<Props> = ({
           />
           <Input
             label={t("quick.field.section_mm2", {
-              defaultValue: tr("Section (mm²)", "Section (mm²)"),
+              defaultValue: "Section (mm²)",
             })}
             value={section}
             onChange={(e) => setSection(e.target.value)}
@@ -1820,61 +1783,61 @@ export const QuickToolsCalculator: React.FC<Props> = ({
       {tool === "decking" && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <Input
-            label={tr("Longueur terrasse (m)", "Deck length (m)")}
+            label="Longueur terrasse (m)"
             value={deckLength}
             onChange={(e) => setDeckLength(e.target.value)}
             inputMode="decimal"
           />
           <Input
-            label={tr("Largeur terrasse (m)", "Deck width (m)")}
+            label="Largeur terrasse (m)"
             value={deckWidth}
             onChange={(e) => setDeckWidth(e.target.value)}
             inputMode="decimal"
           />
           <Input
-            label={tr("Largeur lame (mm)", "Board width (mm)")}
+            label="Largeur lame (mm)"
             value={boardWidthMm}
             onChange={(e) => setBoardWidthMm(e.target.value)}
             inputMode="decimal"
           />
           <Input
-            label={tr("Jeu entre lames (mm)", "Gap between boards (mm)")}
+            label="Jeu entre lames (mm)"
             value={boardGapMm}
             onChange={(e) => setBoardGapMm(e.target.value)}
             inputMode="decimal"
           />
           <Input
-            label={tr("Longueur d'une lame (m)", "Board length (m)")}
+            label="Longueur d'une lame (m)"
             value={boardLengthM}
             onChange={(e) => setBoardLengthM(e.target.value)}
             inputMode="decimal"
           />
           <Input
-            label={tr("Entraxe lambourdes (cm)", "Joist spacing (cm)")}
+            label="Entraxe lambourdes (cm)"
             value={joistSpacingCm}
             onChange={(e) => setJoistSpacingCm(e.target.value)}
             inputMode="decimal"
           />
           <Input
-            label={tr("Longueur lambourde (m)", "Joist length (m)")}
+            label="Longueur lambourde (m)"
             value={joistLengthM}
             onChange={(e) => setJoistLengthM(e.target.value)}
             inputMode="decimal"
           />
           <Input
-            label={tr("Entraxe plots (cm)", "Pedestal spacing (cm)")}
+            label="Entraxe plots (cm)"
             value={pedestalSpacingCm}
             onChange={(e) => setPedestalSpacingCm(e.target.value)}
             inputMode="decimal"
           />
           <Input
-            label={tr("Vis par appui", "Screws per support")}
+            label="Vis par appui"
             value={screwsPerSupport}
             onChange={(e) => setScrewsPerSupport(e.target.value)}
             inputMode="numeric"
           />
           <Input
-            label={tr("Pertes (%)", "Waste (%)")}
+            label="Pertes (%)"
             value={deckWastePercent}
             onChange={(e) => setDeckWastePercent(e.target.value)}
             inputMode="decimal"
@@ -1885,7 +1848,7 @@ export const QuickToolsCalculator: React.FC<Props> = ({
       {tool === "drywallFrame" && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <Select
-            label={tr(tr("Type d'ouvrage", "Assembly type"), "Assembly type")}
+            label="Type d'ouvrage"
             value={drywallMode}
             onChange={(e) =>
               setDrywallMode(
@@ -1893,13 +1856,13 @@ export const QuickToolsCalculator: React.FC<Props> = ({
               )
             }
           >
-            <option value="partition">{tr("Cloison", "Partition")}</option>
-            <option value="lining">{tr("Doublage", "Lining")}</option>
-            <option value="ceiling">{tr("Plafond", "Ceiling")}</option>
+            <option value="partition">Cloison</option>
+            <option value="lining">Doublage</option>
+            <option value="ceiling">Plafond</option>
           </Select>
           {drywallMode === "ceiling" ? (
             <Input
-              label={tr("Surface plafond (m²)", "Ceiling area (m²)")}
+              label="Surface plafond (m²)"
               value={drywallArea}
               onChange={(e) => setDrywallArea(e.target.value)}
               inputMode="decimal"
@@ -1907,13 +1870,13 @@ export const QuickToolsCalculator: React.FC<Props> = ({
           ) : (
             <>
               <Input
-                label={tr("Longueur (m)", "Length (m)")}
+                label="Longueur (m)"
                 value={drywallLength}
                 onChange={(e) => setDrywallLength(e.target.value)}
                 inputMode="decimal"
               />
               <Input
-                label={tr("Hauteur (m)", "Height (m)")}
+                label="Hauteur (m)"
                 value={drywallHeight}
                 onChange={(e) => setDrywallHeight(e.target.value)}
                 inputMode="decimal"
@@ -1921,43 +1884,43 @@ export const QuickToolsCalculator: React.FC<Props> = ({
             </>
           )}
           <Input
-            label={tr("Entraxe montants / fourrures (cm)", "Stud / furring spacing (cm)")}
+            label="Entraxe montants / fourrures (cm)"
             value={studSpacingCm}
             onChange={(e) => setStudSpacingCm(e.target.value)}
             inputMode="decimal"
           />
           <Input
-            label={tr("Largeur plaque (m)", "Board width (m)")}
+            label="Largeur plaque (m)"
             value={boardWidthM}
             onChange={(e) => setBoardWidthM(e.target.value)}
             inputMode="decimal"
           />
           <Input
-            label={tr("Hauteur plaque (m)", "Board height (m)")}
+            label="Hauteur plaque (m)"
             value={boardHeightM}
             onChange={(e) => setBoardHeightM(e.target.value)}
             inputMode="decimal"
           />
           <Input
-            label={tr("Nombre de peaux", "Number of layers")}
+            label="Nombre de peaux"
             value={boardLayers}
             onChange={(e) => setBoardLayers(e.target.value)}
             inputMode="numeric"
           />
           <Input
-            label={tr("Longueur rail / fourrure (m)", "Track / furring length (m)")}
+            label="Longueur rail / fourrure (m)"
             value={railLengthM}
             onChange={(e) => setRailLengthM(e.target.value)}
             inputMode="decimal"
           />
           <Input
-            label={tr("Longueur montant (m)", "Stud length (m)")}
+            label="Longueur montant (m)"
             value={studLengthM}
             onChange={(e) => setStudLengthM(e.target.value)}
             inputMode="decimal"
           />
           <Input
-            label={tr("Vis par plaque", "Screws per board")}
+            label="Vis par plaque"
             value={screwsPerBoard}
             onChange={(e) => setScrewsPerBoard(e.target.value)}
             inputMode="numeric"
@@ -1968,65 +1931,65 @@ export const QuickToolsCalculator: React.FC<Props> = ({
       {tool === "tileDetailed" && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <Input
-            label={tr("Longueur pièce (m)", "Room length (m)")}
+            label="Longueur pièce (m)"
             value={tileLength}
             onChange={(e) => setTileLength(e.target.value)}
             inputMode="decimal"
           />
           <Input
-            label={tr("Largeur pièce (m)", "Room width (m)")}
+            label="Largeur pièce (m)"
             value={tileWidth}
             onChange={(e) => setTileWidth(e.target.value)}
             inputMode="decimal"
           />
           <Input
-            label={tr("Ouvertures / zones à déduire (m²)", "Openings / areas to deduct (m²)")}
+            label="Ouvertures / zones à déduire (m²)"
             value={tileAreaOpenings}
             onChange={(e) => setTileAreaOpenings(e.target.value)}
             inputMode="decimal"
           />
           <Select
-            label={tr("Type de pose", "Layout type")}
+            label="Type de pose"
             value={poseType}
             onChange={(e) =>
               setPoseType(e.target.value as "straight" | "diagonal")
             }
           >
-            <option value="straight">{tr("Droite", "Straight")}</option>
-            <option value="diagonal">{tr("Diagonale", "Diagonal")}</option>
+            <option value="straight">Droite</option>
+            <option value="diagonal">Diagonale</option>
           </Select>
           <Input
-            label={tr("Longueur carreau (cm)", "Tile length (cm)")}
+            label="Longueur carreau (cm)"
             value={tileLenCm}
             onChange={(e) => setTileLenCm(e.target.value)}
             inputMode="decimal"
           />
           <Input
-            label={tr("Largeur carreau (cm)", "Tile width (cm)")}
+            label="Largeur carreau (cm)"
             value={tileWidCm}
             onChange={(e) => setTileWidCm(e.target.value)}
             inputMode="decimal"
           />
           <Input
-            label={tr("Pertes (%)", "Waste (%)")}
+            label="Pertes (%)"
             value={tileWastePercent}
             onChange={(e) => setTileWastePercent(e.target.value)}
             inputMode="decimal"
           />
           <Input
-            label={tr("Colle (kg/m²)", "Adhesive (kg/m²)")}
+            label="Colle (kg/m²)"
             value={adhesiveRate}
             onChange={(e) => setAdhesiveRate(e.target.value)}
             inputMode="decimal"
           />
           <Input
-            label={tr("Joint (kg/m²)", "Grout (kg/m²)")}
+            label="Joint (kg/m²)"
             value={groutRate}
             onChange={(e) => setGroutRate(e.target.value)}
             inputMode="decimal"
           />
           <Input
-            label={tr("Hauteur plinthe (cm)", "Skirting height (cm)")}
+            label="Hauteur plinthe (cm)"
             value={skirtingHeightCm}
             onChange={(e) => setSkirtingHeightCm(e.target.value)}
             inputMode="decimal"
@@ -2037,25 +2000,25 @@ export const QuickToolsCalculator: React.FC<Props> = ({
       {tool === "packagingAdvanced" && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <Select
-            label={tr(tr("Produit", "Product"), "Product")}
+            label="Produit"
             value={packPreset}
             onChange={(e) => setPackPreset(e.target.value as PackagingPresetKey)}
           >
-            <option value="tileAdhesive">{tr("Colle carrelage", "Tile adhesive")}</option>
-            <option value="grout">{tr("Joint poudre", "Powder grout")}</option>
-            <option value="paint">{tr("Peinture finition", "Finish paint")}</option>
-            <option value="primer">{tr("Primaire", "Primer")}</option>
+            <option value="tileAdhesive">Colle carrelage</option>
+            <option value="grout">Joint poudre</option>
+            <option value="paint">Peinture finition</option>
+            <option value="primer">Primaire</option>
             <option value="silicone">Silicone</option>
-            <option value="foam">{tr("Mousse PU", "PU foam")}</option>
+            <option value="foam">Mousse PU</option>
           </Select>
           <Input
-            label={tr("Quantité de base", "Base quantity")}
+            label="Quantité de base"
             value={advBaseQty}
             onChange={(e) => setAdvBaseQty(e.target.value)}
             inputMode="decimal"
           />
           <Select
-            label={tr("Unité de base", "Base unit")}
+            label="Unité de base"
             value={advBaseUnit}
             onChange={(e) =>
               setAdvBaseUnit(e.target.value as "m²" | "m³" | "m" | "unit")
@@ -2064,16 +2027,16 @@ export const QuickToolsCalculator: React.FC<Props> = ({
             <option value="m²">m²</option>
             <option value="m³">m³</option>
             <option value="m">m</option>
-            <option value="unit">{tr("unité", "unit")}</option>
+            <option value="unit">unité</option>
           </Select>
           <Input
-            label={tr("Consommation unitaire", "Unit consumption")}
+            label="Consommation unitaire"
             value={advConsumptionRate}
             onChange={(e) => setAdvConsumptionRate(e.target.value)}
             inputMode="decimal"
           />
           <Select
-            label={tr("Unité consommée", "Consumed unit")}
+            label="Unité consommée"
             value={advConsumptionUnit}
             onChange={(e) =>
               setAdvConsumptionUnit(
@@ -2083,40 +2046,40 @@ export const QuickToolsCalculator: React.FC<Props> = ({
           >
             <option value="kg">kg</option>
             <option value="L">L</option>
-            <option value="cartouche">{tr("cartouche", "cartridge")}</option>
-            <option value="sac">{tr("sac", "bag")}</option>
+            <option value="cartouche">cartouche</option>
+            <option value="sac">sac</option>
           </Select>
           <Input
-            label={tr("Taille d'un conditionnement", "Package size")}
+            label="Taille d'un conditionnement"
             value={advPackSize}
             onChange={(e) => setAdvPackSize(e.target.value)}
             inputMode="decimal"
           />
           <Select
-            label={tr("Type de conditionnement", "Package type")}
+            label="Type de conditionnement"
             value={advPackUnit}
             onChange={(e) => setAdvPackUnit(e.target.value as Unit)}
           >
-            <option value={Unit.BAG}>{tr("Sac", "Bag")}</option>
-            <option value={Unit.BUCKET}>{tr("Seau", "Bucket")}</option>
-            <option value={Unit.BOX}>{tr("Boîte", "Box")}</option>
-            <option value={Unit.ROLL}>{tr("Rouleau", "Roll")}</option>
-            <option value={Unit.PIECE}>{tr("Pièce", "Piece")}</option>
+            <option value={Unit.BAG}>Sac</option>
+            <option value={Unit.BUCKET}>Seau</option>
+            <option value={Unit.BOX}>Boîte</option>
+            <option value={Unit.ROLL}>Rouleau</option>
+            <option value={Unit.PIECE}>Pièce</option>
           </Select>
           <Input
-            label={tr("Prix unitaire (€)", "Unit price (€)")}
+            label="Prix unitaire (€)"
             value={advUnitPrice}
             onChange={(e) => setAdvUnitPrice(e.target.value)}
             inputMode="decimal"
           />
           <Input
-            label={tr("Nombre de couches / passes", "Number of coats / passes")}
+            label="Nombre de couches / passes"
             value={advCoats}
             onChange={(e) => setAdvCoats(e.target.value)}
             inputMode="decimal"
           />
           <Input
-            label={tr("Pertes (%)", "Waste (%)")}
+            label="Pertes (%)"
             value={advWaste}
             onChange={(e) => setAdvWaste(e.target.value)}
             inputMode="decimal"
@@ -2127,31 +2090,31 @@ export const QuickToolsCalculator: React.FC<Props> = ({
       {tool === "fence" && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <Input
-            label={tr("Longueur de clôture (m)", "Fence length (m)")}
+            label="Longueur de clôture (m)"
             value={fenceLength}
             onChange={(e) => setFenceLength(e.target.value)}
             inputMode="decimal"
           />
           <Input
-            label={tr("Hauteur de clôture (m)", "Fence height (m)")}
+            label="Hauteur de clôture (m)"
             value={fenceHeight}
             onChange={(e) => setFenceHeight(e.target.value)}
             inputMode="decimal"
           />
           <Input
-            label={tr("Largeur d'un panneau (m)", "Panel width (m)")}
+            label="Largeur d'un panneau (m)"
             value={panelWidth}
             onChange={(e) => setPanelWidth(e.target.value)}
             inputMode="decimal"
           />
           <Input
-            label={tr("Béton par poteau (m³)", "Concrete per post (m³)")}
+            label="Béton par poteau (m³)"
             value={concretePerPostM3}
             onChange={(e) => setConcretePerPostM3(e.target.value)}
             inputMode="decimal"
           />
           <Input
-            label={tr("Pertes (%)", "Waste (%)")}
+            label="Pertes (%)"
             value={fenceWastePercent}
             onChange={(e) => setFenceWastePercent(e.target.value)}
             inputMode="decimal"
@@ -2162,43 +2125,43 @@ export const QuickToolsCalculator: React.FC<Props> = ({
       {tool === "bulkFill" && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <Input
-            label={tr("Longueur de la zone (m)", "Area length (m)")}
+            label="Longueur de la zone (m)"
             value={bulkLength}
             onChange={(e) => setBulkLength(e.target.value)}
             inputMode="decimal"
           />
           <Input
-            label={tr("Largeur de la zone (m)", "Area width (m)")}
+            label="Largeur de la zone (m)"
             value={bulkWidth}
             onChange={(e) => setBulkWidth(e.target.value)}
             inputMode="decimal"
           />
           <Input
-            label={tr("Épaisseur (cm)", "Depth (cm)")}
+            label="Épaisseur (cm)"
             value={bulkDepthCm}
             onChange={(e) => setBulkDepthCm(e.target.value)}
             inputMode="decimal"
           />
           <Input
-            label={tr("Pertes (%)", "Waste (%)")}
+            label="Pertes (%)"
             value={bulkWastePercent}
             onChange={(e) => setBulkWastePercent(e.target.value)}
             inputMode="decimal"
           />
           <Input
-            label={tr("Densité (t/m³)", "Density (t/m³)")}
+            label="Densité (t/m³)"
             value={bulkDensity}
             onChange={(e) => setBulkDensity(e.target.value)}
             inputMode="decimal"
           />
           <Input
-            label={tr("Poids d'un big bag (t)", "Weight of a bulk bag (t)")}
+            label="Poids d'un big bag (t)"
             value={bigBagSizeTons}
             onChange={(e) => setBigBagSizeTons(e.target.value)}
             inputMode="decimal"
           />
           <Input
-            label={tr("Pertes / recouvrements géotextile (%)", "Geotextile overlap / waste (%)")}
+            label="Pertes / recouvrements géotextile (%)"
             value={geoOverlapPercent}
             onChange={(e) => setGeoOverlapPercent(e.target.value)}
             inputMode="decimal"
@@ -2209,23 +2172,23 @@ export const QuickToolsCalculator: React.FC<Props> = ({
       {tool === "insulation" && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <Select
-            label={tr("Zone à isoler", "Area to insulate")}
+            label="Zone à isoler"
             value={insulationMode}
             onChange={(e) =>
               setInsulationMode(e.target.value as "wall" | "attic")
             }
           >
-            <option value="wall">{tr("Murs", "Walls")}</option>
-            <option value="attic">{tr("Combles", "Attic")}</option>
+            <option value="wall">Murs</option>
+            <option value="attic">Combles</option>
           </Select>
           <Input
-            label={tr("Surface à isoler (m²)", "Area to insulate (m²)")}
+            label="Surface à isoler (m²)"
             value={insulationArea}
             onChange={(e) => setInsulationArea(e.target.value)}
             inputMode="decimal"
           />
           <Input
-            label={tr("Épaisseur isolant (mm)", "Insulation thickness (mm)")}
+            label="Épaisseur isolant (mm)"
             value={insulationThicknessMm}
             onChange={(e) => setInsulationThicknessMm(e.target.value)}
             inputMode="decimal"
@@ -2237,13 +2200,13 @@ export const QuickToolsCalculator: React.FC<Props> = ({
             inputMode="decimal"
           />
           <Input
-            label={tr("Couverture par rouleau (m²)", "Coverage per roll (m²)")}
+            label="Couverture par rouleau (m²)"
             value={insulationCoverageRoll}
             onChange={(e) => setInsulationCoverageRoll(e.target.value)}
             inputMode="decimal"
           />
           <Input
-            label={tr("Pertes (%)", "Waste (%)")}
+            label="Pertes (%)"
             value={insulationWastePercent}
             onChange={(e) => setInsulationWastePercent(e.target.value)}
             inputMode="decimal"
@@ -2254,55 +2217,55 @@ export const QuickToolsCalculator: React.FC<Props> = ({
       {tool === "roofFrame" && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <Input
-            label={tr("Largeur bâtiment (m)", "Building width (m)")}
+            label="Largeur bâtiment (m)"
             value={roofSpanM}
             onChange={(e) => setRoofSpanM(e.target.value)}
             inputMode="decimal"
           />
           <Input
-            label={tr("Longueur bâtiment (m)", "Building length (m)")}
+            label="Longueur bâtiment (m)"
             value={roofLengthM}
             onChange={(e) => setRoofLengthM(e.target.value)}
             inputMode="decimal"
           />
           <Input
-            label={tr("Relèvement faîtage (m)", "Ridge rise (m)")}
+            label="Relèvement faîtage (m)"
             value={roofRiseM}
             onChange={(e) => setRoofRiseM(e.target.value)}
             inputMode="decimal"
           />
           <Input
-            label={tr("Débord de toit (cm)", "Roof overhang (cm)")}
+            label="Débord de toit (cm)"
             value={roofOverhangCm}
             onChange={(e) => setRoofOverhangCm(e.target.value)}
             inputMode="decimal"
           />
           <Input
-            label={tr("Entraxe chevrons (cm)", "Rafter spacing (cm)")}
+            label="Entraxe chevrons (cm)"
             value={rafterSpacingCm}
             onChange={(e) => setRafterSpacingCm(e.target.value)}
             inputMode="decimal"
           />
           <Input
-            label={tr("Pas liteaux (cm)", "Batten spacing (cm)")}
+            label="Pas liteaux (cm)"
             value={battenGapCm}
             onChange={(e) => setBattenGapCm(e.target.value)}
             inputMode="decimal"
           />
           <Input
-            label={tr("Longueur liteau (m)", "Batten length (m)")}
+            label="Longueur liteau (m)"
             value={battenLengthM}
             onChange={(e) => setBattenLengthM(e.target.value)}
             inputMode="decimal"
           />
           <Input
-            label={tr("Écran sous-toiture par rouleau (m²)", "Underlay coverage per roll (m²)")}
+            label="Écran sous-toiture par rouleau (m²)"
             value={underlayRollM2}
             onChange={(e) => setUnderlayRollM2(e.target.value)}
             inputMode="decimal"
           />
           <Input
-            label={tr("Couverture (u/m²)", "Covering (u/m²)")}
+            label="Couverture (u/m²)"
             value={tileCoveragePerM2}
             onChange={(e) => setTileCoveragePerM2(e.target.value)}
             inputMode="decimal"
@@ -2310,9 +2273,9 @@ export const QuickToolsCalculator: React.FC<Props> = ({
         </div>
       )}
 
-      <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+      <div className="rounded-3xl border border-amber-100 bg-gradient-to-r from-amber-50 to-orange-50/60 p-4 shadow-sm">
         <div className="text-xs uppercase tracking-wide text-slate-500 font-bold mb-2">
-          {t("quick.note_title", { defaultValue: tr("Note", "Important") })}
+          {t("quick.note_title", { defaultValue: "Note" })}
         </div>
         <p className="text-sm text-slate-600">
           {t("quick.note", {

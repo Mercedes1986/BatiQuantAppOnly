@@ -244,15 +244,15 @@ export const MaterialsPage: React.FC = () => {
       : t("materials.tabs.data", { defaultValue: "Data" });
 
   return (
-    <div className="pb-20 min-h-screen bg-transparent">
-      <div className="bg-white sticky top-0 z-20 border-b border-slate-200 shadow-sm">
+    <div className="app-shell app-shell--materials pb-20 min-h-screen bg-transparent">
+      <div className="app-topbar sticky top-0 z-20">
         <div className="p-4 max-w-7xl mx-auto">
           <div className="flex justify-between items-center gap-3 mb-4">
             <h1 className="text-2xl font-extrabold text-slate-800">
               {t("materials.title", { defaultValue: "Materials & Pricing" })}
             </h1>
 
-            <div className="flex items-center space-x-1.5 bg-slate-100 p-1 rounded-lg shrink-0">
+            <div className="flex items-center space-x-1.5 soft-chip p-1 rounded-xl shrink-0">
               <button
                 onClick={() => handleTaxChange({ mode: "HT" })}
                 className={`text-xs font-extrabold px-3 py-1.5 rounded-md transition ${
@@ -276,7 +276,7 @@ export const MaterialsPage: React.FC = () => {
 
           {/* Tabs: slightly smaller + centered */}
           <div className="mx-auto w-fit max-w-full">
-            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar rounded-xl bg-slate-200/80 p-1.5 shadow-sm border border-slate-200">
+            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar rounded-2xl bg-emerald-50/70 p-1.5 shadow-sm border border-emerald-100">
               {(["system", "custom", "labor", "data"] as const).map((tb) => (
                 <button
                   key={tb}
@@ -308,13 +308,13 @@ export const MaterialsPage: React.FC = () => {
                 placeholder={t("materials.search", { defaultValue: "Search..." })}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-3 py-2.5 bg-white border border-slate-200 rounded-lg text-sm text-slate-800 focus:ring-2 focus:ring-blue-100 outline-none"
+                className="w-full pl-10 pr-3 py-2.5 bg-white/80 backdrop-blur-sm border border-emerald-100 rounded-xl text-sm text-slate-800 focus:ring-2 focus:ring-emerald-100 outline-none shadow-sm"
               />
             </div>
 
             <button
               onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
-              className={`px-3 py-2.5 rounded-lg border flex items-center justify-center gap-2 text-sm font-extrabold transition ${
+              className={`px-3 py-2.5 rounded-xl border flex items-center justify-center gap-2 text-sm font-extrabold transition shadow-sm ${
                 showFavoritesOnly
                   ? "bg-amber-100 border-amber-300 text-amber-700"
                   : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
@@ -330,7 +330,7 @@ export const MaterialsPage: React.FC = () => {
           </div>
 
           {/* Categories: 2 rows, nicer chip sizing */}
-          <div className="rounded-xl bg-slate-200/70 p-2 shadow-sm border border-slate-200">
+          <div className="rounded-2xl bg-emerald-50/65 p-2 shadow-sm border border-emerald-100">
             <div className="grid grid-rows-2 grid-flow-col auto-cols-max gap-2 overflow-x-auto no-scrollbar">
               <button
                 onClick={() => setCategory("All")}
@@ -367,8 +367,8 @@ export const MaterialsPage: React.FC = () => {
               <div
                 key={item.key}
                 className={[
-                  "rounded-2xl border shadow-sm transition-colors",
-                  "bg-white/65 hover:bg-white/80",
+                  "rounded-3xl border shadow-sm transition-all",
+                  "bg-white/72 backdrop-blur-md hover:bg-white/88 hover:-translate-y-0.5 hover:shadow-lg",
                   item.isModified ? "border-blue-200 ring-1 ring-blue-100" : "border-slate-200",
                 ].join(" ")}
               >
@@ -393,7 +393,7 @@ export const MaterialsPage: React.FC = () => {
                       </button>
 
                       {/* Bigger image */}
-                      <div className="w-20 h-20 rounded-2xl bg-white border border-slate-200 overflow-hidden flex items-center justify-center shrink-0">
+                      <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-white to-emerald-50 border border-emerald-100 overflow-hidden flex items-center justify-center shrink-0 shadow-sm">
                         <img
                           src={item.imageUrl || getMaterialImageUrl(String(item.key || ""))}
                           alt={item.label || String(item.key || "") }

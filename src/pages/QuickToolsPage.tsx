@@ -122,9 +122,9 @@ const ToolCard: React.FC<{ title: string; description: string; icon: React.Eleme
   <button
     type="button"
     onClick={onClick}
-    className="group w-full rounded-2xl border border-slate-200 bg-white p-5 text-left shadow-sm transition-all hover:border-blue-200 hover:shadow-md"
+    className="group w-full rounded-2xl glass-card tint-quick p-5 text-left shadow-sm transition-all hover:border-blue-200 hover:shadow-lg hover:-translate-y-0.5"
   >
-    <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-50 text-blue-700">
+    <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-100 to-cyan-100 text-blue-700 shadow-sm">
       <Icon size={20} />
     </div>
     <div className="text-lg font-extrabold text-slate-900">{title}</div>
@@ -164,8 +164,8 @@ export const QuickToolsPage: React.FC = () => {
   if (activeTool) {
     const Icon = activeTool.icon;
     return (
-      <div className="flex min-h-screen flex-col bg-slate-50 pb-20">
-        <div className="sticky top-0 z-10 flex items-center bg-blue-700 p-4 text-white shadow-md">
+      <div className="app-shell app-shell--quick flex min-h-screen flex-col pb-20">
+        <div className="sticky top-0 z-10 flex items-center bg-gradient-to-r from-blue-700 via-blue-600 to-cyan-500 p-4 text-white shadow-lg">
           <button
             onClick={() => navigate("/app/quick-tools")}
             className="mr-4 rounded-full p-2 transition-colors hover:bg-white/20"
@@ -186,13 +186,13 @@ export const QuickToolsPage: React.FC = () => {
         </div>
 
         <div className="p-4 space-y-6">
-          <div className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm">
+          <div className="glass-card tint-quick rounded-2xl p-5 shadow-sm">
             <QuickToolsCalculator onCalculate={setResult} forcedTool={activeTool.key} hideToolSelector />
           </div>
 
           {result && (
             <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
-              <div className="relative overflow-hidden rounded-2xl border-2 border-blue-600 bg-white p-6 shadow-lg">
+              <div className="relative overflow-hidden rounded-3xl border border-blue-200 bg-gradient-to-br from-white via-blue-50 to-cyan-50 p-6 shadow-[0_16px_40px_rgba(37,99,235,0.14)]">
                 <h2 className="mb-1 text-sm uppercase tracking-wider text-slate-500">
                   {t("calculator.result_estimated", { defaultValue: "Estimated result" })}
                 </h2>
@@ -211,7 +211,7 @@ export const QuickToolsPage: React.FC = () => {
               </div>
 
               {result.materials.length > 0 && (
-                <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+                <div className="rounded-2xl border border-emerald-100 bg-gradient-to-br from-white via-emerald-50/60 to-teal-50/60 p-4 shadow-sm">
                   <div className="mb-4 flex items-center justify-between">
                     <h3 className="font-extrabold text-slate-800">
                       {t("calculator.materials_estimated", { defaultValue: "Estimated materials" })}
@@ -245,11 +245,11 @@ export const QuickToolsPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-transparent pb-20">
+    <div className="app-shell app-shell--quick min-h-screen bg-transparent pb-20">
       <div className="mx-auto max-w-7xl p-4">
-        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div className="glass-card tint-quick rounded-3xl p-5 shadow-sm">
           <div className="flex items-start gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50 text-blue-700">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-100 to-cyan-100 text-blue-700 shadow-sm">
               <ArrowRightLeft size={20} />
             </div>
             <div>

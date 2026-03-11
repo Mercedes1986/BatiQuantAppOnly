@@ -178,9 +178,9 @@ export const SettingsPage: React.FC = () => {
     "w-full p-4 flex items-center justify-between gap-3 text-left hover:bg-white/70 transition-colors";
 
   return (
-    <div className="p-4 pb-20 bg-transparent min-h-screen">
+    <div className="app-shell app-shell--settings p-4 pb-20 bg-transparent min-h-screen">
       <div className="max-w-6xl mx-auto space-y-4">
-        <section className="rounded-[28px] border border-slate-200/80 bg-white/72 backdrop-blur-md shadow-sm p-5 md:p-6">
+        <section className="glass-card tint-settings rounded-[28px] p-5 md:p-6">
           <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
             <div>
               <h1 className="text-2xl font-extrabold text-slate-800">
@@ -190,7 +190,7 @@ export const SettingsPage: React.FC = () => {
           </div>
 
           <div className="mx-auto w-fit max-w-full mt-4">
-            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar rounded-xl bg-slate-200/80 p-1.5 shadow-sm border border-slate-200">
+            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar rounded-2xl bg-violet-50/70 p-1.5 shadow-sm border border-violet-100">
               {tabButton(
                 "app",
                 t("settings.tabs.app", { defaultValue: "Application" }),
@@ -211,7 +211,7 @@ export const SettingsPage: React.FC = () => {
           </div>
         ) : (
           <div className="space-y-4">
-            <section className="bg-white/72 backdrop-blur-md rounded-[28px] shadow-sm border border-slate-200/80 overflow-hidden">
+            <section className="glass-card tint-settings rounded-[28px] overflow-hidden">
               <div className="p-5 flex items-center">
                 <div className="bg-emerald-100 p-3 rounded-2xl mr-3 text-emerald-600">
                   <User size={20} />
@@ -223,7 +223,7 @@ export const SettingsPage: React.FC = () => {
               </div>
             </section>
 
-            <section className="bg-white/72 backdrop-blur-md rounded-[28px] shadow-sm border border-slate-200/80 overflow-hidden">
+            <section className="glass-card tint-settings rounded-[28px] overflow-hidden">
               <h3 className="px-5 pt-5 text-xs font-extrabold text-slate-400 uppercase tracking-wider flex items-center">
                 <HardDrive size={12} className="mr-2" /> {t("settings.data.title", { defaultValue: "Données & Sauvegarde" })}
               </h3>
@@ -261,14 +261,14 @@ export const SettingsPage: React.FC = () => {
               </div>
 
               <div className="px-5 pb-5">
-                <div className="bg-amber-50 text-amber-700 text-xs p-3 rounded-xl flex items-start border border-amber-100">
+                <div className="bg-gradient-to-r from-amber-50 to-orange-50 text-amber-700 text-xs p-3 rounded-2xl flex items-start border border-amber-100">
                   <AlertTriangle size={14} className="mr-2 mt-0.5 shrink-0" />
                   <p>{t("settings.data.warning", { defaultValue: "Important : Vos données sont stockées dans le navigateur. Pensez à faire une sauvegarde régulière." })}</p>
                 </div>
               </div>
             </section>
 
-            <section className="bg-white/72 backdrop-blur-md rounded-[28px] shadow-sm border border-slate-200/80 overflow-hidden">
+            <section className="glass-card tint-settings rounded-[28px] overflow-hidden">
               <h3 className="px-5 pt-5 text-xs font-extrabold text-slate-400 uppercase tracking-wider">
                 {t("settings.app.title", { defaultValue: "Application" })}
               </h3>
@@ -282,7 +282,7 @@ export const SettingsPage: React.FC = () => {
                   <select
                     value={currency}
                     onChange={(e) => onCurrencyChange(e.target.value as Currency)}
-                    className="bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-600 px-3 py-2 focus:ring-0"
+                    className="bg-white/80 border border-violet-100 rounded-xl text-sm text-slate-600 px-3 py-2 focus:ring-0 shadow-sm"
                   >
                     <option value="EUR">EUR (€)</option>
                     <option value="USD">USD ($)</option>
@@ -300,7 +300,7 @@ export const SettingsPage: React.FC = () => {
                   <select
                     value={(i18n.language || "fr").split("-")[0]}
                     onChange={(e) => changeLanguage(e.target.value)}
-                    className="bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-600 px-3 py-2 focus:ring-0"
+                    className="bg-white/80 border border-violet-100 rounded-xl text-sm text-slate-600 px-3 py-2 focus:ring-0 shadow-sm"
                   >
                     <option value="fr">Français</option>
                     <option value="en">English</option>
@@ -309,7 +309,7 @@ export const SettingsPage: React.FC = () => {
               </div>
             </section>
 
-            <section className="bg-white/72 backdrop-blur-md rounded-[28px] shadow-sm border border-slate-200/80 overflow-hidden">
+            <section className="glass-card tint-settings rounded-[28px] overflow-hidden">
               <div className="divide-y divide-slate-100">
                 <button type="button" className={rowClass}>
                   <div className="flex items-center gap-3">
