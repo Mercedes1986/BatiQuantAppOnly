@@ -17,7 +17,6 @@ import { useTranslation } from "react-i18next";
 import { exportAppData, importAppData } from "../services/materialsService";
 import { CompanyProfileForm } from "../components/documents/CompanyProfileForm";
 import { getSettings, saveSettings } from "../services/storage";
-import { getAdsMode, getConsent, openConsent, resetConsent } from "../services/consentService";
 
 type SettingsTab = "app" | "company";
 type Currency = "EUR" | "USD" | "CAD" | "CHF";
@@ -47,9 +46,6 @@ export const SettingsPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<SettingsTab>("app");
   const [currency, setCurrency] = useState<Currency>("EUR");
   const [isImporting, setIsImporting] = useState(false);
-  const consentState = getConsent();
-  const adsMode = getAdsMode();
-  const privacyUrl = String((import.meta as any)?.env?.VITE_PRIVACY_POLICY_URL || "/privacy-policy.html");
 
   const versionLabel = useMemo(() => getAppVersion(), []);
 
@@ -215,59 +211,6 @@ export const SettingsPage: React.FC = () => {
           </div>
         ) : (
           <div className="space-y-4">
-            <section className="bg-white/72 backdrop-blur-md rounded-[28px] shadow-sm border border-slate-200/80 overflow-hidden">
-              <h3 className="px-5 pt-5 text-xs font-extrabold text-slate-400 uppercase tracking-wider flex items-center">
-                <Shield size={12} className="mr-2" /> {t("settings.privacy.title", { defaultValue: "Confidentialité & publicité" })}
-              </h3>
-
-              <div className="p-5 space-y-3">
-                <div className="rounded-2xl border border-slate-200 bg-white/80 p-4">
-                  <p className="text-sm font-semibold text-slate-800">
-                    {t("settings.privacy.current_status", { defaultValue: "Statut actuel" })}
-                  </p>
-                  <p className="mt-1 text-sm text-slate-600">
-                    {consentState.choice === "accepted"
-                      ? t("settings.privacy.accepted", { defaultValue: "Personnalisation et stockage autorisés." })
-                      : consentState.choice === "refused"
-                        ? t("settings.privacy.refused", { defaultValue: "Annonces limitées / non personnalisées." })
-                        : t("settings.privacy.unknown", { defaultValue: "Choix non encore défini." })}
-                  </p>
-                  <p className="mt-2 text-xs text-slate-400">
-                    {t("settings.privacy.ads_mode", { defaultValue: "Mode annonces" })}: {adsMode}
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <button
-                    type="button"
-                    onClick={() => openConsent()}
-                    className="rounded-2xl border border-blue-200 bg-blue-50/80 px-4 py-3 text-sm font-semibold text-blue-700 hover:bg-blue-100 transition-colors"
-                  >
-                    {t("settings.privacy.manage", { defaultValue: "Gérer mes préférences" })}
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      resetConsent();
-                      window.location.reload();
-                    }}
-                    className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
-                  >
-                    {t("settings.privacy.reset", { defaultValue: "Réinitialiser le consentement" })}
-                  </button>
-                </div>
-
-                <a
-                  href={privacyUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center text-sm font-medium text-slate-700 hover:text-blue-700"
-                >
-                  {t("settings.support.privacy", { defaultValue: "Politique de confidentialité" })}
-                </a>
-              </div>
-            </section>
             <section className="bg-white/72 backdrop-blur-md rounded-[28px] shadow-sm border border-slate-200/80 overflow-hidden">
               <div className="p-5 flex items-center">
                 <div className="bg-emerald-100 p-3 rounded-2xl mr-3 text-emerald-600">

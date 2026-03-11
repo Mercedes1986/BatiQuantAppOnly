@@ -1,4 +1,31 @@
 
+function MobileAdPlaceholder({
+  title,
+  description,
+  minHeight = 96,
+}: {
+  title: string;
+  description: string;
+  minHeight?: number;
+}) {
+  return (
+    <div
+      className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-center text-sm text-slate-500"
+      style={{ minHeight }}
+      data-ad-platform="mobile-ready-placeholder"
+      role="complementary"
+      aria-label={title}
+    >
+      <div className="flex h-full items-center justify-center">
+        <div>
+          <div className="font-medium text-slate-600">{title}</div>
+          <div className="mt-1 text-xs text-slate-400">{description}</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 import React, { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {

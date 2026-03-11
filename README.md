@@ -36,12 +36,10 @@ Exemples :
 
 ```env
 VITE_BUILD_ID=local
-VITE_APP_VERSION=0.2.0
+VITE_APP_VERSION=0.1.0
 VITE_AD_PLATFORM=mobile
-VITE_ADS_ENABLED=true
 VITE_ENABLE_WEB_AD_PLACEHOLDERS=true
 VITE_ENABLE_AD_DEBUG=true
-VITE_PRIVACY_POLICY_URL=/privacy-policy.html
 VITE_ADMOB_APP_ID_ANDROID=
 VITE_ADMOB_APP_ID_IOS=
 VITE_ADMOB_BANNER_HOME=
@@ -70,7 +68,6 @@ Les composants `AdSlot` servent maintenant à :
 
 - `npm run dev` : développement local
 - `npm run typecheck` : contrôle TypeScript
-- `npm run lint:types` : vérification TypeScript
 - `npm run build` : build production
 - `npm run preview` : aperçu local du build
 - `npm run ci` : typecheck + build + audit
