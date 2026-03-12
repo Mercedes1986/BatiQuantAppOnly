@@ -10,28 +10,16 @@ function escapeHtml(s: string): string {
 }
 
 function renderInline(md: string): string {
-  // ordre important : on part d'un texte déjà "escaped"
   let s = md;
-
-  // `code`
   s = s.replace(/`([^`]+?)`/g, "<code>$1</code>");
-
-  // **bold**
   s = s.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
-
-  // *italic* (simple)
   s = s.replace(/\*(.+?)\*/g, "<em>$1</em>");
-
-  // liens [texte](url) — URL autorisées: http(s) + mailto
   s = s.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (m, label, url) => {
     const u = String(url || "").trim();
-    const safe =
-      u.startsWith("https://") || u.startsWith("http://") || u.startsWith("mailto:");
+    const safe = u.startsWith("https://") || u.startsWith("http://") || u.startsWith("mailto:");
     if (!safe) return `${label}`;
-    const lbl = String(label || "");
-    return `<a href="${u}" target="_blank" rel="noreferrer noopener">${lbl}</a>`;
+    return `<a href="${u}" target="_blank" rel="noreferrer noopener">${String(label || "")}</a>`;
   });
-
   return s;
 }
 
@@ -39,9 +27,7 @@ export const MarkdownLite: React.FC<Props> = ({ content, className }) => {
   const html = useMemo(() => {
     const raw = content || "";
     const lines = raw.split("\n");
-
     const out: string[] = [];
-
     let inUL = false;
     let inOL = false;
 
@@ -61,11 +47,10 @@ export const MarkdownLite: React.FC<Props> = ({ content, className }) => {
 
       if (!trimmed) {
         closeLists();
-        out.push("<div class='h-2'></div>");
+        out.push("<div class='h-3'></div>");
         continue;
       }
 
-      // Headings
       if (trimmed.startsWith("### ")) {
         closeLists();
         out.push(`<h3>${renderInline(escapeHtml(trimmed.slice(4)))}</h3>`);
@@ -82,9 +67,7 @@ export const MarkdownLite: React.FC<Props> = ({ content, className }) => {
         continue;
       }
 
-      // Ordered list: "1. item"
-      const isOrdered = /^\d+\.\s+/.test(trimmed);
-      if (isOrdered) {
+      if (/^\d+\.\s+/.test(trimmed)) {
         if (inUL) {
           out.push("</ul>");
           inUL = false;
@@ -93,14 +76,11 @@ export const MarkdownLite: React.FC<Props> = ({ content, className }) => {
           out.push("<ol>");
           inOL = true;
         }
-        const item = trimmed.replace(/^\d+\.\s+/, "");
-        out.push(`<li>${renderInline(escapeHtml(item))}</li>`);
+        out.push(`<li>${renderInline(escapeHtml(trimmed.replace(/^\d+\.\s+/, "")))}</li>`);
         continue;
       }
 
-      // Bullet list: "- item" or "* item"
-      const isBullet = /^[-*]\s+/.test(trimmed);
-      if (isBullet) {
+      if (/^[-*]\s+/.test(trimmed)) {
         if (inOL) {
           out.push("</ol>");
           inOL = false;
@@ -109,8 +89,7 @@ export const MarkdownLite: React.FC<Props> = ({ content, className }) => {
           out.push("<ul>");
           inUL = true;
         }
-        const item = trimmed.replace(/^[-*]\s+/, "");
-        out.push(`<li>${renderInline(escapeHtml(item))}</li>`);
+        out.push(`<li>${renderInline(escapeHtml(trimmed.replace(/^[-*]\s+/, "")))}</li>`);
         continue;
       }
 
@@ -126,7 +105,15 @@ export const MarkdownLite: React.FC<Props> = ({ content, className }) => {
     <div
       className={
         className ||
-        "prose prose-slate max-w-none prose-h2:mt-6 prose-h3:mt-4 prose-p:leading-relaxed prose-a:text-blue-600 prose-a:font-semibold prose-code:bg-slate-100 prose-code:px-1 prose-code:py-0.5 prose-code:rounded"
+        [
+          'max-w-none rounded-[24px] border border-white/70 bg-white/74 p-5 backdrop-blur-lg',
+          'prose prose-slate prose-p:leading-relaxed prose-p:text-slate-600 prose-h1:text-slate-900',
+          'prose-h2:text-slate-900 prose-h2:mt-1 prose-h3:text-slate-800 prose-h3:mt-1',
+          'prose-a:text-blue-600 prose-a:font-semibold prose-strong:text-slate-900',
+          'prose-code:rounded prose-code:bg-slate-100 prose-code:px-1.5 prose-code:py-0.5',
+          'prose-ul:my-3 prose-ol:my-3 prose-li:marker:text-slate-400',
+          'shadow-[0_16px_44px_rgba(15,23,42,0.06)]',
+        ].join(' ')
       }
       dangerouslySetInnerHTML={{ __html: html }}
     />

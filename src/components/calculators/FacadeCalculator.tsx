@@ -532,16 +532,16 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
   }, [calculationData, onCalculate, doCleaning, doCoating, doPaint, doITE, doCladding, t]);
 
   return (
-    <div className="space-y-6 animate-in fade-in">
+    <div className="space-y-6 rounded-[32px] border border-white/70 bg-white/72 p-4 shadow-[0_24px_70px_rgba(15,23,42,0.10)] backdrop-blur-xl sm:p-6">
       {/* Navigation */}
-      <div className="flex justify-between items-center mb-6 bg-slate-50 p-1 rounded-lg overflow-x-auto">
+      <div className="flex justify-between items-center mb-6 rounded-[24px] border border-white/80 bg-slate-100/70 p-1.5 shadow-inner overflow-x-auto backdrop-blur-xl">
         {[1, 2, 3, 4, 5].map((s) => (
           <button
             key={s}
             type="button"
             onClick={() => setStep(s)}
-            className={`flex-1 min-w-[70px] py-2 text-xs font-bold rounded transition-all ${
-              step === s ? "bg-white shadow text-blue-600" : "text-slate-400"
+            className={`flex-1 min-w-[70px] py-2 text-xs font-extrabold rounded-2xl transition-all ${
+              step === s ? "bg-white text-slate-950 shadow-[0_14px_32px_rgba(59,130,246,0.18)]" : "text-slate-400"
             }`}
           >
             {s === 1 && t("facade.steps.1", { defaultValue: "1. Murs" })}
@@ -556,17 +556,17 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
       {/* STEP 1 */}
       {step === 1 && (
         <div className="space-y-4">
-          <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
+          <div className="rounded-[22px] border border-blue-100 bg-blue-50/90 p-3 text-xs text-blue-800 flex items-start shadow-sm">
             <Home size={16} className="mr-2 shrink-0 mt-0.5" />
             {t("facade.step1.hint", { defaultValue: "Définissez la géométrie de la maison." })}
           </div>
 
-          <div className="flex bg-slate-100 p-1 rounded-lg">
+          <div className="flex rounded-[24px] border border-white/80 bg-slate-100/70 p-1.5 shadow-inner backdrop-blur-xl">
             <button
               type="button"
               onClick={() => setGeoMode("rect")}
               className={`flex-1 py-2 text-xs font-bold rounded ${
-                geoMode === "rect" ? "bg-white shadow text-indigo-600" : "text-slate-500"
+                geoMode === "rect" ? "bg-white text-slate-950 shadow-[0_14px_32px_rgba(99,102,241,0.18)]" : "text-slate-500"
               }`}
             >
               {t("facade.geo.rect", { defaultValue: "Maison (L x l)" })}
@@ -575,7 +575,7 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
               type="button"
               onClick={() => setGeoMode("simple")}
               className={`flex-1 py-2 text-xs font-bold rounded ${
-                geoMode === "simple" ? "bg-white shadow text-indigo-600" : "text-slate-500"
+                geoMode === "simple" ? "bg-white text-slate-950 shadow-[0_14px_32px_rgba(99,102,241,0.18)]" : "text-slate-500"
               }`}
             >
               {t("facade.geo.perimeter", { defaultValue: "Périmètre" })}
@@ -672,7 +672,7 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
           <button
             type="button"
             onClick={() => setStep(2)}
-            className="w-full py-3 bg-blue-600 text-white rounded-xl font-bold flex justify-center items-center mt-2"
+            className="w-full py-3 bg-blue-600 text-white rounded-2xl font-extrabold shadow-sm flex justify-center items-center mt-2"
           >
             {t("common.next", { defaultValue: "Suivant" })} <ArrowRight size={18} className="ml-2" />
           </button>
@@ -682,7 +682,7 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
       {/* STEP 2 */}
       {step === 2 && (
         <div className="space-y-4">
-          <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
+          <div className="rounded-[22px] border border-blue-100 bg-blue-50/90 p-3 text-xs text-blue-800 flex items-start shadow-sm">
             <LayoutTemplate size={16} className="mr-2 shrink-0 mt-0.5" />
             {t("facade.step2.hint", {
               defaultValue: "Ajoutez les ouvertures. Elles seront déduites de la surface, mais les tableaux seront comptés.",
@@ -794,10 +794,10 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
           </div>
 
           <div className="flex gap-3">
-            <button type="button" onClick={() => setStep(1)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
+            <button type="button" onClick={() => setStep(1)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-extrabold shadow-sm">
               {t("common.back", { defaultValue: "Retour" })}
             </button>
-            <button type="button" onClick={() => setStep(3)} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold">
+            <button type="button" onClick={() => setStep(3)} className="flex-1 py-3 bg-blue-600 text-white rounded-2xl font-extrabold shadow-sm">
               {t("common.next", { defaultValue: "Suivant" })}
             </button>
           </div>
@@ -807,7 +807,7 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
       {/* STEP 3 */}
       {step === 3 && (
         <div className="space-y-4">
-          <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
+          <div className="rounded-[22px] border border-blue-100 bg-blue-50/90 p-3 text-xs text-blue-800 flex items-start shadow-sm">
             <Check size={16} className="mr-2 shrink-0 mt-0.5" />
             {t("facade.step3.hint", { defaultValue: "Sélectionnez les travaux à réaliser." })}
           </div>
@@ -851,10 +851,10 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
           </div>
 
           <div className="flex gap-3">
-            <button type="button" onClick={() => setStep(2)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
+            <button type="button" onClick={() => setStep(2)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-extrabold shadow-sm">
               {t("common.back", { defaultValue: "Retour" })}
             </button>
-            <button type="button" onClick={() => setStep(4)} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold">
+            <button type="button" onClick={() => setStep(4)} className="flex-1 py-3 bg-blue-600 text-white rounded-2xl font-extrabold shadow-sm">
               {t("common.next", { defaultValue: "Suivant" })}
             </button>
           </div>
@@ -864,7 +864,7 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
       {/* STEP 4 */}
       {step === 4 && (
         <div className="space-y-4">
-          <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
+          <div className="rounded-[22px] border border-blue-100 bg-blue-50/90 p-3 text-xs text-blue-800 flex items-start shadow-sm">
             <Settings size={16} className="mr-2 shrink-0 mt-0.5" />
             {t("facade.step4.hint", { defaultValue: "Configurez les détails des travaux sélectionnés." })}
           </div>
@@ -961,10 +961,10 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
           </div>
 
           <div className="flex gap-3">
-            <button type="button" onClick={() => setStep(3)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
+            <button type="button" onClick={() => setStep(3)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-extrabold shadow-sm">
               {t("common.back", { defaultValue: "Retour" })}
             </button>
-            <button type="button" onClick={() => setStep(5)} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold">
+            <button type="button" onClick={() => setStep(5)} className="flex-1 py-3 bg-blue-600 text-white rounded-2xl font-extrabold shadow-sm">
               {t("common.next", { defaultValue: "Suivant" })}
             </button>
           </div>
@@ -974,7 +974,7 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
       {/* STEP 5 */}
       {step === 5 && (
         <div className="space-y-4">
-          <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
+          <div className="rounded-[22px] border border-blue-100 bg-blue-50/90 p-3 text-xs text-blue-800 flex items-start shadow-sm">
             <CircleDollarSign size={16} className="mr-2 shrink-0 mt-0.5" />
             {t("facade.step5.hint", { defaultValue: "Ajustez les prix unitaires pour finaliser le devis." })}
           </div>
@@ -1007,7 +1007,7 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
                         ? updatePrice("stripM2", e.target.value)
                         : updatePrice("cleanM2", e.target.value)
                     }
-                    className="w-full p-1.5 border rounded text-sm bg-white text-slate-900"
+                    className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl"
                   />
                 </div>
               )}
@@ -1015,7 +1015,7 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
               {doRepair && (
                 <div>
                   <label className="block text-[10px] text-slate-500 mb-1">{t("facade.prices.repair", { defaultValue: "Réparations fissures (€/ml)" })}</label>
-                  <input type="number" value={prices.repairMl} onChange={(e) => updatePrice("repairMl", e.target.value)} className="w-full p-1.5 border rounded text-sm bg-white text-slate-900" />
+                  <input type="number" value={prices.repairMl} onChange={(e) => updatePrice("repairMl", e.target.value)} className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl" />
                 </div>
               )}
 
@@ -1023,11 +1023,11 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
                 <>
                   <div>
                     <label className="block text-[10px] text-slate-500 mb-1">{t("facade.prices.coating_bag", { defaultValue: "Sac enduit (€/u)" })}</label>
-                    <input type="number" value={prices.coatingBag} onChange={(e) => updatePrice("coatingBag", e.target.value)} className="w-full p-1.5 border rounded text-sm bg-white text-slate-900" />
+                    <input type="number" value={prices.coatingBag} onChange={(e) => updatePrice("coatingBag", e.target.value)} className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl" />
                   </div>
                   <div>
                     <label className="block text-[10px] text-slate-500 mb-1">{t("facade.prices.angle", { defaultValue: "Cornière 3m (€/u)" })}</label>
-                    <input type="number" value={prices.angleBar} onChange={(e) => updatePrice("angleBar", e.target.value)} className="w-full p-1.5 border rounded text-sm bg-white text-slate-900" />
+                    <input type="number" value={prices.angleBar} onChange={(e) => updatePrice("angleBar", e.target.value)} className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl" />
                   </div>
                 </>
               )}
@@ -1035,7 +1035,7 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
               {doPaint && (
                 <div>
                   <label className="block text-[10px] text-slate-500 mb-1">{t("facade.prices.paint", { defaultValue: "Peinture (€/L)" })}</label>
-                  <input type="number" value={prices.paintL} onChange={(e) => updatePrice("paintL", e.target.value)} className="w-full p-1.5 border rounded text-sm bg-white text-slate-900" />
+                  <input type="number" value={prices.paintL} onChange={(e) => updatePrice("paintL", e.target.value)} className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl" />
                 </div>
               )}
 
@@ -1043,11 +1043,11 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
                 <>
                   <div>
                     <label className="block text-[10px] text-slate-500 mb-1">{t("facade.prices.ite_m2", { defaultValue: "ITE complet (€/m²)" })}</label>
-                    <input type="number" value={prices.iteM2} onChange={(e) => updatePrice("iteM2", e.target.value)} className="w-full p-1.5 border rounded text-sm bg-white text-slate-900" />
+                    <input type="number" value={prices.iteM2} onChange={(e) => updatePrice("iteM2", e.target.value)} className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl" />
                   </div>
                   <div>
                     <label className="block text-[10px] text-slate-500 mb-1">{t("facade.prices.ite_rail", { defaultValue: "Rail départ 2.5m (€/u)" })}</label>
-                    <input type="number" value={prices.iteRail} onChange={(e) => updatePrice("iteRail", e.target.value)} className="w-full p-1.5 border rounded text-sm bg-white text-slate-900" />
+                    <input type="number" value={prices.iteRail} onChange={(e) => updatePrice("iteRail", e.target.value)} className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl" />
                   </div>
                 </>
               )}
@@ -1056,11 +1056,11 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
                 <>
                   <div>
                     <label className="block text-[10px] text-slate-500 mb-1">{t("facade.prices.cladding_m2", { defaultValue: "Bardage (€/m²)" })}</label>
-                    <input type="number" value={prices.claddingM2} onChange={(e) => updatePrice("claddingM2", e.target.value)} className="w-full p-1.5 border rounded text-sm bg-white text-slate-900" />
+                    <input type="number" value={prices.claddingM2} onChange={(e) => updatePrice("claddingM2", e.target.value)} className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl" />
                   </div>
                   <div>
                     <label className="block text-[10px] text-slate-500 mb-1">{t("facade.prices.batten_ml", { defaultValue: "Tasseaux (€/ml)" })}</label>
-                    <input type="number" value={prices.battenMl} onChange={(e) => updatePrice("battenMl", e.target.value)} className="w-full p-1.5 border rounded text-sm bg-white text-slate-900" />
+                    <input type="number" value={prices.battenMl} onChange={(e) => updatePrice("battenMl", e.target.value)} className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl" />
                   </div>
                 </>
               )}
@@ -1068,7 +1068,7 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
               {(scaffold || parseFloat(dimH) > 3) && (
                 <div>
                   <label className="block text-[10px] text-slate-500 mb-1">{t("facade.prices.scaffold", { defaultValue: "Échafaudage (forfait)" })}</label>
-                  <input type="number" value={prices.scaffoldFixed} onChange={(e) => updatePrice("scaffoldFixed", e.target.value)} className="w-full p-1.5 border rounded text-sm bg-white text-slate-900" />
+                  <input type="number" value={prices.scaffoldFixed} onChange={(e) => updatePrice("scaffoldFixed", e.target.value)} className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl" />
                 </div>
               )}
             </div>
@@ -1077,11 +1077,11 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
               <div className="mt-4 pt-3 border-t border-slate-100 grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-[10px] text-blue-600 font-bold mb-1">{t("facade.prices.labor_m2", { defaultValue: "MO façade (€/m²)" })}</label>
-                  <input type="number" value={prices.laborM2} onChange={(e) => updatePrice("laborM2", e.target.value)} className="w-full p-1.5 border border-blue-200 rounded text-sm bg-white text-slate-900" />
+                  <input type="number" value={prices.laborM2} onChange={(e) => updatePrice("laborM2", e.target.value)} className="w-full p-1.5 border border-blue-200 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(37,99,235,0.08)] backdrop-blur-xl" />
                 </div>
                 <div>
                   <label className="block text-[10px] text-blue-600 font-bold mb-1">{t("facade.prices.labor_scaffold", { defaultValue: "MO échafaudage (€/m²)" })}</label>
-                  <input type="number" value={prices.laborScaffold} onChange={(e) => updatePrice("laborScaffold", e.target.value)} className="w-full p-1.5 border border-blue-200 rounded text-sm bg-white text-slate-900" />
+                  <input type="number" value={prices.laborScaffold} onChange={(e) => updatePrice("laborScaffold", e.target.value)} className="w-full p-1.5 border border-blue-200 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(37,99,235,0.08)] backdrop-blur-xl" />
                 </div>
               </div>
             )}
@@ -1098,10 +1098,10 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
           )}
 
           <div className="flex gap-3 pt-2">
-            <button type="button" onClick={() => setStep(4)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
+            <button type="button" onClick={() => setStep(4)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-extrabold shadow-sm">
               {t("common.back", { defaultValue: "Retour" })}
             </button>
-            <button disabled className="flex-1 py-3 bg-emerald-100 text-emerald-700 rounded-xl font-bold flex justify-center items-center">
+            <button disabled className="flex-1 py-3 bg-emerald-100 text-emerald-700 rounded-2xl font-extrabold shadow-sm flex justify-center items-center">
               <Check size={18} className="mr-2" /> {t("struct.common.calculated", { defaultValue: "Calculé" })}
             </button>
           </div>

@@ -491,15 +491,15 @@ export const PlacoCalculator: React.FC<Props> = ({
   }, [calculationData, onCalculate, mode, frameType, t]);
 
   return (
-    <div className="space-y-6 animate-in fade-in">
+    <div className="space-y-6 rounded-[32px] border border-white/70 bg-white/72 p-4 shadow-[0_24px_70px_rgba(15,23,42,0.10)] backdrop-blur-xl sm:p-6">
       {/* Mode tabs */}
       {!hideTabs && (
-        <div className="flex bg-slate-100 p-1 rounded-lg mb-4">
+        <div className="flex rounded-[24px] border border-white/80 bg-slate-100/70 p-1.5 shadow-inner backdrop-blur-xl mb-4">
           <button
             type="button"
             onClick={() => setMode("partition")}
-            className={`flex-1 py-2 text-xs font-bold rounded flex items-center justify-center ${
-              mode === "partition" ? "bg-white shadow text-indigo-600" : "text-slate-500"
+            className={`flex-1 py-2 text-xs font-extrabold rounded-2xl flex items-center justify-center ${
+              mode === "partition" ? "bg-white text-slate-950 shadow-[0_14px_32px_rgba(99,102,241,0.18)]" : "text-slate-500"
             }`}
           >
             <ArrowRightLeft size={16} className="mr-1" /> {t("calc.placo.mode.partition")}
@@ -507,8 +507,8 @@ export const PlacoCalculator: React.FC<Props> = ({
           <button
             type="button"
             onClick={() => setMode("lining")}
-            className={`flex-1 py-2 text-xs font-bold rounded flex items-center justify-center ${
-              mode === "lining" ? "bg-white shadow text-indigo-600" : "text-slate-500"
+            className={`flex-1 py-2 text-xs font-extrabold rounded-2xl flex items-center justify-center ${
+              mode === "lining" ? "bg-white text-slate-950 shadow-[0_14px_32px_rgba(99,102,241,0.18)]" : "text-slate-500"
             }`}
           >
             <PanelTop size={16} className="mr-1" /> {t("calc.placo.mode.lining")}
@@ -516,8 +516,8 @@ export const PlacoCalculator: React.FC<Props> = ({
           <button
             type="button"
             onClick={() => setMode("ceiling")}
-            className={`flex-1 py-2 text-xs font-bold rounded flex items-center justify-center ${
-              mode === "ceiling" ? "bg-white shadow text-indigo-600" : "text-slate-500"
+            className={`flex-1 py-2 text-xs font-extrabold rounded-2xl flex items-center justify-center ${
+              mode === "ceiling" ? "bg-white text-slate-950 shadow-[0_14px_32px_rgba(99,102,241,0.18)]" : "text-slate-500"
             }`}
           >
             <Spline size={16} className="mr-1" /> {t("calc.placo.mode.ceiling")}
@@ -526,14 +526,14 @@ export const PlacoCalculator: React.FC<Props> = ({
       )}
 
       {/* Step nav */}
-      <div className="flex justify-between items-center mb-6 bg-slate-50 p-1 rounded-lg overflow-x-auto">
+      <div className="flex justify-between items-center mb-6 rounded-[24px] border border-white/80 bg-slate-100/70 p-1.5 shadow-inner overflow-x-auto backdrop-blur-xl">
         {[1, 2, 3, 4, 5].map((s) => (
           <button
             key={s}
             type="button"
             onClick={() => setStep(s)}
-            className={`flex-1 min-w-[70px] py-2 text-xs font-bold rounded transition-all ${
-              step === s ? "bg-white shadow text-blue-600" : "text-slate-400"
+            className={`flex-1 min-w-[70px] py-2 text-xs font-extrabold rounded-2xl transition-all ${
+              step === s ? "bg-white text-slate-950 shadow-[0_14px_32px_rgba(59,130,246,0.18)]" : "text-slate-400"
             }`}
           >
             {stepLabel(s)}
@@ -555,7 +555,7 @@ export const PlacoCalculator: React.FC<Props> = ({
       {/* STEP 1 */}
       {step === 1 && (
         <div className="space-y-4">
-          <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
+          <div className="rounded-[22px] border border-blue-100 bg-blue-50/90 p-3 text-xs text-blue-800 flex items-start shadow-sm">
             <Ruler size={16} className="mr-2 shrink-0 mt-0.5" />
             {t("calc.placo.help_step1")}
           </div>
@@ -716,7 +716,7 @@ export const PlacoCalculator: React.FC<Props> = ({
           <button
             type="button"
             onClick={() => setStep(2)}
-            className="w-full py-3 bg-blue-600 text-white rounded-xl font-bold flex justify-center items-center mt-2"
+            className="w-full py-3 bg-blue-600 text-white rounded-2xl font-extrabold shadow-sm flex justify-center items-center mt-2"
           >
             {t("common.next")} <ArrowRight size={18} className="ml-2" />
           </button>
@@ -726,7 +726,7 @@ export const PlacoCalculator: React.FC<Props> = ({
       {/* STEP 2 */}
       {step === 2 && (
         <div className="space-y-4">
-          <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
+          <div className="rounded-[22px] border border-blue-100 bg-blue-50/90 p-3 text-xs text-blue-800 flex items-start shadow-sm">
             <LayoutTemplate size={16} className="mr-2 shrink-0 mt-0.5" />
             {t("calc.placo.help_step2")}
           </div>
@@ -808,10 +808,10 @@ export const PlacoCalculator: React.FC<Props> = ({
           </div>
 
           <div className="flex gap-3">
-            <button type="button" onClick={() => setStep(1)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
+            <button type="button" onClick={() => setStep(1)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-extrabold shadow-sm">
               {t("common.back")}
             </button>
-            <button type="button" onClick={() => setStep(3)} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold">
+            <button type="button" onClick={() => setStep(3)} className="flex-1 py-3 bg-blue-600 text-white rounded-2xl font-extrabold shadow-sm">
               {t("common.next")}
             </button>
           </div>
@@ -821,7 +821,7 @@ export const PlacoCalculator: React.FC<Props> = ({
       {/* STEP 3 */}
       {step === 3 && (
         <div className="space-y-4">
-          <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
+          <div className="rounded-[22px] border border-blue-100 bg-blue-50/90 p-3 text-xs text-blue-800 flex items-start shadow-sm">
             <Wind size={16} className="mr-2 shrink-0 mt-0.5" />
             {t("calc.placo.help_step3")}
           </div>
@@ -877,10 +877,10 @@ export const PlacoCalculator: React.FC<Props> = ({
           </div>
 
           <div className="flex gap-3">
-            <button type="button" onClick={() => setStep(2)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
+            <button type="button" onClick={() => setStep(2)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-extrabold shadow-sm">
               {t("common.back")}
             </button>
-            <button type="button" onClick={() => setStep(4)} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold">
+            <button type="button" onClick={() => setStep(4)} className="flex-1 py-3 bg-blue-600 text-white rounded-2xl font-extrabold shadow-sm">
               {t("common.next")}
             </button>
           </div>
@@ -902,7 +902,7 @@ export const PlacoCalculator: React.FC<Props> = ({
       {/* STEP 5 */}
       {step === 5 && (
         <div className="space-y-4">
-          <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
+          <div className="rounded-[22px] border border-blue-100 bg-blue-50/90 p-3 text-xs text-blue-800 flex items-start shadow-sm">
             <Euro size={16} className="mr-2 shrink-0 mt-0.5" />
             {t("calc.placo.help_step5")}
           </div>
@@ -934,7 +934,7 @@ export const PlacoCalculator: React.FC<Props> = ({
                     type="number"
                     value={(prices as any)[k]}
                     onChange={(e) => updatePrice(k as any, e.target.value)}
-                    className="w-full p-1.5 border rounded text-sm bg-white text-slate-900"
+                    className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl"
                   />
                 </div>
               ))}
@@ -947,7 +947,7 @@ export const PlacoCalculator: React.FC<Props> = ({
                       type="number"
                       value={prices.furring3m}
                       onChange={(e) => updatePrice("furring3m", e.target.value)}
-                      className="w-full p-1.5 border rounded text-sm bg-white text-slate-900"
+                      className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl"
                     />
                   </div>
                   <div>
@@ -956,7 +956,7 @@ export const PlacoCalculator: React.FC<Props> = ({
                       type="number"
                       value={prices.hangerUnit}
                       onChange={(e) => updatePrice("hangerUnit", e.target.value)}
-                      className="w-full p-1.5 border rounded text-sm bg-white text-slate-900"
+                      className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl"
                     />
                   </div>
                 </>
@@ -971,7 +971,7 @@ export const PlacoCalculator: React.FC<Props> = ({
                     type="number"
                     value={prices.laborM2}
                     onChange={(e) => updatePrice("laborM2", e.target.value)}
-                    className="w-full p-1.5 border border-blue-200 rounded text-sm bg-white text-slate-900"
+                    className="w-full p-1.5 border border-blue-200 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(37,99,235,0.08)] backdrop-blur-xl"
                   />
                 </div>
               </div>
@@ -979,10 +979,10 @@ export const PlacoCalculator: React.FC<Props> = ({
           </div>
 
           <div className="flex gap-3 pt-2">
-            <button type="button" onClick={() => setStep(4)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
+            <button type="button" onClick={() => setStep(4)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-extrabold shadow-sm">
               {t("common.back")}
             </button>
-            <button type="button" disabled className="flex-1 py-3 bg-emerald-100 text-emerald-700 rounded-xl font-bold flex justify-center items-center">
+            <button type="button" disabled className="flex-1 py-3 bg-emerald-100 text-emerald-700 rounded-2xl font-extrabold shadow-sm flex justify-center items-center">
               <Check size={18} className="mr-2" /> {t("common.calculated")}
             </button>
           </div>

@@ -400,16 +400,16 @@ export const StairCalculator: React.FC<Props> = ({ onCalculate }) => {
   }, [computed, onCalculate]);
 
   return (
-    <div className="space-y-6 animate-in fade-in">
+    <div className="space-y-6 rounded-[32px] border border-white/70 bg-white/72 p-4 shadow-[0_24px_70px_rgba(15,23,42,0.10)] backdrop-blur-xl sm:p-6">
       {/* Step Navigation */}
-      <div className="flex justify-between items-center mb-6 bg-slate-50 p-1 rounded-lg overflow-x-auto">
+      <div className="flex justify-between items-center mb-6 rounded-[24px] border border-white/80 bg-slate-100/70 p-1.5 shadow-inner overflow-x-auto backdrop-blur-xl">
         {[1, 2, 3, 4, 5].map((s) => (
           <button
             key={s}
             type="button"
             onClick={() => setStep(s)}
-            className={`flex-1 min-w-[70px] py-2 text-xs font-bold rounded transition-all ${
-              step === s ? "bg-white shadow text-blue-600" : "text-slate-400"
+            className={`flex-1 min-w-[70px] py-2 text-xs font-extrabold rounded-2xl transition-all ${
+              step === s ? "bg-white text-slate-950 shadow-[0_14px_32px_rgba(59,130,246,0.18)]" : "text-slate-400"
             }`}
           >
             {stepLabel(s)}
@@ -420,7 +420,7 @@ export const StairCalculator: React.FC<Props> = ({ onCalculate }) => {
       {/* STEP 1 */}
       {step === 1 && (
         <div className="space-y-4">
-          <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
+          <div className="rounded-[22px] border border-blue-100 bg-blue-50/90 p-3 text-xs text-blue-800 flex items-start shadow-sm">
             <Info size={16} className="mr-2 shrink-0 mt-0.5" />
             {t("calc.stairs.ui.step1_hint", { defaultValue: "Define the shape and overall dimensions." })}
           </div>
@@ -519,7 +519,7 @@ export const StairCalculator: React.FC<Props> = ({ onCalculate }) => {
           <button
             type="button"
             onClick={() => setStep(2)}
-            className="w-full py-3 bg-blue-600 text-white rounded-xl font-bold flex justify-center items-center"
+            className="w-full py-3 bg-blue-600 text-white rounded-2xl font-extrabold shadow-sm flex justify-center items-center"
           >
             {t("common.next", { defaultValue: "Next" })} <ArrowRight size={18} className="ml-2" />
           </button>
@@ -529,12 +529,12 @@ export const StairCalculator: React.FC<Props> = ({ onCalculate }) => {
       {/* STEP 2 */}
       {step === 2 && (
         <div className="space-y-4">
-          <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
+          <div className="rounded-[22px] border border-blue-100 bg-blue-50/90 p-3 text-xs text-blue-800 flex items-start shadow-sm">
             <Activity size={16} className="mr-2 shrink-0 mt-0.5" />
             {t("calc.stairs.ui.step2_hint", { defaultValue: "Adjust the number of steps. Ideal Blondel: 60–64 cm." })}
           </div>
 
-          <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm text-center">
+          <div className="rounded-[28px] border border-white/80 bg-white/88 p-4 shadow-[0_16px_40px_rgba(15,23,42,0.08)] backdrop-blur-xl shadow-sm text-center">
             <div className="text-sm text-slate-500 mb-1">
               {t("calc.stairs.ui.riser_label", { defaultValue: "Riser height" })}
             </div>
@@ -619,10 +619,10 @@ export const StairCalculator: React.FC<Props> = ({ onCalculate }) => {
           )}
 
           <div className="flex gap-3">
-            <button type="button" onClick={() => setStep(1)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
+            <button type="button" onClick={() => setStep(1)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-extrabold shadow-sm">
               {t("common.back", { defaultValue: "Back" })}
             </button>
-            <button type="button" onClick={() => setStep(3)} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold">
+            <button type="button" onClick={() => setStep(3)} className="flex-1 py-3 bg-blue-600 text-white rounded-2xl font-extrabold shadow-sm">
               {t("common.next", { defaultValue: "Next" })}
             </button>
           </div>
@@ -632,7 +632,7 @@ export const StairCalculator: React.FC<Props> = ({ onCalculate }) => {
       {/* STEP 3 */}
       {step === 3 && (
         <div className="space-y-4">
-          <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
+          <div className="rounded-[22px] border border-blue-100 bg-blue-50/90 p-3 text-xs text-blue-800 flex items-start shadow-sm">
             <Layers size={16} className="mr-2 shrink-0 mt-0.5" />
             {t("calc.stairs.ui.step3_hint", { defaultValue: "Concrete structure parameters." })}
           </div>
@@ -710,10 +710,10 @@ export const StairCalculator: React.FC<Props> = ({ onCalculate }) => {
           </div>
 
           <div className="flex gap-3">
-            <button type="button" onClick={() => setStep(2)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
+            <button type="button" onClick={() => setStep(2)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-extrabold shadow-sm">
               {t("common.back", { defaultValue: "Back" })}
             </button>
-            <button type="button" onClick={() => setStep(4)} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold">
+            <button type="button" onClick={() => setStep(4)} className="flex-1 py-3 bg-blue-600 text-white rounded-2xl font-extrabold shadow-sm">
               {t("common.next", { defaultValue: "Next" })}
             </button>
           </div>
@@ -723,7 +723,7 @@ export const StairCalculator: React.FC<Props> = ({ onCalculate }) => {
       {/* STEP 4 */}
       {step === 4 && (
         <div className="space-y-4">
-          <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
+          <div className="rounded-[22px] border border-blue-100 bg-blue-50/90 p-3 text-xs text-blue-800 flex items-start shadow-sm">
             <Hammer size={16} className="mr-2 shrink-0 mt-0.5" />
             {t("calc.stairs.ui.step4_hint", { defaultValue: "Finishing options." })}
           </div>
@@ -752,10 +752,10 @@ export const StairCalculator: React.FC<Props> = ({ onCalculate }) => {
           </div>
 
           <div className="flex gap-3">
-            <button type="button" onClick={() => setStep(3)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
+            <button type="button" onClick={() => setStep(3)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-extrabold shadow-sm">
               {t("common.back", { defaultValue: "Back" })}
             </button>
-            <button type="button" onClick={() => setStep(5)} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold">
+            <button type="button" onClick={() => setStep(5)} className="flex-1 py-3 bg-blue-600 text-white rounded-2xl font-extrabold shadow-sm">
               {t("common.next", { defaultValue: "Next" })}
             </button>
           </div>
@@ -765,7 +765,7 @@ export const StairCalculator: React.FC<Props> = ({ onCalculate }) => {
       {/* STEP 5 */}
       {step === 5 && (
         <div className="space-y-4">
-          <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
+          <div className="rounded-[22px] border border-blue-100 bg-blue-50/90 p-3 text-xs text-blue-800 flex items-start shadow-sm">
             <CircleDollarSign size={16} className="mr-2 shrink-0 mt-0.5" />
             {t("calc.stairs.ui.step5_hint", { defaultValue: "Adjust unit prices." })}
           </div>
@@ -835,10 +835,10 @@ export const StairCalculator: React.FC<Props> = ({ onCalculate }) => {
           </div>
 
           <div className="flex gap-3 pt-4">
-            <button type="button" onClick={() => setStep(4)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
+            <button type="button" onClick={() => setStep(4)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-extrabold shadow-sm">
               {t("common.back", { defaultValue: "Back" })}
             </button>
-            <button type="button" className="flex-1 py-3 bg-emerald-100 text-emerald-700 rounded-xl font-bold flex justify-center items-center">
+            <button type="button" className="flex-1 py-3 bg-emerald-100 text-emerald-700 rounded-2xl font-extrabold shadow-sm flex justify-center items-center">
               <Check size={18} className="mr-2" /> {t("common.done", { defaultValue: "Done" })}
             </button>
           </div>

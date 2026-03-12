@@ -420,16 +420,16 @@ export const PaintCalculator: React.FC<Props> = ({ onCalculate }) => {
   const paintTypeLabel = (type: string) => t(`calc.paint.paint_type.${type}`, { defaultValue: type });
 
   return (
-    <div className="space-y-6 animate-in fade-in">
+    <div className="space-y-6 rounded-[32px] border border-white/70 bg-white/72 p-4 shadow-[0_24px_70px_rgba(15,23,42,0.10)] backdrop-blur-xl sm:p-6">
       {/* Navigation */}
-      <div className="flex justify-between items-center mb-6 bg-slate-50 p-1 rounded-lg overflow-x-auto">
+      <div className="flex justify-between items-center mb-6 rounded-[24px] border border-white/80 bg-slate-100/70 p-1.5 shadow-inner overflow-x-auto backdrop-blur-xl">
         {[1, 2, 3, 4, 5].map((s) => (
           <button
             key={s}
             type="button"
             onClick={() => setStep(s)}
-            className={`flex-1 min-w-[70px] py-2 text-xs font-bold rounded transition-all ${
-              step === s ? "bg-white shadow text-blue-600" : "text-slate-400"
+            className={`flex-1 min-w-[70px] py-2 text-xs font-extrabold rounded-2xl transition-all ${
+              step === s ? "bg-white text-slate-950 shadow-[0_14px_32px_rgba(59,130,246,0.18)]" : "text-slate-400"
             }`}
           >
             {stepLabel(s)}
@@ -440,7 +440,7 @@ export const PaintCalculator: React.FC<Props> = ({ onCalculate }) => {
       {/* STEP 1 */}
       {step === 1 && (
         <div className="space-y-4">
-          <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
+          <div className="rounded-[22px] border border-blue-100 bg-blue-50/90 p-3 text-xs text-blue-800 flex items-start shadow-sm">
             <LayoutGrid size={16} className="mr-2 shrink-0 mt-0.5" />
             {t("calc.paint.help_step1")}
           </div>
@@ -511,7 +511,7 @@ export const PaintCalculator: React.FC<Props> = ({ onCalculate }) => {
                 placeholder={t("calc.paint.ph_room_name")}
                 value={newRoomLabel}
                 onChange={(e) => setNewRoomLabel(e.target.value)}
-                className="w-full p-2 mb-2 border border-slate-300 rounded text-sm bg-white text-slate-900"
+                className="w-full p-2 mb-2 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl"
               />
               <div className="grid grid-cols-3 gap-2 mb-2">
                 <input
@@ -519,21 +519,21 @@ export const PaintCalculator: React.FC<Props> = ({ onCalculate }) => {
                   placeholder={t("calc.paint.ph_len")}
                   value={newL}
                   onChange={(e) => setNewL(e.target.value)}
-                  className="p-2 border border-slate-300 rounded text-sm bg-white text-slate-900"
+                  className="p-2 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl"
                 />
                 <input
                   type="number"
                   placeholder={t("calc.paint.ph_wid")}
                   value={newW}
                   onChange={(e) => setNewW(e.target.value)}
-                  className="p-2 border border-slate-300 rounded text-sm bg-white text-slate-900"
+                  className="p-2 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl"
                 />
                 <input
                   type="number"
                   placeholder={t("calc.paint.ph_hgt")}
                   value={newH}
                   onChange={(e) => setNewH(e.target.value)}
-                  className="p-2 border border-slate-300 rounded text-sm bg-white text-slate-900"
+                  className="p-2 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl"
                 />
               </div>
 
@@ -543,7 +543,7 @@ export const PaintCalculator: React.FC<Props> = ({ onCalculate }) => {
             </div>
           </div>
 
-          <button type="button" onClick={() => setStep(2)} className="w-full py-3 bg-blue-600 text-white rounded-xl font-bold flex justify-center items-center mt-2">
+          <button type="button" onClick={() => setStep(2)} className="w-full py-3 bg-blue-600 text-white rounded-2xl font-extrabold shadow-sm flex justify-center items-center mt-2">
             {t("common.next")} <ArrowRight size={18} className="ml-2" />
           </button>
         </div>
@@ -552,7 +552,7 @@ export const PaintCalculator: React.FC<Props> = ({ onCalculate }) => {
       {/* STEP 2 */}
       {step === 2 && (
         <div className="space-y-4">
-          <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
+          <div className="rounded-[22px] border border-blue-100 bg-blue-50/90 p-3 text-xs text-blue-800 flex items-start shadow-sm">
             <Eraser size={16} className="mr-2 shrink-0 mt-0.5" />
             {t("calc.paint.help_step2")}
           </div>
@@ -613,10 +613,10 @@ export const PaintCalculator: React.FC<Props> = ({ onCalculate }) => {
           </div>
 
           <div className="flex gap-3">
-            <button type="button" onClick={() => setStep(1)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
+            <button type="button" onClick={() => setStep(1)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-extrabold shadow-sm">
               {t("common.back")}
             </button>
-            <button type="button" onClick={() => setStep(3)} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold">
+            <button type="button" onClick={() => setStep(3)} className="flex-1 py-3 bg-blue-600 text-white rounded-2xl font-extrabold shadow-sm">
               {t("common.next")}
             </button>
           </div>
@@ -626,7 +626,7 @@ export const PaintCalculator: React.FC<Props> = ({ onCalculate }) => {
       {/* STEP 3 */}
       {step === 3 && (
         <div className="space-y-4">
-          <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
+          <div className="rounded-[22px] border border-blue-100 bg-blue-50/90 p-3 text-xs text-blue-800 flex items-start shadow-sm">
             <PaintBucket size={16} className="mr-2 shrink-0 mt-0.5" />
             {t("calc.paint.help_step3")}
           </div>
@@ -674,10 +674,10 @@ export const PaintCalculator: React.FC<Props> = ({ onCalculate }) => {
           </div>
 
           <div className="flex gap-3">
-            <button type="button" onClick={() => setStep(2)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
+            <button type="button" onClick={() => setStep(2)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-extrabold shadow-sm">
               {t("common.back")}
             </button>
-            <button type="button" onClick={() => setStep(4)} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold">
+            <button type="button" onClick={() => setStep(4)} className="flex-1 py-3 bg-blue-600 text-white rounded-2xl font-extrabold shadow-sm">
               {t("common.next")}
             </button>
           </div>
@@ -687,7 +687,7 @@ export const PaintCalculator: React.FC<Props> = ({ onCalculate }) => {
       {/* STEP 4 */}
       {step === 4 && (
         <div className="space-y-4">
-          <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
+          <div className="rounded-[22px] border border-blue-100 bg-blue-50/90 p-3 text-xs text-blue-800 flex items-start shadow-sm">
             <BoxSelect size={16} className="mr-2 shrink-0 mt-0.5" />
             {t("calc.paint.help_step4")}
           </div>
@@ -715,10 +715,10 @@ export const PaintCalculator: React.FC<Props> = ({ onCalculate }) => {
           </div>
 
           <div className="flex gap-3">
-            <button type="button" onClick={() => setStep(3)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
+            <button type="button" onClick={() => setStep(3)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-extrabold shadow-sm">
               {t("common.back")}
             </button>
-            <button type="button" onClick={() => setStep(5)} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold">
+            <button type="button" onClick={() => setStep(5)} className="flex-1 py-3 bg-blue-600 text-white rounded-2xl font-extrabold shadow-sm">
               {t("common.next")}
             </button>
           </div>
@@ -728,7 +728,7 @@ export const PaintCalculator: React.FC<Props> = ({ onCalculate }) => {
       {/* STEP 5 */}
       {step === 5 && (
         <div className="space-y-4">
-          <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
+          <div className="rounded-[22px] border border-blue-100 bg-blue-50/90 p-3 text-xs text-blue-800 flex items-start shadow-sm">
             <CircleDollarSign size={16} className="mr-2 shrink-0 mt-0.5" />
             {t("calc.paint.help_step5")}
           </div>
@@ -744,49 +744,49 @@ export const PaintCalculator: React.FC<Props> = ({ onCalculate }) => {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="block text-[10px] text-slate-500 mb-1">{t("calc.paint.price_wall_paint")}</label>
-                <input type="number" value={prices.paintWallL} onChange={(e) => updatePrice("paintWallL", e.target.value)} className="w-full p-1.5 border rounded text-sm bg-white text-slate-900" />
+                <input type="number" value={prices.paintWallL} onChange={(e) => updatePrice("paintWallL", e.target.value)} className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl" />
               </div>
 
               <div>
                 <label className="block text-[10px] text-slate-500 mb-1">{t("calc.paint.price_ceiling_paint")}</label>
-                <input type="number" value={prices.paintCeilingL} onChange={(e) => updatePrice("paintCeilingL", e.target.value)} className="w-full p-1.5 border rounded text-sm bg-white text-slate-900" />
+                <input type="number" value={prices.paintCeilingL} onChange={(e) => updatePrice("paintCeilingL", e.target.value)} className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl" />
               </div>
 
               {usePrimer && (
                 <div>
                   <label className="block text-[10px] text-slate-500 mb-1">{t("calc.paint.price_primer")}</label>
-                  <input type="number" value={prices.primerL} onChange={(e) => updatePrice("primerL", e.target.value)} className="w-full p-1.5 border rounded text-sm bg-white text-slate-900" />
+                  <input type="number" value={prices.primerL} onChange={(e) => updatePrice("primerL", e.target.value)} className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl" />
                 </div>
               )}
 
               {useFiller && (
                 <div>
                   <label className="block text-[10px] text-slate-500 mb-1">{t("calc.paint.price_filler")}</label>
-                  <input type="number" value={prices.fillerKg} onChange={(e) => updatePrice("fillerKg", e.target.value)} className="w-full p-1.5 border rounded text-sm bg-white text-slate-900" />
+                  <input type="number" value={prices.fillerKg} onChange={(e) => updatePrice("fillerKg", e.target.value)} className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl" />
                 </div>
               )}
 
               {useSmoothing && (
                 <div>
                   <label className="block text-[10px] text-slate-500 mb-1">{t("calc.paint.price_smoothing")}</label>
-                  <input type="number" value={prices.smoothingKg} onChange={(e) => updatePrice("smoothingKg", e.target.value)} className="w-full p-1.5 border rounded text-sm bg-white text-slate-900" />
+                  <input type="number" value={prices.smoothingKg} onChange={(e) => updatePrice("smoothingKg", e.target.value)} className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl" />
                 </div>
               )}
 
               <div>
                 <label className="block text-[10px] text-slate-500 mb-1">{t("calc.paint.price_tarp")}</label>
-                <input type="number" value={prices.tarpUnit} onChange={(e) => updatePrice("tarpUnit", e.target.value)} className="w-full p-1.5 border rounded text-sm bg-white text-slate-900" />
+                <input type="number" value={prices.tarpUnit} onChange={(e) => updatePrice("tarpUnit", e.target.value)} className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl" />
               </div>
 
               <div>
                 <label className="block text-[10px] text-slate-500 mb-1">{t("calc.paint.price_tape")}</label>
-                <input type="number" value={prices.tapeRoll} onChange={(e) => updatePrice("tapeRoll", e.target.value)} className="w-full p-1.5 border rounded text-sm bg-white text-slate-900" />
+                <input type="number" value={prices.tapeRoll} onChange={(e) => updatePrice("tapeRoll", e.target.value)} className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl" />
               </div>
 
               {paintWood && (
                 <div>
                   <label className="block text-[10px] text-slate-500 mb-1">{t("calc.paint.price_wood_paint")}</label>
-                  <input type="number" value={prices.paintWoodL} onChange={(e) => updatePrice("paintWoodL", e.target.value)} className="w-full p-1.5 border rounded text-sm bg-white text-slate-900" />
+                  <input type="number" value={prices.paintWoodL} onChange={(e) => updatePrice("paintWoodL", e.target.value)} className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl" />
                 </div>
               )}
             </div>
@@ -795,11 +795,11 @@ export const PaintCalculator: React.FC<Props> = ({ onCalculate }) => {
               <div className="mt-4 pt-3 border-t border-slate-100 grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-[10px] text-blue-600 font-bold mb-1">{t("calc.paint.price_labor_prep")}</label>
-                  <input type="number" value={prices.laborPrepM2} onChange={(e) => updatePrice("laborPrepM2", e.target.value)} className="w-full p-1.5 border border-blue-200 rounded text-sm bg-white text-slate-900" />
+                  <input type="number" value={prices.laborPrepM2} onChange={(e) => updatePrice("laborPrepM2", e.target.value)} className="w-full p-1.5 border border-blue-200 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(37,99,235,0.08)] backdrop-blur-xl" />
                 </div>
                 <div>
                   <label className="block text-[10px] text-blue-600 font-bold mb-1">{t("calc.paint.price_labor_paint")}</label>
-                  <input type="number" value={prices.laborPaintM2} onChange={(e) => updatePrice("laborPaintM2", e.target.value)} className="w-full p-1.5 border border-blue-200 rounded text-sm bg-white text-slate-900" />
+                  <input type="number" value={prices.laborPaintM2} onChange={(e) => updatePrice("laborPaintM2", e.target.value)} className="w-full p-1.5 border border-blue-200 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(37,99,235,0.08)] backdrop-blur-xl" />
                 </div>
               </div>
             )}
@@ -816,10 +816,10 @@ export const PaintCalculator: React.FC<Props> = ({ onCalculate }) => {
           )}
 
           <div className="flex gap-3 pt-2">
-            <button type="button" onClick={() => setStep(4)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
+            <button type="button" onClick={() => setStep(4)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-extrabold shadow-sm">
               {t("common.back")}
             </button>
-            <button type="button" disabled className="flex-1 py-3 bg-emerald-100 text-emerald-700 rounded-xl font-bold flex justify-center items-center">
+            <button type="button" disabled className="flex-1 py-3 bg-emerald-100 text-emerald-700 rounded-2xl font-extrabold shadow-sm flex justify-center items-center">
               <Check size={18} className="mr-2" /> {t("common.calculated")}
             </button>
           </div>

@@ -635,16 +635,16 @@ export const HvacCalculator: React.FC<Props> = ({ onCalculate }) => {
   );
 
   return (
-    <div className="space-y-6 animate-in fade-in">
+    <div className="space-y-6 rounded-[32px] border border-white/70 bg-white/72 p-4 shadow-[0_24px_70px_rgba(15,23,42,0.10)] backdrop-blur-xl sm:p-6">
       {/* Step Navigation */}
-      <div className="flex justify-between items-center mb-6 bg-slate-50 p-1 rounded-lg overflow-x-auto">
+      <div className="flex justify-between items-center mb-6 rounded-[24px] border border-white/80 bg-slate-100/70 p-1.5 shadow-inner overflow-x-auto backdrop-blur-xl">
         {[1, 2, 3, 4, 5].map((s) => (
           <button
             key={s}
             type="button"
             onClick={() => setStep(s)}
-            className={`flex-1 min-w-[70px] py-2 text-xs font-bold rounded transition-all ${
-              step === s ? "bg-white shadow text-blue-600" : "text-slate-400"
+            className={`flex-1 min-w-[70px] py-2 text-xs font-extrabold rounded-2xl transition-all ${
+              step === s ? "bg-white text-slate-950 shadow-[0_14px_32px_rgba(59,130,246,0.18)]" : "text-slate-400"
             }`}
           >
             {s === 1 && t("hvac.steps.1", { defaultValue: "1. Insulation" })}
@@ -659,7 +659,7 @@ export const HvacCalculator: React.FC<Props> = ({ onCalculate }) => {
       {/* STEP 1: Insulation */}
       {step === 1 && (
         <div className="space-y-4">
-          <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
+          <div className="rounded-[22px] border border-blue-100 bg-blue-50/90 p-3 text-xs text-blue-800 flex items-start shadow-sm">
             <Activity size={16} className="mr-2 shrink-0 mt-0.5" />
             {t("hvac.step1.hint", { defaultValue: "Set insulation level to estimate required power." })}
           </div>
@@ -716,7 +716,7 @@ export const HvacCalculator: React.FC<Props> = ({ onCalculate }) => {
           <button
             type="button"
             onClick={() => setStep(2)}
-            className="w-full py-3 bg-blue-600 text-white rounded-xl font-bold flex justify-center items-center mt-2"
+            className="w-full py-3 bg-blue-600 text-white rounded-2xl font-extrabold shadow-sm flex justify-center items-center mt-2"
           >
             {t("common.next", { defaultValue: "Next" })} <ArrowRight size={18} className="ml-2" />
           </button>
@@ -726,7 +726,7 @@ export const HvacCalculator: React.FC<Props> = ({ onCalculate }) => {
       {/* STEP 2: Zones */}
       {step === 2 && (
         <div className="space-y-4">
-          <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
+          <div className="rounded-[22px] border border-blue-100 bg-blue-50/90 p-3 text-xs text-blue-800 flex items-start shadow-sm">
             <LayoutGrid size={16} className="mr-2 shrink-0 mt-0.5" />
             {t("hvac.step2.hint", { defaultValue: "Add rooms to compute heating and ventilation needs." })}
           </div>
@@ -788,14 +788,14 @@ export const HvacCalculator: React.FC<Props> = ({ onCalculate }) => {
             <button
               type="button"
               onClick={() => setStep(1)}
-              className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold"
+              className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-extrabold shadow-sm"
             >
               {t("common.back", { defaultValue: "Back" })}
             </button>
             <button
               type="button"
               onClick={() => setStep(3)}
-              className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold"
+              className="flex-1 py-3 bg-blue-600 text-white rounded-2xl font-extrabold shadow-sm"
             >
               {t("common.next", { defaultValue: "Next" })}
             </button>
@@ -806,7 +806,7 @@ export const HvacCalculator: React.FC<Props> = ({ onCalculate }) => {
       {/* STEP 3: Heating */}
       {step === 3 && (
         <div className="space-y-4">
-          <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
+          <div className="rounded-[22px] border border-blue-100 bg-blue-50/90 p-3 text-xs text-blue-800 flex items-start shadow-sm">
             <Flame size={16} className="mr-2 shrink-0 mt-0.5" />
             {t("hvac.step3.hint", { defaultValue: "Configure the heating system." })}
           </div>
@@ -902,14 +902,14 @@ export const HvacCalculator: React.FC<Props> = ({ onCalculate }) => {
             <button
               type="button"
               onClick={() => setStep(2)}
-              className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold"
+              className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-extrabold shadow-sm"
             >
               {t("common.back", { defaultValue: "Back" })}
             </button>
             <button
               type="button"
               onClick={() => setStep(4)}
-              className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold"
+              className="flex-1 py-3 bg-blue-600 text-white rounded-2xl font-extrabold shadow-sm"
             >
               {t("common.next", { defaultValue: "Next" })}
             </button>
@@ -920,7 +920,7 @@ export const HvacCalculator: React.FC<Props> = ({ onCalculate }) => {
       {/* STEP 4: VMC */}
       {step === 4 && (
         <div className="space-y-4">
-          <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
+          <div className="rounded-[22px] border border-blue-100 bg-blue-50/90 p-3 text-xs text-blue-800 flex items-start shadow-sm">
             <Fan size={16} className="mr-2 shrink-0 mt-0.5" />
             {t("hvac.step4.hint", { defaultValue: "Select ventilation type and ducting." })}
           </div>
@@ -985,14 +985,14 @@ export const HvacCalculator: React.FC<Props> = ({ onCalculate }) => {
             <button
               type="button"
               onClick={() => setStep(3)}
-              className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold"
+              className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-extrabold shadow-sm"
             >
               {t("common.back", { defaultValue: "Back" })}
             </button>
             <button
               type="button"
               onClick={() => setStep(5)}
-              className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold"
+              className="flex-1 py-3 bg-blue-600 text-white rounded-2xl font-extrabold shadow-sm"
             >
               {t("common.next", { defaultValue: "Next" })}
             </button>
@@ -1003,7 +1003,7 @@ export const HvacCalculator: React.FC<Props> = ({ onCalculate }) => {
       {/* STEP 5: Pricing */}
       {step === 5 && (
         <div className="space-y-4">
-          <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
+          <div className="rounded-[22px] border border-blue-100 bg-blue-50/90 p-3 text-xs text-blue-800 flex items-start shadow-sm">
             <CircleDollarSign size={16} className="mr-2 shrink-0 mt-0.5" />
             {t("hvac.step5.hint", { defaultValue: "Adjust unit prices." })}
           </div>
@@ -1030,7 +1030,7 @@ export const HvacCalculator: React.FC<Props> = ({ onCalculate }) => {
                   type="number"
                   value={prices.pacAirWater}
                   onChange={(e) => updatePrice("pacAirWater", e.target.value)}
-                  className="w-full p-1.5 border rounded text-sm bg-white text-slate-900"
+                  className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl"
                 />
               </div>
               <div>
@@ -1041,7 +1041,7 @@ export const HvacCalculator: React.FC<Props> = ({ onCalculate }) => {
                   type="number"
                   value={prices.boilerGas}
                   onChange={(e) => updatePrice("boilerGas", e.target.value)}
-                  className="w-full p-1.5 border rounded text-sm bg-white text-slate-900"
+                  className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl"
                 />
               </div>
 
@@ -1053,7 +1053,7 @@ export const HvacCalculator: React.FC<Props> = ({ onCalculate }) => {
                   type="number"
                   value={prices.radWater}
                   onChange={(e) => updatePrice("radWater", e.target.value)}
-                  className="w-full p-1.5 border rounded text-sm bg-white text-slate-900"
+                  className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl"
                 />
               </div>
               <div>
@@ -1064,7 +1064,7 @@ export const HvacCalculator: React.FC<Props> = ({ onCalculate }) => {
                   type="number"
                   value={prices.radElec}
                   onChange={(e) => updatePrice("radElec", e.target.value)}
-                  className="w-full p-1.5 border rounded text-sm bg-white text-slate-900"
+                  className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl"
                 />
               </div>
 
@@ -1076,7 +1076,7 @@ export const HvacCalculator: React.FC<Props> = ({ onCalculate }) => {
                   type="number"
                   value={prices.kitVmcHygro}
                   onChange={(e) => updatePrice("kitVmcHygro", e.target.value)}
-                  className="w-full p-1.5 border rounded text-sm bg-white text-slate-900"
+                  className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl"
                 />
               </div>
               <div>
@@ -1087,7 +1087,7 @@ export const HvacCalculator: React.FC<Props> = ({ onCalculate }) => {
                   type="number"
                   value={prices.ductFlexM}
                   onChange={(e) => updatePrice("ductFlexM", e.target.value)}
-                  className="w-full p-1.5 border rounded text-sm bg-white text-slate-900"
+                  className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl"
                 />
               </div>
             </div>
@@ -1102,7 +1102,7 @@ export const HvacCalculator: React.FC<Props> = ({ onCalculate }) => {
                     type="number"
                     value={prices.installGenerator}
                     onChange={(e) => updatePrice("installGenerator", e.target.value)}
-                    className="w-full p-1.5 border border-blue-200 rounded text-sm bg-white text-slate-900"
+                    className="w-full p-1.5 border border-blue-200 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(37,99,235,0.08)] backdrop-blur-xl"
                   />
                 </div>
                 <div>
@@ -1113,7 +1113,7 @@ export const HvacCalculator: React.FC<Props> = ({ onCalculate }) => {
                     type="number"
                     value={prices.installVmc}
                     onChange={(e) => updatePrice("installVmc", e.target.value)}
-                    className="w-full p-1.5 border border-blue-200 rounded text-sm bg-white text-slate-900"
+                    className="w-full p-1.5 border border-blue-200 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(37,99,235,0.08)] backdrop-blur-xl"
                   />
                 </div>
               </div>
@@ -1134,14 +1134,14 @@ export const HvacCalculator: React.FC<Props> = ({ onCalculate }) => {
             <button
               type="button"
               onClick={() => setStep(4)}
-              className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold"
+              className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-extrabold shadow-sm"
             >
               {t("common.back", { defaultValue: "Back" })}
             </button>
             <button
               type="button"
               disabled
-              className="flex-1 py-3 bg-emerald-100 text-emerald-700 rounded-xl font-bold flex justify-center items-center"
+              className="flex-1 py-3 bg-emerald-100 text-emerald-700 rounded-2xl font-extrabold shadow-sm flex justify-center items-center"
             >
               <Check size={18} className="mr-2" /> {t("struct.common.calculated", { defaultValue: "Calculated" })}
             </button>

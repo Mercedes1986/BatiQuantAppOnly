@@ -1470,9 +1470,9 @@ export const StructuralCalculator: React.FC<Props> = ({
   // UI
   // -------------------------
   return (
-    <div className="space-y-6 animate-in fade-in">
+    <div className="space-y-6 rounded-[32px] border border-white/70 bg-white/72 p-4 shadow-[0_24px_70px_rgba(15,23,42,0.10)] backdrop-blur-xl sm:p-6">
       {!hideTabs && (
-        <div className="flex bg-slate-100 p-1 rounded-lg mb-4">
+        <div className="flex rounded-[24px] border border-white/80 bg-slate-100/70 p-1.5 shadow-inner backdrop-blur-xl mb-4">
           <button
             type="button"
             onClick={() => {
@@ -1480,7 +1480,7 @@ export const StructuralCalculator: React.FC<Props> = ({
               setStep(1);
             }}
             className={`flex-1 py-2 text-xs font-extrabold rounded flex items-center justify-center ${
-              mode === "groundwork" ? "bg-white shadow text-blue-600" : "text-slate-500"
+              mode === "groundwork" ? "bg-white text-slate-950 shadow-[0_14px_32px_rgba(59,130,246,0.18)]" : "text-slate-500"
             }`}
           >
             <Mountain size={16} className="mr-1" /> {tr("struct.tabs.groundwork")}
@@ -1493,7 +1493,7 @@ export const StructuralCalculator: React.FC<Props> = ({
               setStep(1);
             }}
             className={`flex-1 py-2 text-xs font-extrabold rounded flex items-center justify-center ${
-              mode === "foundations" ? "bg-white shadow text-blue-600" : "text-slate-500"
+              mode === "foundations" ? "bg-white text-slate-950 shadow-[0_14px_32px_rgba(59,130,246,0.18)]" : "text-slate-500"
             }`}
           >
             <Warehouse size={16} className="mr-1" /> {tr("struct.tabs.foundations")}
@@ -1506,7 +1506,7 @@ export const StructuralCalculator: React.FC<Props> = ({
               setStep(1);
             }}
             className={`flex-1 py-2 text-xs font-extrabold rounded flex items-center justify-center ${
-              mode === "walls" ? "bg-white shadow text-blue-600" : "text-slate-500"
+              mode === "walls" ? "bg-white text-slate-950 shadow-[0_14px_32px_rgba(59,130,246,0.18)]" : "text-slate-500"
             }`}
           >
             <BrickWall size={16} className="mr-1" /> {tr("struct.tabs.walls")}
@@ -1517,13 +1517,13 @@ export const StructuralCalculator: React.FC<Props> = ({
       {/* ======================= GROUNDWORK WIZARD ======================= */}
       {mode === "groundwork" && (
         <>
-          <div className="flex justify-between items-center mb-6 bg-slate-50 p-1 rounded-lg overflow-x-auto">
+          <div className="flex justify-between items-center mb-6 rounded-[24px] border border-white/80 bg-slate-100/70 p-1.5 shadow-inner overflow-x-auto backdrop-blur-xl">
             {[1, 2, 3, 4, 5].map((s) => (
               <button
                 key={s}
                 onClick={() => setStep(s)}
-                className={`flex-1 min-w-[70px] py-2 text-xs font-bold rounded transition-all ${
-                  step === s ? "bg-white shadow text-blue-600" : "text-slate-400"
+                className={`flex-1 min-w-[70px] py-2 text-xs font-extrabold rounded-2xl transition-all ${
+                  step === s ? "bg-white text-slate-950 shadow-[0_14px_32px_rgba(59,130,246,0.18)]" : "text-slate-400"
                 }`}
                 type="button"
               >
@@ -1535,7 +1535,7 @@ export const StructuralCalculator: React.FC<Props> = ({
           {/* STEP 1 */}
           {step === 1 && (
             <div className="space-y-4">
-              <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
+              <div className="rounded-[22px] border border-blue-100 bg-blue-50/90 p-3 text-xs text-blue-800 flex items-start shadow-sm">
                 <Mountain size={16} className="mr-2 shrink-0 mt-0.5" />
                 {tr("struct.gw.step1.hint")}
               </div>
@@ -1595,7 +1595,7 @@ export const StructuralCalculator: React.FC<Props> = ({
               <button
                 type="button"
                 onClick={() => setStep(2)}
-                className="w-full py-3 bg-blue-600 text-white rounded-xl font-bold flex justify-center items-center mt-2"
+                className="w-full py-3 bg-blue-600 text-white rounded-2xl font-extrabold shadow-sm flex justify-center items-center mt-2"
               >
                 {tr("common.next")} <ArrowRight size={18} className="ml-2" />
               </button>
@@ -1605,7 +1605,7 @@ export const StructuralCalculator: React.FC<Props> = ({
           {/* STEP 2 */}
           {step === 2 && (
             <div className="space-y-4">
-              <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
+              <div className="rounded-[22px] border border-blue-100 bg-blue-50/90 p-3 text-xs text-blue-800 flex items-start shadow-sm">
                 <Pickaxe size={16} className="mr-2 shrink-0 mt-0.5" />
                 {tr("struct.gw.step2.hint")}
               </div>
@@ -1681,14 +1681,14 @@ export const StructuralCalculator: React.FC<Props> = ({
               <div className="flex gap-3">
                 <button
                   onClick={() => setStep(1)}
-                  className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold"
+                  className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-extrabold shadow-sm"
                   type="button"
                 >
                   {tr("common.back")}
                 </button>
                 <button
                   onClick={() => setStep(3)}
-                  className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold"
+                  className="flex-1 py-3 bg-blue-600 text-white rounded-2xl font-extrabold shadow-sm"
                   type="button"
                 >
                   {tr("common.next")}
@@ -1700,7 +1700,7 @@ export const StructuralCalculator: React.FC<Props> = ({
           {/* STEP 3 */}
           {step === 3 && (
             <div className="space-y-4">
-              <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
+              <div className="rounded-[22px] border border-blue-100 bg-blue-50/90 p-3 text-xs text-blue-800 flex items-start shadow-sm">
                 <Combine size={16} className="mr-2 shrink-0 mt-0.5" />
                 {tr("struct.gw.step3.hint")}
               </div>
@@ -1723,14 +1723,14 @@ export const StructuralCalculator: React.FC<Props> = ({
               <div className="flex gap-3">
                 <button
                   onClick={() => setStep(2)}
-                  className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold"
+                  className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-extrabold shadow-sm"
                   type="button"
                 >
                   {tr("common.back")}
                 </button>
                 <button
                   onClick={() => setStep(4)}
-                  className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold"
+                  className="flex-1 py-3 bg-blue-600 text-white rounded-2xl font-extrabold shadow-sm"
                   type="button"
                 >
                   {tr("common.next")}
@@ -1742,7 +1742,7 @@ export const StructuralCalculator: React.FC<Props> = ({
           {/* STEP 4 */}
           {step === 4 && (
             <div className="space-y-4">
-              <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
+              <div className="rounded-[22px] border border-blue-100 bg-blue-50/90 p-3 text-xs text-blue-800 flex items-start shadow-sm">
                 <Truck size={16} className="mr-2 shrink-0 mt-0.5" />
                 {tr("struct.gw.step4.hint")}
               </div>
@@ -1846,14 +1846,14 @@ export const StructuralCalculator: React.FC<Props> = ({
               <div className="flex gap-3">
                 <button
                   onClick={() => setStep(3)}
-                  className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold"
+                  className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-extrabold shadow-sm"
                   type="button"
                 >
                   {tr("common.back")}
                 </button>
                 <button
                   onClick={() => setStep(5)}
-                  className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold"
+                  className="flex-1 py-3 bg-blue-600 text-white rounded-2xl font-extrabold shadow-sm"
                   type="button"
                 >
                   {tr("common.next")}
@@ -1865,7 +1865,7 @@ export const StructuralCalculator: React.FC<Props> = ({
           {/* STEP 5 */}
           {step === 5 && (
             <div className="space-y-4">
-              <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
+              <div className="rounded-[22px] border border-blue-100 bg-blue-50/90 p-3 text-xs text-blue-800 flex items-start shadow-sm">
                 <Euro size={16} className="mr-2 shrink-0 mt-0.5" />
                 {tr("struct.gw.step5.hint")}
               </div>
@@ -1886,7 +1886,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                       type="number"
                       value={gwPrices.excavM3}
                       onChange={(e) => setGwPrices({ ...gwPrices, excavM3: parseFloat(e.target.value) || 0 })}
-                      className="w-full p-1.5 border border-slate-300 rounded text-sm bg-white text-slate-900"
+                      className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl"
                     />
                   </div>
 
@@ -1896,7 +1896,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                       type="number"
                       value={gwPrices.stripM2}
                       onChange={(e) => setGwPrices({ ...gwPrices, stripM2: parseFloat(e.target.value) || 0 })}
-                      className="w-full p-1.5 border border-slate-300 rounded text-sm bg-white text-slate-900"
+                      className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl"
                     />
                   </div>
 
@@ -1906,7 +1906,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                       type="number"
                       value={gwPrices.truckRotation}
                       onChange={(e) => setGwPrices({ ...gwPrices, truckRotation: parseFloat(e.target.value) || 0 })}
-                      className="w-full p-1.5 border border-slate-300 rounded text-sm bg-white text-slate-900"
+                      className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl"
                     />
                   </div>
 
@@ -1916,7 +1916,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                       type="number"
                       value={gwPrices.dumpFeeTon}
                       onChange={(e) => setGwPrices({ ...gwPrices, dumpFeeTon: parseFloat(e.target.value) || 0 })}
-                      className="w-full p-1.5 border border-slate-300 rounded text-sm bg-white text-slate-900"
+                      className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl"
                     />
                   </div>
                 </div>
@@ -1929,7 +1929,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                         type="number"
                         value={gwPrices.laborM3}
                         onChange={(e) => setGwPrices({ ...gwPrices, laborM3: parseFloat(e.target.value) || 0 })}
-                        className="w-full p-1.5 border border-blue-200 rounded text-sm bg-white text-slate-900"
+                        className="w-full p-1.5 border border-blue-200 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(37,99,235,0.08)] backdrop-blur-xl"
                       />
                     </div>
                   </div>
@@ -1939,14 +1939,14 @@ export const StructuralCalculator: React.FC<Props> = ({
               <div className="flex gap-3 pt-4">
                 <button
                   onClick={() => setStep(4)}
-                  className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold"
+                  className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-extrabold shadow-sm"
                   type="button"
                 >
                   {tr("common.back")}
                 </button>
                 <button
                   disabled
-                  className="flex-1 py-3 bg-emerald-100 text-emerald-700 rounded-xl font-bold flex justify-center items-center"
+                  className="flex-1 py-3 bg-emerald-100 text-emerald-700 rounded-2xl font-extrabold shadow-sm flex justify-center items-center"
                   type="button"
                 >
                   <Check size={18} className="mr-2" /> {tr("struct.common.calculated")}
@@ -1960,13 +1960,13 @@ export const StructuralCalculator: React.FC<Props> = ({
       {/* ======================= FOUNDATIONS WIZARD ======================= */}
       {mode === "foundations" && (
         <>
-          <div className="flex justify-between items-center mb-6 bg-slate-50 p-1 rounded-lg overflow-x-auto">
+          <div className="flex justify-between items-center mb-6 rounded-[24px] border border-white/80 bg-slate-100/70 p-1.5 shadow-inner overflow-x-auto backdrop-blur-xl">
             {[1, 2, 3, 4, 5].map((s) => (
               <button
                 key={s}
                 onClick={() => setStep(s)}
-                className={`flex-1 min-w-[70px] py-2 text-xs font-bold rounded transition-all ${
-                  step === s ? "bg-white shadow text-blue-600" : "text-slate-400"
+                className={`flex-1 min-w-[70px] py-2 text-xs font-extrabold rounded-2xl transition-all ${
+                  step === s ? "bg-white text-slate-950 shadow-[0_14px_32px_rgba(59,130,246,0.18)]" : "text-slate-400"
                 }`}
                 type="button"
               >
@@ -1978,7 +1978,7 @@ export const StructuralCalculator: React.FC<Props> = ({
           {/* STEP 1 */}
           {step === 1 && (
             <div className="space-y-4">
-              <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
+              <div className="rounded-[22px] border border-blue-100 bg-blue-50/90 p-3 text-xs text-blue-800 flex items-start shadow-sm">
                 <Warehouse size={16} className="mr-2 shrink-0 mt-0.5" />
                 {tr("struct.fd.step1.hint")}
               </div>
@@ -2051,7 +2051,7 @@ export const StructuralCalculator: React.FC<Props> = ({
 
               <button
                 onClick={() => setStep(2)}
-                className="w-full py-3 bg-blue-600 text-white rounded-xl font-bold flex justify-center items-center mt-2"
+                className="w-full py-3 bg-blue-600 text-white rounded-2xl font-extrabold shadow-sm flex justify-center items-center mt-2"
                 type="button"
               >
                 {tr("common.next")} <ArrowRight size={18} className="ml-2" />
@@ -2062,7 +2062,7 @@ export const StructuralCalculator: React.FC<Props> = ({
           {/* STEP 2 */}
           {step === 2 && (
             <div className="space-y-4">
-              <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
+              <div className="rounded-[22px] border border-blue-100 bg-blue-50/90 p-3 text-xs text-blue-800 flex items-start shadow-sm">
                 <Shovel size={16} className="mr-2 shrink-0 mt-0.5" />
                 {tr("struct.fd.step2.hint")}
               </div>
@@ -2132,14 +2132,14 @@ export const StructuralCalculator: React.FC<Props> = ({
               <div className="flex gap-3">
                 <button
                   onClick={() => setStep(1)}
-                  className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold"
+                  className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-extrabold shadow-sm"
                   type="button"
                 >
                   {tr("common.back")}
                 </button>
                 <button
                   onClick={() => setStep(3)}
-                  className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold"
+                  className="flex-1 py-3 bg-blue-600 text-white rounded-2xl font-extrabold shadow-sm"
                   type="button"
                 >
                   {tr("common.next")}
@@ -2151,7 +2151,7 @@ export const StructuralCalculator: React.FC<Props> = ({
           {/* STEP 3 */}
           {step === 3 && (
             <div className="space-y-4">
-              <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
+              <div className="rounded-[22px] border border-blue-100 bg-blue-50/90 p-3 text-xs text-blue-800 flex items-start shadow-sm">
                 <Combine size={16} className="mr-2 shrink-0 mt-0.5" />
                 {tr("struct.fd.step3.hint")}
               </div>
@@ -2169,7 +2169,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                         type="number"
                         value={fdStripL}
                         onChange={(e) => setFdStripL(e.target.value)}
-                        className="w-full p-1.5 border border-slate-300 rounded text-sm bg-white text-slate-900"
+                        className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl"
                       />
                     </div>
                     <div>
@@ -2178,7 +2178,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                         type="number"
                         value={fdStripW}
                         onChange={(e) => setFdStripW(e.target.value)}
-                        className="w-full p-1.5 border border-slate-300 rounded text-sm bg-white text-slate-900"
+                        className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl"
                       />
                     </div>
                     <div>
@@ -2187,7 +2187,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                         type="number"
                         value={fdStripH}
                         onChange={(e) => setFdStripH(e.target.value)}
-                        className="w-full p-1.5 border border-slate-300 rounded text-sm bg-white text-slate-900"
+                        className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl"
                       />
                     </div>
                   </div>
@@ -2295,7 +2295,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                         type="number"
                         value={fdRaftThick}
                         onChange={(e) => setFdRaftThick(e.target.value)}
-                        className="w-20 p-1.5 border border-slate-300 rounded text-sm bg-white text-slate-900"
+                        className="w-20 p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl"
                       />
                     </div>
 
@@ -2304,7 +2304,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                       <select
                         value={fdRebarRaftType}
                         onChange={(e) => setFdRebarRaftType(e.target.value)}
-                        className="w-full p-1.5 border border-slate-300 rounded text-sm bg-white text-slate-900"
+                        className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl"
                       >
                         <option value="ST25C">{tr("struct.fd.mesh_st25")}</option>
                         <option value="ST10">{tr("struct.fd.mesh_st10")}</option>
@@ -2326,10 +2326,10 @@ export const StructuralCalculator: React.FC<Props> = ({
               </div>
 
               <div className="flex gap-3">
-                <button onClick={() => setStep(2)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold" type="button">
+                <button onClick={() => setStep(2)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-extrabold shadow-sm" type="button">
                   {tr("common.back")}
                 </button>
-                <button onClick={() => setStep(4)} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold" type="button">
+                <button onClick={() => setStep(4)} className="flex-1 py-3 bg-blue-600 text-white rounded-2xl font-extrabold shadow-sm" type="button">
                   {tr("common.next")}
                 </button>
               </div>
@@ -2339,7 +2339,7 @@ export const StructuralCalculator: React.FC<Props> = ({
           {/* STEP 4 */}
           {step === 4 && (
             <div className="space-y-4">
-              <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
+              <div className="rounded-[22px] border border-blue-100 bg-blue-50/90 p-3 text-xs text-blue-800 flex items-start shadow-sm">
                 <Layers size={16} className="mr-2 shrink-0 mt-0.5" />
                 {tr("struct.fd.step4.hint")}
               </div>
@@ -2371,10 +2371,10 @@ export const StructuralCalculator: React.FC<Props> = ({
               </div>
 
               <div className="flex gap-3">
-                <button onClick={() => setStep(3)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold" type="button">
+                <button onClick={() => setStep(3)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-extrabold shadow-sm" type="button">
                   {tr("common.back")}
                 </button>
-                <button onClick={() => setStep(5)} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold" type="button">
+                <button onClick={() => setStep(5)} className="flex-1 py-3 bg-blue-600 text-white rounded-2xl font-extrabold shadow-sm" type="button">
                   {tr("common.next")}
                 </button>
               </div>
@@ -2384,7 +2384,7 @@ export const StructuralCalculator: React.FC<Props> = ({
           {/* STEP 5 */}
           {step === 5 && (
             <div className="space-y-4">
-              <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
+              <div className="rounded-[22px] border border-blue-100 bg-blue-50/90 p-3 text-xs text-blue-800 flex items-start shadow-sm">
                 <Euro size={16} className="mr-2 shrink-0 mt-0.5" />
                 {tr("struct.fd.step5.hint")}
               </div>
@@ -2405,7 +2405,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                       type="number"
                       value={fdPrices.concrete}
                       onChange={(e) => setFdPrices({ ...fdPrices, concrete: parseFloat(e.target.value) || 0 })}
-                      className="w-full p-1.5 border border-slate-300 rounded text-sm bg-white text-slate-900"
+                      className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl"
                     />
                   </div>
 
@@ -2415,7 +2415,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                       type="number"
                       value={fdPrices.rebarCage}
                       onChange={(e) => setFdPrices({ ...fdPrices, rebarCage: parseFloat(e.target.value) || 0 })}
-                      className="w-full p-1.5 border border-slate-300 rounded text-sm bg-white text-slate-900"
+                      className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl"
                     />
                   </div>
 
@@ -2426,7 +2426,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                         type="number"
                         value={fdPrices.excavation}
                         onChange={(e) => setFdPrices({ ...fdPrices, excavation: parseFloat(e.target.value) || 0 })}
-                        className="w-full p-1.5 border border-slate-300 rounded text-sm bg-white text-slate-900"
+                        className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl"
                       />
                     </div>
                   )}
@@ -2438,7 +2438,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                         type="number"
                         value={fdPrices.formwork}
                         onChange={(e) => setFdPrices({ ...fdPrices, formwork: parseFloat(e.target.value) || 0 })}
-                        className="w-full p-1.5 border border-slate-300 rounded text-sm bg-white text-slate-900"
+                        className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl"
                       />
                     </div>
                   )}
@@ -2452,7 +2452,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                         type="number"
                         value={fdPrices.laborM3}
                         onChange={(e) => setFdPrices({ ...fdPrices, laborM3: parseFloat(e.target.value) || 0 })}
-                        className="w-full p-1.5 border border-blue-200 rounded text-sm bg-white text-slate-900"
+                        className="w-full p-1.5 border border-blue-200 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(37,99,235,0.08)] backdrop-blur-xl"
                       />
                     </div>
 
@@ -2463,7 +2463,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                           type="number"
                           value={fdPrices.laborForm}
                           onChange={(e) => setFdPrices({ ...fdPrices, laborForm: parseFloat(e.target.value) || 0 })}
-                          className="w-full p-1.5 border border-blue-200 rounded text-sm bg-white text-slate-900"
+                          className="w-full p-1.5 border border-blue-200 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(37,99,235,0.08)] backdrop-blur-xl"
                         />
                       </div>
                     )}
@@ -2472,10 +2472,10 @@ export const StructuralCalculator: React.FC<Props> = ({
               </div>
 
               <div className="flex gap-3 pt-4">
-                <button onClick={() => setStep(4)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold" type="button">
+                <button onClick={() => setStep(4)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-extrabold shadow-sm" type="button">
                   {tr("common.back")}
                 </button>
-                <button disabled className="flex-1 py-3 bg-emerald-100 text-emerald-700 rounded-xl font-bold flex justify-center items-center" type="button">
+                <button disabled className="flex-1 py-3 bg-emerald-100 text-emerald-700 rounded-2xl font-extrabold shadow-sm flex justify-center items-center" type="button">
                   <Check size={18} className="mr-2" /> {tr("struct.common.calculated")}
                 </button>
               </div>
@@ -2487,13 +2487,13 @@ export const StructuralCalculator: React.FC<Props> = ({
       {/* ======================= WALLS WIZARD ======================= */}
       {mode === "walls" && (
         <>
-          <div className="flex justify-between items-center mb-6 bg-slate-50 p-1 rounded-lg overflow-x-auto">
+          <div className="flex justify-between items-center mb-6 rounded-[24px] border border-white/80 bg-slate-100/70 p-1.5 shadow-inner overflow-x-auto backdrop-blur-xl">
             {[1, 2, 3, 4, 5, 6].map((s) => (
               <button
                 key={s}
                 onClick={() => setStep(s)}
-                className={`flex-1 min-w-[70px] py-2 text-xs font-bold rounded transition-all ${
-                  step === s ? "bg-white shadow text-blue-600" : "text-slate-400"
+                className={`flex-1 min-w-[70px] py-2 text-xs font-extrabold rounded-2xl transition-all ${
+                  step === s ? "bg-white text-slate-950 shadow-[0_14px_32px_rgba(59,130,246,0.18)]" : "text-slate-400"
                 }`}
                 type="button"
               >
@@ -2505,12 +2505,12 @@ export const StructuralCalculator: React.FC<Props> = ({
           {/* STEP 1 */}
           {step === 1 && (
             <div className="space-y-4">
-              <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
+              <div className="rounded-[22px] border border-blue-100 bg-blue-50/90 p-3 text-xs text-blue-800 flex items-start shadow-sm">
                 <Ruler size={16} className="mr-2 shrink-0 mt-0.5" />
                 {tr("struct.w.step1.hint")}
               </div>
 
-              <div className="flex bg-slate-100 p-1 rounded-lg">
+              <div className="flex rounded-[24px] border border-white/80 bg-slate-100/70 p-1.5 shadow-inner backdrop-blur-xl">
                 <button
                   onClick={() => setWInputMode("global")}
                   className={`flex-1 py-1.5 text-xs font-bold rounded ${wInputMode === "global" ? "bg-white shadow" : "text-slate-500"}`}
@@ -2647,7 +2647,7 @@ export const StructuralCalculator: React.FC<Props> = ({
 
               <button
                 onClick={() => setStep(2)}
-                className="w-full py-3 bg-blue-600 text-white rounded-xl font-bold flex justify-center items-center mt-2"
+                className="w-full py-3 bg-blue-600 text-white rounded-2xl font-extrabold shadow-sm flex justify-center items-center mt-2"
                 type="button"
               >
                 {tr("common.next")} <ArrowRight size={18} className="ml-2" />
@@ -2658,7 +2658,7 @@ export const StructuralCalculator: React.FC<Props> = ({
           {/* STEP 2 */}
           {step === 2 && (
             <div className="space-y-4">
-              <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
+              <div className="rounded-[22px] border border-blue-100 bg-blue-50/90 p-3 text-xs text-blue-800 flex items-start shadow-sm">
                 <BrickWall size={16} className="mr-2 shrink-0 mt-0.5" />
                 {tr("struct.w.step2.hint")}
               </div>
@@ -2704,10 +2704,10 @@ export const StructuralCalculator: React.FC<Props> = ({
               </div>
 
               <div className="flex gap-3">
-                <button onClick={() => setStep(1)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold" type="button">
+                <button onClick={() => setStep(1)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-extrabold shadow-sm" type="button">
                   {tr("common.back")}
                 </button>
-                <button onClick={() => setStep(3)} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold" type="button">
+                <button onClick={() => setStep(3)} className="flex-1 py-3 bg-blue-600 text-white rounded-2xl font-extrabold shadow-sm" type="button">
                   {tr("common.next")}
                 </button>
               </div>
@@ -2717,7 +2717,7 @@ export const StructuralCalculator: React.FC<Props> = ({
           {/* STEP 3 */}
           {step === 3 && (
             <div className="space-y-4">
-              <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
+              <div className="rounded-[22px] border border-blue-100 bg-blue-50/90 p-3 text-xs text-blue-800 flex items-start shadow-sm">
                 <LayoutTemplate size={16} className="mr-2 shrink-0 mt-0.5" />
                 {tr("struct.w.step3.hint")}
               </div>
@@ -2790,10 +2790,10 @@ export const StructuralCalculator: React.FC<Props> = ({
               </div>
 
               <div className="flex gap-3">
-                <button onClick={() => setStep(2)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold" type="button">
+                <button onClick={() => setStep(2)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-extrabold shadow-sm" type="button">
                   {tr("common.back")}
                 </button>
-                <button onClick={() => setStep(4)} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold" type="button">
+                <button onClick={() => setStep(4)} className="flex-1 py-3 bg-blue-600 text-white rounded-2xl font-extrabold shadow-sm" type="button">
                   {tr("common.next")}
                 </button>
               </div>
@@ -2803,7 +2803,7 @@ export const StructuralCalculator: React.FC<Props> = ({
           {/* STEP 4 */}
           {step === 4 && (
             <div className="space-y-4">
-              <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
+              <div className="rounded-[22px] border border-blue-100 bg-blue-50/90 p-3 text-xs text-blue-800 flex items-start shadow-sm">
                 <Combine size={16} className="mr-2 shrink-0 mt-0.5" />
                 {tr("struct.w.step4.hint")}
               </div>
@@ -2858,10 +2858,10 @@ export const StructuralCalculator: React.FC<Props> = ({
               </div>
 
               <div className="flex gap-3">
-                <button onClick={() => setStep(3)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold" type="button">
+                <button onClick={() => setStep(3)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-extrabold shadow-sm" type="button">
                   {tr("common.back")}
                 </button>
-                <button onClick={() => setStep(5)} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold" type="button">
+                <button onClick={() => setStep(5)} className="flex-1 py-3 bg-blue-600 text-white rounded-2xl font-extrabold shadow-sm" type="button">
                   {tr("common.next")}
                 </button>
               </div>
@@ -2871,7 +2871,7 @@ export const StructuralCalculator: React.FC<Props> = ({
           {/* STEP 5 */}
           {step === 5 && (
             <div className="space-y-4">
-              <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
+              <div className="rounded-[22px] border border-blue-100 bg-blue-50/90 p-3 text-xs text-blue-800 flex items-start shadow-sm">
                 <PaintRoller size={16} className="mr-2 shrink-0 mt-0.5" />
                 {tr("struct.w.step5.hint")}
               </div>
@@ -2903,10 +2903,10 @@ export const StructuralCalculator: React.FC<Props> = ({
               </div>
 
               <div className="flex gap-3">
-                <button onClick={() => setStep(4)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold" type="button">
+                <button onClick={() => setStep(4)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-extrabold shadow-sm" type="button">
                   {tr("common.back")}
                 </button>
-                <button onClick={() => setStep(6)} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold" type="button">
+                <button onClick={() => setStep(6)} className="flex-1 py-3 bg-blue-600 text-white rounded-2xl font-extrabold shadow-sm" type="button">
                   {tr("common.next")}
                 </button>
               </div>
@@ -2916,7 +2916,7 @@ export const StructuralCalculator: React.FC<Props> = ({
           {/* STEP 6 */}
           {step === 6 && (
             <div className="space-y-4">
-              <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
+              <div className="rounded-[22px] border border-blue-100 bg-blue-50/90 p-3 text-xs text-blue-800 flex items-start shadow-sm">
                 <Euro size={16} className="mr-2 shrink-0 mt-0.5" />
                 {tr("struct.w.step6.hint")}
               </div>
@@ -2958,7 +2958,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                             type="number"
                             value={current}
                             onChange={(e) => setUnitOverride(priceKey, parseFloat(e.target.value) || 0)}
-                            className="w-full p-1.5 border border-slate-300 rounded text-sm bg-white text-slate-900"
+                            className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl"
                           />
                           <p className="text-[11px] text-slate-400 mt-1">{tr("struct.w.unit_price_variant_help")}</p>
                         </>
@@ -2977,7 +2977,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                         if (wallBinderKind === "mortier") updateWPrice("mortarBag", e.target.value);
                         else updateWPrice("glueBag", e.target.value);
                       }}
-                      className="w-full p-1.5 border border-slate-300 rounded text-sm bg-white text-slate-900"
+                      className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl"
                     />
 
                     {wallBinderKind === "mortier" && (
@@ -2998,7 +2998,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                       type="number"
                       value={wPrices.lintelM}
                       onChange={(e) => updateWPrice("lintelM", e.target.value)}
-                      className="w-full p-1.5 border border-slate-300 rounded text-sm bg-white text-slate-900"
+                      className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl"
                     />
                   </div>
 
@@ -3009,7 +3009,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                         type="number"
                         value={wPrices.coatingExtBag}
                         onChange={(e) => updateWPrice("coatingExtBag", e.target.value)}
-                        className="w-full p-1.5 border border-slate-300 rounded text-sm bg-white text-slate-900"
+                        className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl"
                       />
                     </div>
                   )}
@@ -3021,7 +3021,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                         type="number"
                         value={wPrices.scaffoldFixed}
                         onChange={(e) => updateWPrice("scaffoldFixed", e.target.value)}
-                        className="w-full p-1.5 border border-slate-300 rounded text-sm bg-white text-slate-900"
+                        className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl"
                       />
                     </div>
                   )}
@@ -3035,7 +3035,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                         type="number"
                         value={wPrices.laborM2}
                         onChange={(e) => updateWPrice("laborM2", e.target.value)}
-                        className="w-full p-1.5 border border-blue-200 rounded text-sm bg-white text-slate-900"
+                        className="w-full p-1.5 border border-blue-200 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(37,99,235,0.08)] backdrop-blur-xl"
                       />
                     </div>
                   </div>
@@ -3043,10 +3043,10 @@ export const StructuralCalculator: React.FC<Props> = ({
               </div>
 
               <div className="flex gap-3 pt-4">
-                <button onClick={() => setStep(5)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold" type="button">
+                <button onClick={() => setStep(5)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-extrabold shadow-sm" type="button">
                   {tr("common.back")}
                 </button>
-                <button disabled className="flex-1 py-3 bg-emerald-100 text-emerald-700 rounded-xl font-bold flex justify-center items-center" type="button">
+                <button disabled className="flex-1 py-3 bg-emerald-100 text-emerald-700 rounded-2xl font-extrabold shadow-sm flex justify-center items-center" type="button">
                   <Check size={18} className="mr-2" /> {tr("struct.common.calculated")}
                 </button>
               </div>

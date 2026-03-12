@@ -468,16 +468,16 @@ export const ScreedCalculator: React.FC<Props> = ({ onCalculate }) => {
   }, [calculationData, onCalculate, t, zones.length]);
 
   return (
-    <div className="space-y-6 animate-in fade-in">
+    <div className="space-y-6 rounded-[32px] border border-white/70 bg-white/72 p-4 shadow-[0_24px_70px_rgba(15,23,42,0.10)] backdrop-blur-xl sm:p-6">
       {/* Navigation */}
-      <div className="flex justify-between items-center mb-6 bg-slate-50 p-1 rounded-lg overflow-x-auto">
+      <div className="flex justify-between items-center mb-6 rounded-[24px] border border-white/80 bg-slate-100/70 p-1.5 shadow-inner overflow-x-auto backdrop-blur-xl">
         {[1, 2, 3, 4].map((s) => (
           <button
             key={s}
             type="button"
             onClick={() => setStep(s)}
-            className={`flex-1 min-w-[80px] py-2 text-xs font-bold rounded transition-all ${
-              step === s ? "bg-white shadow text-blue-600" : "text-slate-400"
+            className={`flex-1 min-w-[80px] py-2 text-xs font-extrabold rounded-2xl transition-all ${
+              step === s ? "bg-white text-slate-950 shadow-[0_14px_32px_rgba(59,130,246,0.18)]" : "text-slate-400"
             }`}
           >
             {stepLabel(s)}
@@ -488,7 +488,7 @@ export const ScreedCalculator: React.FC<Props> = ({ onCalculate }) => {
       {/* STEP 1 */}
       {step === 1 && (
         <div className="space-y-4">
-          <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
+          <div className="rounded-[22px] border border-blue-100 bg-blue-50/90 p-3 text-xs text-blue-800 flex items-start shadow-sm">
             <LayoutGrid size={16} className="mr-2 shrink-0 mt-0.5" />
             {t("calc.screed.help_step1")}
           </div>
@@ -566,7 +566,7 @@ export const ScreedCalculator: React.FC<Props> = ({ onCalculate }) => {
                     placeholder={t("calc.screed.ph_zone_name")}
                     value={newZoneLabel}
                     onChange={(e) => setNewZoneLabel(e.target.value)}
-                    className="w-full p-2 border rounded text-sm bg-white text-slate-900"
+                    className="w-full p-2 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl"
                   />
                 </div>
                 <input
@@ -574,14 +574,14 @@ export const ScreedCalculator: React.FC<Props> = ({ onCalculate }) => {
                   placeholder={t("calc.screed.ph_m2")}
                   value={newZoneArea}
                   onChange={(e) => setNewZoneArea(e.target.value)}
-                  className="w-full p-2 border rounded text-sm bg-white text-slate-900"
+                  className="w-full p-2 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl"
                 />
                 <input
                   type="number"
                   placeholder={t("calc.screed.ph_thick_cm")}
                   value={newZoneThick}
                   onChange={(e) => setNewZoneThick(e.target.value)}
-                  className="w-full p-2 border rounded text-sm bg-white text-slate-900"
+                  className="w-full p-2 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl"
                 />
                 <button
                   type="button"
@@ -594,7 +594,7 @@ export const ScreedCalculator: React.FC<Props> = ({ onCalculate }) => {
             </div>
           </div>
 
-          <button type="button" onClick={() => setStep(2)} className="w-full py-3 bg-blue-600 text-white rounded-xl font-bold flex justify-center items-center mt-2">
+          <button type="button" onClick={() => setStep(2)} className="w-full py-3 bg-blue-600 text-white rounded-2xl font-extrabold shadow-sm flex justify-center items-center mt-2">
             {t("common.next")} <ArrowRight size={18} className="ml-2" />
           </button>
         </div>
@@ -603,7 +603,7 @@ export const ScreedCalculator: React.FC<Props> = ({ onCalculate }) => {
       {/* STEP 2 */}
       {step === 2 && (
         <div className="space-y-4">
-          <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
+          <div className="rounded-[22px] border border-blue-100 bg-blue-50/90 p-3 text-xs text-blue-800 flex items-start shadow-sm">
             <Layers size={16} className="mr-2 shrink-0 mt-0.5" />
             {t("calc.screed.help_step2")}
           </div>
@@ -628,17 +628,17 @@ export const ScreedCalculator: React.FC<Props> = ({ onCalculate }) => {
               {useInsulation && (
                 <div className="px-2 pb-2">
                   <label className="block text-xs text-slate-500 mb-1">{t("calc.screed.insul_thick_cm")}</label>
-                  <input type="number" value={insulThick} onChange={(e) => setInsulThick(e.target.value)} className="w-20 p-1.5 border rounded text-sm bg-white text-slate-900" />
+                  <input type="number" value={insulThick} onChange={(e) => setInsulThick(e.target.value)} className="w-20 p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl" />
                 </div>
               )}
             </div>
           </div>
 
           <div className="flex gap-3">
-            <button type="button" onClick={() => setStep(1)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
+            <button type="button" onClick={() => setStep(1)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-extrabold shadow-sm">
               {t("common.back")}
             </button>
-            <button type="button" onClick={() => setStep(3)} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold">
+            <button type="button" onClick={() => setStep(3)} className="flex-1 py-3 bg-blue-600 text-white rounded-2xl font-extrabold shadow-sm">
               {t("common.next")}
             </button>
           </div>
@@ -648,7 +648,7 @@ export const ScreedCalculator: React.FC<Props> = ({ onCalculate }) => {
       {/* STEP 3 */}
       {step === 3 && (
         <div className="space-y-4">
-          <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
+          <div className="rounded-[22px] border border-blue-100 bg-blue-50/90 p-3 text-xs text-blue-800 flex items-start shadow-sm">
             <BoxSelect size={16} className="mr-2 shrink-0 mt-0.5" />
             {t("calc.screed.help_step3")}
           </div>
@@ -741,10 +741,10 @@ export const ScreedCalculator: React.FC<Props> = ({ onCalculate }) => {
           </div>
 
           <div className="flex gap-3">
-            <button type="button" onClick={() => setStep(2)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
+            <button type="button" onClick={() => setStep(2)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-extrabold shadow-sm">
               {t("common.back")}
             </button>
-            <button type="button" onClick={() => setStep(4)} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold">
+            <button type="button" onClick={() => setStep(4)} className="flex-1 py-3 bg-blue-600 text-white rounded-2xl font-extrabold shadow-sm">
               {t("common.next")}
             </button>
           </div>
@@ -754,7 +754,7 @@ export const ScreedCalculator: React.FC<Props> = ({ onCalculate }) => {
       {/* STEP 4 */}
       {step === 4 && (
         <div className="space-y-4">
-          <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
+          <div className="rounded-[22px] border border-blue-100 bg-blue-50/90 p-3 text-xs text-blue-800 flex items-start shadow-sm">
             <CircleDollarSign size={16} className="mr-2 shrink-0 mt-0.5" />
             {t("calc.screed.help_step4")}
           </div>
@@ -772,11 +772,11 @@ export const ScreedCalculator: React.FC<Props> = ({ onCalculate }) => {
                 <>
                   <div>
                     <label className="block text-[10px] text-slate-500 mb-1">{t("calc.screed.price.cement")}</label>
-                    <input type="number" value={prices.cementBag} onChange={(e) => updatePrice("cementBag", e.target.value)} className="w-full p-1.5 border rounded text-sm bg-white text-slate-900" />
+                    <input type="number" value={prices.cementBag} onChange={(e) => updatePrice("cementBag", e.target.value)} className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl" />
                   </div>
                   <div>
                     <label className="block text-[10px] text-slate-500 mb-1">{t("calc.screed.price.sand")}</label>
-                    <input type="number" value={prices.sandTon} onChange={(e) => updatePrice("sandTon", e.target.value)} className="w-full p-1.5 border rounded text-sm bg-white text-slate-900" />
+                    <input type="number" value={prices.sandTon} onChange={(e) => updatePrice("sandTon", e.target.value)} className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl" />
                   </div>
                 </>
               )}
@@ -784,56 +784,56 @@ export const ScreedCalculator: React.FC<Props> = ({ onCalculate }) => {
               {screedType === "light" && (
                 <div>
                   <label className="block text-[10px] text-slate-500 mb-1">{t("calc.screed.price.premix")}</label>
-                  <input type="number" value={prices.premixBag} onChange={(e) => updatePrice("premixBag", e.target.value)} className="w-full p-1.5 border rounded text-sm bg-white text-slate-900" />
+                  <input type="number" value={prices.premixBag} onChange={(e) => updatePrice("premixBag", e.target.value)} className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl" />
                 </div>
               )}
 
               {(screedType === "fluid_anh" || screedType === "fluid_cem") && (
                 <div className="col-span-2">
                   <label className="block text-[10px] text-slate-500 mb-1">{t("calc.screed.price.fluid")}</label>
-                  <input type="number" value={prices.bpeM3} onChange={(e) => updatePrice("bpeM3", e.target.value)} className="w-full p-1.5 border rounded text-sm bg-white text-slate-900" />
+                  <input type="number" value={prices.bpeM3} onChange={(e) => updatePrice("bpeM3", e.target.value)} className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl" />
                 </div>
               )}
 
               {reinforceType === "mesh" && (
                 <div>
                   <label className="block text-[10px] text-slate-500 mb-1">{t("calc.screed.price.mesh_fallback")}</label>
-                  <input type="number" value={prices.meshPanel} onChange={(e) => updatePrice("meshPanel", e.target.value)} className="w-full p-1.5 border rounded text-sm bg-white text-slate-900" />
+                  <input type="number" value={prices.meshPanel} onChange={(e) => updatePrice("meshPanel", e.target.value)} className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl" />
                 </div>
               )}
 
               {reinforceType === "fiber" && (
                 <div>
                   <label className="block text-[10px] text-slate-500 mb-1">{t("calc.screed.price.fiber")}</label>
-                  <input type="number" value={prices.fiberKg} onChange={(e) => updatePrice("fiberKg", e.target.value)} className="w-full p-1.5 border rounded text-sm bg-white text-slate-900" />
+                  <input type="number" value={prices.fiberKg} onChange={(e) => updatePrice("fiberKg", e.target.value)} className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl" />
                 </div>
               )}
 
               {usePolyane && (
                 <div>
                   <label className="block text-[10px] text-slate-500 mb-1">{t("calc.screed.price.polyane")}</label>
-                  <input type="number" value={prices.polyaneM2} onChange={(e) => updatePrice("polyaneM2", e.target.value)} className="w-full p-1.5 border rounded text-sm bg-white text-slate-900" />
+                  <input type="number" value={prices.polyaneM2} onChange={(e) => updatePrice("polyaneM2", e.target.value)} className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl" />
                 </div>
               )}
 
               {useStrip && (
                 <div>
                   <label className="block text-[10px] text-slate-500 mb-1">{t("calc.screed.price.strip")}</label>
-                  <input type="number" value={prices.stripM} onChange={(e) => updatePrice("stripM", e.target.value)} className="w-full p-1.5 border rounded text-sm bg-white text-slate-900" />
+                  <input type="number" value={prices.stripM} onChange={(e) => updatePrice("stripM", e.target.value)} className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl" />
                 </div>
               )}
 
               {useInsulation && (
                 <div>
                   <label className="block text-[10px] text-slate-500 mb-1">{t("calc.screed.price.insulation")}</label>
-                  <input type="number" value={prices.insulM2} onChange={(e) => updatePrice("insulM2", e.target.value)} className="w-full p-1.5 border rounded text-sm bg-white text-slate-900" />
+                  <input type="number" value={prices.insulM2} onChange={(e) => updatePrice("insulM2", e.target.value)} className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl" />
                 </div>
               )}
 
               {useJoints && (
                 <div>
                   <label className="block text-[10px] text-slate-500 mb-1">{t("calc.screed.price.joints")}</label>
-                  <input type="number" value={prices.jointM} onChange={(e) => updatePrice("jointM", e.target.value)} className="w-full p-1.5 border rounded text-sm bg-white text-slate-900" />
+                  <input type="number" value={prices.jointM} onChange={(e) => updatePrice("jointM", e.target.value)} className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl" />
                 </div>
               )}
             </div>
@@ -842,12 +842,12 @@ export const ScreedCalculator: React.FC<Props> = ({ onCalculate }) => {
               <div className="mt-4 pt-3 border-t border-slate-100 grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-[10px] text-blue-600 font-bold mb-1">{t("calc.screed.price.labor")}</label>
-                  <input type="number" value={prices.laborM2} onChange={(e) => updatePrice("laborM2", e.target.value)} className="w-full p-1.5 border border-blue-200 rounded text-sm bg-white text-slate-900" />
+                  <input type="number" value={prices.laborM2} onChange={(e) => updatePrice("laborM2", e.target.value)} className="w-full p-1.5 border border-blue-200 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(37,99,235,0.08)] backdrop-blur-xl" />
                 </div>
                 {(screedType === "fluid_anh" || screedType === "fluid_cem") && (
                   <div>
                     <label className="block text-[10px] text-blue-600 font-bold mb-1">{t("calc.screed.price.pump")}</label>
-                    <input type="number" value={prices.pumpFlat} onChange={(e) => updatePrice("pumpFlat", e.target.value)} className="w-full p-1.5 border border-blue-200 rounded text-sm bg-white text-slate-900" />
+                    <input type="number" value={prices.pumpFlat} onChange={(e) => updatePrice("pumpFlat", e.target.value)} className="w-full p-1.5 border border-blue-200 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(37,99,235,0.08)] backdrop-blur-xl" />
                   </div>
                 )}
               </div>
@@ -855,10 +855,10 @@ export const ScreedCalculator: React.FC<Props> = ({ onCalculate }) => {
           </div>
 
           <div className="flex gap-3 pt-2">
-            <button type="button" onClick={() => setStep(3)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
+            <button type="button" onClick={() => setStep(3)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-extrabold shadow-sm">
               {t("common.back")}
             </button>
-            <button type="button" className="flex-1 py-3 bg-emerald-100 text-emerald-700 rounded-xl font-bold flex justify-center items-center">
+            <button type="button" className="flex-1 py-3 bg-emerald-100 text-emerald-700 rounded-2xl font-extrabold shadow-sm flex justify-center items-center">
               <Check size={18} className="mr-2" /> {t("common.done")}
             </button>
           </div>

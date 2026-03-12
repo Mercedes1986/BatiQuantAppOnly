@@ -653,7 +653,7 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
     });
 
   return (
-    <div className="space-y-6 animate-in fade-in">
+    <div className="space-y-6 rounded-[32px] border border-white/70 bg-white/72 p-4 shadow-[0_24px_70px_rgba(15,23,42,0.10)] backdrop-blur-xl sm:p-6">
       {/* Step Navigation */}
       <div className="flex justify-between items-center mb-6 bg-slate-50 p-1 rounded-lg">
         {[1, 2, 3, 4].map((s) => (
@@ -661,8 +661,8 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
             key={s}
             type="button"
             onClick={() => setStep(s)}
-            className={`flex-1 py-2 text-xs font-bold rounded transition-all ${
-              step === s ? "bg-white shadow text-blue-600" : "text-slate-400"
+            className={`flex-1 py-2 text-xs font-extrabold rounded-2xl transition-all ${
+              step === s ? "bg-white text-slate-950 shadow-[0_14px_32px_rgba(59,130,246,0.18)]" : "text-slate-400"
             }`}
           >
             {stepLabel(s)}
@@ -684,7 +684,7 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
       {/* STEP 1: WALLS */}
       {step === 1 && (
         <div className="space-y-4">
-          <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
+          <div className="rounded-[22px] border border-blue-100 bg-blue-50/90 p-3 text-xs text-blue-800 flex items-start shadow-sm">
             <Info size={16} className="mr-2 shrink-0 mt-0.5" />
             {t("calc.substructure.ui.step1_hint", {
               defaultValue: "Define the perimeter and height of the substructure walls.",
@@ -871,7 +871,7 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
           <button
             type="button"
             onClick={() => setStep(2)}
-            className="w-full py-3 bg-blue-600 text-white rounded-xl font-bold flex justify-center items-center"
+            className="w-full py-3 bg-blue-600 text-white rounded-2xl font-extrabold shadow-sm flex justify-center items-center"
           >
             {t("common.next", { defaultValue: "Next" })} <ArrowRight size={18} className="ml-2" />
           </button>
@@ -881,7 +881,7 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
       {/* STEP 2: WATERPROOFING */}
       {step === 2 && (
         <div className="space-y-4">
-          <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
+          <div className="rounded-[22px] border border-blue-100 bg-blue-50/90 p-3 text-xs text-blue-800 flex items-start shadow-sm">
             <Droplets size={16} className="mr-2 shrink-0 mt-0.5" />
             {t("calc.substructure.ui.step2_hint", {
               defaultValue: "Waterproofing protection (buried walls).",
@@ -987,14 +987,14 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
             <button
               type="button"
               onClick={() => setStep(1)}
-              className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold"
+              className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-extrabold shadow-sm"
             >
               {t("common.back", { defaultValue: "Back" })}
             </button>
             <button
               type="button"
               onClick={() => setStep(3)}
-              className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold"
+              className="flex-1 py-3 bg-blue-600 text-white rounded-2xl font-extrabold shadow-sm"
             >
               {t("common.next", { defaultValue: "Next" })}
             </button>
@@ -1005,7 +1005,7 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
       {/* STEP 3: DRAINAGE */}
       {step === 3 && (
         <div className="space-y-4">
-          <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
+          <div className="rounded-[22px] border border-blue-100 bg-blue-50/90 p-3 text-xs text-blue-800 flex items-start shadow-sm">
             <ScanLine size={16} className="mr-2 shrink-0 mt-0.5" />
             {t("calc.substructure.ui.step3_hint", {
               defaultValue: "Perimeter drainage (pipe + gravel + geotextile).",
@@ -1102,14 +1102,14 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
             <button
               type="button"
               onClick={() => setStep(2)}
-              className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold"
+              className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-extrabold shadow-sm"
             >
               {t("common.back", { defaultValue: "Back" })}
             </button>
             <button
               type="button"
               onClick={() => setStep(4)}
-              className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold"
+              className="flex-1 py-3 bg-blue-600 text-white rounded-2xl font-extrabold shadow-sm"
             >
               {t("common.next", { defaultValue: "Next" })}
             </button>
@@ -1120,7 +1120,7 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
       {/* STEP 4: PRICING */}
       {step === 4 && (
         <div className="space-y-4">
-          <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
+          <div className="rounded-[22px] border border-blue-100 bg-blue-50/90 p-3 text-xs text-blue-800 flex items-start shadow-sm">
             <CircleDollarSign size={16} className="mr-2 shrink-0 mt-0.5" />
             {t("calc.substructure.ui.step4_hint", {
               defaultValue: "Local overrides (highest priority) for this calculation.",
@@ -1262,13 +1262,13 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
             <button
               type="button"
               onClick={() => setStep(3)}
-              className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold"
+              className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-extrabold shadow-sm"
             >
               {t("common.back", { defaultValue: "Back" })}
             </button>
             <button
               type="button"
-              className="flex-1 py-3 bg-emerald-100 text-emerald-700 rounded-xl font-bold flex justify-center items-center"
+              className="flex-1 py-3 bg-emerald-100 text-emerald-700 rounded-2xl font-extrabold shadow-sm flex justify-center items-center"
             >
               <Check size={18} className="mr-2" /> {t("common.done", { defaultValue: "Done" })}
             </button>

@@ -502,16 +502,16 @@ export const TileCalculator: React.FC<Props> = ({ onCalculate }) => {
   }, [calculationData, onCalculate, t, tileLength, tileWidth, patternLabel]);
 
   return (
-    <div className="space-y-6 animate-in fade-in">
+    <div className="space-y-6 rounded-[32px] border border-white/70 bg-white/72 p-4 shadow-[0_24px_70px_rgba(15,23,42,0.10)] backdrop-blur-xl sm:p-6">
       {/* Navigation */}
-      <div className="flex justify-between items-center mb-6 bg-slate-50 p-1 rounded-lg overflow-x-auto">
+      <div className="flex justify-between items-center mb-6 rounded-[24px] border border-white/80 bg-slate-100/70 p-1.5 shadow-inner overflow-x-auto backdrop-blur-xl">
         {[1, 2, 3, 4, 5].map((s) => (
           <button
             key={s}
             type="button"
             onClick={() => setStep(s)}
-            className={`flex-1 min-w-[70px] py-2 text-xs font-bold rounded transition-all ${
-              step === s ? "bg-white shadow text-blue-600" : "text-slate-400"
+            className={`flex-1 min-w-[70px] py-2 text-xs font-extrabold rounded-2xl transition-all ${
+              step === s ? "bg-white text-slate-950 shadow-[0_14px_32px_rgba(59,130,246,0.18)]" : "text-slate-400"
             }`}
           >
             {stepLabel(s)}
@@ -534,7 +534,7 @@ export const TileCalculator: React.FC<Props> = ({ onCalculate }) => {
       {/* STEP 1: ZONES */}
       {step === 1 && (
         <div className="space-y-4">
-          <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
+          <div className="rounded-[22px] border border-blue-100 bg-blue-50/90 p-3 text-xs text-blue-800 flex items-start shadow-sm">
             <Home size={16} className="mr-2 shrink-0 mt-0.5" />
             {t("calc.tile.ui.step1_hint", { defaultValue: "Define the areas to tile (floors and walls)." })}
           </div>
@@ -660,7 +660,7 @@ export const TileCalculator: React.FC<Props> = ({ onCalculate }) => {
           <button
             type="button"
             onClick={() => setStep(2)}
-            className="w-full py-3 bg-blue-600 text-white rounded-xl font-bold flex justify-center items-center mt-2"
+            className="w-full py-3 bg-blue-600 text-white rounded-2xl font-extrabold shadow-sm flex justify-center items-center mt-2"
           >
             {t("common.next", { defaultValue: "Next" })} <ArrowRight size={18} className="ml-2" />
           </button>
@@ -670,7 +670,7 @@ export const TileCalculator: React.FC<Props> = ({ onCalculate }) => {
       {/* STEP 2: TILES SPECS */}
       {step === 2 && (
         <div className="space-y-4">
-          <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
+          <div className="rounded-[22px] border border-blue-100 bg-blue-50/90 p-3 text-xs text-blue-800 flex items-start shadow-sm">
             <Grid3X3 size={16} className="mr-2 shrink-0 mt-0.5" />
             {t("calc.tile.ui.step2_hint", { defaultValue: "Tile format and pattern." })}
           </div>
@@ -742,10 +742,10 @@ export const TileCalculator: React.FC<Props> = ({ onCalculate }) => {
           </div>
 
           <div className="flex gap-3">
-            <button type="button" onClick={() => setStep(1)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
+            <button type="button" onClick={() => setStep(1)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-extrabold shadow-sm">
               {t("common.back", { defaultValue: "Back" })}
             </button>
-            <button type="button" onClick={() => setStep(3)} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold">
+            <button type="button" onClick={() => setStep(3)} className="flex-1 py-3 bg-blue-600 text-white rounded-2xl font-extrabold shadow-sm">
               {t("common.next", { defaultValue: "Next" })}
             </button>
           </div>
@@ -755,7 +755,7 @@ export const TileCalculator: React.FC<Props> = ({ onCalculate }) => {
       {/* STEP 3: GLUE & GROUT */}
       {step === 3 && (
         <div className="space-y-4">
-          <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
+          <div className="rounded-[22px] border border-blue-100 bg-blue-50/90 p-3 text-xs text-blue-800 flex items-start shadow-sm">
             <Layers size={16} className="mr-2 shrink-0 mt-0.5" />
             {t("calc.tile.ui.step3_hint", { defaultValue: "Adhesive, grout and leveling." })}
           </div>
@@ -821,10 +821,10 @@ export const TileCalculator: React.FC<Props> = ({ onCalculate }) => {
           </div>
 
           <div className="flex gap-3">
-            <button type="button" onClick={() => setStep(2)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
+            <button type="button" onClick={() => setStep(2)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-extrabold shadow-sm">
               {t("common.back", { defaultValue: "Back" })}
             </button>
-            <button type="button" onClick={() => setStep(4)} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold">
+            <button type="button" onClick={() => setStep(4)} className="flex-1 py-3 bg-blue-600 text-white rounded-2xl font-extrabold shadow-sm">
               {t("common.next", { defaultValue: "Next" })}
             </button>
           </div>
@@ -834,7 +834,7 @@ export const TileCalculator: React.FC<Props> = ({ onCalculate }) => {
       {/* STEP 4: FINISHES */}
       {step === 4 && (
         <div className="space-y-4">
-          <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
+          <div className="rounded-[22px] border border-blue-100 bg-blue-50/90 p-3 text-xs text-blue-800 flex items-start shadow-sm">
             <PaintBucket size={16} className="mr-2 shrink-0 mt-0.5" />
             {t("calc.tile.ui.step4_hint", { defaultValue: "Primer, waterproofing and skirting." })}
           </div>
@@ -868,10 +868,10 @@ export const TileCalculator: React.FC<Props> = ({ onCalculate }) => {
           </div>
 
           <div className="flex gap-3">
-            <button type="button" onClick={() => setStep(3)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
+            <button type="button" onClick={() => setStep(3)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-extrabold shadow-sm">
               {t("common.back", { defaultValue: "Back" })}
             </button>
-            <button type="button" onClick={() => setStep(5)} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold">
+            <button type="button" onClick={() => setStep(5)} className="flex-1 py-3 bg-blue-600 text-white rounded-2xl font-extrabold shadow-sm">
               {t("common.next", { defaultValue: "Next" })}
             </button>
           </div>
@@ -881,7 +881,7 @@ export const TileCalculator: React.FC<Props> = ({ onCalculate }) => {
       {/* STEP 5: PRICING */}
       {step === 5 && (
         <div className="space-y-4">
-          <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
+          <div className="rounded-[22px] border border-blue-100 bg-blue-50/90 p-3 text-xs text-blue-800 flex items-start shadow-sm">
             <CircleDollarSign size={16} className="mr-2 shrink-0 mt-0.5" />
             {t("calc.tile.ui.step5_hint", { defaultValue: "Adjust unit prices." })}
           </div>
@@ -898,49 +898,49 @@ export const TileCalculator: React.FC<Props> = ({ onCalculate }) => {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="block text-[10px] text-slate-500 mb-1">{t("calc.tile.price.tile_m2", { defaultValue: "Tiles (€/m²)" })}</label>
-                <input type="number" value={prices.tileM2} onChange={(e) => updatePrice("tileM2", e.target.value)} className="w-full p-1.5 border rounded text-sm bg-white text-slate-900" />
+                <input type="number" value={prices.tileM2} onChange={(e) => updatePrice("tileM2", e.target.value)} className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl" />
               </div>
 
               <div>
                 <label className="block text-[10px] text-slate-500 mb-1">{t("calc.tile.price.glue_bag", { defaultValue: "Adhesive (25kg)" })}</label>
-                <input type="number" value={prices.glueBag} onChange={(e) => updatePrice("glueBag", e.target.value)} className="w-full p-1.5 border rounded text-sm bg-white text-slate-900" />
+                <input type="number" value={prices.glueBag} onChange={(e) => updatePrice("glueBag", e.target.value)} className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl" />
               </div>
 
               <div>
                 <label className="block text-[10px] text-slate-500 mb-1">{t("calc.tile.price.grout_bag", { defaultValue: "Cement grout (5kg)" })}</label>
-                <input type="number" value={prices.groutBag} onChange={(e) => updatePrice("groutBag", e.target.value)} className="w-full p-1.5 border rounded text-sm bg-white text-slate-900" />
+                <input type="number" value={prices.groutBag} onChange={(e) => updatePrice("groutBag", e.target.value)} className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl" />
               </div>
 
               <div>
                 <label className="block text-[10px] text-slate-500 mb-1">{t("calc.tile.price.epoxy_kit", { defaultValue: "Epoxy (3kg kit)" })}</label>
-                <input type="number" value={prices.epoxyKit} onChange={(e) => updatePrice("epoxyKit", e.target.value)} className="w-full p-1.5 border rounded text-sm bg-white text-slate-900" />
+                <input type="number" value={prices.epoxyKit} onChange={(e) => updatePrice("epoxyKit", e.target.value)} className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl" />
               </div>
 
               {usePrimer && (
                 <div>
                   <label className="block text-[10px] text-slate-500 mb-1">{t("calc.tile.price.primer_l", { defaultValue: "Primer (€/L)" })}</label>
-                  <input type="number" value={prices.primerL} onChange={(e) => updatePrice("primerL", e.target.value)} className="w-full p-1.5 border rounded text-sm bg-white text-slate-900" />
+                  <input type="number" value={prices.primerL} onChange={(e) => updatePrice("primerL", e.target.value)} className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl" />
                 </div>
               )}
 
               {useSkirting && (
                 <div>
                   <label className="block text-[10px] text-slate-500 mb-1">{t("calc.tile.price.skirting_m", { defaultValue: "Skirting (€/m)" })}</label>
-                  <input type="number" value={prices.skirtingM} onChange={(e) => updatePrice("skirtingM", e.target.value)} className="w-full p-1.5 border rounded text-sm bg-white text-slate-900" />
+                  <input type="number" value={prices.skirtingM} onChange={(e) => updatePrice("skirtingM", e.target.value)} className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl" />
                 </div>
               )}
 
               {useWaterproofing && (
                 <div>
                   <label className="block text-[10px] text-slate-500 mb-1">{t("calc.tile.price.spec_kit", { defaultValue: "SPEC kit (€)" })}</label>
-                  <input type="number" value={prices.specKit} onChange={(e) => updatePrice("specKit", e.target.value)} className="w-full p-1.5 border rounded text-sm bg-white text-slate-900" />
+                  <input type="number" value={prices.specKit} onChange={(e) => updatePrice("specKit", e.target.value)} className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl" />
                 </div>
               )}
 
               {useLevelingSystem && (
                 <div>
                   <label className="block text-[10px] text-slate-500 mb-1">{t("calc.tile.price.leveling", { defaultValue: "Leveling (box)" })}</label>
-                  <input type="number" value={prices.levelingKit} onChange={(e) => updatePrice("levelingKit", e.target.value)} className="w-full p-1.5 border rounded text-sm bg-white text-slate-900" />
+                  <input type="number" value={prices.levelingKit} onChange={(e) => updatePrice("levelingKit", e.target.value)} className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl" />
                 </div>
               )}
             </div>
@@ -949,27 +949,27 @@ export const TileCalculator: React.FC<Props> = ({ onCalculate }) => {
               <div className="mt-4 pt-3 border-t border-slate-100 grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-[10px] text-blue-600 font-bold mb-1">{t("calc.tile.price.labor_tiling", { defaultValue: "Labor tiling (€/m²)" })}</label>
-                  <input type="number" value={prices.laborM2} onChange={(e) => updatePrice("laborM2", e.target.value)} className="w-full p-1.5 border border-blue-200 rounded text-sm bg-white text-slate-900" />
+                  <input type="number" value={prices.laborM2} onChange={(e) => updatePrice("laborM2", e.target.value)} className="w-full p-1.5 border border-blue-200 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(37,99,235,0.08)] backdrop-blur-xl" />
                 </div>
 
                 <div>
                   <label className="block text-[10px] text-blue-600 font-bold mb-1">{t("calc.tile.price.labor_skirting", { defaultValue: "Labor skirting (€/m)" })}</label>
-                  <input type="number" value={prices.laborSkirting} onChange={(e) => updatePrice("laborSkirting", e.target.value)} className="w-full p-1.5 border border-blue-200 rounded text-sm bg-white text-slate-900" />
+                  <input type="number" value={prices.laborSkirting} onChange={(e) => updatePrice("laborSkirting", e.target.value)} className="w-full p-1.5 border border-blue-200 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(37,99,235,0.08)] backdrop-blur-xl" />
                 </div>
 
                 <div>
                   <label className="block text-[10px] text-blue-600 font-bold mb-1">{t("calc.tile.price.labor_spec", { defaultValue: "Labor SPEC (€/m²)" })}</label>
-                  <input type="number" value={prices.laborSpec} onChange={(e) => updatePrice("laborSpec", e.target.value)} className="w-full p-1.5 border border-blue-200 rounded text-sm bg-white text-slate-900" />
+                  <input type="number" value={prices.laborSpec} onChange={(e) => updatePrice("laborSpec", e.target.value)} className="w-full p-1.5 border border-blue-200 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(37,99,235,0.08)] backdrop-blur-xl" />
                 </div>
               </div>
             )}
           </div>
 
           <div className="flex gap-3 pt-4">
-            <button type="button" onClick={() => setStep(4)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
+            <button type="button" onClick={() => setStep(4)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-extrabold shadow-sm">
               {t("common.back", { defaultValue: "Back" })}
             </button>
-            <button type="button" className="flex-1 py-3 bg-emerald-100 text-emerald-700 rounded-xl font-bold flex justify-center items-center">
+            <button type="button" className="flex-1 py-3 bg-emerald-100 text-emerald-700 rounded-2xl font-extrabold shadow-sm flex justify-center items-center">
               <Check size={18} className="mr-2" /> {t("common.done", { defaultValue: "Done" })}
             </button>
           </div>

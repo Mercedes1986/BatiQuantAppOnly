@@ -38,7 +38,7 @@ const inputClass =
   "w-full p-2.5 border border-slate-300 rounded-lg text-slate-900 bg-white focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-all text-sm font-medium placeholder:text-slate-400";
 const labelClass = "block text-xs font-bold text-slate-600 mb-1.5 uppercase tracking-wide";
 const sectionClass =
-  "bg-white p-5 rounded-2xl shadow-sm border border-slate-100 space-y-4 animate-in fade-in slide-in-from-bottom-2";
+  "rounded-[30px] border border-white/80 bg-white/88 p-5 shadow-[0_18px_44px_rgba(15,23,42,0.08)] backdrop-blur-xl space-y-4 animate-in fade-in slide-in-from-bottom-2";
 
 const toNum = (v: string, fallback = 0) => {
   const n = parseFloat(String(v).replace(",", "."));
@@ -340,7 +340,7 @@ export const FoundationsCalculator: React.FC<Props> = ({ onCalculate, initialMod
           <button
             type="button"
             onClick={() => setStep(2)}
-            className="w-full py-3.5 bg-blue-600 text-white rounded-xl font-bold flex justify-center items-center shadow-lg shadow-blue-200 active:scale-[0.98] transition-transform"
+            className="w-full py-3.5 bg-blue-600 text-white rounded-2xl font-extrabold shadow-sm flex justify-center items-center shadow-lg shadow-blue-200 active:scale-[0.98] transition-transform"
           >
             {t("common.next", { defaultValue: "Suivant" })} <ArrowRight size={20} className="ml-2" />
           </button>
@@ -451,7 +451,7 @@ export const FoundationsCalculator: React.FC<Props> = ({ onCalculate, initialMod
             <button type="button" onClick={() => setStep(step - 1)} className="p-3 rounded-xl bg-white border border-slate-200 text-slate-500" aria-label={t("common.back", { defaultValue: "Retour" })}>
               <ArrowLeft />
             </button>
-            <button type="button" onClick={() => setStep(step + 1)} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold">
+            <button type="button" onClick={() => setStep(step + 1)} className="flex-1 py-3 bg-blue-600 text-white rounded-2xl font-extrabold shadow-sm">
               {t("common.next", { defaultValue: "Suivant" })}
             </button>
           </div>
@@ -513,7 +513,7 @@ export const FoundationsCalculator: React.FC<Props> = ({ onCalculate, initialMod
             <button type="button" onClick={() => setStep(step - 1)} className="p-3 rounded-xl bg-white border border-slate-200 text-slate-500" aria-label={t("common.back", { defaultValue: "Retour" })}>
               <ArrowLeft />
             </button>
-            <button type="button" onClick={() => setStep(step + 1)} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold">
+            <button type="button" onClick={() => setStep(step + 1)} className="flex-1 py-3 bg-blue-600 text-white rounded-2xl font-extrabold shadow-sm">
               {t("common.next", { defaultValue: "Suivant" })}
             </button>
           </div>
@@ -550,7 +550,7 @@ export const FoundationsCalculator: React.FC<Props> = ({ onCalculate, initialMod
             <button type="button" onClick={() => setStep(step - 1)} className="p-3 rounded-xl bg-white border border-slate-200 text-slate-500" aria-label={t("common.back", { defaultValue: "Retour" })}>
               <ArrowLeft />
             </button>
-            <button type="button" onClick={() => setStep(step + 1)} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold">
+            <button type="button" onClick={() => setStep(step + 1)} className="flex-1 py-3 bg-blue-600 text-white rounded-2xl font-extrabold shadow-sm">
               {t("common.next", { defaultValue: "Suivant" })}
             </button>
           </div>
@@ -629,7 +629,7 @@ export const FoundationsCalculator: React.FC<Props> = ({ onCalculate, initialMod
             <button type="button" onClick={() => setStep(step - 1)} className="p-3 rounded-xl bg-white border border-slate-200 text-slate-500" aria-label={t("common.back", { defaultValue: "Retour" })}>
               <ArrowLeft />
             </button>
-            <button type="button" onClick={() => setStep(step + 1)} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold">
+            <button type="button" onClick={() => setStep(step + 1)} className="flex-1 py-3 bg-blue-600 text-white rounded-2xl font-extrabold shadow-sm">
               {t("common.next", { defaultValue: "Suivant" })}
             </button>
           </div>
@@ -708,7 +708,7 @@ export const FoundationsCalculator: React.FC<Props> = ({ onCalculate, initialMod
             <button type="button" onClick={() => setStep(step - 1)} className="p-3 rounded-xl bg-white border border-slate-200 text-slate-500" aria-label={t("common.back", { defaultValue: "Retour" })}>
               <ArrowLeft />
             </button>
-            <button disabled className="flex-1 py-3 bg-emerald-100 text-emerald-700 rounded-xl font-bold flex justify-center items-center">
+            <button disabled className="flex-1 py-3 bg-emerald-100 text-emerald-700 rounded-2xl font-extrabold shadow-sm flex justify-center items-center">
               <Check size={20} className="mr-2" /> {t("struct.common.calculated", { defaultValue: "Calculated" })}
             </button>
           </div>
