@@ -1,0 +1,63 @@
+import React, { useMemo } from "react";
+import { FolderOpen, Settings, Hammer, Package, Menu, Calculator } from "lucide-react";
+import { useTranslation } from "react-i18next";
+
+interface BottomNavProps {
+  currentTab: string;
+  onChange: (tab: string) => void;
+}
+
+type NavItem = {
+  id: string;
+  label: string;
+  icon: React.ElementType;
+};
+
+export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, onChange }) => {
+  const { t } = useTranslation();
+
+  const navItems: NavItem[] = useMemo(
+    () => [
+      { id: "menu", icon: Menu, label: t("nav.menu", { defaultValue: "Menu" }) },
+      { id: "quick-tools", icon: Calculator, label: t("nav.quick_tools", { defaultValue: "Rapides" }) },
+      { id: "projects", icon: FolderOpen, label: t("nav.projects", { defaultValue: "Projets" }) },
+      { id: "house", icon: Hammer, label: t("nav.site", { defaultValue: "Chantier" }) },
+      { id: "materials", icon: Package, label: t("nav.materials", { defaultValue: "Matériaux" }) },
+      { id: "settings", icon: Settings, label: t("nav.settings", { defaultValue: "Réglages" }) },
+    ],
+    [t]
+  );
+
+  return (
+    <div className="no-print fixed bottom-3 left-1/2 z-50 w-[min(94vw,720px)] -translate-x-1/2">
+      <div className="rounded-[26px] border border-white/65 bg-white/72 p-1.5 shadow-[0_22px_60px_rgba(15,23,42,0.20)] backdrop-blur-2xl">
+        <div className="grid h-[68px] grid-cols-6 gap-1">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const active = currentTab === item.id;
+
+            return (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => onChange(item.id)}
+                aria-current={active ? "page" : undefined}
+                aria-label={item.label}
+                className={`flex h-full flex-col items-center justify-center rounded-[20px] transition-all duration-200 ${
+                  active
+                    ? "bg-gradient-to-b from-blue-600 to-blue-500 text-white shadow-[0_10px_24px_rgba(37,99,235,0.35)]"
+                    : "text-slate-500 hover:bg-white/70 hover:text-slate-700"
+                }`}
+              >
+                <Icon size={active ? 21 : 19} strokeWidth={active ? 2.4 : 2.1} />
+                <span className={`mt-1 text-[10px] font-bold leading-none ${active ? "text-white" : ""}`}>
+                  {item.label}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+};

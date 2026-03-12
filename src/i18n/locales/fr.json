@@ -1,0 +1,2902 @@
+{
+  "common": {
+    "loading": "Chargement…",
+    "back": "Retour",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "attention": "Attention",
+    "share": "Partager",
+    "add": "Ajouter",
+    "auto": "Auto",
+    "back_home": "Retour à l’accueil",
+    "calculated": "Calculé",
+    "choose": "Choisir",
+    "close": "Fermer",
+    "decrease": "Diminuer",
+    "done": "Terminé",
+    "duplicate": "Dupliquer",
+    "increase": "Augmenter",
+    "label": "Libellé",
+    "loading_document": "Chargement du document…",
+    "minus": "Moins",
+    "next": "Suivant",
+    "none": "Aucun",
+    "off": "Désactivé",
+    "on": "Activé",
+    "optional": "Optionnel",
+    "plus": "Plus",
+    "preset": "Préréglage",
+    "print": "Imprimer",
+    "pro_mode": "Mode Pro",
+    "remove": "Retirer",
+    "simple_mode": "Mode Simple",
+    "type": "Type",
+    "unknown": "Inconnu",
+    "validate": "Valider",
+    "waste_plus": "Pertes +"
+  },
+  "calculator": {
+    "open": "Ouvrir le calculateur",
+    "best_practices": "Bonnes pratiques",
+    "click_to_validate_step": "Cliquer pour valider cette étape",
+    "copied": "Copié",
+    "estimated_cost": "Coût estimé",
+    "generated_by": "Généré par",
+    "hide_tips": "Masquer les astuces",
+    "in_dev": "En développement",
+    "materials_estimated": "Matériaux estimés",
+    "missing_config": "Configuration manquante",
+    "precision": "Précision",
+    "pro_tips": "Astuces Pro",
+    "project_name": "Nom du projet",
+    "project_placeholder": "Ex. Rénovation cuisine",
+    "result_estimated": "Résultat estimé",
+    "save_result": "Enregistrer le résultat",
+    "share_title": "Partager ce calcul",
+    "shopping_list": "Liste d’achats",
+    "tech_details": "Détails techniques",
+    "tips_prefix": "Astuce :",
+    "title_fallback": "Calculateur"
+  },
+  "nav": {
+    "menu": "Menu",
+    "calc": "Calcul",
+    "site": "Chantier",
+    "projects": "Projets",
+    "materials": "Matériaux",
+    "settings": "Réglages"
+  },
+  "menu": {
+    "title": "Menu de l’application",
+    "subtitle": "Accès direct aux sections + aux outils",
+    "back_dashboard": "Tableau de bord",
+    "back_dashboard_title": "Retour au tableau de bord",
+    "how": {
+      "title": "Comment ça marche ?",
+      "text": "Utilisez Calcul pour estimer vos quantités, puis Projets pour retrouver vos calculs. Pour un suivi complet, créez un Chantier et enregistrez les résultats par étape. Pensez à exporter en JSON pour sauvegarder vos données."
+    },
+    "open": "Ouvrir",
+    "cards": {
+      "calc": {
+        "title": "Calcul",
+        "desc": "Accédez à tous les calculateurs pour estimer quantités et coûts.",
+        "badge": "OUTILS"
+      },
+      "house": {
+        "title": "Chantier",
+        "desc": "Créez un chantier et enregistrez les résultats par étape (suivi complet)."
+      },
+      "projects": {
+        "title": "Projets",
+        "desc": "Retrouvez vos calculs sauvegardés (estimations, matériaux, coûts)."
+      },
+      "materials": {
+        "title": "Matériaux & Prix",
+        "desc": "Ajustez les prix, créez des matériaux perso, main d’œuvre + données."
+      },
+      "settings": {
+        "title": "Réglages",
+        "desc": "Paramétrez l’application (options, préférences, affichage)."
+      },
+      "backup": {
+        "title": "Sauvegarde JSON",
+        "desc": "Exportez/importez vos données pour éviter toute perte (recommandé).",
+        "badge": "RECOMMANDÉ"
+      },
+      "quicktools": {
+        "title": "Calculs rapides chantier",
+        "desc": "Accédez aux calculateurs rapides : conversions, pentes, conditionnements et contrôles express.",
+        "badge": "RAPIDE"
+      },
+      "quick_tools": {
+        "title": "Calculs rapides chantier",
+        "desc": "Accédez aux calculateurs rapides : conversions, pentes, conditionnements et contrôles express.",
+        "badge": "RAPIDE"
+      }
+    },
+    "tools": {
+      "title": "Tous les outils (accès direct)",
+      "subtitle": "Cliquez sur un outil pour ouvrir le calculateur directement."
+    }
+  },
+  "struct": {
+    "tabs": {
+      "groundwork": "Terrassement",
+      "foundations": "Fondations",
+      "walls": "Murs"
+    },
+    "common": {
+      "thickness": "Ép.",
+      "items": "ouvrages",
+      "bags": "sacs",
+      "bags_count": "{{n}} sacs",
+      "qty": "Qté",
+      "auto": "Auto",
+      "calculated": "Calculé",
+      "unit_prices": "Prix unitaires",
+      "materials": "Matériaux",
+      "materials_services": "Matériaux & prestations",
+      "pro_mode": "Mode Pro",
+      "simple_mode": "Mode Simple",
+      "multiplier": "x{{x}}",
+      "dash": "-",
+      "length_m": "Longueur (m)",
+      "width_m": "Largeur (m)",
+      "height_m": "Hauteur (m)",
+      "length_m_short": "Long. (m)",
+      "width_m_short": "Larg. (m)",
+      "height_m_short": "Haut. (m)",
+      "house_length": "Longueur maison",
+      "house_width": "Largeur maison",
+      "width": "Larg",
+      "height": "Haut",
+      "L": "L",
+      "W": "l",
+      "D": "P",
+      "H": "H",
+      "l": "L",
+      "w": "l",
+      "h": "H",
+      "constraints": "Contraintes",
+      "geometry": "Géométrie",
+      "height_cm": "Hauteur (cm)",
+      "local_overrides": "Surcharges locales",
+      "options": "Options",
+      "surface": "Surface",
+      "waste": "Pertes",
+      "width_cm": "Largeur (cm)"
+    },
+    "excav": {
+      "trench": "Tranchée",
+      "pit": "Fouille isolée",
+      "mass": "Pleine masse"
+    },
+    "opening": {
+      "window": "Fenêtre",
+      "door": "Porte",
+      "bay": "Baie vitrée",
+      "garage": "Porte de garage"
+    },
+    "wall": {
+      "segment_default": "Mur {{n}}"
+    },
+    "gw": {
+      "steps": {
+        "1": "1. Emprise",
+        "2": "2. Fouilles",
+        "3": "3. Terres",
+        "4": "4. Logist.",
+        "5": "5. Devis"
+      },
+      "step1": {
+        "hint": "Définissez l’emprise du chantier et le décapage de la terre végétale."
+      },
+      "step2": {
+        "hint": "Ajoutez les fouilles spécifiques (fondations, réseaux, plateforme)."
+      },
+      "step3": {
+        "hint": "Nature du sol et foisonnement (augmentation du volume)."
+      },
+      "step4": {
+        "hint": "Gestion des déblais et moyens matériels."
+      },
+      "step5": {
+        "hint": "Tarification du terrassement."
+      },
+      "strip": "Décapage terre végétale",
+      "excav": "Excavation / fouilles",
+      "excav_details": "{{count}} ouvrages · ×{{swell}}",
+      "margin_m": "Marge de travail (m)",
+      "strip_depth_m": "Épaisseur décapage (m)",
+      "keep_topsoil": "Conserver la terre végétale sur site",
+      "slope": "Talus",
+      "slope_0": "Vertical (90°)",
+      "slope_05": "Talus raide (2:1)",
+      "slope_1": "Talus 45° (1:1)",
+      "soil_type": "Nature du terrain",
+      "topsoil_stored": "Terre végétale stockée",
+      "reused_fill": "Remblai réutilisé",
+      "truck_cap": "Capacité camion (m³)",
+      "truck_rotation": "Rotations camion",
+      "truck_rotation_named": "Rotations camion ({{cap}} m³)",
+      "dump_fee": "Mise en décharge",
+      "dump_details": "{{vol}} m³",
+      "fill_imports": "Apports & remblai",
+      "fill_type": "Type d’apport",
+      "fill_volume": "Volume nécessaire (m³)",
+      "fill_import": "Apport",
+      "fill_import_named": "Apport : {{label}}",
+      "fill_gravel": "Grave / tout-venant",
+      "fill_sand": "Sable",
+      "fill_soil": "Terre végétale (apport)",
+      "fill_soil_short": "Terre végétale",
+      "means": "Moyens",
+      "digger_days": "Jours mini-pelle",
+      "compactor_days": "Jours compacteur",
+      "difficult_access": "Accès difficile / contraintes",
+      "digger_rental": "Location mini-pelle",
+      "compactor_rental": "Location compacteur",
+      "strip_area": "Surface décapée",
+      "volume_inplace": "Volume en place",
+      "volume_bulking": "Volume foisonné",
+      "to_evac": "À évacuer",
+      "warn_no_compaction": "Remblai avec terre réutilisée sans compactage prévu ?",
+      "price_excav": "Excavation (€/m³)",
+      "price_strip": "Décapage (€/m²)",
+      "price_truck": "Rotation camion (€/rotation)",
+      "price_dump": "Décharge (€/t)",
+      "labor_m3": "MO (€/m³)",
+      "summary_excavated": "{{m3}} m³ excavés"
+    },
+    "fd": {
+      "steps": {
+        "1": "1. Type",
+        "2": "2. Fouilles",
+        "3": "3. Béton",
+        "4": "4. Options",
+        "5": "5. Devis"
+      },
+      "step1": {
+        "hint": "Choisissez le type de fondations et les dimensions globales."
+      },
+      "step2": {
+        "hint": "Calcul automatique des fouilles en fonction des fondations choisies."
+      },
+      "step3": {
+        "hint": "Dimensionnement du béton et des armatures."
+      },
+      "step4": {
+        "hint": "Coffrage et protections."
+      },
+      "step5": {
+        "hint": "Récapitulatif des prix unitaires."
+      },
+      "systems": "Systèmes constructifs",
+      "strip": "Semelles filantes",
+      "strip_hint": "Sous murs porteurs",
+      "pads": "Plots isolés",
+      "pads_hint": "Sous poteaux",
+      "no_pads": "Aucun plot.",
+      "raft": "Radier général",
+      "raft_hint": "Dalle porteuse intégrale",
+      "count_excav": "Inclure le terrassement",
+      "depth": "Profondeur hors-gel (m)",
+      "margin": "Marge de travail (m)",
+      "soil_type": "Nature du sol",
+      "evac": "Évacuation des terres (foisonné)",
+      "conc_strip": "Béton (semelles filantes)",
+      "conc_pads": "Béton (plots)",
+      "conc_raft": "Béton (radier)",
+      "rebar": "Armatures",
+      "rebar_s35": "S35 (6 fils)",
+      "rebar_s15": "S15 (4 fils)",
+      "rebar_strip_named": "Armatures semelles ({{type}})",
+      "rebar_ratio": "~1 cage / 6 m",
+      "mesh": "Treillis soudé",
+      "mesh_named": "Treillis soudé ({{type}})",
+      "mesh_st25": "ST25C (Standard)",
+      "mesh_st10": "ST10 (Léger)",
+      "mesh_st40": "ST40C (Lourd)",
+      "mesh_ratio": "~1 panneau / 14,4 m²",
+      "clean_concrete": "Béton de propreté (5 cm)",
+      "excav": "Terrassement / fouilles",
+      "formwork": "Coffrage",
+      "formwork_hint": "Si fouilles non réalisées en pleine terre",
+      "formwork_panels": "Coffrage (panneaux)",
+      "drain": "Drain périphérique",
+      "drain_hint": "Drain + gravier + géotextile",
+      "polyane": "Polyane",
+      "polyane_hint": "Sous radier/dallage",
+      "diameter": "Ø",
+      "labor_concrete": "Main d’œuvre (béton)",
+      "soil": "Sol",
+      "total_concrete": "Béton total",
+      "price_concrete": "Béton BPE (€/m³)",
+      "price_rebar": "Ferraillage (€/u)",
+      "price_excav": "Fouilles (€/m³)",
+      "price_formwork": "Coffrage (€/m²)",
+      "price_labor_conc": "MO béton (€/m³)",
+      "price_labor_form": "MO coffrage (€/m²)",
+      "summary_concrete": "{{m3}} m³ béton",
+      "add_pad": "Ajouter un plot",
+      "clean_concrete_hint": "Fine couche pour niveler et protéger les armatures.",
+      "drain_gravel": "Gravier drainant",
+      "drain_gravel_hint": "Gravier lavé autour du drain.",
+      "evac_hint": "Volume à évacuer incluant le foisonnement.",
+      "frost_depth": "Hors-gel",
+      "grade_beam": "Longrine",
+      "groundwater": "Nappe phréatique",
+      "pad_type": "Type de plot",
+      "price_evac": "Décharge (€/m³)",
+      "price_steel": "Acier (€/kg)",
+      "reuse": "Réutiliser les terres sur site",
+      "reuse_hint": "Réduit l’évacuation si les terres sont réemployées.",
+      "steel_ratio": "Ratio acier",
+      "subtitle": "Estimez fouilles, béton et armatures pour vos fondations.",
+      "title": "Calculateur de fondations",
+      "warn_clay": "Sol argileux : peut nécessiter une étude spécifique (consultez un pro).",
+      "warn_frost": "Le hors-gel varie selon la région : appliquez les règles locales."
+    },
+    "w": {
+      "steps": {
+        "1": "1. Plan",
+        "2": "2. Matériau",
+        "3": "3. Ouv.",
+        "4": "4. Struct.",
+        "5": "5. Finitions",
+        "6": "6. Devis"
+      },
+      "step1": {
+        "hint": "Dimensions des murs."
+      },
+      "step2": {
+        "hint": "Choix du matériau."
+      },
+      "step3": {
+        "hint": "Ouvertures."
+      },
+      "step4": {
+        "hint": "Chaînages et linteaux."
+      },
+      "step5": {
+        "hint": "Finitions."
+      },
+      "step6": {
+        "hint": "Prix unitaires murs."
+      },
+      "mode_global": "Global",
+      "mode_segments": "Segments",
+      "perimeter_total": "Périmètre total (m)",
+      "height": "Hauteur (m)",
+      "waste_pct": "Pertes (% · casse / chutes)",
+      "gables": "Pignons",
+      "gables_hint": "Ajouter une surface triangulaire",
+      "gable_h": "Hauteur pignon (m)",
+      "gable_count": "Nombre",
+      "seg_name": "Nom",
+      "family": {
+        "parpaing": "Parpaing",
+        "brique": "Brique",
+        "cellulaire": "Béton cellulaire",
+        "stepoc": "Bloc à bancher"
+      },
+      "block_format": "Format / épaisseur",
+      "reveal": "Tableau",
+      "reveal_cm": "Tableau (cm)",
+      "no_openings": "Aucune ouverture.",
+      "add_opening": "Ajouter une ouverture",
+      "chain_h": "Chaînage horizontal",
+      "chain_inter": "Chaînage intermédiaire",
+      "vert": "Raidisseurs verticaux",
+      "vert_total": "Nombre total",
+      "lintel_type": "Type de linteau",
+      "lintel_precast": "Préfabriqué",
+      "lintel_cast": "Coffré / coulé",
+      "coating_ext": "Enduit extérieur",
+      "coating_ext_hint": "Monocouche",
+      "coating_int": "Enduit intérieur",
+      "coating_int_hint": "Plâtre / enduit",
+      "scaffold": "Échafaudage",
+      "scaffold_hint": "Forfait",
+      "unit_price_variant": "Prix unité (€/u) — variante sélectionnée",
+      "unit_price_variant_help": "Ce prix est mémorisé pour la variante sélectionnée (famille/épaisseur).",
+      "mortar_bag": "Mortier (€/sac)",
+      "glue_bag": "Colle (€/sac)",
+      "lintel_m": "Linteau (€/m)",
+      "coating_ext_bag": "Enduit façade (€/sac)",
+      "scaffold_fixed": "Échafaudage (forfait)",
+      "labor_m2": "MO maçonnerie (€/m²)"
+    },
+    "walls": {
+      "stepoc_fill": "Béton de remplissage (C25/30)",
+      "stepoc_fill_details": "{{lpm2}} L/m²",
+      "glue": "Mortier colle (joint mince)",
+      "glue_ratio": "~1 sac / 10 m²",
+      "mortar": "Mortier de montage",
+      "mortar_ratio": "~1 sac / 3 m²",
+      "lintels": "Linteaux",
+      "prefab": "préfabriqués",
+      "casted": "coffrés / coulés",
+      "lintels_named": "Linteaux ({{kind}})",
+      "chainage_concrete": "Béton chaînages (horiz.)",
+      "chainage_steel": "Aciers chaînages (horiz.)",
+      "vert_concrete": "Béton raidisseurs (vert.)",
+      "vert_steel": "Aciers raidisseurs (vert.)",
+      "coating_ext": "Enduit façade (monocouche)",
+      "coating_int": "Enduit intérieur / plâtre",
+      "scaffold": "Échafaudage (forfait)",
+      "labor": "Main d’œuvre maçonnerie",
+      "gross_area": "Surface brute",
+      "net_area": "Surface nette",
+      "block_selected": "Bloc sélectionné",
+      "consumption": "Consommation",
+      "units": "Blocs/éléments",
+      "binder": "Mortier/colle",
+      "summary_units": "{{units}} unités ({{m2}} m²)"
+    }
+  },
+  "ads": {
+    "dev": {
+      "format": "Format",
+      "mode": "Mode",
+      "only": "Dev only",
+      "title": "Debug pubs"
+    },
+    "label": "Publicité",
+    "placeholder_title": "Emplacement publicitaire mobile réservé",
+    "placeholder_text": "La publicité web est désactivée dans cette base. Branche AdMob à intégrer dans la couche Android/iOS native."
+  },
+  "app": {
+    "name": "BatiQuant",
+    "name_suffix": "Pro"
+  },
+  "calc": {
+    "concrete": {
+      "calculated": "Calculé",
+      "concrete": {
+        "add_pump": "Ajouter la pompe",
+        "bpe": "Béton prêt à l’emploi (BPE)",
+        "site_mix": "Béton gâché sur site",
+        "slab_thickness_cm": "Épaisseur de dalle (cm)",
+        "type": "Type de béton",
+        "waste_pct": "Pertes (%)"
+      },
+      "details": {
+        "bags_of": "Sacs de",
+        "bpe_step": "Détails BPE",
+        "formwork_calc": "Calcul du coffrage",
+        "overlap_15": "Recouvrement 15 cm",
+        "spacing_m": "Espacement (m)",
+        "thickness_cm": "Épaisseur (cm)",
+        "useful_area_panel": "Surface utile d’un panneau"
+      },
+      "inputs": {
+        "area_m2": "Surface (m²)",
+        "length_m": "Longueur (m)",
+        "perimeter_m": "Périmètre (m)",
+        "perimeter_opt": "Périmètre (optionnel)",
+        "width_m": "Largeur (m)"
+      },
+      "kpi": {
+        "area": "Surface",
+        "thickness": "Épaisseur",
+        "volume": "Volume"
+      },
+      "layers": {
+        "edge_strip": "Bande périphérique",
+        "herisson_cm": "Hérisson (cm)",
+        "herisson_help": "Couche granulaire sous dalle.",
+        "insulation": "Isolation",
+        "insulation_thickness": "Épaisseur d’isolation",
+        "polyane": "Film polyane"
+      },
+      "materials": {
+        "bpe": "Béton BPE",
+        "cement_named": "Ciment ({{label}})",
+        "delivery": "Livraison",
+        "delivery_pump": "Livraison + pompe",
+        "edge_strip": "Bande périphérique",
+        "formwork": "Coffrage",
+        "gravel": "Gravier",
+        "herisson": "Hérisson",
+        "insulation_named": "Isolation ({{label}})",
+        "joints": "Joints",
+        "labor": "Main d’œuvre",
+        "mesh_named": "Treillis ({{type}})",
+        "polyane": "Polyane",
+        "sand": "Sable"
+      },
+      "prices": {
+        "bpe_m3": "BPE (€/m³)",
+        "cement_bag": "Ciment (€/sac)",
+        "delivery": "Livraison (forfait)",
+        "formwork_m2": "Coffrage (€/m²)",
+        "gravel_ton": "Gravier (€/t)",
+        "labor_m2": "MO (€/m²)",
+        "mesh_panel": "Panneau treillis (€/panneau)",
+        "pro": "Pro",
+        "pump": "Pompe (forfait)",
+        "sand_ton": "Sable (€/t)",
+        "simple": "Simple",
+        "title": "Prix"
+      },
+      "shape": {
+        "area": "Surface",
+        "rect": "Rectangle"
+      },
+      "site_mix": {
+        "bag_25": "Sac 25 kg",
+        "bag_35": "Sac 35 kg",
+        "bag_size": "Poids du sac",
+        "dosage": "Dosage",
+        "dosage_300": "300 kg/m³",
+        "dosage_350": "350 kg/m³",
+        "dosage_400": "400 kg/m³"
+      },
+      "step1": {
+        "hint": "Saisissez les dimensions de la dalle."
+      },
+      "step2": {
+        "hint": "Choisissez l’épaisseur et les pertes."
+      },
+      "step3": {
+        "hint": "Choisissez le type de béton (BPE ou gâché)."
+      },
+      "step4": {
+        "hint": "Options (couches) et prix."
+      },
+      "steps": {
+        "1": "1. Dimensions",
+        "2": "2. Épaisseur",
+        "3": "3. Béton",
+        "4": "4. Options"
+      },
+      "structure": {
+        "formwork": "Coffrage",
+        "joints": "Joints",
+        "mesh": "Treillis"
+      },
+      "summary": "Estimation dalle béton",
+      "summary_zero": "Saisissez des dimensions pour afficher les résultats.",
+      "usage": {
+        "driveway": "Allée",
+        "interior": "Dalle intérieure",
+        "label": "Usage",
+        "terrace": "Terrasse"
+      }
+    },
+    "electricity": {
+      "actions": {
+        "add": "Ajouter",
+        "decrease": "Diminuer",
+        "increase": "Augmenter"
+      },
+      "bom": {
+        "boxes": "Boîtes de dérivation",
+        "breakers": "Disjoncteurs",
+        "cable_15": "Câble 1,5 mm²",
+        "cable_25": "Câble 2,5 mm²",
+        "cable_6": "Câble 6 mm²",
+        "conduit": "Gaine",
+        "diff_switches": "Interrupteurs différentiels",
+        "labor_panel": "MO (tableau)",
+        "labor_points": "MO (points)",
+        "lights": "Points lumineux",
+        "network": "Points réseau",
+        "panel_named": "Tableau électrique ({{n}} rangée{{s}})",
+        "sockets": "Prises",
+        "special_sockets": "Prises dédiées",
+        "switches": "Interrupteurs"
+      },
+      "calculated": "Calculé",
+      "circuits": {
+        "heating": "Chauffage",
+        "hob": "Plaque",
+        "lighting": "Éclairage",
+        "shutters": "Volets",
+        "sockets": "Prises",
+        "special": "Circuits dédiés"
+      },
+      "config": {
+        "avg_panel_dist": "Distance moyenne au tableau (m)",
+        "avg_point_dist": "Distance moyenne entre points (m)",
+        "renovation": "Rénovation",
+        "renovation_help": "Ajoute une marge de longueur pour passages en existant."
+      },
+      "details": {
+        "reno_plus15": "+15% (rénovation)"
+      },
+      "kpi": {
+        "circuits": "Circuits",
+        "panel": "Tableau",
+        "panel_rows": "Rangées",
+        "points": "Points"
+      },
+      "presets": {
+        "center_point": "Point lumineux plafond",
+        "counter_sockets": "Prises plan de travail",
+        "dishwasher": "Lave-vaisselle",
+        "hob_socket": "Plaque",
+        "light_point": "Point lumineux",
+        "mirror_light": "Lumière miroir",
+        "network": "Réseau (RJ45)",
+        "network_tv": "TV + réseau",
+        "oven_socket": "Four",
+        "socket": "Prise",
+        "sockets": "Prises",
+        "switch": "Interrupteur",
+        "switches": "Interrupteurs",
+        "washing_machine": "Lave-linge"
+      },
+      "prices": {
+        "breaker": "Disjoncteur (€/u)",
+        "cable25": "Câble 2,5 mm² (€/m)",
+        "labor_panel": "MO tableau (forfait)",
+        "labor_point": "MO par point",
+        "pro": "Pro",
+        "simple": "Simple",
+        "socket": "Prise (€/u)",
+        "switch": "Interrupteur (€/u)",
+        "title": "Prix"
+      },
+      "quick_add": {
+        "heater": "Chauffage",
+        "light": "Lumière",
+        "network": "Réseau",
+        "shutter": "Volet",
+        "socket": "Prise",
+        "switch": "Interrupteur"
+      },
+      "rooms": {
+        "room_named": "Pièce {{n}}",
+        "types": {
+          "bathroom": "Salle de bain",
+          "bedroom": "Chambre",
+          "kitchen": "Cuisine",
+          "living": "Séjour",
+          "other": "Autre",
+          "wc": "WC"
+        }
+      },
+      "step1": {
+        "hint": "Ajoutez des pièces et des points."
+      },
+      "step2": {
+        "hint": "Choisissez les circuits et préréglages."
+      },
+      "step3": {
+        "hint": "Ajustez les distances et l’option rénovation."
+      },
+      "step4": {
+        "hint": "Vérifiez les matériaux et les prix."
+      },
+      "steps": {
+        "1": "1. Pièces",
+        "2": "2. Points",
+        "3": "3. Options",
+        "4": "4. Prix"
+      },
+      "summary": "Estimation électricité"
+    },
+    "exterior": {
+      "actions": {
+        "add_zone": "Ajouter une zone"
+      },
+      "defaults": {
+        "wall_label": "Mur",
+        "zone_fallback": "Zone {{n}}",
+        "zone_label": "Zone"
+      },
+      "details": {
+        "dim_cm": "Dimensions (cm)",
+        "overlap_plus": "Marge de recouvrement",
+        "rolls_for_length": "Rouleaux pour longueur",
+        "thickness_cm": "Épaisseur (cm)"
+      },
+      "done": "Terminé",
+      "fence": {
+        "title": "Clôture"
+      },
+      "garden": {
+        "lawn": "Gazon (semis)",
+        "lawn_roll": "Gazon (rouleaux)",
+        "lawn_seed": "Semences gazon",
+        "planting": "Plantation",
+        "roll": "Rouleau",
+        "seed": "Semence"
+      },
+      "items": {
+        "fence": "Clôture",
+        "gate": "Portail",
+        "pool": "Piscine"
+      },
+      "kpi": {
+        "fences_walls": "Clôtures/Murs",
+        "networks": "Réseaux",
+        "zones": "Zones"
+      },
+      "materials": {
+        "backfill": "Remblai",
+        "bedding_sand": "Sable de pose",
+        "blocks_named": "Blocs ({{label}})",
+        "borders": "Bordures",
+        "coating_named": "Revêtement ({{label}})",
+        "concrete_slab": "Dalle béton",
+        "coping": "Chaperon",
+        "drain_roll_named": "Drain ({{label}})",
+        "excavation_named": "Terrassement ({{label}})",
+        "facade_coating": "Revêtement façade",
+        "fence_posts": "Poteaux de clôture",
+        "foundation_gravel": "Gravier de fondation",
+        "garden_lights": "Éclairage jardin",
+        "geotextile": "Géotextile",
+        "manholes": "Regards",
+        "mortar": "Mortier",
+        "option_install_named": "Pose ({{label}})",
+        "pipe_named": "Tuyau ({{label}})",
+        "trench_named": "Tranchée ({{label}})",
+        "wall_footing_named": "Semelle de mur ({{label}})"
+      },
+      "modes": {
+        "pro": "Pro",
+        "simple": "Simple"
+      },
+      "network": {
+        "surface": "Surface",
+        "trench": "Tranchée"
+      },
+      "placeholders": {
+        "area_m2": "Surface (m²)",
+        "height_m": "Hauteur (m)",
+        "length_ml": "Longueur (m)",
+        "length_ml_full": "Longueur (m lin.)",
+        "qty": "Qté",
+        "thickness_cm": "Épaisseur (cm)",
+        "zone_name": "Nom de la zone"
+      },
+      "plant_labels": {
+        "default": "Plante"
+      },
+      "plants": {
+        "HEDGE_PLANT_UNIT": "Plant de haie",
+        "PLANT_UNIT": "Plante",
+        "SHRUB_UNIT": "Arbuste",
+        "TREE_UNIT": "Arbre"
+      },
+      "price_editor": {
+        "edit": "Modifier les prix",
+        "overridden_catalog": "Catalogue surchargé",
+        "reset": "Réinitialiser",
+        "subtitle": "Ajustez les prix unitaires et options.",
+        "title": "Éditeur de prix"
+      },
+      "step1": {
+        "hint": "Définissez vos zones (surfaces/longueurs)."
+      },
+      "step2": {
+        "hint": "Choisissez les postes (clôture, jardin, réseaux)."
+      },
+      "step3": {
+        "hint": "Configurez matériaux et options."
+      },
+      "step4": {
+        "hint": "Vérifiez quantités et pertes."
+      },
+      "step5": {
+        "hint": "Récapitulatif des prix."
+      },
+      "steps": {
+        "1": "1. Zones",
+        "2": "2. Postes",
+        "3": "3. Options",
+        "4": "4. Récap.",
+        "5": "5. Prix"
+      },
+      "summary": "Estimation extérieurs",
+      "total": {
+        "title": "Total"
+      },
+      "units": {
+        "items": "ouvrages",
+        "mlin": "m lin.",
+        "unit": "unité",
+        "zones": "zones"
+      },
+      "wall": {
+        "title": "Mur"
+      },
+      "warnings": {
+        "concrete_no_slab": "Béton sélectionné sans surface de dalle."
+      },
+      "zone_fields": {
+        "bedding": "Pose",
+        "excav": "Terrassement",
+        "foundation": "Fondation",
+        "slab": "Dalle"
+      },
+      "zone_types": {
+        "terrace": "Terrasse",
+        "driveway": "Allée",
+        "path": "Chemin",
+        "other": "Autre"
+      },
+      "fence_types": {
+        "mesh_rigid": "Grillage rigide",
+        "mesh_soft": "Grillage souple",
+        "wood": "Bois"
+      },
+      "network_types": {
+        "elec": "Électricité",
+        "water": "Eau",
+        "sewer": "Eaux usées",
+        "drain": "Drainage",
+        "light": "Éclairage"
+      }
+    },
+    "leveling": {
+      "bag_kg": "Poids du sac (kg)",
+      "bag_size": "Poids du sac",
+      "btn_add_zone": "Ajouter une zone",
+      "default_zone": "Zone {{n}}",
+      "detail_area": "Surface",
+      "detail_avg_thickness": "Épaisseur moyenne",
+      "detail_product": "Produit",
+      "drying_floor": "Circulable",
+      "drying_tile": "Carrelable",
+      "drying_title": "Temps de séchage (indicatif)",
+      "drying_walk": "Trafic léger",
+      "empty_zones": "Aucune zone.",
+      "estimate_line": "{{m2}} m² · moy. {{cm}} cm",
+      "help_step1": "Ajoutez une ou plusieurs zones à ragréer.",
+      "help_step2": "Saisissez l’épaisseur (moyenne ou min/max).",
+      "help_step3": "Choisissez le type de produit et options.",
+      "help_step4": "Vérifiez quantités et prix.",
+      "layers": "Couches",
+      "mat_band": "Bande périphérique",
+      "mat_compound": "Ragréage",
+      "mat_compound_details": "{{bags}} sacs",
+      "mat_labor_pour": "MO (coulage)",
+      "mat_labor_prep": "MO (prépa)",
+      "mat_mesh": "Treillis",
+      "mat_mesh_details": "{{m2}} m²",
+      "mat_primer": "Primaire",
+      "opt_band": "Bande périphérique",
+      "opt_band_help": "Réduit les risques de fissures et améliore l’acoustique.",
+      "opt_mesh": "Treillis",
+      "opt_mesh_help": "Recommandé pour fortes épaisseurs et supports faibles.",
+      "opt_primer": "Primaire",
+      "ph_area": "Surface (m²)",
+      "ph_thickness_avg": "Ép. moy. (cm)",
+      "ph_thickness_max": "Ép. max (cm)",
+      "ph_thickness_min": "Ép. min (cm)",
+      "ph_zone_name": "Nom de la zone",
+      "price_band": "Bande (€/m)",
+      "price_compound_fibre": "Ragréage fibré (€/sac)",
+      "price_compound_std": "Ragréage standard (€/sac)",
+      "price_labor_pour": "MO coulage (€/m²)",
+      "price_labor_prep": "MO prépa (€/m²)",
+      "price_mesh": "Treillis (€/m²)",
+      "price_primer": "Primaire (€/L)",
+      "prices_title": "Prix",
+      "product_fallback_label": "Ragréage",
+      "product_specs": "Min {{min}} mm · Max {{max}} mm · Densité {{density}}",
+      "product_title": "Produit",
+      "step_1": "1. Zones",
+      "step_2": "2. Épaisseur",
+      "step_3": "3. Options",
+      "step_4": "4. Prix",
+      "summary": "Estimation ragréage",
+      "thickness_avg_value": "Épaisseur moyenne",
+      "thickness_minmax_value": "Épaisseur min/max",
+      "thickness_mode_avg": "Moyenne",
+      "thickness_mode_minmax": "Min/Max",
+      "warn_add_zone": "Ajoutez au moins une zone.",
+      "warn_minmax_gap": "Écart min/max trop important.",
+      "warn_thickness_too_high": "Épaisseur très élevée : envisagez plusieurs passes ou une autre solution.",
+      "warn_thickness_too_low": "Épaisseur trop faible : vérifiez le minimum produit.",
+      "warn_tile_primer": "Un primaire est recommandé avant carrelage.",
+      "warn_wood_mesh": "Sur support bois, un treillis est fortement recommandé.",
+      "waste_pct": "Pertes (%)",
+      "zone_line": "{{name}} · {{m2}} m²"
+    },
+    "paint": {
+      "ceiling": "Plafond",
+      "ceilings_title": "Plafonds",
+      "default_room": "Pièce {{n}}",
+      "detail_ceilings": "Plafonds",
+      "detail_state": "État du support",
+      "detail_walls": "Murs",
+      "doors": "Portes",
+      "help_step1": "Ajoutez des pièces et saisissez les dimensions.",
+      "help_step2": "Choisissez les surfaces à peindre.",
+      "help_step3": "Sélectionnez l’état et le nombre de couches.",
+      "help_step4": "Options de préparation et protections.",
+      "help_step5": "Vérifiez quantités et prix.",
+      "labor_coef_bad": "Coef. MO (support mauvais)",
+      "layers_n": "{{n}} couches",
+      "mat_filler": "Enduit de rebouchage",
+      "mat_labor_paint": "MO (peinture)",
+      "mat_labor_prep": "MO (prépa)",
+      "mat_paint_ceiling": "Peinture plafond",
+      "mat_paint_walls": "Peinture murs",
+      "mat_paint_wood": "Peinture boiseries",
+      "mat_primer": "Sous-couche",
+      "mat_smoothing": "Enduit de lissage",
+      "mat_tape": "Ruban de masquage",
+      "mat_tarps": "Bâches de protection",
+      "mat_tools_kit": "Kit outillage",
+      "opt_floor_protection": "Protection sols",
+      "opt_floor_protection_help": "Bâches, masquage, consommables.",
+      "opt_tape": "Ruban de masquage",
+      "opt_tape_help": "Masquage des arêtes pour des lignes nettes.",
+      "opt_wood": "Boiseries",
+      "ph_hgt": "Hauteur (m)",
+      "ph_len": "Longueur (m)",
+      "ph_room_name": "Nom de la pièce",
+      "ph_wid": "Largeur (m)",
+      "prep_filler": "Rebouchage",
+      "prep_primer": "Sous-couche",
+      "prep_primer_help": "Améliore l’adhérence et le rendu.",
+      "prep_smoothing": "Lissage",
+      "prep_title": "Préparation",
+      "price_ceiling_paint": "Peinture plafond (€/L)",
+      "price_filler": "Enduit rebouchage (€/kg)",
+      "price_labor_paint": "MO peinture (€/m²)",
+      "price_labor_prep": "MO prépa (€/m²)",
+      "price_primer": "Sous-couche (€/L)",
+      "price_smoothing": "Enduit lissage (€/kg)",
+      "price_tape": "Ruban (€/rouleau)",
+      "price_tarp": "Bâche (€/u)",
+      "price_wall_paint": "Peinture murs (€/L)",
+      "price_wood_paint": "Peinture bois (€/L)",
+      "prices_title": "Prix",
+      "room_dims_line": "{{name}} · {{len}}×{{wid}}×{{hgt}}",
+      "state_bad": "Mauvais",
+      "state_good": "Bon",
+      "state_medium": "Moyen",
+      "state_title": "État",
+      "step_1": "1. Pièces",
+      "step_2": "2. Surfaces",
+      "step_3": "3. État",
+      "step_4": "4. Options",
+      "step_5": "5. Prix",
+      "summary": "Estimation peinture",
+      "tools_included_price": "Outillage inclus",
+      "walls": "Murs",
+      "walls_title": "Murs",
+      "warn_add_room": "Ajoutez au moins une pièce.",
+      "warn_invalid_dimensions": "Dimensions invalides.",
+      "warn_no_surface_selected": "Sélectionnez au moins une surface.",
+      "warn_too_many_openings": "Les ouvertures dépassent la surface des murs.",
+      "windows": "Fenêtres",
+      "paint_type": {
+        "acry_mat": "Acrylique mat",
+        "acry_satin": "Acrylique satin",
+        "velours": "Velours"
+      }
+    },
+    "placo": {
+      "board_type": "Type de plaque",
+      "ceiling_furring_spacing_cm": "Entraxe fourrures (cm)",
+      "ceiling_grid_title": "Ossature plafond",
+      "detail": {
+        "frame": "Ossature",
+        "mode": "Mode",
+        "net_area": "Surface nette"
+      },
+      "double_skin": "Double peau",
+      "edit_prices": "Modifier les prix",
+      "frame": "Ossature",
+      "hanger_spacing_m": "Entraxe suspentes (m)",
+      "help_step1": "Choisissez le mode placo et les dimensions.",
+      "help_step2": "Réglez l’ossature et les entraxes.",
+      "help_step3": "Ajoutez des ouvertures si besoin.",
+      "help_step5": "Vérifiez quantités et prix.",
+      "hgt_m": "Hauteur (m)",
+      "insul_thick_mm": "Épaisseur isolation (mm)",
+      "insul_type": "Type d’isolant",
+      "len_m": "Longueur (m)",
+      "mat": {
+        "boards": "Plaques de plâtre",
+        "boards_details": "{{n}} plaques",
+        "edge_angles": "Cornières / bandes d’angle",
+        "furring": "Fourrures",
+        "furring_details": "{{n}} pièces",
+        "hangers": "Suspentes",
+        "hangers_details": "{{n}} pièces",
+        "insulation": "Isolation",
+        "joint_compound": "Enduit à joint",
+        "joint_tape": "Bande à joint",
+        "labor": "Main d’œuvre",
+        "membrane": "Membrane pare-vapeur",
+        "membrane_details": "{{m2}} m²",
+        "rails": "Rails",
+        "screws": "Vis",
+        "studs": "Montants",
+        "studs_details": "{{n}} pièces"
+      },
+      "mode": {
+        "ceiling": "Plafond",
+        "lining": "Doublage",
+        "partition": "Cloison"
+      },
+      "no_opening": "Aucune ouverture.",
+      "opening": {
+        "door": "Porte",
+        "window": "Fenêtre"
+      },
+      "openings_title": "Ouvertures",
+      "ph_h": "Hauteur (m)",
+      "ph_w": "Largeur (m)",
+      "price": {
+        "furring_3m": "Fourrure 3 m (€/pièce)",
+        "hanger_unit": "Suspente (€/pièce)",
+        "labor_m2": "Main d’œuvre (€/m²)",
+        "ba13": "Plaque BA13 (€/plaque)",
+        "hydro": "Plaque hydro (€/plaque)",
+        "fire": "Plaque feu/acoustique (€/plaque)",
+        "rail_3m": "Rail 3 m (€/pièce)",
+        "stud_3m": "Montant 3 m (€/pièce)",
+        "screws_1000": "Vis (boîte 1000) (€/boîte)",
+        "tape_150": "Bande à joint (rouleau) (€/rouleau)",
+        "compound_25": "Enduit à joint 25 kg (€/sac)",
+        "membrane_m2": "Membrane pare-vapeur (€/m²)",
+        "insulation_m2": "Isolation (€/m²)"
+      },
+      "prices_title": "Prix",
+      "ready_desc": "Votre estimation est prête.",
+      "ready_title": "Prêt",
+      "step_1": "1. Plan",
+      "step_2": "2. Ossature",
+      "step_3": "3. Ouvertures",
+      "step_4": "4. Options",
+      "step_5": "5. Prix",
+      "stud_spacing_cm": "Entraxe montants (cm)",
+      "summary": "Estimation placo",
+      "use_insulation": "Avec isolation",
+      "use_membrane": "Avec pare-vapeur",
+      "warn_insul_thick_low": "Épaisseur d’isolant faible.",
+      "warn_invalid_dims": "Dimensions invalides.",
+      "warn_net_surface_zero": "Surface nette nulle.",
+      "warn_openings_gt_surface": "Les ouvertures dépassent la surface.",
+      "warn_surface_zero": "Surface nulle.",
+      "waste_pct": "Pertes (%)",
+      "wid_m": "Largeur (m)",
+      "insulation": {
+        "GR32": "Laine de verre (GR32) - rouleau",
+        "ROCK": "Laine de roche - panneau",
+        "PSE": "Polystyrène expansé (PSE / EPS)",
+        "XPS": "Polystyrène extrudé (XPS)",
+        "WOOD": "Fibre de bois",
+        "HEMP": "Chanvre / coton recyclé"
+      }
+    },
+    "plumbing": {
+      "appliance": {
+        "bath": "Baignoire",
+        "dishwasher": "Lave-vaisselle",
+        "generic": "Appareil",
+        "other": "Autre",
+        "shower": "Douche",
+        "sink": "Évier",
+        "tap_ext": "Robinet extérieur",
+        "washbasin": "Vasque",
+        "washing_machine": "Lave-linge",
+        "wc": "WC"
+      },
+      "avg_distance_drain_m": "Distance moyenne évacuation (m)",
+      "avg_distance_supply_m": "Distance moyenne alimentation (m)",
+      "cold": "Froid",
+      "detail": {
+        "cold": "Eau froide",
+        "drain": "Évacuation",
+        "hot": "Eau chaude",
+        "manifold_mode": "Distribution en nourrice",
+        "series_coef": "Coefficient en série",
+        "supply": "Alimentation"
+      },
+      "distribution": {
+        "manifold": "Nourrice",
+        "series": "Série"
+      },
+      "distribution_title": "Distribution",
+      "drain_title": "Évacuations",
+      "heater_auto_included": "Chauffe-eau inclus automatiquement",
+      "heater_capacity_l": "Capacité chauffe-eau (L)",
+      "heater_coef_help": "Ajuste l’estimation MO/matériaux pour la pose du chauffe-eau.",
+      "heater_title": "Chauffe-eau",
+      "heater_type": {
+        "electric": "Électrique",
+        "thermo": "Thermodynamique"
+      },
+      "heater_type_title": "Type de chauffe-eau",
+      "help_step1": "Ajoutez des pièces et appareils.",
+      "help_step2": "Choisissez le mode de distribution et distances.",
+      "help_step3": "Configurez le chauffe-eau si besoin d’eau chaude.",
+      "help_step4": "Vérifiez quantités et prix.",
+      "hint_add_room": "Ajoutez au moins une pièce.",
+      "hot": "Chaud",
+      "manifold_help": "La nourrice est plus simple à équilibrer et à entretenir.",
+      "mat": {
+        "consumables": "Consommables",
+        "fittings": "Raccords",
+        "fittings_details": "{{n}} pièces",
+        "heater": "Chauffe-eau",
+        "heater_misc": "Accessoires chauffe-eau",
+        "labor_apps": "MO (appareils)",
+        "labor_network": "MO (réseau)",
+        "manifolds": "Nourrices",
+        "manifolds_details": "{{n}} pièces",
+        "pvc100": "PVC Ø100",
+        "pvc32": "PVC Ø32",
+        "pvc40": "PVC Ø40",
+        "pvc50": "PVC Ø50",
+        "safety_group": "Groupe de sécurité",
+        "siphons": "Siphons"
+      },
+      "material": "Matériau",
+      "material_copper": "Cuivre",
+      "material_multiskin": "Multicouche",
+      "material_per": "PER",
+      "pack": {
+        "bath": "Pack baignoire",
+        "shower": "Pack douche",
+        "sink": "Pack évier",
+        "tap_ext": "Pack robinet ext.",
+        "washbasin": "Pack vasque",
+        "wc": "Pack WC"
+      },
+      "pipe": {
+        "copper": "Cuivre",
+        "multiskin": "Multicouche",
+        "per": "PER"
+      },
+      "price_heater_base_200": "Chauffe-eau 200 L (€/u)",
+      "price_labor_network": "MO réseau (€/m)",
+      "price_labor_point": "MO par point",
+      "price_pipe_selected": "Tuyau sélectionné (€/m)",
+      "price_pvc40": "PVC Ø40 (€/m)",
+      "price_wc_pack": "Pack WC (€/u)",
+      "prices_title": "Prix",
+      "room_label": "Pièce",
+      "series_help": "La distribution en série réduit les longueurs mais complique l’équilibrage.",
+      "step_1": "1. Pièces",
+      "step_2": "2. Distribution",
+      "step_3": "3. Chauffe-eau",
+      "step_4": "4. Prix",
+      "summary": "Estimation plomberie",
+      "supply_title": "Alimentation",
+      "warn_add_room": "Ajoutez au moins une pièce.",
+      "warn_hot_needed_no_heater": "Eau chaude requise mais aucun chauffe-eau sélectionné.",
+      "warn_no_appliance": "Ajoutez au moins un appareil.",
+      "rooms": {
+        "types": {
+          "laundry": "Buanderie"
+        }
+      },
+      "room_type": {
+        "bathroom": "Salle de bain",
+        "kitchen": "Cuisine",
+        "wc": "WC",
+        "laundry": "Buanderie",
+        "other": "Autre"
+      }
+    },
+    "roof": {
+      "detail": {
+        "eaves": "Égout",
+        "projected_area": "Surface projetée",
+        "real_area": "Surface réelle",
+        "ridge": "Faîtage",
+        "slope": "Pente"
+      },
+      "mat": {
+        "counter_batten": "Contre-lattes",
+        "cover_details": "Détails couverture",
+        "downspouts": "Descentes",
+        "gutter": "Gouttière",
+        "gutter_details": "Détails gouttières",
+        "hip": "Arêtier",
+        "insulation": "Isolation",
+        "labor": "Main d’œuvre",
+        "ridge": "Faîtage",
+        "screen": "Écran sous-toiture",
+        "valley": "Noues",
+        "vapor": "Pare-vapeur",
+        "verge": "Rives"
+      },
+      "price": {
+        "cover_m2": "Couverture (€/m²)",
+        "gutter_m": "Gouttière (€/m)",
+        "insul_m2": "Isolation (€/m²)",
+        "labor_m2": "MO (€/m²)",
+        "ridge_m": "Faîtage (€/m)",
+        "screen_m2": "Écran (€/m²)",
+        "valley_m": "Noue (€/m)"
+      },
+      "summary": "Estimation toiture",
+      "title": "Calculateur toiture",
+      "ui": {
+        "cover_material": "Matériau de couverture",
+        "downspouts": "Descentes",
+        "gutters": "Gouttières",
+        "insul_thick_mm": "Épaisseur isolation (mm)",
+        "insulation": "Isolation",
+        "length_m": "Longueur (m)",
+        "overhang_cm": "Débord (cm)",
+        "ph_length": "Longueur",
+        "ph_width": "Largeur",
+        "prices_title": "Prix",
+        "roof_type": "Type de toit",
+        "screen": "Écran sous-toiture",
+        "slope_pct": "Pente (%)",
+        "step1_hint": "Saisissez l’emprise du toit.",
+        "step2_hint": "Choisissez le type de toit et la pente.",
+        "step3_hint": "Sélectionnez les postes (couverture, gouttières, etc.).",
+        "step4_hint": "Ajoutez isolation et membranes.",
+        "step5_hint": "Vérifiez les prix.",
+        "valleys_m": "Noues (m)",
+        "vapor": "Pare-vapeur",
+        "vapor_help": "Recommandé selon la composition et l’isolation.",
+        "waste_pct": "Pertes (%)",
+        "width_m": "Largeur (m)"
+      },
+      "warn": {
+        "fill_dims": "Veuillez renseigner les dimensions.",
+        "flat_roof_material": "Les toits plats nécessitent des systèmes d’étanchéité spécifiques.",
+        "low_slope_tiles": "Faible pente : vérifier tuiles et écran adaptés.",
+        "low_slope_zinc": "Faible pente : vérifier les exigences du zinc."
+      },
+      "steps": {
+        "1": "1. Emprise",
+        "2": "2. Toit",
+        "3": "3. Postes",
+        "4": "4. Options",
+        "5": "5. Prix"
+      },
+      "cover": {
+        "tile_mech": "Tuile mécanique",
+        "tile_flat": "Tuile plate",
+        "slate": "Ardoise",
+        "steel": "Bac acier",
+        "zinc": "Zinc"
+      }
+    },
+    "screed": {
+      "cement_dosage": "Dosage ciment",
+      "default_zone": "Zone {{n}}",
+      "detail": {
+        "area": "Surface",
+        "avg_thick": "Ép. moyenne",
+        "vol": "Volume"
+      },
+      "fiber_dosage": "Dosage fibres",
+      "fluid_help": "Les chapes fluides nécessitent des produits spécifiques et souvent une pompe.",
+      "fluid_kind": {
+        "anh": "Anhydrite",
+        "cem": "Ciment"
+      },
+      "help_step1": "Ajoutez des zones et surfaces.",
+      "help_step2": "Saisissez épaisseur et type.",
+      "help_step3": "Choisissez renforts et options.",
+      "help_step4": "Vérifiez quantités et prix.",
+      "insul_thick_cm": "Épaisseur isolation (cm)",
+      "light_bag_help": "Le ravoirage (allégé) réduit le poids et facilite la mise à niveau.",
+      "light_bag_vol": "Volume ravoirage",
+      "m": "m",
+      "mat": {
+        "cement": "Ciment",
+        "cement_details": "{{bags}} sacs",
+        "fiber": "Fibres",
+        "fiber_details": "{{kg}} kg",
+        "fluid": "Chape fluide",
+        "insulation": "Isolation",
+        "joints": "Joints",
+        "labor": "Main d’œuvre",
+        "light_mix": "Ravoirage",
+        "light_mix_details": "{{bags}} sacs",
+        "mesh": "Treillis",
+        "mesh_details": "{{m2}} m²",
+        "polyane": "Polyane",
+        "pump": "Pompe",
+        "sand": "Sable",
+        "strip": "Bande périphérique"
+      },
+      "mesh": {
+        "fallback_label": "Treillis",
+        "type": "Type"
+      },
+      "opt_insulation": "Isolation",
+      "opt_polyane": "Polyane",
+      "opt_strip": "Bande périphérique",
+      "pct_over": "Pertes (%)",
+      "ph_m": "m",
+      "ph_m2": "m²",
+      "ph_pct": "%",
+      "ph_thick_cm": "Épaisseur (cm)",
+      "ph_zone_name": "Nom de la zone",
+      "price": {
+        "cement": "Ciment (€/sac)",
+        "fiber": "Fibres (€/kg)",
+        "fluid": "Chape fluide (€/m³)",
+        "insulation": "Isolation (€/m²)",
+        "joints": "Joints (€/m)",
+        "labor": "MO (€/m²)",
+        "mesh_fallback": "Treillis (€/m²)",
+        "polyane": "Polyane (€/m²)",
+        "premix": "Prémélange (€/sac)",
+        "pump": "Pompe (forfait)",
+        "sand": "Sable (€/t)",
+        "strip": "Bande (€/m)"
+      },
+      "prices_title": "Prix",
+      "reinforce_title": "Renfort",
+      "sand_ratio": "Ratio sable",
+      "screed_type": "Type de chape",
+      "sloped": "Pente",
+      "step_1": "1. Zones",
+      "step_2": "2. Type",
+      "step_3": "3. Options",
+      "step_4": "4. Prix",
+      "summary": "Estimation chape",
+      "use_joints": "Avec joints",
+      "warn_add_zone": "Ajoutez au moins une zone.",
+      "warn_high_thickness": "Épaisseur élevée : vérifier la faisabilité.",
+      "warn_max_thickness": "Épaisseur au-delà des maxima usuels.",
+      "warn_ravoirage_dosage": "Vérifiez le dosage du ravoirage.",
+      "warn_small_fluid": "Petits volumes : minimum de facturation possible.",
+      "zone_area_line": "{{name}} · {{m2}} m²",
+      "zone_thick_line": "{{name}} · {{cm}} cm",
+      "type": {
+        "trad": "Chape traditionnelle",
+        "fluid_cem": "Chape fluide (ciment)",
+        "fluid_anh": "Chape fluide (anhydrite)",
+        "light": "Chape allégée",
+        "ravoirage": "Ravoirage"
+      },
+      "reinforce": {
+        "none": "Aucun",
+        "mesh": "Treillis",
+        "fiber": "Fibres"
+      }
+    },
+    "stairs": {
+      "detail": {
+        "blondel": "Blondel",
+        "concrete_vol": "Volume béton",
+        "formwork_area": "Surface coffrage",
+        "run": "Giron",
+        "total_height": "Hauteur totale",
+        "tread": "Marche",
+        "width": "Largeur"
+      },
+      "mat": {
+        "coating": "Revêtement",
+        "concrete": "Béton",
+        "concrete_details": "{{m3}} m³",
+        "formwork_labor": "MO (coffrage)",
+        "formwork_panels": "Panneaux coffrage",
+        "props": "Étais",
+        "pump": "Pompe",
+        "railing": "Garde-corps",
+        "steel": "Aciers",
+        "tiling": "Carrelage"
+      },
+      "price": {
+        "coating": "Revêtement (€/m²)",
+        "concrete": "Béton (€/m³)",
+        "formwork": "Coffrage (€/m²)",
+        "formwork_labor": "MO coffrage (€/m²)",
+        "props": "Étais (€/u)",
+        "pump": "Pompe (forfait)",
+        "railing": "Garde-corps (€/m)",
+        "steel": "Acier (€/kg)",
+        "tiling": "Carrelage (€/m²)"
+      },
+      "steps": {
+        "1": "1. Géométrie",
+        "2": "2. Confort",
+        "3": "3. Structure",
+        "4": "4. Finitions",
+        "5": "5. Prix"
+      },
+      "summary": "Estimation escalier",
+      "summary_fallback": "Saisissez des dimensions pour calculer l’escalier.",
+      "ui": {
+        "blondel": "Blondel",
+        "comfort_ok": "Confort OK",
+        "decrease": "Diminuer",
+        "finish_coating": "Revêtement",
+        "finish_railing": "Garde-corps",
+        "finish_tiling": "Carrelage",
+        "height_cm": "Hauteur (cm)",
+        "height_help": "Hauteur sol à sol.",
+        "increase": "Augmenter",
+        "landing_cm": "Palier (cm)",
+        "prices_title": "Prix",
+        "rebar_title": "Armatures",
+        "riser_label": "Contremarche",
+        "run_cm": "Giron (cm)",
+        "run_help": "Développement horizontal.",
+        "shape": "Forme",
+        "slab_thickness_cm": "Épaisseur dalle (cm)",
+        "steel_ratio": "Ratio acier",
+        "steel_ratio_hint": "Règle de pouce pour le poids d’armatures.",
+        "step1_hint": "Saisissez les dimensions de l’escalier.",
+        "step2_hint": "Vérifiez le confort (Blondel).",
+        "step3_hint": "Choisissez béton et armatures.",
+        "step4_hint": "Sélectionnez finitions et options.",
+        "step5_hint": "Vérifiez les prix.",
+        "steps_count": "Nombre de marches",
+        "tread": "Marche",
+        "use_props": "Avec étais",
+        "waste_concrete_pct": "Pertes béton (%)",
+        "waste_form_pct": "Pertes coffrage (%)",
+        "width_cm": "Largeur (cm)"
+      },
+      "warn_blondel": "Blondel hors plage de confort.",
+      "warn_missing_dims": "Dimensions manquantes.",
+      "warn_riser_high": "Contremarche trop haute.",
+      "warn_riser_low": "Contremarche trop basse.",
+      "warn_slope": "Pente trop forte.",
+      "warn_tread_short": "Giron trop court.",
+      "shape": {
+        "straight": "Droit",
+        "quarter": "Quart-tournant",
+        "half": "Demi-tournant"
+      },
+      "calc_mode": {
+        "auto": "Auto",
+        "fixed_N": "Fixé"
+      }
+    },
+    "substructure": {
+      "detail": {
+        "block": "Bloc",
+        "consumption": "Consommation",
+        "height": "Hauteur",
+        "net_surface": "Surface nette",
+        "perimeter": "Périmètre",
+        "poured_concrete": "Béton coulé",
+        "thickness": "Épaisseur",
+        "treated_surface": "Surface traitée",
+        "wall": "Mur"
+      },
+      "mat": {
+        "bitumen": "Enduit bitumineux",
+        "bitumen_detail": "{{l}} L",
+        "blocks_details": "{{units}} unités",
+        "delta_ms": "Membrane Delta MS",
+        "delta_ms_overlap": "Recouvrement",
+        "delta_profile": "Profil Delta",
+        "dpc": "Arase étanche",
+        "dpc_ratio": "Ratio",
+        "drain_pipe": "Drain",
+        "geotextile": "Géotextile",
+        "glue": "Colle",
+        "glue_ratio": "Ratio",
+        "gravel": "Gravier",
+        "gravel_detail": "{{m3}} m³",
+        "manholes": "Regards",
+        "mortar": "Mortier",
+        "mortar_ratio": "Ratio",
+        "poured_wall": "Mur banché",
+        "stepoc_fill": "Béton de remplissage",
+        "stepoc_fill_detail_fallback": "Volume de remplissage",
+        "stepoc_fill_detail_spec": "{{m3}} m³"
+      },
+      "summary": "Estimation soubassement",
+      "title": "Calculateur soubassement",
+      "ui": {
+        "advanced": "Avancé",
+        "advanced_hint": "Plus d’options et de détails.",
+        "bitumen": "Bitume",
+        "bitumen_help": "Traitement d’étanchéité des murs enterrés.",
+        "block_variant": "Variante de bloc",
+        "buried_share": "Part enterrée",
+        "coats": "Couches",
+        "consumption": "Consommation",
+        "deductions_m2": "Déductions (m²)",
+        "delta_ms": "Delta MS",
+        "delta_ms_help": "Membrane de protection/drainage.",
+        "dpc": "Arase étanche",
+        "dpc_help": "Barrière anti-remontées capillaires en pied de mur.",
+        "family": "Famille",
+        "geotextile": "Géotextile",
+        "gravel_height_m": "Hauteur gravier (m)",
+        "height_m": "Hauteur (m)",
+        "install_drain": "Poser un drain",
+        "manholes": "Regards",
+        "perimeter_m": "Périmètre (m)",
+        "price": {
+          "bitumen": "Bitume (€/L)",
+          "block_unit": "Bloc (€/u)",
+          "concrete": "Béton (€/m³)",
+          "delta_profile": "Profil (€/m)",
+          "delta_roll": "Rouleau Delta MS (€/rouleau)",
+          "dpc_roll": "Rouleau arase (€/rouleau)",
+          "drain_roll": "Rouleau drain (€/rouleau)",
+          "fallback_hint": "Valeur par défaut",
+          "fallback_value_hint": "Utilisation d’une valeur par défaut",
+          "geo_m2": "Géotextile (€/m²)",
+          "glue": "Colle (€/sac)",
+          "gravel_ton": "Gravier (€/t)",
+          "key_hint": "Clé de prix",
+          "manhole_unit": "Regard (€/u)",
+          "mortar": "Mortier (€/sac)"
+        },
+        "step1_hint": "Choisissez le type de mur et les dimensions.",
+        "step2_hint": "Sélectionnez étanchéité et drainage.",
+        "step3_hint": "Matériaux et options.",
+        "step4_hint": "Récapitulatif des prix.",
+        "stepoc_fill_fallback": "Ratio de remplissage par défaut",
+        "stepoc_fill_note": "Le remplissage dépend du type de bloc.",
+        "thickness": "Épaisseur",
+        "thickness_cm": "Épaisseur (cm)",
+        "trench": "Tranchée",
+        "trench_width_m": "Largeur tranchée (m)",
+        "wall_type": "Type de mur",
+        "waste_pct": "Pertes (%)"
+      },
+      "warn": {
+        "deductions_over_gross": "Les déductions dépassent la surface brute.",
+        "fill_perimeter_height": "Renseignez le périmètre et la hauteur.",
+        "net_zero": "Surface nette nulle."
+      },
+      "steps": {
+        "1": "1. Murs",
+        "2": "2. Étanchéité",
+        "3": "3. Drainage",
+        "4": "4. Prix"
+      },
+      "wall_mode": {
+        "masonry": "Maçonnerie (blocs)",
+        "poured": "Béton coulé"
+      },
+      "wall_family": {
+        "parpaing": "Bloc béton",
+        "brique": "Brique",
+        "cellulaire": "Bloc cellulaire",
+        "stepoc": "Bloc à bancher"
+      }
+    },
+    "tile": {
+      "detail": {
+        "format": "Format",
+        "pattern": "Pose",
+        "total_area": "Surface totale",
+        "wet_area": "Surface humide"
+      },
+      "double_no": "Non",
+      "double_yes": "Oui",
+      "mat": {
+        "glue": "Colle carrelage",
+        "glue_details": "{{bags}} sacs",
+        "grout_cement": "Joint ciment",
+        "grout_details": "{{bags}} sacs",
+        "grout_epoxy": "Joint époxy",
+        "grout_qty": "Qté de joint",
+        "labor_skirting": "MO (plinthes)",
+        "labor_spec": "MO (étanchéité)",
+        "labor_tiling": "MO (pose)",
+        "leveling": "Système de nivellement",
+        "leveling_details": "{{n}} kits",
+        "primer": "Primaire",
+        "skirting": "Plinthes",
+        "spec": "Étanchéité (SPEC)",
+        "spec_details": "{{m2}} m²",
+        "tiles": "Carrelage",
+        "tiles_details": "{{m2}} m²"
+      },
+      "price": {
+        "epoxy_kit": "Kit époxy (€/kit)",
+        "glue_bag": "Colle (€/sac)",
+        "grout_bag": "Joint (€/sac)",
+        "labor_skirting": "MO plinthes (€/m)",
+        "labor_spec": "MO étanchéité (€/m²)",
+        "labor_tiling": "MO pose (€/m²)",
+        "leveling": "Nivellement (€/kit)",
+        "primer_l": "Primaire (€/L)",
+        "skirting_m": "Plinthe (€/m)",
+        "spec_kit": "Kit SPEC (€/kit)",
+        "tile_m2": "Carrelage (€/m²)"
+      },
+      "steps": {
+        "1": "1. Zones",
+        "2": "2. Carrelage",
+        "3": "3. Colle",
+        "4": "4. Joints",
+        "5": "5. Prix"
+      },
+      "summary": "Estimation carrelage",
+      "ui": {
+        "add_zone": "Ajouter une zone",
+        "box_m2": "Rendement boîte (m²)",
+        "comb_mm": "Peigne (mm)",
+        "double_glue": "Double encollage",
+        "double_suggested": "Recommandé pour grands formats",
+        "glue_title": "Colle",
+        "glue_type": "Type de colle",
+        "grout_title": "Joints",
+        "joint_type": "Type de joint",
+        "joint_width_mm": "Largeur joint (mm)",
+        "length_cm": "Longueur (cm)",
+        "leveling": "Nivellement",
+        "no_zone": "Aucune zone.",
+        "pattern": "Pose",
+        "perimeter_short": "Périm.",
+        "ph_area": "Surface (m²)",
+        "ph_name": "Nom",
+        "ph_perimeter": "Périmètre (m)",
+        "prices_title": "Prix",
+        "primer": "Primaire",
+        "primer_help": "Améliore l’adhérence sur support poreux.",
+        "skirting": "Plinthes",
+        "skirting_help": "Finition périphérique optionnelle.",
+        "spec": "SPEC",
+        "spec_help": "Recommandé en pièces humides (douche, SDB).",
+        "step1_hint": "Ajoutez des zones et surfaces.",
+        "step2_hint": "Sélectionnez format et boîtes.",
+        "step3_hint": "Choisissez colle et double encollage.",
+        "step4_hint": "Choisissez type de joint et largeur.",
+        "step5_hint": "Vérifiez les prix.",
+        "thickness_mm": "Épaisseur (mm)",
+        "waste_add": "Ajouter des pertes",
+        "wet": "Pièce humide",
+        "wet_zone": "Zone humide",
+        "width_cm": "Largeur (cm)",
+        "zone_line": "{{name}} · {{m2}} m²"
+      },
+      "warn_add_zone": "Ajoutez au moins une zone.",
+      "warn_box_small": "Rendement boîte trop faible.",
+      "warn_double": "Double encollage recommandé pour ce format.",
+      "warn_old_tile": "Pose sur ancien carrelage : préparation spécifique requise.",
+      "warn_wet_no_spec": "Pièce humide sans étanchéité sélectionnée.",
+      "warn_wood": "Support bois : système spécifique requis.",
+      "zone_type": {
+        "floor": "Sol",
+        "wall": "Mur"
+      },
+      "substrate": {
+        "screed": "Chape / dalle",
+        "tile": "Ancien carrelage",
+        "plaster": "Plâtre / enduit",
+        "wood": "Bois / OSB"
+      },
+      "joint_type": {
+        "cement": "Ciment",
+        "epoxy": "Époxy"
+      },
+      "pattern": {
+        "straight": "Pose droite",
+        "staggered": "Pose décalée (1/2, 1/3)",
+        "diagonal": "Pose diagonale"
+      }
+    }
+  },
+  "client": {
+    "address": {
+      "placeholder": "Adresse"
+    },
+    "address_full": "Adresse complète",
+    "city": "Ville",
+    "contact": "Contact",
+    "email": "E-mail",
+    "info": "Infos",
+    "name": {
+      "placeholder": "Nom du client"
+    },
+    "phone": "Téléphone",
+    "zip": "Code postal"
+  },
+  "client_modal": {
+    "address": "Adresse",
+    "address_ph": "Rue, numéro",
+    "city": "Ville",
+    "client_name": "Nom du client",
+    "client_name_ph": "Ex. Jean Dupont",
+    "email": "E-mail",
+    "generate": "Générer",
+    "phone": "Téléphone",
+    "phone_ph": "+33 …",
+    "title": "Coordonnées client",
+    "zip": "Code postal"
+  },
+  "company": {
+    "address": "Adresse",
+    "city": "Ville",
+    "default_name": "Mon entreprise",
+    "details_title": "Détails entreprise",
+    "email": "E-mail",
+    "footer_note": "Note de pied de page",
+    "footer_note_ph": "Affichée en bas des devis/factures",
+    "logo": "Logo",
+    "logo_format": "PNG/JPG",
+    "logo_hint": "Logo carré recommandé.",
+    "logo_title": "Logo de l’entreprise",
+    "logo_too_big": "Logo trop volumineux.",
+    "name": "Nom",
+    "no_logo": "Pas de logo",
+    "phone": "Téléphone",
+    "saved": "Enregistré",
+    "siret": "SIRET",
+    "upload_logo": "Importer un logo",
+    "vat": "N° TVA",
+    "zip": "Code postal"
+  },
+  "consent": {
+    "accept": "Accepter",
+    "customize": "Personnaliser",
+    "refuse": "Refuser",
+    "text": "Nous utilisons des cookies pour améliorer l’application et mesurer l’audience.",
+    "title": "Consentement cookies"
+  },
+  "dashboard": {
+    "subtitle": "Aperçu de vos derniers projets et outils."
+  },
+  "doc": {
+    "generated_by": "Généré par",
+    "invoice_title": "Facture",
+    "issue_date": "Date d’émission",
+    "line": {
+      "desc": "Désignation",
+      "qty": "Qté",
+      "total": "Total",
+      "total_ht": "Total HT",
+      "unit_price": "PU",
+      "unit_price_ht": "PU HT"
+    },
+    "net_to_pay": "Net à payer",
+    "notes": "Notes",
+    "notes_placeholder": "Notes optionnelles…",
+    "notes_title": "Notes",
+    "number_prefix": "N°",
+    "quote_title": "Devis",
+    "recipient": "Destinataire",
+    "total_ht": "Total HT",
+    "total_ttc": "Total TTC",
+    "valid_until": "Valable jusqu’au",
+    "vat": "TVA"
+  },
+  "errors": {
+    "generic_hint": "Réessayez ou contactez le support si le problème persiste.",
+    "generic_title": "Une erreur est survenue"
+  },
+  "facade": {
+    "cladding": {
+      "battens": "Bardage sur tasseaux",
+      "composite": "Composite",
+      "title": "Bardage",
+      "wood": "Bois"
+    },
+    "clean": {
+      "moss": "Traitement mousse",
+      "moss_opt": "Anti-mousse",
+      "strip": "Décapage peinture",
+      "strip_opt": "Décapant",
+      "title": "Nettoyage",
+      "wash": "Nettoyage haute pression",
+      "wash_opt": "Karcher"
+    },
+    "coating": {
+      "angles": "Angles",
+      "angles_details": "{{n}} pièces",
+      "mono": "Enduit monocouche",
+      "mono_opt": "Monocouche",
+      "rpe": "RPE",
+      "rpe_opt": "RPE",
+      "title": "Enduit"
+    },
+    "details": {
+      "gross": "Brut",
+      "net": "Net",
+      "treatable": "Traitables",
+      "works": "Travaux"
+    },
+    "geo": {
+      "gable_count": "Pignons",
+      "gable_height": "Hauteur pignon",
+      "gables": "Pignons",
+      "height": "Hauteur",
+      "length": "Longueur",
+      "perimeter": "Périmètre",
+      "perimeter_total": "Périmètre total",
+      "rect": "Rectangle",
+      "width": "Largeur"
+    },
+    "ite": {
+      "details": "Détails",
+      "pse": "PSE",
+      "rail": "Rails",
+      "rock": "Laine de roche",
+      "title": "ITE"
+    },
+    "labor": {
+      "title": "Main d’œuvre"
+    },
+    "opening": {
+      "add": "Ajouter une ouverture",
+      "bay": "Baie",
+      "door": "Porte",
+      "garage": "Garage",
+      "height": "Hauteur",
+      "none": "Aucune",
+      "reveal": "Tableau",
+      "reveal_cm": "Tableau (cm)",
+      "reveal_title": "Tableau",
+      "width": "Largeur",
+      "window": "Fenêtre"
+    },
+    "paint": {
+      "acry": "Acrylique",
+      "layers": "Couches",
+      "layers_n": "{{n}} couches",
+      "plio": "Pliolite",
+      "silo": "Siloxane",
+      "title": "Peinture"
+    },
+    "prices": {
+      "angle": "Angle (€/u)",
+      "batten_ml": "Tasseaux (€/m)",
+      "cladding_m2": "Bardage (€/m²)",
+      "coating_bag": "Enduit (€/sac)",
+      "ite_m2": "ITE (€/m²)",
+      "ite_rail": "Rail (€/m)",
+      "labor_m2": "MO (€/m²)",
+      "labor_scaffold": "MO échafaudage (forfait)",
+      "moss": "Anti-mousse (€/L)",
+      "paint": "Peinture (€/L)",
+      "repair": "Réparation (€/m)",
+      "scaffold": "Échafaudage (forfait)",
+      "strip": "Décapant (€/L)",
+      "title": "Prix",
+      "wash": "Nettoyage HP (€/m²)"
+    },
+    "repair": {
+      "cracks_ml": "Fissures (m)",
+      "details": "Détails",
+      "title": "Réparations"
+    },
+    "scaffold": {
+      "std": "Standard",
+      "tall": "Hauteur",
+      "title": "Échafaudage",
+      "toggle": "Inclure échafaudage"
+    },
+    "step1": {
+      "hint": "Saisissez la géométrie de façade."
+    },
+    "step2": {
+      "hint": "Choisissez ouvertures et déductions."
+    },
+    "step3": {
+      "hint": "Sélectionnez les travaux (nettoyage, enduit, peinture, etc.)."
+    },
+    "step4": {
+      "hint": "Options et matériaux."
+    },
+    "step5": {
+      "hint": "Récapitulatif des prix."
+    },
+    "steps": {
+      "1": "1. Géométrie",
+      "2": "2. Ouvertures",
+      "3": "3. Travaux",
+      "4": "4. Options",
+      "5": "5. Prix"
+    },
+    "warn_coat_paint": "Enduit et peinture sélectionnés : vérifier la compatibilité.",
+    "warn_geometry": "Veuillez renseigner la géométrie.",
+    "warn_no_openings": "Aucune ouverture.",
+    "warn_repair_zero": "Réparations à zéro.",
+    "warn_scaffold_auto": "Échafaudage estimé automatiquement.",
+    "work": {
+      "cladding": "Bardage",
+      "cleaning": "Nettoyage",
+      "coating": "Enduit",
+      "ite": "ITE",
+      "paint": "Peinture",
+      "repair": "Réparations"
+    }
+  },
+  "house": {
+    "budget_steps": "Étapes budget",
+    "ceiling_height": "Hauteur sous plafond",
+    "ceiling_height_label": "HSP (m)",
+    "coming_soon": "Bientôt disponible",
+    "confirm_delete": "Confirmer la suppression ?",
+    "create": "Créer",
+    "create_site": "Créer un chantier",
+    "edit": "Modifier",
+    "edit_data": "Modifier les données",
+    "generate_quote": "Générer un devis",
+    "levels": "Niveaux",
+    "my_sites": "Mes chantiers (estimation complète)",
+    "my_sites_subtitle": "Créez un chantier et enregistrez les résultats étape par étape (suivi complet).",
+    "need_company_profile": "Complétez d’abord le profil entreprise.",
+    "new_project": "Nouveau projet",
+    "new_site": "Nouveau chantier",
+    "no_official_docs": "Aucun document officiel.",
+    "official_docs": "Documents officiels",
+    "perimeter": "Périmètre",
+    "perimeter_label": "Périmètre (m)",
+    "project_name": "Nom du projet",
+    "project_placeholder": "Ex. Construction maison",
+    "quick_estimator": "Estimateur rapide",
+    "quote_error": "Erreur génération devis",
+    "quote_status": {
+      "draft": "Brouillon",
+      "invoiced": "Facturé"
+    },
+    "single_storey": "Plain-pied",
+    "site_data": "Données chantier",
+    "surface": "Surface",
+    "surface_living": "Surface habitable",
+    "surface_living_m2": "Surface habitable (m²)",
+    "tabs": {
+      "quote": "Devis",
+      "steps": "Étapes"
+    }
+  },
+  "hvac": {
+    "area_placeholder": "Surface (m²)",
+    "ceiling_height": "Hauteur sous plafond (m)",
+    "details": {
+      "power": "Puissance nécessaire"
+    },
+    "emit": {
+      "floor": "Plancher chauffant",
+      "rad_elec": "Radiateurs électriques",
+      "rad_water": "Radiateurs eau",
+      "splits": "Splits"
+    },
+    "emitters": "Émetteurs",
+    "floor": {
+      "collector": "Nourrice",
+      "insul": "Isolation",
+      "loops_details": "{{n}} boucles",
+      "pipe": "Tube",
+      "pipe_line": "{{m}} m",
+      "pipe_type": "Type de tube",
+      "pitch": "Pas"
+    },
+    "gen": {
+      "boiler_gas": "Chaudière gaz",
+      "elec": "Électrique",
+      "pac_aa": "PAC air/air",
+      "pac_aw": "PAC air/eau"
+    },
+    "generator": "Générateur",
+    "insul": {
+      "poor": {
+        "sub": "Ancien / non isolé",
+        "title": "Mauvaise"
+      },
+      "renov_avg": {
+        "sub": "Isolation partielle",
+        "title": "Rénovation moyenne"
+      },
+      "renov_good": {
+        "sub": "Bonne isolation",
+        "title": "Bonne rénovation"
+      },
+      "rt2012": {
+        "sub": "Standard récent",
+        "title": "RT2012+"
+      }
+    },
+    "insulation_level": "Niveau d’isolation",
+    "labor": {
+      "emit": "MO émetteurs",
+      "gen": "MO générateur",
+      "vmc": "MO ventilation"
+    },
+    "need": "Besoin",
+    "net": {
+      "copper": "Cuivre",
+      "frigo": "Frigorifique",
+      "hydraulic": "Hydraulique"
+    },
+    "no_zones": "Aucune zone.",
+    "pipe": {
+      "multicouche": "Multicouche"
+    },
+    "power": "Puissance",
+    "prices": {
+      "boiler_gas": "Chaudière gaz (€/u)",
+      "flex_duct_m": "Gaine souple (€/m)",
+      "labor_gen": "MO générateur (forfait)",
+      "labor_vmc": "MO VMC (forfait)",
+      "pac_air_water": "PAC air/eau (€/u)",
+      "radiator_elec": "Radiateur élec. (€/u)",
+      "radiator_water": "Radiateur eau (€/u)",
+      "vmc_hygro_kit": "Kit VMC hygro (€/kit)"
+    },
+    "step1": {
+      "hint": "Saisissez surface et HSP."
+    },
+    "step2": {
+      "hint": "Choisissez le niveau d’isolation."
+    },
+    "step3": {
+      "hint": "Choisissez les émetteurs."
+    },
+    "step4": {
+      "hint": "Choisissez générateur et réseaux."
+    },
+    "step5": {
+      "hint": "Vérifiez les prix."
+    },
+    "steps": {
+      "1": "1. Bâtiment",
+      "2": "2. Isolation",
+      "3": "3. Émetteurs",
+      "4": "4. Générateur",
+      "5": "5. Prix"
+    },
+    "ventilation": "Ventilation",
+    "vmc": {
+      "double": "Double flux",
+      "ducts": "Réseau",
+      "ducts_line": "{{m}} m",
+      "extra_vents": "Bouches supplémentaires",
+      "flex": "Souple",
+      "hygro": "Hygro",
+      "insulated": "Isolé",
+      "network": "Réseau",
+      "rigid": "Rigide",
+      "simple": "Simple flux",
+      "simple_auto": "Auto-réglable",
+      "type": "Type",
+      "vents_details": "{{n}} bouches"
+    },
+    "w_per_m2": "W par m²",
+    "warn": {
+      "floor_need_hydraulic": "Plancher chauffant : réseau hydraulique requis.",
+      "min_extract": "Débit minimal d’extraction non atteint.",
+      "need_zones": "Ajoutez au moins une zone.",
+      "no_zones": "Aucune zone.",
+      "rads_need_hydraulic": "Radiateurs à eau : réseau hydraulique requis.",
+      "split_need_pac": "Splits : PAC air/air requise."
+    },
+    "zone": {
+      "bathroom": "Salle de bain",
+      "bedroom": "Chambre",
+      "kitchen": "Cuisine",
+      "living": "Séjour",
+      "other": "Autre",
+      "wc": "WC"
+    }
+  },
+  "invoice": {
+    "payment_date": "Date de paiement",
+    "status": {
+      "draft": "Brouillon",
+      "late": "En retard",
+      "paid": "Payée",
+      "sent": "Envoyée"
+    }
+  },
+  "joinery": {
+    "add": "Ajouter",
+    "details": {
+      "install_type": "Type de pose",
+      "shutter": "Volet",
+      "supply_install": "Fourniture + pose"
+    },
+    "empty": "Aucun élément.",
+    "install": {
+      "new": "Neuf",
+      "new_full": "Construction neuve",
+      "reno": "Rénovation",
+      "reno_full": "Rénovation",
+      "tunnel": "Tunnel",
+      "tunnel_full": "Pose en tunnel"
+    },
+    "install_type": "Type de pose",
+    "line": {
+      "install_name": "Pose",
+      "supply_name": "Fourniture"
+    },
+    "material": {
+      "wood": "Bois"
+    },
+    "override_placeholder": "Surcharger le prix…",
+    "override_supply": "Surcharger fourniture",
+    "price_override": "Surcharge de prix",
+    "prices": {
+      "coef_alu": "Coef. alu",
+      "coef_wood": "Coef. bois",
+      "compriband_m": "Compribande (€/m)",
+      "fixing_kit": "Kit fixations (€/kit)",
+      "foam_cart": "Cartouche mousse (€/cart.)",
+      "install_bay": "Pose baie (€/u)",
+      "install_door": "Pose porte (€/u)",
+      "install_garage": "Pose garage (€/u)",
+      "install_velux": "Pose Velux (€/u)",
+      "install_window": "Pose fenêtre (€/u)",
+      "reno_surcharge": "Surcoût rénovation",
+      "silicone_cart": "Silicone (€/cart.)"
+    },
+    "shutter": {
+      "rolling": "Roulant",
+      "swing": "Battant"
+    },
+    "stats": {
+      "area": "Surface",
+      "install": "Pose",
+      "perimeter": "Périmètre"
+    },
+    "step1": {
+      "hint": "Ajoutez des menuiseries."
+    },
+    "step2": {
+      "hint": "Choisissez pose et volets."
+    },
+    "step3": {
+      "hint": "Vérifiez les prix."
+    },
+    "steps": {
+      "1": "1. Éléments",
+      "2": "2. Options",
+      "3": "3. Prix"
+    },
+    "summary": {
+      "units": "unités"
+    },
+    "supplies": {
+      "compriband": "Compribande",
+      "fixings": "Fixations",
+      "foam": "Mousse",
+      "silicone": "Silicone",
+      "silicone_yield": "Rendement silicone"
+    },
+    "type": {
+      "bay": "Baie",
+      "door": "Porte",
+      "garage": "Garage",
+      "generic": "Menuiserie",
+      "velux": "Velux",
+      "window": "Fenêtre"
+    },
+    "warn": {
+      "high_waste": "Pertes élevées.",
+      "low_override": "Surcharge de prix faible.",
+      "no_items": "Ajoutez au moins un élément."
+    },
+    "supplies_title": "Fournitures de pose"
+  },
+  "materials": {
+    "all": "Tout",
+    "backup_hint": "Exportez votre catalogue pour le sauvegarder.",
+    "backup_restore": "Sauvegarde / restauration",
+    "category": "Catégorie",
+    "category_placeholder": "Ex. Béton",
+    "confirm_delete_custom": "Supprimer ce matériau personnalisé ?",
+    "create_custom": "Créer un matériau personnalisé",
+    "export_error": "Erreur d’export",
+    "export_json": "Exporter JSON",
+    "favorite": "Favori",
+    "favorites": "Favoris",
+    "import_invalid": "Fichier invalide",
+    "import_json": "Importer JSON",
+    "import_ok": "Import réussi",
+    "labor": {
+      "info": "Taux horaire utilisé pour les lignes de main d’œuvre.",
+      "rate": "Taux horaire",
+      "title": "Main d’œuvre"
+    },
+    "map": "Correspondance",
+    "map_need_custom": "Créez d’abord un matériau personnalisé.",
+    "map_none": "Aucune correspondance",
+    "map_replace": "Remplacer",
+    "map_title": "Mapping",
+    "material": "Matériau",
+    "misc": "Divers",
+    "name": "Nom",
+    "name_placeholder": "Nom du matériau",
+    "new": "Nouveau",
+    "none_custom": "Aucun matériau personnalisé.",
+    "none_found": "Aucun résultat.",
+    "reset": "Réinitialiser",
+    "search": "Rechercher",
+    "tabs": {
+      "catalog": "Catalogue",
+      "custom": "Personnalisés",
+      "data": "Données",
+      "labor": "MO"
+    },
+    "tax": {
+      "ht": "HT",
+      "ttc": "TTC"
+    },
+    "tax_config": "TVA",
+    "title": "Matériaux",
+    "unit": "Unité",
+    "unit_price_ht": "Prix unitaire HT",
+    "vat_rate": "Taux de TVA",
+    "PAINT_LITER": "Peinture murs",
+    "PRIMER_LITER": "Sous-couche universelle",
+    "CEMENT_BAG_35KG": "Ciment (sac 35 kg)",
+    "CEMENT_BAG_25KG": "Ciment (sac 25 kg)",
+    "SAND_TON": "Sable (tonne)",
+    "GRAVEL_TON": "Gravier (tonne)",
+    "SAND_BIGBAG": "Sable (big bag)",
+    "GRAVEL_BIGBAG": "Gravier (big bag)",
+    "TILE_M2": "Carrelage (m²)",
+    "GLUE_BAG_25KG": "Colle (sac 25 kg)",
+    "GROUT_BAG_5KG": "Joint (sac 5 kg)",
+    "SKIRTING_METER": "Plinthe (m)",
+    "SPACERS_BOX": "Croisillons (boîte)",
+    "RAGREAGE_BAG_25KG": "Ragréage (sac 25 kg)",
+    "RAGREAGE_FIBRE_25KG": "Ragréage fibré (25 kg)",
+    "PRIMER_FLOOR_LITER": "Primaire sol (L)",
+    "PERIPHERAL_BAND_M": "Bande périphérique (m)",
+    "SCREED_MORTAR_BAG": "Mortier de chape (sac)",
+    "PLACO_PLATE_BA13": "Plaque BA13",
+    "PLACO_PLATE_HYDRO": "Plaque hydro (H1)",
+    "PLACO_PLATE_FIRE": "Plaque coupe-feu",
+    "RAIL_3M": "Rail (3 m)",
+    "MONTANT_3M": "Montant (3 m)",
+    "FURRING_3M": "Fourrure (3 m)",
+    "HANGER_BOX_50": "Suspentes (boîte 50)",
+    "SCREWS_BOX_1000": "Vis (boîte 1000)",
+    "JOINT_TAPE_ROLL": "Bande à joint (rouleau)",
+    "COMPOUND_BAG_25KG": "Enduit (sac 25 kg)",
+    "MAP_BAG_25KG": "MAP / mortier adhésif (25 kg)",
+    "INSULATION_M2": "Isolation (m²)",
+    "CORNER_BEAD_3M": "Cornière d’angle (3 m)",
+    "MESH_PANEL_ST10": "Treillis ST10 (panneau)",
+    "MESH_PANEL_ST25": "Treillis ST25 (panneau)",
+    "MESH_PANEL_ST40": "Treillis ST40 (panneau)",
+    "REBAR_KG": "Fer à béton (kg)",
+    "CHAINAGE_3M": "Chaînage (3 m)",
+    "REBAR_CAGE_35_15_6M": "Cage d’armature 35×15 (6 m)",
+    "REBAR_CAGE_15_35_6M": "Cage d’armature 15×35 (6 m)",
+    "REBAR_CAGE_20_20_6M": "Cage d’armature 20×20 (6 m)",
+    "BPE_M3": "Béton prêt à l’emploi (m³)",
+    "DELIVERY_FEE": "Frais de livraison",
+    "PUMP_FEE": "Forfait pompe",
+    "CLEAN_CONCRETE_M3": "Béton de propreté (m³)",
+    "BLOCK_20_PALLET": "Parpaing 20 (palette)",
+    "BLOCK_20_UNIT": "Parpaing 20 (unité)",
+    "BLOCK_STEPOC_UNIT": "Bloc à bancher (unité)",
+    "BRICK_20_UNIT": "Brique 20 (unité)",
+    "CELLULAR_20_UNIT": "Béton cellulaire 20 (unité)",
+    "BLOCK_10_UNIT": "Parpaing 10 (unité)",
+    "BLOCK_15_UNIT": "Parpaing 15 (unité)",
+    "BLOCK_25_UNIT": "Parpaing 25 (unité)",
+    "BLOCK_STEPOC_15_UNIT": "Bloc à bancher 15 (unité)",
+    "BLOCK_STEPOC_20_UNIT": "Bloc à bancher 20 (unité)",
+    "BLOCK_STEPOC_25_UNIT": "Bloc à bancher 25 (unité)",
+    "BRICK_15_UNIT": "Brique 15 (unité)",
+    "CELLULAR_15_UNIT": "Béton cellulaire 15 (unité)",
+    "MORTAR_BAG_25KG": "Mortier (sac 25 kg)",
+    "GLUE_MORTAR_BAG_25KG": "Mortier-colle (sac 25 kg)",
+    "LINTEL_PRECAST_M": "Linteau préfabriqué (m)",
+    "COATING_EXT_BAG": "Enduit extérieur (sac)",
+    "COATING_INT_BAG": "Enduit intérieur (sac)",
+    "EXCAVATION_M3": "Terrassement / fouilles (m³)",
+    "EVACUATION_M3": "Évacuation (m³)",
+    "TOPSOIL_STRIP_M2": "Décapage terre végétale (m²)",
+    "GRAVEL_FOUNDATION_TON": "Gravier fondation (t)",
+    "GEOTEXTILE_M2": "Géotextile (m²)",
+    "POLYANE_ROLL_150M2": "Polyane (rouleau 150 m²)",
+    "FORM_PANEL_M2": "Panneau de coffrage (m²)",
+    "TRENCH_EXCAVATION_M3": "Fouille en tranchée (m³)",
+    "BACKFILL_M3": "Remblai (m³)",
+    "DIGGER_DAY": "Mini-pelle (jour)",
+    "DUMPER_DAY": "Dumper (jour)",
+    "SKIP_DAY": "Benne (jour)",
+    "COMPACTOR_DAY": "Plaque vibrante (jour)",
+    "BITUMEN_COATING_BUCKET_25KG": "Enduit bitumeux (seau 25 kg)",
+    "DELTA_MS_ROLL_20M": "Delta MS (rouleau 20 m)",
+    "DRAIN_PIPE_50M": "Drain (50 m)",
+    "GEOTEXTILE_ROLL_50M2": "Géotextile (rouleau 50 m²)",
+    "TILE_ROOF_M2": "Tuiles toiture (m²)",
+    "BATTEN_M": "Liteau (m)",
+    "UNDERLAY_ROLL_75M2": "Écran sous-toiture (rouleau 75 m²)",
+    "CABLE_3G15_100M": "Câble 3G1,5 (100 m)",
+    "CABLE_3G25_100M": "Câble 3G2,5 (100 m)",
+    "CONDUIT_ICTA_20_100M": "Gaine ICTA 20 (100 m)",
+    "SOCKET_UNIT": "Prise (unité)",
+    "SWITCH_UNIT": "Interrupteur (unité)",
+    "BREAKER_UNIT": "Disjoncteur (unité)",
+    "PER_PIPE_100M": "Tuyau PER (100 m)",
+    "PVC_PIPE_4M": "Tuyau PVC (4 m)",
+    "FACADE_COATING_BAG": "Enduit façade (sac)",
+    "PROP_UNIT": "Étais (unité)",
+    "TIMBER_M": "Bois (m)",
+    "FORM_OIL_L": "Huile de décoffrage (L)",
+    "FENCE_MESH_M": "Grillage (m)",
+    "FENCE_RIGID_M": "Grillage rigide (m)",
+    "FENCE_WOOD_M": "Clôture bois (m)",
+    "FENCE_POST_UNIT": "Poteau de clôture (unité)",
+    "BORDER_CONCRETE_M": "Bordure béton (m)",
+    "WALL_COPING_UNIT": "Chaperon de mur (unité)",
+    "PAVERS_M2": "Pavés (m²)",
+    "WOOD_DECK_M2": "Terrasse bois (m²)",
+    "COMPOSITE_DECK_M2": "Terrasse composite (m²)",
+    "GATE_UNIT": "Portail (unité)",
+    "GATE_MOTOR_UNIT": "Motorisation portail (unité)",
+    "GATE_INSTALL_UNIT": "Pose portail (unité)",
+    "POOL_UNIT": "Piscine (unité)",
+    "POOL_INSTALL_UNIT": "Installation piscine (unité)",
+    "POOL_COPING_ML": "Margelle piscine (ml)",
+    "WATER_PIPE_M": "Tuyau d’eau (m)",
+    "SEWER_PIPE_M": "Tuyau évacuation (m)",
+    "ELECTRIC_CONDUIT_M": "Conduit électrique (m)",
+    "MANHOLE_UNIT": "Regard (unité)",
+    "GARDEN_LIGHT_UNIT": "Éclairage jardin (unité)",
+    "TRANSFORMER_UNIT": "Transformateur (unité)",
+    "TOPSOIL_M3": "Terre végétale (m³)",
+    "COMPOST_M3": "Compost (m³)",
+    "MULCH_M3": "Paillage / mulch (m³)",
+    "DECOR_GRAVEL_TON": "Gravier décoratif (t)",
+    "LAWN_ROLL_M2": "Gazon en rouleau (m²)",
+    "LAWN_SEED_KG": "Gazon en semence (kg)",
+    "FERTILIZER_KG": "Engrais (kg)",
+    "GARDEN_EDGING_M": "Bordure de jardin (m)",
+    "IRRIGATION_DRIP_M": "Goutte-à-goutte (m)",
+    "IRRIGATION_SPRINKLER_UNIT": "Arroseur (unité)",
+    "IRRIGATION_PROGRAMMER_UNIT": "Programmateur arrosage (unité)",
+    "PLANT_UNIT": "Plante (unité)",
+    "SHRUB_UNIT": "Arbuste (unité)",
+    "HEDGE_PLANT_UNIT": "Plant de haie (unité)",
+    "TREE_UNIT": "Arbre (unité)",
+    "FOUNDATION_CONCRETE": "Béton de fondation (m³)",
+    "DELIVERY": "Livraison",
+    "TABLEAU_ELECTRIQUE": "Tableau électrique",
+    "INTERRUPTEURS_DIFFERENTIELS": "Interrupteurs différentiels",
+    "CHAUFFE_EAU": "Chauffe-eau",
+    "GROUPE_SECURITE": "Groupe de sécurité",
+    "RADIATEURS_EAU": "Radiateurs à eau",
+    "HYDRAULIQUE": "Raccords hydrauliques",
+    "TRAITEMENT_MOUSSE": "Traitement anti-mousse",
+    "PEINTURE_SILO": "Peinture en silo",
+    "ITE_120_PSE": "ITE PSE 120 mm",
+    "BARDAGE_BOIS": "Bardage bois",
+    "BARDAGE_SUR_TASSEAUX": "Bardage sur tasseaux",
+    "COMPRIBAND": "Compribande",
+    "SILICONE": "Silicone",
+    "FOAM": "Mousse",
+    "FIXINGS": "Fixations"
+  },
+  "notfound": {
+    "description": "Cette page n’existe pas.",
+    "go_to_app": "Aller à l’app",
+    "title": "Introuvable"
+  },
+  "projects": {
+    "confirm_delete": "Supprimer ce projet ?",
+    "cost_breakdown": "Détail des coûts",
+    "created_on": "Créé le",
+    "empty": "Aucun calcul sauvegardé.",
+    "items": "Éléments",
+    "materials_list": "Liste matériaux",
+    "need_company_profile": "Complétez le profil entreprise pour générer des documents.",
+    "notes": "Notes",
+    "print": "Imprimer",
+    "print_footer": "Généré avec BatiQuant",
+    "quote": "Devis",
+    "quote_error": "Erreur devis",
+    "title": "Mes calculs",
+    "subtitle": "Sauvegardes issues des calculateurs (calculs unitaires)",
+    "total_estimated": "Total estimé",
+    "create_new": "Créer un calcul",
+    "create_new_hint": "Choisissez un calculateur et sauvegardez le résultat ici"
+  },
+  "quote": {
+    "addline": {
+      "default_label": "Ligne {{n}}",
+      "global_btn": "Ajouter une ligne globale",
+      "global_title": "Ligne globale",
+      "label": "Libellé",
+      "open": "Ouvrir",
+      "qty": "Qté",
+      "type_labor": "MO",
+      "type_material": "Matériau",
+      "type_service": "Prestation",
+      "unit_price": "Prix unitaire"
+    },
+    "confirm_convert": "Convertir en facture ?",
+    "confirm_delete": "Supprimer ce devis ?",
+    "convert": "Convertir",
+    "discount": "Remise",
+    "empty": {
+      "subtitle": "Ajoutez des lignes pour construire votre devis.",
+      "title": "Devis vide"
+    },
+    "export_csv": "Exporter CSV",
+    "labor_tag": "MO",
+    "margin": "Marge",
+    "margin_label": "Marge (%)",
+    "net_to_pay": "Net à payer",
+    "settings": "Réglages",
+    "settings_title": "Réglages du devis",
+    "state": "État",
+    "status": {
+      "accepted": "Accepté",
+      "draft": "Brouillon",
+      "invoiced": "Facturé",
+      "rejected": "Refusé",
+      "sent": "Envoyé"
+    },
+    "subtitle": "Créez et exportez votre devis.",
+    "table": {
+      "designation": "Désignation",
+      "qty": "Qté",
+      "total": "Total",
+      "unit_price": "PU"
+    },
+    "tax": "TVA",
+    "tax_0": "0%",
+    "tax_10": "10%",
+    "tax_20": "20%",
+    "tax_55": "5,5%",
+    "title": "Devis",
+    "total_ht": "Total HT",
+    "total_labor_ht": "Total MO HT",
+    "total_materials_ht": "Total matériaux HT",
+    "vat": "TVA"
+  },
+  "settings": {
+    "app": {
+      "currency": "Devise",
+      "language": "Langue",
+      "title": "Application"
+    },
+    "data": {
+      "backup": "Sauvegarde",
+      "export_json": "Exporter JSON",
+      "import_json": "Importer JSON",
+      "import_title": "Import",
+      "importing": "Import en cours…",
+      "importing_short": "Import…",
+      "restore": "Restaurer",
+      "title": "Données",
+      "warning": "Conservez une sauvegarde de vos données."
+    },
+    "export_error": "Erreur d’export",
+    "file_read_error": "Erreur de lecture",
+    "file_too_big": "Fichier trop volumineux",
+    "footer": "Réglages",
+    "import_confirm": "Importer cette sauvegarde ?",
+    "invalid_backup": "Sauvegarde invalide",
+    "pro": {
+      "subtitle": "Débloquez des fonctionnalités avancées.",
+      "title": "Pro"
+    },
+    "restore_ok": "Restauration réussie",
+    "support": {
+      "help": "Aide",
+      "privacy": "Confidentialité"
+    },
+    "tabs": {
+      "app": "App",
+      "company": "Entreprise"
+    },
+    "title": "Réglages"
+  },
+  "tutorial_auth": {
+    "access_code": "Code d’accès",
+    "invalid_code": "Code invalide",
+    "locked": "Verrouillé",
+    "not_configured": "Non configuré",
+    "note": "Saisissez le code fourni pour déverrouiller les tutoriels.",
+    "notice": "Les tutoriels sont protégés.",
+    "placeholder": "Code…",
+    "subtitle": "Déverrouillez l’espace tutoriels.",
+    "title": "Accès tutoriels",
+    "unlock": "Déverrouiller"
+  },
+  "units": {
+    "day": "jour",
+    "hour": "heure",
+    "m2": "m²",
+    "package": "colis",
+    "piece": "pièce"
+  },
+  "categories": {
+    "paint": "Peinture",
+    "masonry": "Maçonnerie",
+    "aggregates": "Agrégats",
+    "tiling": "Carrelage",
+    "leveling": "Ragréage",
+    "screed": "Chapes",
+    "drywall": "Plâtrerie",
+    "insulation": "Isolation",
+    "reinforcement": "Ferraillage",
+    "concrete": "Béton",
+    "walls": "Maçonnerie",
+    "earthworks": "Terrassement",
+    "rental": "Location",
+    "waterproofing": "Étanchéité",
+    "roofing": "Toiture",
+    "electricity": "Électricité",
+    "plumbing": "Plomberie",
+    "facade": "Façade",
+    "formwork": "Coffrage",
+    "fencing": "Clôtures",
+    "exterior": "Extérieurs",
+    "gates": "Portails",
+    "pool": "Piscine",
+    "networks": "Réseaux",
+    "garden": "Jardin",
+    "finishes": "Finitions"
+  },
+  "calculators": {
+    "groundwork": {
+      "name": "Terrassement",
+      "desc": "Excavation, tranchées, remblai",
+      "alt": "Terrassement : excavation, tranchées et remblai"
+    },
+    "foundations": {
+      "name": "Fondations",
+      "desc": "Semelles, radier, béton, ferraillage",
+      "alt": "Fondations : semelles, radier, béton et ferraillage"
+    },
+    "substructure": {
+      "name": "Soubassement",
+      "desc": "Vide sanitaire, murs de soutènement, drainage",
+      "alt": "Soubassement : vide sanitaire, murs de soutènement, drainage"
+    },
+    "concrete": {
+      "name": "Béton / Dalle",
+      "desc": "Dalles, planchers, dosages",
+      "alt": "Béton et dalle : dalles, planchers et dosages"
+    },
+    "walls": {
+      "name": "Murs",
+      "desc": "Parpaings, briques, linteaux",
+      "alt": "Murs : parpaings, briques et linteaux"
+    },
+    "stairs": {
+      "name": "Escalier béton",
+      "desc": "Marches, dalle, coffrage",
+      "alt": "Escalier béton : marches, dalle et coffrage"
+    },
+    "roof": {
+      "name": "Toiture",
+      "desc": "Charpente, tuiles, gouttières",
+      "alt": "Toiture : charpente, tuiles et gouttières"
+    },
+    "joinery": {
+      "name": "Menuiseries",
+      "desc": "Fenêtres, portes, volets",
+      "alt": "Menuiseries : fenêtres, portes et volets"
+    },
+    "placo": {
+      "name": "Placo / Isolation",
+      "desc": "Cloisons, doublages, plafonds",
+      "alt": "Placo et isolation : cloisons, doublages et plafonds"
+    },
+    "electricity": {
+      "name": "Électricité",
+      "desc": "Câbles, gaines, appareillage",
+      "alt": "Électricité : câbles, gaines et appareillage"
+    },
+    "plumbing": {
+      "name": "Plomberie",
+      "desc": "Tuyaux, évacuations, raccords",
+      "alt": "Plomberie : tuyaux, évacuations et raccords"
+    },
+    "hvac": {
+      "name": "Chauffage / Ventilation",
+      "desc": "Ventilation, radiateurs, pompes à chaleur",
+      "alt": "Chauffage et ventilation : radiateurs, PAC et ventilation"
+    },
+    "screed": {
+      "name": "Chapes",
+      "desc": "Chape fluide, chape traditionnelle",
+      "alt": "Chapes : chape fluide et chape traditionnelle"
+    },
+    "tiles": {
+      "name": "Carrelage",
+      "desc": "Sol, murs, colle",
+      "alt": "Carrelage : sol, murs et colle"
+    },
+    "leveling": {
+      "name": "Ragréage",
+      "desc": "Ragréage sol (rénovation)",
+      "alt": "Ragréage : ragréage de sol en rénovation"
+    },
+    "paint": {
+      "name": "Peinture",
+      "desc": "Murs, plafonds",
+      "alt": "Peinture : murs et plafonds"
+    },
+    "facade": {
+      "name": "Façade",
+      "desc": "Enduit, bardage",
+      "alt": "Façade : enduit et bardage"
+    },
+    "exterior": {
+      "name": "Extérieurs",
+      "desc": "Terrasse, clôtures, chemins",
+      "alt": "Extérieurs : terrasse, clôtures et chemins"
+    }
+  },
+  "steps": {
+    "groups": {
+      "go": "Gros œuvre",
+      "so": "Second œuvre",
+      "fin": "Finitions"
+    },
+    "go": {
+      "groundwork": "Terrassement",
+      "foundations": "Fondations",
+      "substructure": "Soubassement",
+      "slab": "Dalle RDC",
+      "walls": "Élévation des murs",
+      "stairs": "Escalier béton",
+      "roofing": "Toiture / charpente",
+      "windows": "Menuiseries extérieures"
+    },
+    "so": {
+      "lining": "Doublage (isolation)",
+      "partitions": "Cloisons",
+      "ceilings": "Plafonds",
+      "electricity": "Électricité",
+      "plumbing": "Plomberie",
+      "hvac": "Chauffage / ventilation",
+      "screed": "Chape / ragréage"
+    },
+    "fin": {
+      "flooring": "Sols (carrelage/parquet)",
+      "painting": "Peinture",
+      "facade": "Façade",
+      "exterior": "Extérieurs"
+    }
+  },
+  "tips": {
+    "paint": {
+      "1": "Toujours appliquer une sous-couche sur supports bruts (placo, plâtre) pour limiter l’absorption.",
+      "2": "Croiser les passes (horizontale puis verticale) pour éviter les traces.",
+      "3": "Éviter de peindre au-dessus de 25°C (séchage trop rapide) ou en dessous de 10°C."
+    },
+    "concrete": {
+      "1": "Respectez le dosage en eau : trop d’eau affaiblit le béton (retrait, fissures).",
+      "2": "Pour une dalle carrossable, viser 12–15 cm + treillis ST25C.",
+      "3": "Rehausser le treillis avec des cales : il doit être dans le béton, pas au sol.",
+      "4": "Prévoir des joints de dilatation tous les 15–20 m² pour limiter les fissures."
+    }
+  },
+  "packaging": {
+    "paint": {
+      "10l": "Bidon 10 L",
+      "5l": "Bidon 5 L",
+      "2_5l": "Bidon 2,5 L",
+      "1l": "Bidon 1 L"
+    },
+    "concrete": {
+      "25kg": "Sac 25 kg",
+      "35kg": "Sac 35 kg",
+      "1t": "Big bag 1 T"
+    }
+  },
+  "tiles": {
+    "patterns": {
+      "straight": "Pose droite",
+      "staggered": "Pose décalée (1/2, 1/3)",
+      "diagonal": "Pose en diagonale"
+    }
+  },
+  "leveling": {
+    "substrates": {
+      "concrete": "Béton / chape ciment",
+      "tile": "Carrelage existant (non poreux)",
+      "wood": "Bois / OSB / parquet",
+      "anhydrite": "Chape anhydrite"
+    },
+    "warnings": {
+      "tile": "Un primaire d’accrochage dédié est requis",
+      "wood": "Ragréage fibré requis sur support bois",
+      "anhydrite": "Ponçage + primaire spécifique requis"
+    },
+    "products": {
+      "standard": "Ragréage standard (P3)",
+      "fibre": "Ragréage fibré (rénovation/bois)",
+      "thicks": "Ragréage forte épaisseur / rebouchage",
+      "exterior": "Ragréage extérieur"
+    }
+  },
+  "placo": {
+    "boards": {
+      "ba13": "BA13 standard",
+      "hydro": "Hydrofuge (H1)",
+      "fire": "Feu / acoustique"
+    },
+    "profiles": {
+      "m48": "Montant M48 / Rail R48 (standard)",
+      "m70": "Montant M70 / Rail R70 (isolation renforcée)",
+      "m90": "Montant M90 (grands volumes)"
+    },
+    "insulation": {
+      "gr32": "Laine de verre (GR32) - rouleau",
+      "rock": "Laine de roche - panneau",
+      "pse": "Polystyrène expansé (PSE)",
+      "xps": "Polystyrène extrudé (XPS)",
+      "wood": "Fibre de bois",
+      "bio": "Chanvre / coton recyclé"
+    }
+  },
+  "openings": {
+    "doors": {
+      "63": "Porte 63 cm",
+      "73": "Porte 73 cm (standard)",
+      "83": "Porte 83 cm (PMR)",
+      "93": "Porte 93 cm",
+      "140": "Double porte 140 cm"
+    },
+    "windows": {
+      "60x60": "Fenêtre 60×60",
+      "75x60": "Fenêtre 75×60",
+      "100x115": "Fenêtre 100×115",
+      "120x115": "Fenêtre 120×115",
+      "120x125": "Fenêtre 120×125",
+      "120x215": "Porte-fenêtre 120×215",
+      "215x240": "Baie coulissante 215×240"
+    }
+  },
+  "mesh": {
+    "ST10": "ST10 (léger - terrasse)",
+    "ST25C": "ST25C (standard - dalle)",
+    "ST40C": "ST40C (lourd - structure)"
+  },
+  "soil": {
+    "soil": "Terre végétale",
+    "clay": "Argile / limon",
+    "sand": "Sable",
+    "gravel": "Gravier / cailloux",
+    "rock": "Roche (massif)",
+    "mixed": "Tout-venant (mix)"
+  },
+  "groundwork": {
+    "project": {
+      "house": "Maison individuelle",
+      "extension": "Extension",
+      "garage": "Garage",
+      "terrace": "Terrasse",
+      "pool": "Piscine",
+      "other": "Autre"
+    }
+  },
+  "foundations": {
+    "strip": "Semelles filantes",
+    "raft": "Radier (dalle porteuse)",
+    "pads": "Plots isolés"
+  },
+  "reinforcement": {
+    "S35": "Cage semelle S35 (15×35) - 6 fils",
+    "S15": "Cage semelle S15 (15×15) - 4 fils",
+    "L20": "Cage longrine 20×20 - 4 fils",
+    "ST25C": "Treillis ST25C (radier)",
+    "HA10": "Fer HA10 (armature)",
+    "HA12": "Fer HA12 (armature)"
+  },
+  "quick": {
+    "page_title": "Calculs rapides chantier",
+    "page_subtitle": "Outils unitaires pour les conversions, surfaces nettes, conditionnements, terrasse bois, placo détaillé, carrelage détaillé et toiture.",
+    "page_precision": "Calcul rapide dédié",
+    "tools": {
+      "convert": "Convertisseur",
+      "net_area": "Surface nette",
+      "packaging": "Conditionnements",
+      "slope": "Pente",
+      "linear": "Linéaires",
+      "voltage_drop": "Chute de tension",
+      "decking": "Terrasse bois",
+      "drywall_frame": "Placo détaillé ossature",
+      "tile_detailed": "Carrelage détaillé",
+      "packaging_advanced": "Sacs / seaux / cartouches",
+      "roof_frame": "Toiture / chevrons / liteaux",
+      "fence": "Clôture / grillage",
+      "bulk_fill": "Gravier / remblai / sable",
+      "insulation": "Isolation murs / combles"
+    },
+    "cards": {
+      "convert": "Surface, volume, litres et estimation de sacs.",
+      "net_area": "Déductions d’ouvertures et calcul de la surface nette.",
+      "packaging": "Consommation, conditionnements et coût théorique.",
+      "slope": "Pente en %, cm/m, angle et longueur réelle.",
+      "linear": "Recouvrements, pertes et nombre de pièces linéaires.",
+      "voltage_drop": "Chute de tension et section de câble indicative.",
+      "decking": "Lames, lambourdes, plots et vis inox pour terrasse.",
+      "drywall_frame": "Cloisons, doublages, plafonds, rails et montants.",
+      "tile_detailed": "Carreaux, colle, joints, plinthes et primaire.",
+      "packaging_advanced": "Produits multi-couches et conditionnements détaillés.",
+      "roof_frame": "Pente, surface de toiture, chevrons, liteaux et couverture."
+    },
+    "warn_thickness": "L'épaisseur doit être supérieure à 0.",
+    "warn_openings": "La surface des ouvertures dépasse la surface brute.",
+    "warn_voltage_high": "Chute de tension élevée : section ou longueur à revoir.",
+    "warn_voltage_medium": "La chute de tension dépasse 3 %, à vérifier selon l'usage.",
+    "summary": {
+      "convert": "{{area}} m² sur {{thickness}} cm représentent {{volume}} m³.",
+      "net_area": "Surface nette calculée : {{net}} m², soit {{withWaste}} m² avec pertes.",
+      "packaging": "{{raw}} {{unit}} nécessaires, soit {{packs}} conditionnements.",
+      "slope": "Pente de {{percent}} %, soit {{cm}} cm/m et {{angle}}°.",
+      "linear": "{{pieces}} pièces nécessaires pour couvrir {{total}} m linéaires.",
+      "voltage": "Chute estimée : {{volts}} V ({{percent}} %). Section indicative recommandée : {{section}} mm²."
+    },
+    "detail": {
+      "area": "Surface",
+      "thickness": "Épaisseur",
+      "volume": "Volume",
+      "liters_to_m3": "Conversion litres → m³",
+      "bags_needed": "Sacs nécessaires",
+      "gross_area": "Surface brute",
+      "openings": "Déduction ouvertures",
+      "net_area": "Surface nette",
+      "loss": "Pertes",
+      "with_waste": "Surface avec pertes",
+      "base_quantity": "Base",
+      "consumption": "Consommation unitaire",
+      "total_need": "Besoin total",
+      "pack_size": "Conditionnement",
+      "pack_count": "Nombre de conditionnements",
+      "horizontal": "Longueur horizontale",
+      "vertical": "Dénivelé",
+      "percent": "Pente",
+      "cm_per_m": "Centimètres par mètre",
+      "angle": "Angle",
+      "ramp_length": "Longueur réelle",
+      "linear_total": "Longueur utile",
+      "linear_overlap": "Recouvrement",
+      "linear_effective": "Longueur utile par pièce",
+      "linear_with_waste": "Longueur avec pertes",
+      "linear_pieces": "Nombre de pièces",
+      "linear_offcut": "Chutes estimées",
+      "phase": "Réseau",
+      "current": "Intensité estimée",
+      "length": "Longueur",
+      "section": "Section utilisée",
+      "drop_volts": "Chute de tension",
+      "drop_percent": "Chute de tension",
+      "section_recommended": "Section indicative recommandée"
+    },
+    "material": {
+      "bags": "Sacs théoriques",
+      "bags_detail": "Basé sur le rendement saisi",
+      "net_area": "Surface exploitable",
+      "packaging": "Conditionnements nécessaires",
+      "linear_pieces": "Pièces linéaires"
+    },
+    "note_title": "Note",
+    "note": "Les résultats sont indicatifs et destinés à l'estimation chantier rapide. Vérifier les contraintes techniques, les entraxes fabricants et les règles de mise en œuvre avant exécution.",
+    "field": {
+      "area": "Surface (m²)",
+      "thickness_cm": "Épaisseur (cm)",
+      "liters": "Litres",
+      "bag_yield": "Rendement d'un sac (m³)",
+      "length": "Longueur (m)",
+      "height": "Hauteur (m)",
+      "openings_count": "Nombre d'ouvertures",
+      "opening_area": "Surface moyenne d'une ouverture (m²)",
+      "waste_percent": "Pertes (%)",
+      "base_quantity": "Quantité de base",
+      "base_unit": "Unité de base",
+      "consumption_rate": "Consommation unitaire",
+      "consumption_unit": "Unité consommée",
+      "pack_size": "Taille d'un conditionnement",
+      "package_type": "Type de conditionnement",
+      "package_price": "Prix par conditionnement (€)",
+      "total_length": "Longueur totale à couvrir (m)",
+      "piece_length": "Longueur d'une pièce (m)",
+      "overlap_cm": "Recouvrement par jonction (cm)",
+      "linear_waste": "Pertes (%)",
+      "horizontal_length": "Longueur horizontale (m)",
+      "vertical_drop": "Dénivelé (m)",
+      "phase": "Type de réseau",
+      "conductor": "Conducteur",
+      "power": "Puissance (W)",
+      "voltage": "Tension (V)",
+      "cable_length": "Longueur de câble (m)",
+      "section_mm2": "Section (mm²)"
+    },
+    "title": "Calculs rapides chantier"
+  }
+}

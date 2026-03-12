@@ -1,0 +1,102 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+  --app-bg: #f6f8fc;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  min-height: 100%;
+}
+
+html {
+  background: var(--app-bg);
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(1200px 600px at -10% -10%, rgba(59, 130, 246, 0.16), transparent 55%),
+    radial-gradient(900px 500px at 110% 0%, rgba(16, 185, 129, 0.10), transparent 52%),
+    linear-gradient(180deg, #f8fbff 0%, #f5f7fb 55%, #eef3f9 100%);
+  color: #0f172a;
+}
+
+.app-shell {
+  position: relative;
+  min-height: 100vh;
+}
+
+.app-shell::before,
+.app-shell::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.app-shell::before {
+  background:
+    radial-gradient(560px 340px at 12% 14%, rgba(59, 130, 246, 0.13), transparent 64%),
+    radial-gradient(520px 300px at 88% 18%, rgba(139, 92, 246, 0.10), transparent 62%),
+    radial-gradient(500px 280px at 50% 100%, rgba(16, 185, 129, 0.08), transparent 60%);
+}
+
+.app-shell::after {
+  background:
+    linear-gradient(to bottom, rgba(255,255,255,0.50), rgba(255,255,255,0.22) 20%, rgba(255,255,255,0.14) 100%);
+  backdrop-filter: blur(1px);
+}
+
+.app-shell > * {
+  position: relative;
+  z-index: 1;
+}
+
+.app-shell--menu::before {
+  background:
+    radial-gradient(620px 380px at 10% 10%, rgba(37, 99, 235, 0.15), transparent 64%),
+    radial-gradient(460px 280px at 88% 14%, rgba(16, 185, 129, 0.10), transparent 62%),
+    radial-gradient(500px 280px at 50% 100%, rgba(14, 165, 233, 0.08), transparent 60%);
+}
+
+.glass-panel {
+  border: 1px solid rgba(255,255,255,0.72);
+  background: rgba(255,255,255,0.78);
+  box-shadow: 0 18px 50px rgba(15, 23, 42, 0.10);
+  backdrop-filter: blur(18px);
+}
+
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+.no-print { }
+.print-only { display: none; }
+
+@media print {
+  .no-print { display: none !important; }
+  .print-only { display: block !important; }
+}
+
+input,
+select,
+textarea {
+  background-color: rgba(255,255,255,0.94) !important;
+  color: #0f172a !important;
+  border-color: #d8e1ef !important;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.7) inset;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px rgba(255,255,255,0.96) inset !important;
+}
