@@ -610,7 +610,7 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate }) => {
           <button
             type="button"
             onClick={handleAddItem}
-            className="w-full py-3 bg-blue-600 text-white rounded-2xl font-extrabold shadow-sm flex justify-center items-center shadow-md active:scale-95 transition-transform"
+            className="w-full py-3 bg-blue-600 text-white rounded-2xl font-extrabold flex justify-center items-center shadow-md active:scale-95 transition-transform"
           >
             <Plus size={20} className="mr-2" /> {t("joinery.add", { defaultValue: "Add joinery item" })}
           </button>

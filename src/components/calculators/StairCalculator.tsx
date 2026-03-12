@@ -534,7 +534,7 @@ export const StairCalculator: React.FC<Props> = ({ onCalculate }) => {
             {t("calc.stairs.ui.step2_hint", { defaultValue: "Adjust the number of steps. Ideal Blondel: 60–64 cm." })}
           </div>
 
-          <div className="rounded-[28px] border border-white/80 bg-white/88 p-4 shadow-[0_16px_40px_rgba(15,23,42,0.08)] backdrop-blur-xl shadow-sm text-center">
+          <div className="rounded-[28px] border border-white/80 bg-white/88 p-4 shadow-[0_16px_40px_rgba(15,23,42,0.08)] backdrop-blur-xl text-center">
             <div className="text-sm text-slate-500 mb-1">
               {t("calc.stairs.ui.riser_label", { defaultValue: "Riser height" })}
             </div>

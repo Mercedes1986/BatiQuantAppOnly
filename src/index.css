@@ -132,7 +132,6 @@ body {
 
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-.no-print {}
 .print-only { display: none; }
 @media print {
   .no-print { display: none !important; }

@@ -340,7 +340,7 @@ export const FoundationsCalculator: React.FC<Props> = ({ onCalculate, initialMod
           <button
             type="button"
             onClick={() => setStep(2)}
-            className="w-full py-3.5 bg-blue-600 text-white rounded-2xl font-extrabold shadow-sm flex justify-center items-center shadow-lg shadow-blue-200 active:scale-[0.98] transition-transform"
+            className="w-full py-3.5 bg-blue-600 text-white rounded-2xl font-extrabold flex justify-center items-center shadow-lg shadow-blue-200 active:scale-[0.98] transition-transform"
           >
             {t("common.next", { defaultValue: "Suivant" })} <ArrowRight size={20} className="ml-2" />
           </button>
