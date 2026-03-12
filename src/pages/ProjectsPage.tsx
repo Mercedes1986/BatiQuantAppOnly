@@ -101,8 +101,8 @@ export const ProjectsPage: React.FC = () => {
     }));
 
     return (
-      <div className="app-shell app-shell--projects pb-20 bg-transparent min-h-screen relative">
-        <div className="app-topbar sticky top-0 z-30 no-print">
+      <div className="pb-20 app-shell min-h-screen relative">
+        <div className="sticky top-0 z-30 border-b border-slate-200/80 glass-panel shadow-sm no-print">
           <div className="mx-auto max-w-6xl px-4 py-3 flex items-center justify-between gap-3">
             <button
               onClick={() => setSelectedProject(null)}
@@ -144,8 +144,8 @@ export const ProjectsPage: React.FC = () => {
           </div>
         </div>
 
-        <div className="max-w-6xl mx-auto p-4 md:p-6 printable-content space-y-4">
-          <section className="rounded-[28px] border border-slate-200/80 glass-card shadow-sm overflow-hidden print:bg-white">
+        <div className="page-frame md:p-6 printable-content space-y-4">
+          <section className="rounded-[28px] border border-slate-200/80 app-card shadow-sm overflow-hidden print:bg-white">
             <div className="p-5 md:p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div>
                 <div className="inline-flex items-center gap-2 rounded-full bg-blue-50 px-3 py-1 text-xs font-extrabold text-blue-700 border border-blue-100 mb-3">
@@ -159,7 +159,7 @@ export const ProjectsPage: React.FC = () => {
                 </p>
               </div>
 
-              <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50/80 px-4 py-3 self-start md:self-auto">
+              <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-transparent/80 px-4 py-3 self-start md:self-auto">
                 <div className="w-11 h-11 rounded-2xl bg-white border border-slate-200 flex items-center justify-center text-blue-600 shadow-sm">
                   <Package size={20} />
                 </div>
@@ -174,7 +174,7 @@ export const ProjectsPage: React.FC = () => {
           </section>
 
           <div className="grid xl:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.8fr)] gap-4 md:gap-5">
-            <section className="rounded-[28px] border border-slate-200/80 glass-card shadow-sm p-5 md:p-6 print:bg-white">
+            <section className="rounded-[28px] border border-slate-200/80 app-card shadow-sm p-5 md:p-6 print:bg-white">
               <h2 className="text-lg font-extrabold mb-4 flex items-center text-slate-800">
                 {t("projects.materials_list", { defaultValue: "Materials list" })}
               </h2>
@@ -199,7 +199,7 @@ export const ProjectsPage: React.FC = () => {
             </section>
 
             <div className="space-y-4 print:hidden">
-              <section className="rounded-[28px] border border-slate-200/80 glass-card shadow-sm p-5 md:p-6">
+              <section className="rounded-[28px] border border-slate-200/80 app-card shadow-sm p-5 md:p-6">
                 <h2 className="text-lg font-extrabold mb-4 flex items-center text-slate-800">
                   <PieChart className="mr-2 text-slate-400" size={20} />
                   {t("projects.cost_breakdown", { defaultValue: "Cost breakdown" })}
@@ -226,7 +226,7 @@ export const ProjectsPage: React.FC = () => {
                 </div>
               </section>
 
-              <section className="rounded-[28px] border border-blue-100 bg-gradient-to-r from-blue-50 to-indigo-50 shadow-sm p-5 md:p-6 print:bg-transparent print:border-slate-900">
+              <section className="rounded-[28px] border border-blue-100 bg-blue-50/90 shadow-sm p-5 md:p-6 print:bg-transparent print:border-slate-900">
                 <div className="flex items-center justify-between gap-3">
                   <span className="font-extrabold text-blue-900 text-lg">
                     {t("projects.total_estimated", { defaultValue: "Estimated total" })}
@@ -261,9 +261,9 @@ export const ProjectsPage: React.FC = () => {
   }
 
   return (
-    <div className="p-4 pb-24 bg-transparent min-h-screen">
-      <div className="max-w-6xl mx-auto space-y-4">
-        <section className="rounded-[28px] border border-slate-200/80 glass-card shadow-sm p-5 md:p-6">
+    <div className="p-4 pb-24 app-shell min-h-screen">
+      <div className="page-frame space-y-4">
+        <section className="rounded-[28px] border border-slate-200/80 app-card shadow-sm p-5 md:p-6">
           <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 mb-4">
             <div>
               <h1 className="text-2xl font-extrabold text-slate-800">
@@ -319,7 +319,7 @@ export const ProjectsPage: React.FC = () => {
         </section>
 
         {projects.length === 0 ? (
-          <div className="rounded-[28px] border border-dashed border-slate-200 bg-white/65 backdrop-blur-sm py-16 text-center text-slate-400">
+          <div className="rounded-[28px] border border-dashed border-slate-200 app-card-soft py-16 text-center text-slate-400">
             <FolderOpen size={64} className="mx-auto text-slate-300" />
             <p className="mt-4 text-slate-500 font-medium">
               {t("projects.empty", { defaultValue: "No saved calculations." })}

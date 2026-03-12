@@ -1,4 +1,3 @@
-
 import React from 'react';
 
 interface PageContainerProps {
@@ -8,8 +7,8 @@ interface PageContainerProps {
 
 export const PageContainer: React.FC<PageContainerProps> = ({ children, className = '' }) => {
   return (
-    <div className={`max-w-3xl mx-auto p-4 sm:p-6 pb-24 ${className}`}>
-      {children}
+    <div className={`page-narrow ${className}`}>
+      <div className="glass-panel rounded-[30px] p-4 sm:p-5 lg:p-6">{children}</div>
     </div>
   );
 };

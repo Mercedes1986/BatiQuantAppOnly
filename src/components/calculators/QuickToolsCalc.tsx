@@ -1497,16 +1497,16 @@ export const QuickToolsCalculator: React.FC<Props> = ({
       </div>
 
       {!hideToolSelector && (
-        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-2">
+        <div className="grid grid-cols-2 gap-2 md:grid-cols-3 xl:grid-cols-4">
           {toolButtons.map(({ key, label, icon: Icon }) => (
             <button
               key={key}
               type="button"
               onClick={() => setTool(key)}
-              className={`rounded-xl border px-3 py-3 text-left transition-all ${
+              className={`rounded-2xl border border-white/70 bg-white/82 px-3 py-3 text-left shadow-[0_8px_24px_rgba(15,23,42,0.06)] backdrop-blur-xl transition-all ${
                 tool === key
-                  ? "border-blue-600 bg-blue-50 text-blue-900"
-                  : "border-slate-200 bg-white text-slate-700 hover:border-slate-300"
+                  ? "border-blue-200 bg-blue-50/90 text-blue-900 shadow-[0_10px_24px_rgba(37,99,235,0.10)]"
+                  : "border-white/70 bg-white/80 text-slate-700 hover:border-slate-200 hover:bg-white/92"
               }`}
             >
               <Icon size={16} className="mb-2" />
@@ -2273,7 +2273,7 @@ export const QuickToolsCalculator: React.FC<Props> = ({
         </div>
       )}
 
-      <div className="rounded-3xl border border-amber-100 bg-gradient-to-r from-amber-50 to-orange-50/60 p-4 shadow-sm">
+      <div className="rounded-[26px] border border-amber-100 bg-amber-50/80 p-4 shadow-[0_10px_28px_rgba(245,158,11,0.08)]">
         <div className="text-xs uppercase tracking-wide text-slate-500 font-bold mb-2">
           {t("quick.note_title", { defaultValue: "Note" })}
         </div>

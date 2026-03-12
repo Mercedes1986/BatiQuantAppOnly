@@ -219,8 +219,8 @@ export const HouseProjectPage: React.FC = () => {
     const totalBudget = getProjectTotal(currentProject);
 
     return (
-      <div className="app-shell app-shell--house min-h-screen bg-transparent pb-20">
-        <div className="app-topbar sticky top-0 z-20">
+      <div className="app-shell app-shell--house min-h-screen pb-20">
+        <div className="sticky top-0 z-20 border-b border-slate-200/80 glass-panel shadow-sm">
           <div className="p-4 flex items-center justify-between">
             <button
               onClick={closeProject}
@@ -242,13 +242,13 @@ export const HouseProjectPage: React.FC = () => {
 
           <div className="px-4 pb-4">
             <div className="mx-auto w-fit max-w-full">
-              <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar rounded-2xl bg-amber-50/70 p-1.5 shadow-sm border border-amber-100">
+              <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar rounded-xl bg-slate-200/80 p-1.5 shadow-sm border border-slate-200">
             <button
               onClick={() => setActiveTab("steps")}
               className={`px-4 py-2 text-sm font-extrabold rounded-xl whitespace-nowrap transition-colors flex items-center ${
                 activeTab === "steps"
                   ? "bg-white text-slate-900 shadow"
-                  : "text-slate-700 hover:bg-white/70"
+                  : "text-slate-700 hover:bg-white/84"
               }`}
               type="button"
             >
@@ -261,7 +261,7 @@ export const HouseProjectPage: React.FC = () => {
               className={`px-4 py-2 text-sm font-extrabold rounded-xl whitespace-nowrap transition-colors flex items-center ${
                 activeTab === "quote"
                   ? "bg-white text-slate-900 shadow"
-                  : "text-slate-700 hover:bg-white/70"
+                  : "text-slate-700 hover:bg-white/84"
               }`}
               type="button"
             >
@@ -273,11 +273,11 @@ export const HouseProjectPage: React.FC = () => {
           </div>
         </div>
 
-        <div className="max-w-6xl mx-auto p-4 space-y-4">
+        <div className="page-frame space-y-4">
           {activeTab === "steps" && (
             <>
               {isEditingParams ? (
-                <div className="glass-card rounded-[28px] shadow-sm border border-amber-100 p-5 mb-4 animate-in fade-in">
+                <div className="app-card rounded-[28px] shadow-sm border border-blue-100 p-5 mb-4 animate-in fade-in">
                   <div className="flex justify-between items-center mb-4">
                     <h2 className="text-sm font-extrabold text-blue-600 uppercase">
                       {t("house.edit_data", { defaultValue: "Edit data" })}
@@ -329,14 +329,14 @@ export const HouseProjectPage: React.FC = () => {
 
                   <button
                     onClick={saveEditedParams}
-                    className="w-full py-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl font-extrabold shadow-sm"
+                    className="w-full py-2 bg-blue-600 text-white rounded-lg font-extrabold shadow-sm"
                     type="button"
                   >
                     {t("common.save", { defaultValue: "Save" })}
                   </button>
                 </div>
               ) : (
-                <div className="glass-card rounded-[28px] shadow-sm border border-slate-200/80 p-5 mb-4 relative group">
+                <div className="app-card rounded-[28px] shadow-sm border border-slate-200/80 p-5 mb-4 relative group">
                   <div className="flex justify-between items-start mb-3">
                     <h2 className="text-sm font-extrabold text-slate-400 uppercase flex items-center">
                       <Ruler size={16} className="mr-2" />{" "}
@@ -344,7 +344,7 @@ export const HouseProjectPage: React.FC = () => {
                     </h2>
                     <button
                       onClick={startEditParams}
-                      className="p-1.5 bg-slate-50 text-slate-400 rounded-full hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                      className="p-1.5 bg-transparent text-slate-400 rounded-full hover:bg-blue-50 hover:text-blue-600 transition-colors"
                       type="button"
                       aria-label={t("house.edit", { defaultValue: "Edit" })}
                     >
@@ -531,7 +531,7 @@ export const HouseProjectPage: React.FC = () => {
                     ))}
                   </div>
                 ) : (
-                  <div className="bg-white/70 border border-dashed border-slate-300 rounded-2xl p-6 text-center text-slate-400 text-sm">
+                  <div className="bg-white/84 border border-dashed border-slate-300 rounded-2xl p-6 text-center text-slate-400 text-sm">
                     {t("house.no_official_docs", { defaultValue: "No official document created." })}
                   </div>
                 )}
@@ -561,9 +561,9 @@ export const HouseProjectPage: React.FC = () => {
 
   // ===== LIST PAGE (same aesthetic as Projects) =====
   return (
-    <div className="min-h-screen bg-transparent p-4 pb-20">
-      <div className="max-w-6xl mx-auto space-y-4">
-      <section className="rounded-[28px] border border-slate-200/80 glass-card shadow-sm p-5 md:p-6">
+    <div className="app-shell app-shell--house min-h-screen p-4 pb-20">
+      <div className="page-frame space-y-4">
+      <section className="rounded-[28px] border border-slate-200/80 app-card shadow-sm p-5 md:p-6">
       <div className="mb-3">
         <h1 className="text-2xl font-extrabold text-slate-800">
           {t("house.my_sites", { defaultValue: "My sites (full estimate)" })}
@@ -621,7 +621,7 @@ export const HouseProjectPage: React.FC = () => {
       </section>
 
       {isCreating ? (
-        <div className="glass-card p-5 rounded-[28px] shadow-sm border border-amber-100 animate-in zoom-in-95">
+        <div className="app-card p-5 rounded-[28px] shadow-sm border border-blue-100 animate-in zoom-in-95">
           <h2 className="font-extrabold text-lg mb-4">
             {t("house.new_site", { defaultValue: "New site" })}
           </h2>
@@ -697,7 +697,7 @@ export const HouseProjectPage: React.FC = () => {
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <span className="font-extrabold text-slate-700 bg-slate-50 border border-slate-200 px-3 py-1 rounded-lg">
+                  <span className="font-extrabold text-slate-700 bg-transparent border border-slate-200 px-3 py-1 rounded-lg">
                     {euro.format(total)}
                   </span>
 
