@@ -9,4 +9,4 @@ export interface MeshType {
   height: number;
   coverM2?: number;
   priceRef?: string; // ✅ clé vers DEFAULT_PRICES
-}
+} 
