@@ -1,9 +1,10 @@
-import React, { useMemo } from "react";
+import React, { Suspense, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   LayoutGrid,
   ArrowLeft,
   ShieldCheck,
+  Hammer,
   HardHat,
   FolderOpen,
   Boxes,
@@ -13,17 +14,36 @@ import {
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
+import { CalculatorPage } from "@/pages/CalculatorPage";
+import { CalculatorType } from "@/types";
+import { getCalculators } from "@/constants";
+import { CalculatorCard } from "@/components/ui/CalculatorCard";
+
 type SectionCard = {
   title: string;
   desc: string;
   path: string;
   icon: React.ReactNode;
-  accentClass: string;
-  iconWrapClass: string;
-  compact?: boolean;
+  imageSrc: string;
+  badge?: string;
 };
 
-const MainSectionCard: React.FC<{
+/**
+ * IMPORTANT:
+ * - On met des defaultValue en ANGLAIS ici pour éviter du FR en fallback quand une clé EN manque.
+ * - Le vrai 100% vient de en.json complet (clés présentes). Mais ceci évite le "Franglais" en cas de trou.
+ */
+const PageLoader = () => {
+  const { t } = useTranslation();
+  return (
+    <div className="flex flex-col items-center justify-center h-64 text-slate-400">
+      <div className="w-8 h-8 border-2 border-slate-200 border-t-slate-500 rounded-full animate-spin mb-2" />
+      <span className="text-sm">{t("common.loading", { defaultValue: "Loading…" })}</span>
+    </div>
+  );
+};
+
+const ImageSectionCard: React.FC<{
   card: SectionCard;
   onClick: () => void;
 }> = ({ card, onClick }) => {
@@ -31,50 +51,48 @@ const MainSectionCard: React.FC<{
 
   return (
     <button
-      type="button"
       onClick={onClick}
-      className={`group relative overflow-hidden rounded-[26px] border border-white/70 bg-white/88 p-4 text-left shadow-[0_12px_40px_rgba(15,23,42,0.10)] backdrop-blur-xl transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_18px_50px_rgba(15,23,42,0.14)] ${card.accentClass}`}
+      className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm hover:shadow transition-shadow text-left"
+      type="button"
     >
-      <div className="relative z-10 flex items-start justify-between gap-3">
-        <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl shadow-sm ${card.iconWrapClass}`}>
-          {card.icon}
+      <div className="relative h-28 sm:h-32">
+        <img
+          src={card.imageSrc}
+          alt={card.title}
+          className="absolute inset-0 w-full h-full object-cover"
+          loading="lazy"
+          decoding="async"
+          onError={(e) => {
+            (e.currentTarget as HTMLImageElement).src = "/images/menu/fallback.jpg";
+          }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/35 to-black/10" />
+
+        <div className="absolute top-3 right-3 flex items-center gap-2">
+          {card.badge && (
+            <span className="text-[10px] font-extrabold uppercase tracking-wide bg-blue-600/90 text-white px-2 py-1 rounded-full">
+              {card.badge}
+            </span>
+          )}
+          <div className="w-9 h-9 rounded-xl bg-white/90 text-slate-900 flex items-center justify-center shadow">
+            {card.icon}
+          </div>
         </div>
-        <ChevronRight className="mt-1 shrink-0 text-slate-400 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:text-slate-600" size={18} />
+
+        <div className="absolute left-4 bottom-3">
+          <div className="text-white font-extrabold text-base sm:text-lg">{card.title}</div>
+        </div>
       </div>
 
-      <div className="relative z-10 mt-6">
-        <h3 className="text-[17px] font-extrabold leading-tight text-slate-900">{card.title}</h3>
-        <p className="mt-2 line-clamp-2 text-[13px] leading-snug text-slate-600">{card.desc}</p>
+      <div className="p-4">
+        <p className="text-sm text-slate-600 leading-snug">{card.desc}</p>
+
+        <div className="mt-3 inline-flex items-center text-sm font-extrabold text-blue-700">
+          {t("menu.open", { defaultValue: "Open" })} <ChevronRight size={18} className="ml-1" />
+        </div>
       </div>
 
-      <div className="relative z-10 mt-4 inline-flex items-center text-sm font-extrabold text-blue-700">
-        {t("menu.open", { defaultValue: "Ouvrir" })}
-        <ChevronRight size={16} className="ml-0.5" />
-      </div>
-
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-white/0 via-white/20 to-white/0 opacity-80" />
-    </button>
-  );
-};
-
-const MiniSectionCard: React.FC<{
-  card: SectionCard;
-  onClick: () => void;
-}> = ({ card, onClick }) => {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="group flex items-center gap-3 rounded-[22px] border border-white/70 bg-white/86 px-4 py-3 text-left shadow-[0_10px_30px_rgba(15,23,42,0.08)] backdrop-blur-xl transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_16px_38px_rgba(15,23,42,0.12)]"
-    >
-      <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl ${card.iconWrapClass}`}>
-        {card.icon}
-      </div>
-      <div className="min-w-0 flex-1">
-        <div className="truncate text-sm font-extrabold text-slate-900">{card.title}</div>
-        <div className="mt-0.5 line-clamp-1 text-xs text-slate-500">{card.desc}</div>
-      </div>
-      <ChevronRight size={16} className="shrink-0 text-slate-400 group-hover:text-slate-700" />
+      <div className="absolute inset-0 ring-0 group-hover:ring-2 ring-blue-200 rounded-2xl pointer-events-none" />
     </button>
   );
 };
@@ -82,133 +100,182 @@ const MiniSectionCard: React.FC<{
 export const AppMenuPage: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const [selectedCalc, setSelectedCalc] = useState<CalculatorType | null>(null);
 
-  const mainCards: SectionCard[] = useMemo(
+  const sectionCards: SectionCard[] = useMemo(
     () => [
       {
-        title: t("menu.cards.quicktools.title", { defaultValue: "Calculs rapides" }),
-        desc: t("menu.cards.quicktools.desc", {
-          defaultValue: "Conversions, pentes, conditionnements et contrôles express.",
+        title: t("menu.cards.calc.title", { defaultValue: "Calculator" }),
+        desc: t("menu.cards.calc.desc", {
+          defaultValue: "Access all calculators to estimate quantities and costs.",
         }),
-        path: "/app/quick-tools",
-        icon: <Sparkles size={19} />,
-        accentClass: "before:absolute before:inset-0 before:bg-[radial-gradient(circle_at_top_left,rgba(37,99,235,0.18),transparent_58%)]",
-        iconWrapClass: "bg-blue-100 text-blue-700",
+        path: "#tools",
+        icon: <Hammer size={18} />,
+        imageSrc: "/images/menu/calcul.jpg",
+        badge: t("menu.cards.calc.badge", { defaultValue: "TOOLS" }),
       },
       {
-        title: t("menu.cards.house.title", { defaultValue: "Chantier" }),
+        // NOTE: le code utilise house => la clé doit être menu.cards.house.*
+        title: t("menu.cards.house.title", { defaultValue: "Site" }),
         desc: t("menu.cards.house.desc", {
-          defaultValue: "Créer un chantier et enregistrer les résultats étape par étape.",
+          defaultValue: "Create a site and save results step-by-step (full tracking).",
         }),
         path: "/app/house",
-        icon: <HardHat size={19} />,
-        accentClass: "before:absolute before:inset-0 before:bg-[radial-gradient(circle_at_top_left,rgba(245,158,11,0.18),transparent_58%)]",
-        iconWrapClass: "bg-amber-100 text-amber-700",
+        icon: <HardHat size={18} />,
+        imageSrc: "/images/menu/chantier.jpg",
       },
       {
-        title: t("menu.cards.projects.title", { defaultValue: "Projets" }),
+        title: t("menu.cards.quicktools.title", { defaultValue: "Quick tools" }),
+        desc: t("menu.cards.quicktools.desc", {
+          defaultValue: "Dedicated quick calculators: conversions, slopes, packaging and other fast checks.",
+        }),
+        path: "/app/quick-tools",
+        icon: <Sparkles size={18} />,
+        imageSrc: "/images/menu/calcul.jpg",
+        badge: t("menu.cards.quicktools.badge", { defaultValue: "FAST" }),
+      },
+      {
+        title: t("menu.cards.projects.title", { defaultValue: "Projects" }),
         desc: t("menu.cards.projects.desc", {
-          defaultValue: "Retrouver les calculs sauvegardés, matériaux et coûts.",
+          defaultValue: "Find your saved calculations (estimates, materials, costs).",
         }),
         path: "/app/projects",
-        icon: <FolderOpen size={19} />,
-        accentClass: "before:absolute before:inset-0 before:bg-[radial-gradient(circle_at_top_left,rgba(99,102,241,0.16),transparent_58%)]",
-        iconWrapClass: "bg-indigo-100 text-indigo-700",
+        icon: <FolderOpen size={18} />,
+        imageSrc: "/images/menu/projets.jpg",
       },
       {
-        title: t("menu.cards.materials.title", { defaultValue: "Matériaux & Prix" }),
+        // NOTE: le code utilise materials => la clé doit être menu.cards.materials.*
+        title: t("menu.cards.materials.title", { defaultValue: "Materials & Pricing" }),
         desc: t("menu.cards.materials.desc", {
-          defaultValue: "Prix, matériaux perso, main d’œuvre et données.",
+          defaultValue: "Adjust prices, create custom materials, labor + data.",
         }),
         path: "/app/materials",
-        icon: <Boxes size={19} />,
-        accentClass: "before:absolute before:inset-0 before:bg-[radial-gradient(circle_at_top_left,rgba(16,185,129,0.16),transparent_58%)]",
-        iconWrapClass: "bg-emerald-100 text-emerald-700",
+        icon: <Boxes size={18} />,
+        imageSrc: "/images/menu/materiaux.jpg",
       },
-    ],
-    [t]
-  );
-
-  const secondaryCards: SectionCard[] = useMemo(
-    () => [
       {
-        title: t("menu.cards.settings.title", { defaultValue: "Réglages" }),
+        title: t("menu.cards.settings.title", { defaultValue: "Settings" }),
         desc: t("menu.cards.settings.desc", {
-          defaultValue: "Options, préférences et affichage.",
+          defaultValue: "Configure the app (options, preferences, display).",
         }),
         path: "/app/settings",
         icon: <SettingsIcon size={18} />,
-        accentClass: "",
-        iconWrapClass: "bg-violet-100 text-violet-700",
-        compact: true,
+        imageSrc: "/images/menu/reglages.jpg",
       },
       {
-        title: t("menu.cards.backup.title", { defaultValue: "Sauvegarde JSON" }),
+        // NOTE: le code utilise backup => la clé doit être menu.cards.backup.*
+        title: t("menu.cards.backup.title", { defaultValue: "JSON backup" }),
         desc: t("menu.cards.backup.desc", {
-          defaultValue: "Exporter ou importer vos données.",
+          defaultValue: "Export/import your data to avoid any loss (recommended).",
         }),
         path: "/app/materials?tab=data",
         icon: <ShieldCheck size={18} />,
-        accentClass: "",
-        iconWrapClass: "bg-slate-100 text-slate-700",
-        compact: true,
+        imageSrc: "/images/menu/sauvegarde.jpg",
+        badge: t("menu.cards.backup.badge", { defaultValue: "RECOMMENDED" }),
       },
     ],
     [t]
   );
 
-  return (
-    <div className="app-shell app-shell--menu pb-24">
-      <div className="mx-auto w-full max-w-md px-4 pt-4 sm:max-w-xl lg:max-w-3xl">
-        <div className="glass-panel sticky top-3 z-20 rounded-[28px] px-4 py-4 sm:px-5">
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex min-w-0 items-center gap-3">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-600 to-cyan-500 text-white shadow-[0_10px_24px_rgba(37,99,235,0.35)]">
-                <LayoutGrid size={20} />
-              </div>
-              <div className="min-w-0">
-                <h1 className="truncate text-[22px] font-extrabold leading-tight text-slate-950">
-                  {t("menu.title", { defaultValue: "Menu de l'application" })}
-                </h1>
-                <p className="mt-0.5 truncate text-xs text-slate-500">
-                  {t("menu.subtitle", { defaultValue: "Accès rapide aux sections principales" })}
-                </p>
-              </div>
-            </div>
+  if (selectedCalc) {
+    return (
+      <Suspense
+        fallback={
+          <div className="h-screen bg-slate-50 flex items-center justify-center">
+            <PageLoader />
+          </div>
+        }
+      >
+        <CalculatorPage
+          type={selectedCalc}
+          onBack={() => setSelectedCalc(null)}
+          onNavigateProjects={() => {
+            setSelectedCalc(null);
+            navigate("/app/projects");
+          }}
+        />
+      </Suspense>
+    );
+  }
 
-            <button
-              type="button"
-              onClick={() => navigate("/app/projects")}
-              className="hidden shrink-0 items-center gap-1.5 rounded-2xl bg-slate-100/90 px-3 py-2 text-sm font-bold text-slate-700 transition hover:bg-slate-200 sm:inline-flex"
-              title={t("menu.back_dashboard_title", { defaultValue: "Retour au tableau de bord" })}
-            >
-              <ArrowLeft size={16} />
-              <span>{t("menu.back_dashboard", { defaultValue: "Tableau de bord" })}</span>
-            </button>
+  const goTo = (path: string) => {
+    if (path === "#tools") {
+      const el = document.getElementById("tools");
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+      return;
+    }
+    navigate(path);
+  };
+
+  return (
+    <div className="pb-20 min-h-screen bg-transparent">
+      <div className="bg-white sticky top-0 z-20 border-b border-slate-200 shadow-sm">
+        <div className="max-w-7xl mx-auto p-4 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-blue-600 text-white flex items-center justify-center shadow-sm">
+              <LayoutGrid size={18} />
+            </div>
+            <div>
+              <h1 className="text-xl font-extrabold text-slate-900">
+                {t("menu.title", { defaultValue: "App menu" })}
+              </h1>
+              <p className="text-xs text-slate-500">
+                {t("menu.subtitle", { defaultValue: "Quick access to sections + tools" })}
+              </p>
+            </div>
+          </div>
+
+          <button
+            onClick={() => navigate("/app/projects")}
+            className="inline-flex items-center px-3 py-2 rounded-xl text-sm font-extrabold bg-slate-100 text-slate-700 hover:bg-slate-200"
+            title={t("menu.back_dashboard_title", { defaultValue: "Back to dashboard" })}
+            type="button"
+          >
+            <ArrowLeft size={16} className="mr-2" />
+            {t("menu.back_dashboard", { defaultValue: "Dashboard" })}
+          </button>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto p-4">
+        <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center">
+              <Sparkles size={18} />
+            </div>
+            <div>
+              <div className="font-extrabold text-slate-900">
+                {t("menu.how.title", { defaultValue: "How does it work?" })}
+              </div>
+              <p className="text-sm text-slate-600 mt-1 leading-relaxed">
+                {t("menu.how.text", {
+                  defaultValue:
+                    "Use Calculator to estimate your quantities, then Projects to find your saved calculations. For full tracking, create a Site and save results step by step. Remember to export as JSON to back up your data.",
+                })}
+              </p>
+            </div>
           </div>
         </div>
 
-        <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
-          {mainCards.map((card) => (
-            <MainSectionCard key={card.path} card={card} onClick={() => navigate(card.path)} />
+        <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {sectionCards.map((c) => (
+            <ImageSectionCard key={`${c.path}-${c.title}`} card={c} onClick={() => goTo(c.path)} />
           ))}
         </div>
 
-        <div className="mt-4 rounded-[28px] border border-white/70 bg-white/72 p-3 shadow-[0_12px_40px_rgba(15,23,42,0.08)] backdrop-blur-xl">
-          <div className="px-1 pb-2">
-            <h2 className="text-sm font-extrabold text-slate-900">
-              {t("menu.secondary.title", { defaultValue: "Autres options" })}
-            </h2>
-            <p className="mt-0.5 text-xs text-slate-500">
-              {t("menu.secondary.subtitle", {
-                defaultValue: "Sauvegarde et réglages de l’application.",
-              })}
-            </p>
-          </div>
+        <div id="tools" className="mt-8">
+          <h2 className="text-xl font-extrabold text-slate-900">
+            {t("menu.tools.title", { defaultValue: "All tools (quick access)" })}
+          </h2>
+          <p className="text-sm text-slate-600 mt-1">
+            {t("menu.tools.subtitle", {
+              defaultValue: "Click a tool to open the calculator directly.",
+            })}
+          </p>
 
-          <div className="grid grid-cols-1 gap-2">
-            {secondaryCards.map((card) => (
-              <MiniSectionCard key={card.path} card={card} onClick={() => navigate(card.path)} />
+          <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {getCalculators().filter((calc) => calc.id !== CalculatorType.QUICK_TOOLS).map((calc) => (
+              <CalculatorCard key={calc.id} config={calc} onClick={() => setSelectedCalc(calc.id)} />
             ))}
           </div>
         </div>

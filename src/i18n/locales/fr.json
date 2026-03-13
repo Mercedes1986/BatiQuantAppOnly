@@ -2808,7 +2808,10 @@
       "drywall_frame": "Cloisons, doublages, plafonds, rails et montants.",
       "tile_detailed": "Carreaux, colle, joints, plinthes et primaire.",
       "packaging_advanced": "Produits multi-couches et conditionnements détaillés.",
-      "roof_frame": "Pente, surface de toiture, chevrons, liteaux et couverture."
+      "roof_frame": "Pente, surface de toiture, chevrons, liteaux et couverture.",
+      "fence": "Panneaux, poteaux et béton de scellement.",
+      "bulk_fill": "Volume, tonnage, big bags et géotextile.",
+      "insulation": "Surface, épaisseur, R et rouleaux d’isolant."
     },
     "warn_thickness": "L'épaisseur doit être supérieure à 0.",
     "warn_openings": "La surface des ouvertures dépasse la surface brute.",
@@ -2897,6 +2900,7 @@
       "cable_length": "Longueur de câble (m)",
       "section_mm2": "Section (mm²)"
     },
-    "title": "Calculs rapides chantier"
+    "title": "Calculs rapides chantier",
+    "subtitle": "Micro-outils pour conversions, surfaces, quantités, terrasse bois, ossature placo, carrelage détaillé, toiture, clôture, gravier / remblai et isolation."
   }
 }

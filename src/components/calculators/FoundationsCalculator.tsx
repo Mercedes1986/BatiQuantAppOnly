@@ -38,7 +38,7 @@ const inputClass =
   "w-full p-2.5 border border-slate-300 rounded-lg text-slate-900 bg-white focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-all text-sm font-medium placeholder:text-slate-400";
 const labelClass = "block text-xs font-bold text-slate-600 mb-1.5 uppercase tracking-wide";
 const sectionClass =
-  "rounded-[30px] border border-white/80 bg-white/88 p-5 shadow-[0_18px_44px_rgba(15,23,42,0.08)] backdrop-blur-xl space-y-4 animate-in fade-in slide-in-from-bottom-2";
+  "bg-white p-5 rounded-2xl shadow-sm border border-slate-100 space-y-4 animate-in fade-in slide-in-from-bottom-2";
 
 const toNum = (v: string, fallback = 0) => {
   const n = parseFloat(String(v).replace(",", "."));
@@ -151,10 +151,10 @@ export const FoundationsCalculator: React.FC<Props> = ({ onCalculate, initialMod
 
   const foundationTypeLabel = (ft: FoundationType) =>
     ft === "strip"
-      ? t("struct.fd.strip", { defaultValue: "Filantes" })
+      ? t("struct.fd.strip", { defaultValue: "Strip footings" })
       : ft === "pad"
-      ? t("struct.fd.pads", { defaultValue: "Pads" })
-      : t("struct.fd.grade_beam", { defaultValue: "Longrines" });
+      ? t("struct.fd.pads", { defaultValue: "Pad footings" })
+      : t("struct.fd.grade_beam", { defaultValue: "Grade beams" });
 
   // --- CALCULATE ---
   const results = useMemo(() => {
@@ -227,7 +227,7 @@ export const FoundationsCalculator: React.FC<Props> = ({ onCalculate, initialMod
       details: [
         { label: t("common.type", { defaultValue: "Type" }), value: foundationTypeLabel(type), unit: "" },
         { label: t("struct.fd.total_concrete", { defaultValue: "Concrete" }), value: (results.volumes?.concrete ?? 0).toFixed(1), unit: "m³" },
-        { label: t("struct.walls.chainage_steel", { defaultValue: "Acier" }), value: (results.quantities?.steel ?? 0).toFixed(0), unit: "kg" },
+        { label: t("struct.walls.chainage_steel", { defaultValue: "Steel" }), value: (results.quantities?.steel ?? 0).toFixed(0), unit: "kg" },
         { label: t("struct.fd.excav", { defaultValue: "Excavation" }), value: (results.volumes?.excavation ?? 0).toFixed(1), unit: "m³" },
       ],
       materials: results.materials || [],
@@ -259,14 +259,14 @@ export const FoundationsCalculator: React.FC<Props> = ({ onCalculate, initialMod
               {s === 1
                 ? t("common.type", { defaultValue: "Type" })
                 : s === 2
-                ? t("struct.common.geometry", { defaultValue: "Geom." })
+                ? t("struct.common.geometry", { defaultValue: "Geometry" })
                 : s === 3
-                ? t("struct.fd.soil", { defaultValue: "Sol" })
+                ? t("struct.fd.soil", { defaultValue: "Soil" })
                 : s === 4
-                ? t("struct.fd.rebar", { defaultValue: "Acier" })
+                ? t("struct.fd.rebar", { defaultValue: "Steel" })
                 : s === 5
-                ? t("struct.common.options", { defaultValue: "Ops." })
-                : t("struct.common.unit_prices", { defaultValue: "Prix" })}
+                ? t("struct.common.options", { defaultValue: "Options" })
+                : t("struct.common.unit_prices", { defaultValue: "Pricing" })}
             </span>
             <div className={`h-1 w-8 rounded-full ${step === s ? "bg-blue-600" : "bg-transparent"}`} />
           </button>
@@ -279,7 +279,7 @@ export const FoundationsCalculator: React.FC<Props> = ({ onCalculate, initialMod
           <div className="p-4 bg-blue-50 text-blue-800 text-sm rounded-xl flex items-start border border-blue-100">
             <Warehouse size={20} className="mr-3 shrink-0 mt-0.5" />
             <div>
-              <p className="font-bold">{t("struct.fd.title", { defaultValue: "Fondations" })}</p>
+              <p className="font-bold">{t("struct.fd.title", { defaultValue: "Foundations" })}</p>
               <p className="opacity-80 mt-1">
                 {t("struct.fd.subtitle", {
                   defaultValue: "Concrete, steel, excavation and disposal in one estimate.",
@@ -301,7 +301,7 @@ export const FoundationsCalculator: React.FC<Props> = ({ onCalculate, initialMod
                   <Combine size={24} />
                 </div>
                 <div>
-                  <span className="block font-bold text-slate-800">{t("struct.fd.strip", { defaultValue: "Semelles filantes" })}</span>
+                  <span className="block font-bold text-slate-800">{t("struct.fd.strip", { defaultValue: "Strip footings" })}</span>
                   <span className="text-xs text-slate-500">{t("struct.fd.strip_hint", { defaultValue: "Under load-bearing walls" })}</span>
                 </div>
               </div>
@@ -320,7 +320,7 @@ export const FoundationsCalculator: React.FC<Props> = ({ onCalculate, initialMod
                 </div>
                 <div>
                   <span className="block font-bold text-slate-800">{t("struct.fd.pads", { defaultValue: "Pad footings" })}</span>
-                  <span className="text-xs text-slate-500">{t("struct.fd.pads_hint", { defaultValue: "Pour poteaux ponctuels" })}</span>
+                  <span className="text-xs text-slate-500">{t("struct.fd.pads_hint", { defaultValue: "For isolated columns" })}</span>
                 </div>
               </div>
             </button>
@@ -329,7 +329,7 @@ export const FoundationsCalculator: React.FC<Props> = ({ onCalculate, initialMod
           <div className="flex items-center justify-between p-4 bg-white rounded-xl border border-slate-200">
             <div className="flex items-center space-x-2">
               <Settings size={20} className={proMode ? "text-blue-600" : "text-slate-400"} />
-              <span className="font-bold text-slate-700">{t("struct.common.pro_mode", { defaultValue: "Mode Pro" })}</span>
+              <span className="font-bold text-slate-700">{t("struct.common.pro_mode", { defaultValue: "Pro mode" })}</span>
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
               <input type="checkbox" checked={proMode} onChange={(e) => setProMode(e.target.checked)} className="sr-only peer" />
@@ -340,9 +340,9 @@ export const FoundationsCalculator: React.FC<Props> = ({ onCalculate, initialMod
           <button
             type="button"
             onClick={() => setStep(2)}
-            className="w-full py-3.5 bg-blue-600 text-white rounded-2xl font-extrabold flex justify-center items-center shadow-lg shadow-blue-200 active:scale-[0.98] transition-transform"
+            className="w-full py-3.5 bg-blue-600 text-white rounded-xl font-bold flex justify-center items-center shadow-lg shadow-blue-200 active:scale-[0.98] transition-transform"
           >
-            {t("common.next", { defaultValue: "Suivant" })} <ArrowRight size={20} className="ml-2" />
+            {t("common.next", { defaultValue: "Next" })} <ArrowRight size={20} className="ml-2" />
           </button>
         </div>
       )}
@@ -358,7 +358,7 @@ export const FoundationsCalculator: React.FC<Props> = ({ onCalculate, initialMod
             {type === "strip" && (
               <>
                 <div>
-                  <label className={labelClass}>{t("struct.common.length_m", { defaultValue: "Longueur totale (ml)" })}</label>
+                  <label className={labelClass}>{t("struct.common.length_m", { defaultValue: "Total length (lm)" })}</label>
                   <input type="number" value={totalLengthMl} onChange={(e) => setTotalLengthMl(e.target.value)} className={inputClass} />
                 </div>
 
@@ -368,7 +368,7 @@ export const FoundationsCalculator: React.FC<Props> = ({ onCalculate, initialMod
                     <input type="number" value={stripWidthCm} onChange={(e) => setStripWidthCm(e.target.value)} className={inputClass} />
                   </div>
                   <div>
-                    <label className={labelClass}>{t("struct.common.height_cm", { defaultValue: "Hauteur (cm)" })}</label>
+                    <label className={labelClass}>{t("struct.common.height_cm", { defaultValue: "Height (cm)" })}</label>
                     <input type="number" value={stripHeightCm} onChange={(e) => setStripHeightCm(e.target.value)} className={inputClass} />
                   </div>
                 </div>
@@ -451,8 +451,8 @@ export const FoundationsCalculator: React.FC<Props> = ({ onCalculate, initialMod
             <button type="button" onClick={() => setStep(step - 1)} className="p-3 rounded-xl bg-white border border-slate-200 text-slate-500" aria-label={t("common.back", { defaultValue: "Retour" })}>
               <ArrowLeft />
             </button>
-            <button type="button" onClick={() => setStep(step + 1)} className="flex-1 py-3 bg-blue-600 text-white rounded-2xl font-extrabold shadow-sm">
-              {t("common.next", { defaultValue: "Suivant" })}
+            <button type="button" onClick={() => setStep(step + 1)} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold">
+              {t("common.next", { defaultValue: "Next" })}
             </button>
           </div>
         </div>
@@ -513,8 +513,8 @@ export const FoundationsCalculator: React.FC<Props> = ({ onCalculate, initialMod
             <button type="button" onClick={() => setStep(step - 1)} className="p-3 rounded-xl bg-white border border-slate-200 text-slate-500" aria-label={t("common.back", { defaultValue: "Retour" })}>
               <ArrowLeft />
             </button>
-            <button type="button" onClick={() => setStep(step + 1)} className="flex-1 py-3 bg-blue-600 text-white rounded-2xl font-extrabold shadow-sm">
-              {t("common.next", { defaultValue: "Suivant" })}
+            <button type="button" onClick={() => setStep(step + 1)} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold">
+              {t("common.next", { defaultValue: "Next" })}
             </button>
           </div>
         </div>
@@ -550,8 +550,8 @@ export const FoundationsCalculator: React.FC<Props> = ({ onCalculate, initialMod
             <button type="button" onClick={() => setStep(step - 1)} className="p-3 rounded-xl bg-white border border-slate-200 text-slate-500" aria-label={t("common.back", { defaultValue: "Retour" })}>
               <ArrowLeft />
             </button>
-            <button type="button" onClick={() => setStep(step + 1)} className="flex-1 py-3 bg-blue-600 text-white rounded-2xl font-extrabold shadow-sm">
-              {t("common.next", { defaultValue: "Suivant" })}
+            <button type="button" onClick={() => setStep(step + 1)} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold">
+              {t("common.next", { defaultValue: "Next" })}
             </button>
           </div>
         </div>
@@ -629,8 +629,8 @@ export const FoundationsCalculator: React.FC<Props> = ({ onCalculate, initialMod
             <button type="button" onClick={() => setStep(step - 1)} className="p-3 rounded-xl bg-white border border-slate-200 text-slate-500" aria-label={t("common.back", { defaultValue: "Retour" })}>
               <ArrowLeft />
             </button>
-            <button type="button" onClick={() => setStep(step + 1)} className="flex-1 py-3 bg-blue-600 text-white rounded-2xl font-extrabold shadow-sm">
-              {t("common.next", { defaultValue: "Suivant" })}
+            <button type="button" onClick={() => setStep(step + 1)} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold">
+              {t("common.next", { defaultValue: "Next" })}
             </button>
           </div>
         </div>
@@ -708,7 +708,7 @@ export const FoundationsCalculator: React.FC<Props> = ({ onCalculate, initialMod
             <button type="button" onClick={() => setStep(step - 1)} className="p-3 rounded-xl bg-white border border-slate-200 text-slate-500" aria-label={t("common.back", { defaultValue: "Retour" })}>
               <ArrowLeft />
             </button>
-            <button disabled className="flex-1 py-3 bg-emerald-100 text-emerald-700 rounded-2xl font-extrabold shadow-sm flex justify-center items-center">
+            <button disabled className="flex-1 py-3 bg-emerald-100 text-emerald-700 rounded-xl font-bold flex justify-center items-center">
               <Check size={20} className="mr-2" /> {t("struct.common.calculated", { defaultValue: "Calculated" })}
             </button>
           </div>

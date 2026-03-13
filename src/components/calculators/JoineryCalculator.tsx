@@ -516,7 +516,7 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate }) => {
   }, [calc, installType, onCalculate, t]);
 
   return (
-    <div className="space-y-6 rounded-[32px] border border-white/70 bg-white/72 p-4 shadow-[0_24px_70px_rgba(15,23,42,0.10)] backdrop-blur-xl sm:p-6">
+    <div className="space-y-6 animate-in fade-in">
       {/* Steps */}
       <div className="flex justify-between items-center mb-6 bg-slate-50 p-1 rounded-lg">
         {[1, 2, 3].map((s) => (
@@ -524,8 +524,8 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate }) => {
             key={s}
             type="button"
             onClick={() => setStep(s)}
-            className={`flex-1 py-2 text-xs font-extrabold rounded-2xl transition-all ${
-              step === s ? "bg-white text-slate-950 shadow-[0_14px_32px_rgba(59,130,246,0.18)]" : "text-slate-400"
+            className={`flex-1 py-2 text-xs font-bold rounded transition-all ${
+              step === s ? "bg-white shadow text-blue-600" : "text-slate-400"
             }`}
           >
             {s === 1 && t("joinery.steps.1", { defaultValue: "1. List" })}
@@ -538,7 +538,7 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate }) => {
       {/* STEP 1 */}
       {step === 1 && (
         <div className="space-y-4">
-          <div className="rounded-[22px] border border-blue-100 bg-blue-50/90 p-3 text-xs text-blue-800 flex items-start shadow-sm">
+          <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
             <Info size={16} className="mr-2 shrink-0 mt-0.5" />
             {t("joinery.step1.hint", { defaultValue: "Create your joinery list." })}
           </div>
@@ -610,7 +610,7 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate }) => {
           <button
             type="button"
             onClick={handleAddItem}
-            className="w-full py-3 bg-blue-600 text-white rounded-2xl font-extrabold flex justify-center items-center shadow-md active:scale-95 transition-transform"
+            className="w-full py-3 bg-blue-600 text-white rounded-xl font-bold flex justify-center items-center shadow-md active:scale-95 transition-transform"
           >
             <Plus size={20} className="mr-2" /> {t("joinery.add", { defaultValue: "Add joinery item" })}
           </button>
@@ -618,7 +618,7 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate }) => {
           <button
             type="button"
             onClick={() => setStep(2)}
-            className="w-full py-3 bg-white border border-slate-200 text-slate-700 rounded-2xl font-extrabold shadow-sm flex justify-center items-center"
+            className="w-full py-3 bg-white border border-slate-200 text-slate-700 rounded-xl font-bold flex justify-center items-center"
             disabled={items.length === 0}
           >
             {t("common.next", { defaultValue: "Next" })} <ArrowRight size={18} className="ml-2" />
@@ -804,7 +804,7 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate }) => {
                   <button
                     type="button"
                     onClick={handleSaveItem}
-                    className="flex-1 py-3 bg-blue-600 text-white rounded-2xl font-extrabold shadow-sm"
+                    className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold"
                   >
                     {t("common.save", { defaultValue: "Save" })}
                   </button>
@@ -818,7 +818,7 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate }) => {
       {/* STEP 2 */}
       {step === 2 && (
         <div className="space-y-4">
-          <div className="rounded-[22px] border border-blue-100 bg-blue-50/90 p-3 text-xs text-blue-800 flex items-start shadow-sm">
+          <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
             <Hammer size={16} className="mr-2 shrink-0 mt-0.5" />
             {t("joinery.step2.hint", { defaultValue: "Install type + consumables." })}
           </div>
@@ -935,14 +935,14 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate }) => {
             <button
               type="button"
               onClick={() => setStep(1)}
-              className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-extrabold shadow-sm"
+              className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold"
             >
               {t("common.back", { defaultValue: "Back" })}
             </button>
             <button
               type="button"
               onClick={() => setStep(3)}
-              className="flex-1 py-3 bg-blue-600 text-white rounded-2xl font-extrabold shadow-sm"
+              className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold"
             >
               {t("common.next", { defaultValue: "Next" })}
             </button>
@@ -953,7 +953,7 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate }) => {
       {/* STEP 3 */}
       {step === 3 && (
         <div className="space-y-4">
-          <div className="rounded-[22px] border border-blue-100 bg-blue-50/90 p-3 text-xs text-blue-800 flex items-start shadow-sm">
+          <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg flex items-start">
             <CircleDollarSign size={16} className="mr-2 shrink-0 mt-0.5" />
             {t("joinery.step3.hint", { defaultValue: "Adjust unit prices." })}
           </div>
@@ -985,7 +985,7 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate }) => {
                     type="number"
                     value={(prices as any)[k]}
                     onChange={(e) => updatePrice(k as any, e.target.value)}
-                    className="w-full p-2 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl"
+                    className="w-full p-2 border rounded text-sm bg-white text-slate-900"
                   />
                 </div>
               ))}
@@ -998,7 +998,7 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate }) => {
                   type="number"
                   value={prices.shutterRolling}
                   onChange={(e) => updatePrice("shutterRolling", e.target.value)}
-                  className="w-full p-2 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl"
+                  className="w-full p-2 border rounded text-sm bg-white text-slate-900"
                 />
               </div>
               <div>
@@ -1009,7 +1009,7 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate }) => {
                   type="number"
                   value={prices.shutterSwing}
                   onChange={(e) => updatePrice("shutterSwing", e.target.value)}
-                  className="w-full p-2 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl"
+                  className="w-full p-2 border rounded text-sm bg-white text-slate-900"
                 />
               </div>
 
@@ -1021,7 +1021,7 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate }) => {
                   type="number"
                   value={prices.materialAlu}
                   onChange={(e) => updatePrice("materialAlu", e.target.value)}
-                  className="w-full p-2 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl"
+                  className="w-full p-2 border rounded text-sm bg-white text-slate-900"
                 />
               </div>
               <div>
@@ -1032,7 +1032,7 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate }) => {
                   type="number"
                   value={prices.materialWood}
                   onChange={(e) => updatePrice("materialWood", e.target.value)}
-                  className="w-full p-2 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl"
+                  className="w-full p-2 border rounded text-sm bg-white text-slate-900"
                 />
               </div>
             </div>
@@ -1047,7 +1047,7 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate }) => {
                     type="number"
                     value={prices.installWindow}
                     onChange={(e) => updatePrice("installWindow", e.target.value)}
-                    className="w-full p-1.5 border border-blue-200 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(37,99,235,0.08)] backdrop-blur-xl"
+                    className="w-full p-1.5 border border-blue-200 rounded text-sm bg-white text-slate-900"
                   />
                 </div>
                 <div>
@@ -1058,7 +1058,7 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate }) => {
                     type="number"
                     value={prices.installDoor}
                     onChange={(e) => updatePrice("installDoor", e.target.value)}
-                    className="w-full p-1.5 border border-blue-200 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(37,99,235,0.08)] backdrop-blur-xl"
+                    className="w-full p-1.5 border border-blue-200 rounded text-sm bg-white text-slate-900"
                   />
                 </div>
                 <div>
@@ -1069,7 +1069,7 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate }) => {
                     type="number"
                     value={prices.installBay}
                     onChange={(e) => updatePrice("installBay", e.target.value)}
-                    className="w-full p-1.5 border border-blue-200 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(37,99,235,0.08)] backdrop-blur-xl"
+                    className="w-full p-1.5 border border-blue-200 rounded text-sm bg-white text-slate-900"
                   />
                 </div>
                 <div>
@@ -1080,7 +1080,7 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate }) => {
                     type="number"
                     value={prices.installVelux}
                     onChange={(e) => updatePrice("installVelux", e.target.value)}
-                    className="w-full p-1.5 border border-blue-200 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(37,99,235,0.08)] backdrop-blur-xl"
+                    className="w-full p-1.5 border border-blue-200 rounded text-sm bg-white text-slate-900"
                   />
                 </div>
                 <div>
@@ -1091,7 +1091,7 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate }) => {
                     type="number"
                     value={prices.installGarage}
                     onChange={(e) => updatePrice("installGarage", e.target.value)}
-                    className="w-full p-1.5 border border-blue-200 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(37,99,235,0.08)] backdrop-blur-xl"
+                    className="w-full p-1.5 border border-blue-200 rounded text-sm bg-white text-slate-900"
                   />
                 </div>
                 <div>
@@ -1102,7 +1102,7 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate }) => {
                     type="number"
                     value={prices.renoSurcharge}
                     onChange={(e) => updatePrice("renoSurcharge", e.target.value)}
-                    className="w-full p-1.5 border border-blue-200 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(37,99,235,0.08)] backdrop-blur-xl"
+                    className="w-full p-1.5 border border-blue-200 rounded text-sm bg-white text-slate-900"
                   />
                 </div>
               </div>
@@ -1117,7 +1117,7 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate }) => {
                   type="number"
                   value={prices.compribandM}
                   onChange={(e) => updatePrice("compribandM", e.target.value)}
-                  className="w-full p-2 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl"
+                  className="w-full p-2 border rounded text-sm bg-white text-slate-900"
                 />
               </div>
               <div>
@@ -1128,7 +1128,7 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate }) => {
                   type="number"
                   value={prices.siliconeCart}
                   onChange={(e) => updatePrice("siliconeCart", e.target.value)}
-                  className="w-full p-2 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl"
+                  className="w-full p-2 border rounded text-sm bg-white text-slate-900"
                 />
               </div>
               <div>
@@ -1139,7 +1139,7 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate }) => {
                   type="number"
                   value={prices.foamCart}
                   onChange={(e) => updatePrice("foamCart", e.target.value)}
-                  className="w-full p-2 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl"
+                  className="w-full p-2 border rounded text-sm bg-white text-slate-900"
                 />
               </div>
               <div>
@@ -1150,7 +1150,7 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate }) => {
                   type="number"
                   value={prices.fixingKit}
                   onChange={(e) => updatePrice("fixingKit", e.target.value)}
-                  className="w-full p-2 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl"
+                  className="w-full p-2 border rounded text-sm bg-white text-slate-900"
                 />
               </div>
             </div>
@@ -1170,14 +1170,14 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate }) => {
             <button
               type="button"
               onClick={() => setStep(2)}
-              className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-extrabold shadow-sm"
+              className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold"
             >
               {t("common.back", { defaultValue: "Back" })}
             </button>
             <button
               type="button"
               disabled
-              className="flex-1 py-3 bg-emerald-100 text-emerald-700 rounded-2xl font-extrabold shadow-sm flex justify-center items-center"
+              className="flex-1 py-3 bg-emerald-100 text-emerald-700 rounded-xl font-bold flex justify-center items-center"
             >
               <Check size={18} className="mr-2" /> {t("struct.common.calculated", { defaultValue: "Calculated" })}
             </button>

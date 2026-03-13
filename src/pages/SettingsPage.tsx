@@ -77,7 +77,7 @@ export const SettingsPage: React.FC = () => {
       URL.revokeObjectURL(url);
     } catch (e) {
       console.error(e);
-      alert(t("settings.export_error", { defaultValue: "Erreur lors de l’export. Réessayez." }));
+      alert(t("settings.export_error", { defaultValue: "Export failed. Please try again." }));
     }
   };
 
@@ -86,14 +86,14 @@ export const SettingsPage: React.FC = () => {
     if (!file) return;
 
     if (file.size > 5 * 1024 * 1024) {
-      alert(t("settings.file_too_big", { defaultValue: "Fichier trop volumineux (max 5 Mo)." }));
+      alert(t("settings.file_too_big", { defaultValue: "File is too large (max 5 MB)." }));
       resetFileInput();
       return;
     }
 
     const ok = confirm(
       t("settings.import_confirm", {
-        defaultValue: "Attention : L'importation remplacera vos données actuelles. Voulez-vous continuer ?",
+        defaultValue: "Warning: importing will replace your current data. Do you want to continue?",
       })
     );
     if (!ok) {
@@ -107,27 +107,27 @@ export const SettingsPage: React.FC = () => {
     reader.onerror = () => {
       setIsImporting(false);
       resetFileInput();
-      alert(t("settings.file_read_error", { defaultValue: "Erreur de lecture du fichier." }));
+      alert(t("settings.file_read_error", { defaultValue: "Failed to read the file." }));
     };
 
     reader.onload = (evt) => {
       try {
         const content = evt.target?.result;
         if (!content || typeof content !== "string") {
-          alert(t("settings.invalid_backup", { defaultValue: "Erreur: Fichier de sauvegarde invalide." }));
+          alert(t("settings.invalid_backup", { defaultValue: "Error: invalid backup file." }));
           return;
         }
 
         const success = importAppData(content, "replace");
         if (success) {
-          alert(t("settings.restore_ok", { defaultValue: "Données restaurées avec succès !" }));
+          alert(t("settings.restore_ok", { defaultValue: "Data restored successfully!" }));
           window.location.reload();
         } else {
-          alert(t("settings.invalid_backup", { defaultValue: "Erreur: Fichier de sauvegarde invalide." }));
+          alert(t("settings.invalid_backup", { defaultValue: "Error: invalid backup file." }));
         }
       } catch (err) {
         console.error(err);
-        alert(t("settings.invalid_backup", { defaultValue: "Erreur: Fichier de sauvegarde invalide." }));
+        alert(t("settings.invalid_backup", { defaultValue: "Error: invalid backup file." }));
       } finally {
         setIsImporting(false);
         resetFileInput();
@@ -166,7 +166,7 @@ export const SettingsPage: React.FC = () => {
       onClick={() => setActiveTab(tab)}
       className={[
         "px-4 py-2 text-sm font-extrabold rounded-xl whitespace-nowrap transition-colors flex items-center gap-2",
-        activeTab === tab ? "bg-white text-slate-900 shadow" : "text-slate-700 hover:bg-white/84",
+        activeTab === tab ? "bg-white text-slate-900 shadow" : "text-slate-700 hover:bg-white/70",
       ].join(" ")}
     >
       {icon}
@@ -175,12 +175,12 @@ export const SettingsPage: React.FC = () => {
   );
 
   const rowClass =
-    "w-full p-4 flex items-center justify-between gap-3 text-left hover:bg-white/84 transition-colors";
+    "w-full p-4 flex items-center justify-between gap-3 text-left hover:bg-white/70 transition-colors";
 
   return (
-    <div className="p-4 pb-20 app-shell min-h-screen">
-      <div className="page-frame space-y-4">
-        <section className="rounded-[28px] border border-slate-200/80 app-card shadow-sm p-5 md:p-6">
+    <div className="p-4 pb-20 bg-transparent min-h-screen">
+      <div className="max-w-6xl mx-auto space-y-4">
+        <section className="rounded-[28px] border border-slate-200/80 bg-white/72 backdrop-blur-md shadow-sm p-5 md:p-6">
           <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
             <div>
               <h1 className="text-2xl font-extrabold text-slate-800">
@@ -193,12 +193,12 @@ export const SettingsPage: React.FC = () => {
             <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar rounded-xl bg-slate-200/80 p-1.5 shadow-sm border border-slate-200">
               {tabButton(
                 "app",
-                t("settings.tabs.app", { defaultValue: "Application" }),
+                t("settings.tabs.app", { defaultValue: "App" }),
                 <Globe size={16} />
               )}
               {tabButton(
                 "company",
-                t("settings.tabs.company", { defaultValue: "Entreprise & Facturation" }),
+                t("settings.tabs.company", { defaultValue: "Company & Billing" }),
                 <Building2 size={16} />
               )}
             </div>
@@ -206,56 +206,56 @@ export const SettingsPage: React.FC = () => {
         </section>
 
         {activeTab === "company" ? (
-          <div className="rounded-[28px] border border-slate-200/80 app-card shadow-sm p-1 md:p-2">
+          <div className="rounded-[28px] border border-slate-200/80 bg-white/72 backdrop-blur-md shadow-sm p-1 md:p-2">
             <CompanyProfileForm />
           </div>
         ) : (
           <div className="space-y-4">
-            <section className="app-card rounded-[28px] shadow-sm border border-slate-200/80 overflow-hidden">
+            <section className="bg-white/72 backdrop-blur-md rounded-[28px] shadow-sm border border-slate-200/80 overflow-hidden">
               <div className="p-5 flex items-center">
                 <div className="bg-emerald-100 p-3 rounded-2xl mr-3 text-emerald-600">
                   <User size={20} />
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-extrabold text-slate-800">{t("settings.pro.title", { defaultValue: "Version Pro" })}</h3>
-                  <p className="text-xs text-slate-500">{t("settings.pro.subtitle", { defaultValue: "Licence active • Mode Hors-ligne" })}</p>
+                  <h3 className="font-extrabold text-slate-800">{t("settings.pro.title", { defaultValue: "Pro" })}</h3>
+                  <p className="text-xs text-slate-500">{t("settings.pro.subtitle", { defaultValue: "Advanced features unlocked." })}</p>
                 </div>
               </div>
             </section>
 
-            <section className="app-card rounded-[28px] shadow-sm border border-slate-200/80 overflow-hidden">
+            <section className="bg-white/72 backdrop-blur-md rounded-[28px] shadow-sm border border-slate-200/80 overflow-hidden">
               <h3 className="px-5 pt-5 text-xs font-extrabold text-slate-400 uppercase tracking-wider flex items-center">
-                <HardDrive size={12} className="mr-2" /> {t("settings.data.title", { defaultValue: "Données & Sauvegarde" })}
+                <HardDrive size={12} className="mr-2" /> {t("settings.data.title", { defaultValue: "Data & Backup" })}
               </h3>
 
               <div className="p-5 grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <button
                   type="button"
                   onClick={handleExport}
-                  className="flex flex-col items-center justify-center p-5 border border-slate-200 rounded-2xl hover:bg-blue-50/70 hover:border-blue-200 transition-colors group bg-white/84"
+                  className="flex flex-col items-center justify-center p-5 border border-slate-200 rounded-2xl hover:bg-blue-50/70 hover:border-blue-200 transition-colors group bg-white/70"
                 >
                   <Download size={24} className="text-blue-600 mb-2 group-hover:scale-110 transition-transform" />
-                  <span className="text-sm font-extrabold text-slate-700">{t("settings.data.backup", { defaultValue: "Sauvegarder" })}</span>
-                  <span className="text-[10px] text-slate-400">{t("settings.data.export_json", { defaultValue: "Exporter JSON" })}</span>
+                  <span className="text-sm font-extrabold text-slate-700">{t("settings.data.backup", { defaultValue: "Backup" })}</span>
+                  <span className="text-[10px] text-slate-400">{t("settings.data.export_json", { defaultValue: "Export JSON" })}</span>
                 </button>
 
                 <label
-                  className={`flex flex-col items-center justify-center p-5 border border-slate-200 rounded-2xl transition-colors cursor-pointer group bg-white/84 ${
+                  className={`flex flex-col items-center justify-center p-5 border border-slate-200 rounded-2xl transition-colors cursor-pointer group bg-white/70 ${
                     isImporting ? "opacity-60 pointer-events-none" : "hover:bg-emerald-50/70 hover:border-emerald-200"
                   }`}
                   title={
                     isImporting
-                      ? t("settings.data.importing", { defaultValue: "Import en cours…" })
-                      : t("settings.data.import_title", { defaultValue: "Importer une sauvegarde" })
+                      ? t("settings.data.importing", { defaultValue: "Importing…" })
+                      : t("settings.data.import_title", { defaultValue: "Import a backup" })
                   }
                 >
                   <Upload size={24} className="text-emerald-600 mb-2 group-hover:scale-110 transition-transform" />
                   <span className="text-sm font-extrabold text-slate-700">
                     {isImporting
                       ? t("settings.data.importing_short", { defaultValue: "Import..." })
-                      : t("settings.data.restore", { defaultValue: "Restaurer" })}
+                      : t("settings.data.restore", { defaultValue: "Restore" })}
                   </span>
-                  <span className="text-[10px] text-slate-400">{t("settings.data.import_json", { defaultValue: "Importer JSON" })}</span>
+                  <span className="text-[10px] text-slate-400">{t("settings.data.import_json", { defaultValue: "Import JSON" })}</span>
                   <input type="file" ref={fileInputRef} className="hidden" accept="application/json,.json" onChange={handleImport} />
                 </label>
               </div>
@@ -263,14 +263,14 @@ export const SettingsPage: React.FC = () => {
               <div className="px-5 pb-5">
                 <div className="bg-amber-50 text-amber-700 text-xs p-3 rounded-xl flex items-start border border-amber-100">
                   <AlertTriangle size={14} className="mr-2 mt-0.5 shrink-0" />
-                  <p>{t("settings.data.warning", { defaultValue: "Important : Vos données sont stockées dans le navigateur. Pensez à faire une sauvegarde régulière." })}</p>
+                  <p>{t("settings.data.warning", { defaultValue: "Important: your data is stored in the browser. Remember to make regular backups." })}</p>
                 </div>
               </div>
             </section>
 
-            <section className="app-card rounded-[28px] shadow-sm border border-slate-200/80 overflow-hidden">
+            <section className="bg-white/72 backdrop-blur-md rounded-[28px] shadow-sm border border-slate-200/80 overflow-hidden">
               <h3 className="px-5 pt-5 text-xs font-extrabold text-slate-400 uppercase tracking-wider">
-                {t("settings.app.title", { defaultValue: "Application" })}
+                {t("settings.app.title", { defaultValue: "App" })}
               </h3>
 
               <div className="divide-y divide-slate-100">
@@ -282,7 +282,7 @@ export const SettingsPage: React.FC = () => {
                   <select
                     value={currency}
                     onChange={(e) => onCurrencyChange(e.target.value as Currency)}
-                    className="bg-transparent border border-slate-200 rounded-xl text-sm text-slate-600 px-3 py-2 focus:ring-0"
+                    className="bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-600 px-3 py-2 focus:ring-0"
                   >
                     <option value="EUR">EUR (€)</option>
                     <option value="USD">USD ($)</option>
@@ -300,7 +300,7 @@ export const SettingsPage: React.FC = () => {
                   <select
                     value={(i18n.language || "fr").split("-")[0]}
                     onChange={(e) => changeLanguage(e.target.value)}
-                    className="bg-transparent border border-slate-200 rounded-xl text-sm text-slate-600 px-3 py-2 focus:ring-0"
+                    className="bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-600 px-3 py-2 focus:ring-0"
                   >
                     <option value="fr">Français</option>
                     <option value="en">English</option>
@@ -309,7 +309,7 @@ export const SettingsPage: React.FC = () => {
               </div>
             </section>
 
-            <section className="app-card rounded-[28px] shadow-sm border border-slate-200/80 overflow-hidden">
+            <section className="bg-white/72 backdrop-blur-md rounded-[28px] shadow-sm border border-slate-200/80 overflow-hidden">
               <div className="divide-y divide-slate-100">
                 <button type="button" className={rowClass}>
                   <div className="flex items-center gap-3">
@@ -321,7 +321,7 @@ export const SettingsPage: React.FC = () => {
                 <button type="button" className={rowClass}>
                   <div className="flex items-center gap-3">
                     <Shield size={18} className="text-slate-400" />
-                    <span className="text-sm font-medium text-slate-700">{t("settings.support.privacy", { defaultValue: "Politique de confidentialité" })}</span>
+                    <span className="text-sm font-medium text-slate-700">{t("settings.support.privacy", { defaultValue: "Privacy policy" })}</span>
                   </div>
                   <ChevronRight size={18} className="text-slate-300" />
                 </button>
@@ -330,7 +330,7 @@ export const SettingsPage: React.FC = () => {
 
             <div className="text-center pt-4">
               <p className="text-xs text-slate-400">{versionLabel}</p>
-              <p className="text-[10px] text-slate-300 mt-2">{t("settings.footer", { defaultValue: "Aucune donnée n'est collectée." })}</p>
+              <p className="text-[10px] text-slate-300 mt-2">{t("settings.footer", { defaultValue: "No data is collected." })}</p>
             </div>
           </div>
         )}

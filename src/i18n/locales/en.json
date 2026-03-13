@@ -2605,7 +2605,10 @@
       "drywall_frame": "Partitions, linings, ceilings, tracks and studs.",
       "tile_detailed": "Tiles, adhesive, grout, skirting and primer.",
       "packaging_advanced": "Multi-coat products and detailed packaging.",
-      "roof_frame": "Pitch, roof area, rafters, battens and tiles."
+      "roof_frame": "Pitch, roof area, rafters, battens and tiles.",
+      "fence": "Panels, posts and post concrete.",
+      "bulk_fill": "Volume, tonnage, bulk bags and geotextile.",
+      "insulation": "Area, thickness, R-value and insulation rolls."
     },
     "warn_thickness": "Thickness must be greater than 0.",
     "warn_openings": "Openings area exceeds the gross area.",
@@ -2694,6 +2697,7 @@
       "cable_length": "Cable length (m)",
       "section_mm2": "Section (mm²)"
     },
-    "title": "Quick site tools"
+    "title": "Quick site tools",
+    "subtitle": "Micro-tools for conversions, areas, quantities, timber decking, drywall framing, detailed tiling, roofing, fencing, gravel / backfill and insulation."
   }
 }
