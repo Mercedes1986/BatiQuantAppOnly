@@ -4,25 +4,43 @@
 
 :root {
   color-scheme: light;
-  --app-bg: #f6f8fc;
-  --panel-bg: rgba(255,255,255,0.78);
-  --panel-border: rgba(255,255,255,0.72);
-  --panel-shadow: 0 18px 50px rgba(15, 23, 42, 0.10);
+  --app-bg: #d8e7ff;
+  --panel-bg: rgba(255, 255, 255, 0.60);
+  --panel-border: rgba(255, 255, 255, 0.50);
+  --panel-shadow: 0 22px 60px rgba(15, 23, 42, 0.16);
 }
 
-*, *::before, *::after { box-sizing: border-box; }
-html, body, #root { min-height: 100%; }
-html { background: var(--app-bg); }
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+html {
+  background: var(--app-bg);
+}
+
 body {
   margin: 0;
   background:
-    radial-gradient(1200px 600px at -10% -10%, rgba(59,130,246,0.14), transparent 55%),
-    radial-gradient(900px 500px at 110% 0%, rgba(16,185,129,0.10), transparent 52%),
-    linear-gradient(180deg, #f8fbff 0%, #f5f7fb 55%, #eef3f9 100%);
+    radial-gradient(1400px 900px at -12% -12%, rgba(37, 99, 235, 0.52), transparent 54%),
+    radial-gradient(1100px 760px at 112% -4%, rgba(6, 182, 212, 0.42), transparent 52%),
+    radial-gradient(1000px 640px at 50% 110%, rgba(139, 92, 246, 0.34), transparent 58%),
+    radial-gradient(820px 520px at 18% 82%, rgba(16, 185, 129, 0.24), transparent 56%),
+    linear-gradient(180deg, #edf4ff 0%, #d8eaff 46%, #c7ddff 100%);
   color: #0f172a;
 }
 
-.app-shell { position: relative; min-height: 100vh; }
+.app-shell {
+  position: relative;
+  min-height: 100vh;
+  isolation: isolate;
+}
+
 .app-shell::before,
 .app-shell::after {
   content: "";
@@ -31,122 +49,166 @@ body {
   pointer-events: none;
   z-index: 0;
 }
+
 .app-shell::before {
   background:
-    radial-gradient(560px 340px at 12% 14%, rgba(59,130,246,0.13), transparent 64%),
-    radial-gradient(520px 300px at 88% 18%, rgba(139,92,246,0.10), transparent 62%),
-    radial-gradient(500px 280px at 50% 100%, rgba(16,185,129,0.08), transparent 60%);
+    radial-gradient(760px 460px at 10% 12%, rgba(59, 130, 246, 0.30), transparent 60%),
+    radial-gradient(620px 360px at 88% 14%, rgba(139, 92, 246, 0.28), transparent 58%),
+    radial-gradient(640px 340px at 52% 100%, rgba(16, 185, 129, 0.22), transparent 58%);
 }
-.app-shell::after {
-  background: linear-gradient(to bottom, rgba(255,255,255,0.50), rgba(255,255,255,0.22) 20%, rgba(255,255,255,0.14) 100%);
-  backdrop-filter: blur(1px);
-}
-.app-shell > * { position: relative; z-index: 1; }
 
+.app-shell::after {
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.14),
+      rgba(255, 255, 255, 0.06) 24%,
+      rgba(255, 255, 255, 0.02) 100%
+    );
+  backdrop-filter: blur(3px);
+}
+
+.app-shell > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Variantes par page */
 .app-shell--menu::before {
   background:
-    radial-gradient(620px 380px at 10% 10%, rgba(37,99,235,0.15), transparent 64%),
-    radial-gradient(460px 280px at 88% 14%, rgba(16,185,129,0.10), transparent 62%),
-    radial-gradient(500px 280px at 50% 100%, rgba(14,165,233,0.08), transparent 60%);
+    radial-gradient(820px 500px at 7% 8%, rgba(37, 99, 235, 0.46), transparent 60%),
+    radial-gradient(640px 360px at 92% 10%, rgba(14, 165, 233, 0.34), transparent 58%),
+    radial-gradient(700px 380px at 50% 100%, rgba(16, 185, 129, 0.28), transparent 56%);
 }
+
 .app-shell--quick::before {
   background:
-    radial-gradient(620px 380px at 8% 8%, rgba(37,99,235,0.16), transparent 64%),
-    radial-gradient(480px 280px at 88% 16%, rgba(6,182,212,0.10), transparent 60%),
-    radial-gradient(480px 260px at 50% 100%, rgba(59,130,246,0.07), transparent 58%);
+    radial-gradient(860px 520px at 7% 8%, rgba(37, 99, 235, 0.48), transparent 60%),
+    radial-gradient(660px 380px at 92% 12%, rgba(6, 182, 212, 0.38), transparent 58%),
+    radial-gradient(700px 360px at 50% 100%, rgba(59, 130, 246, 0.28), transparent 56%);
 }
+
 .app-shell--projects::before {
   background:
-    radial-gradient(620px 380px at 10% 10%, rgba(99,102,241,0.16), transparent 64%),
-    radial-gradient(460px 280px at 88% 14%, rgba(59,130,246,0.10), transparent 62%),
-    radial-gradient(500px 280px at 50% 100%, rgba(79,70,229,0.08), transparent 60%);
+    radial-gradient(840px 520px at 8% 8%, rgba(99, 102, 241, 0.44), transparent 60%),
+    radial-gradient(620px 360px at 90% 14%, rgba(59, 130, 246, 0.30), transparent 58%),
+    radial-gradient(700px 360px at 50% 100%, rgba(139, 92, 246, 0.28), transparent 56%);
 }
-.app-shell--house::before {
+
+.app-shell--house::before,
+.app-shell--site::before {
   background:
-    radial-gradient(620px 380px at 10% 10%, rgba(245,158,11,0.16), transparent 64%),
-    radial-gradient(460px 280px at 88% 14%, rgba(234,179,8,0.10), transparent 62%),
-    radial-gradient(500px 280px at 50% 100%, rgba(251,191,36,0.08), transparent 60%);
+    radial-gradient(840px 520px at 8% 8%, rgba(245, 158, 11, 0.42), transparent 60%),
+    radial-gradient(620px 360px at 90% 14%, rgba(249, 115, 22, 0.34), transparent 58%),
+    radial-gradient(700px 360px at 50% 100%, rgba(234, 179, 8, 0.26), transparent 56%);
 }
+
 .app-shell--materials::before {
   background:
-    radial-gradient(620px 380px at 10% 10%, rgba(16,185,129,0.16), transparent 64%),
-    radial-gradient(460px 280px at 88% 14%, rgba(34,197,94,0.10), transparent 62%),
-    radial-gradient(500px 280px at 50% 100%, rgba(20,184,166,0.08), transparent 60%);
+    radial-gradient(840px 520px at 8% 8%, rgba(16, 185, 129, 0.44), transparent 60%),
+    radial-gradient(620px 360px at 90% 14%, rgba(34, 197, 94, 0.32), transparent 58%),
+    radial-gradient(700px 360px at 50% 100%, rgba(20, 184, 166, 0.28), transparent 56%);
 }
+
 .app-shell--settings::before {
   background:
-    radial-gradient(620px 380px at 10% 10%, rgba(139,92,246,0.16), transparent 64%),
-    radial-gradient(460px 280px at 88% 14%, rgba(167,139,250,0.10), transparent 62%),
-    radial-gradient(500px 280px at 50% 100%, rgba(99,102,241,0.08), transparent 60%);
+    radial-gradient(840px 520px at 8% 8%, rgba(139, 92, 246, 0.44), transparent 60%),
+    radial-gradient(620px 360px at 90% 14%, rgba(167, 139, 250, 0.34), transparent 58%),
+    radial-gradient(700px 360px at 50% 100%, rgba(99, 102, 241, 0.28), transparent 56%);
 }
+
 .app-shell--dashboard::before,
 .app-shell--calculator::before {
   background:
-    radial-gradient(620px 380px at 10% 10%, rgba(37,99,235,0.12), transparent 64%),
-    radial-gradient(460px 280px at 88% 14%, rgba(148,163,184,0.10), transparent 62%),
-    radial-gradient(500px 280px at 50% 100%, rgba(16,185,129,0.06), transparent 60%);
+    radial-gradient(840px 520px at 8% 8%, rgba(37, 99, 235, 0.40), transparent 60%),
+    radial-gradient(620px 360px at 90% 14%, rgba(6, 182, 212, 0.30), transparent 58%),
+    radial-gradient(700px 360px at 50% 100%, rgba(16, 185, 129, 0.24), transparent 56%);
 }
 
 .glass-panel {
   border: 1px solid var(--panel-border);
   background: var(--panel-bg);
   box-shadow: var(--panel-shadow);
-  backdrop-filter: blur(18px);
+  backdrop-filter: blur(24px);
 }
+
 .app-card {
-  border: 1px solid rgba(255,255,255,0.72);
-  background: rgba(255,255,255,0.84);
-  box-shadow: 0 12px 36px rgba(15,23,42,0.08);
-  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.48);
+  background: rgba(255, 255, 255, 0.52);
+  box-shadow: 0 16px 42px rgba(15, 23, 42, 0.12);
+  backdrop-filter: blur(22px);
 }
+
 .app-card-soft {
-  border: 1px solid rgba(255,255,255,0.70);
-  background: rgba(255,255,255,0.68);
-  box-shadow: 0 10px 30px rgba(15,23,42,0.06);
-  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.42);
+  background: rgba(255, 255, 255, 0.40);
+  box-shadow: 0 12px 34px rgba(15, 23, 42, 0.10);
+  backdrop-filter: blur(20px);
 }
+
 .page-frame {
   width: min(100%, 1180px);
   margin-inline: auto;
   padding: 1rem;
   padding-bottom: 6rem;
 }
+
 .page-narrow {
   width: min(100%, 1040px);
   margin-inline: auto;
   padding: 1rem;
   padding-bottom: 6rem;
 }
+
 .page-header-chip {
   display: inline-flex;
   align-items: center;
-  gap: .5rem;
+  gap: 0.5rem;
   border-radius: 999px;
-  background: rgba(255,255,255,0.72);
-  border: 1px solid rgba(255,255,255,0.72);
-  padding: .45rem .8rem;
-  font-size: .75rem;
+  background: rgba(255, 255, 255, 0.58);
+  border: 1px solid rgba(255, 255, 255, 0.46);
+  padding: 0.45rem 0.8rem;
+  font-size: 0.75rem;
   font-weight: 800;
   color: #334155;
+  backdrop-filter: blur(14px);
 }
 
-.no-scrollbar::-webkit-scrollbar { display: none; }
-.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-.print-only { display: none; }
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.print-only {
+  display: none;
+}
+
 @media print {
-  .no-print { display: none !important; }
-  .print-only { display: block !important; }
+  .no-print {
+    display: none !important;
+  }
+
+  .print-only {
+    display: block !important;
+  }
 }
 
-input, select, textarea {
-  background-color: rgba(255,255,255,0.94) !important;
+input,
+select,
+textarea {
+  background-color: rgba(255, 255, 255, 0.86) !important;
   color: #0f172a !important;
-  border-color: #d8e1ef !important;
-  box-shadow: 0 1px 0 rgba(255,255,255,0.7) inset;
+  border-color: rgba(203, 213, 225, 0.9) !important;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.7) inset;
 }
+
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
 input:-webkit-autofill:active {
-  -webkit-box-shadow: 0 0 0 30px rgba(255,255,255,0.96) inset !important;
+  -webkit-box-shadow: 0 0 0 30px rgba(255, 255, 255, 0.92) inset !important;
 }
