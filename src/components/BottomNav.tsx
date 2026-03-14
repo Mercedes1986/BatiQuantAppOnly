@@ -19,19 +19,19 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, onChange }) =>
   const navItems: NavItem[] = useMemo(
     () => [
       { id: "menu", icon: Menu, label: t("nav.menu", { defaultValue: "Menu" }) },
-      { id: "quick-tools", icon: Calculator, label: t("nav.quick_tools", { defaultValue: "Rapides" }) },
-      { id: "projects", icon: FolderOpen, label: t("nav.projects", { defaultValue: "Projets" }) },
-      { id: "house", icon: Hammer, label: t("nav.site", { defaultValue: "Chantier" }) },
-      { id: "materials", icon: Package, label: t("nav.materials", { defaultValue: "Matériaux" }) },
-      { id: "settings", icon: Settings, label: t("nav.settings", { defaultValue: "Réglages" }) },
+      { id: "quick-tools", icon: Calculator, label: t("nav.quick_tools", { defaultValue: "Quick" }) },
+      { id: "projects", icon: FolderOpen, label: t("nav.projects", { defaultValue: "Projects" }) },
+      { id: "house", icon: Hammer, label: t("nav.site", { defaultValue: "Site" }) },
+      { id: "materials", icon: Package, label: t("nav.materials", { defaultValue: "Materials" }) },
+      { id: "settings", icon: Settings, label: t("nav.settings", { defaultValue: "Settings" }) },
     ],
     [t]
   );
 
   return (
-    <div className="no-print fixed bottom-3 left-1/2 z-50 w-[min(94vw,720px)] -translate-x-1/2">
-      <div className="rounded-[26px] border border-white/65 bg-white/72 p-1.5 shadow-[0_22px_60px_rgba(15,23,42,0.20)] backdrop-blur-2xl">
-        <div className="grid h-[68px] grid-cols-6 gap-1">
+    <div className="no-print fixed bottom-3 left-1/2 z-50 w-[min(92vw,620px)] -translate-x-1/2">
+      <div className="rounded-[28px] border border-white/70 bg-white/72 p-1.5 shadow-[0_24px_60px_rgba(15,23,42,0.18)] backdrop-blur-2xl">
+        <div className="grid h-[68px] grid-cols-6 gap-1.5">
           {navItems.map((item) => {
             const Icon = item.icon;
             const active = currentTab === item.id;

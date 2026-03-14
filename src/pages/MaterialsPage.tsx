@@ -244,7 +244,7 @@ export const MaterialsPage: React.FC = () => {
       : t("materials.tabs.data", { defaultValue: "Data" });
 
   return (
-    <div className="pb-20 app-shell min-h-screen">
+    <div className="pb-20 min-h-screen bg-transparent">
       <div className="bg-white sticky top-0 z-20 border-b border-slate-200 shadow-sm">
         <div className="p-4 max-w-7xl mx-auto">
           <div className="flex justify-between items-center gap-3 mb-4">
@@ -285,7 +285,7 @@ export const MaterialsPage: React.FC = () => {
                     "px-4 py-2 text-sm font-extrabold rounded-lg whitespace-nowrap transition-colors",
                     activeTab === tb
                       ? "bg-white text-slate-900 shadow"
-                      : "text-slate-700 hover:bg-white/84",
+                      : "text-slate-700 hover:bg-white/70",
                   ].join(" ")}
                   type="button"
                 >
@@ -317,7 +317,7 @@ export const MaterialsPage: React.FC = () => {
               className={`px-3 py-2.5 rounded-lg border flex items-center justify-center gap-2 text-sm font-extrabold transition ${
                 showFavoritesOnly
                   ? "bg-amber-100 border-amber-300 text-amber-700"
-                  : "bg-white border-slate-200 text-slate-600 hover:bg-transparent"
+                  : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
               }`}
               title={t("materials.favorites", { defaultValue: "Favorites" })}
               type="button"
@@ -337,7 +337,7 @@ export const MaterialsPage: React.FC = () => {
                 className={`px-3 py-2 rounded-full text-xs font-extrabold whitespace-nowrap border transition-colors ${
                   categoryFilter === "All"
                     ? "bg-white text-slate-900 border-white shadow-sm"
-                    : "bg-white/40 text-slate-800 border-slate-200 hover:bg-white/84"
+                    : "bg-white/40 text-slate-800 border-slate-200 hover:bg-white/70"
                 }`}
                 type="button"
               >
@@ -412,7 +412,7 @@ export const MaterialsPage: React.FC = () => {
                         </span>
 
                         <div className="flex flex-wrap gap-1.5 mt-1.5">
-                          <span className="text-[10px] uppercase font-extrabold text-slate-800 bg-transparent px-2 py-1 rounded-full border border-slate-200">
+                          <span className="text-[10px] uppercase font-extrabold text-slate-800 bg-slate-50 px-2 py-1 rounded-full border border-slate-200">
                             {item.category}
                           </span>
 
@@ -430,7 +430,7 @@ export const MaterialsPage: React.FC = () => {
                       {item.isModified && (
                         <button
                           onClick={() => handleReset(item.key)}
-                          className="p-2 rounded-lg border border-slate-200 bg-transparent text-slate-700 hover:text-red-600 hover:bg-red-50 transition"
+                          className="p-2 rounded-lg border border-slate-200 bg-slate-50 text-slate-700 hover:text-red-600 hover:bg-red-50 transition"
                           title={t("materials.reset", { defaultValue: "Reset" })}
                           type="button"
                         >
@@ -441,7 +441,7 @@ export const MaterialsPage: React.FC = () => {
                       <button
                         onClick={() => setMappingTarget(item.key)}
                         className={`p-2 rounded-lg border border-slate-200 transition ${
-                          item.isMapped ? "text-emerald-800 bg-emerald-100/70" : "text-slate-700 bg-transparent"
+                          item.isMapped ? "text-emerald-800 bg-emerald-100/70" : "text-slate-700 bg-slate-50"
                         }`}
                         title={t("materials.map", { defaultValue: "Map a material" })}
                         type="button"
@@ -472,7 +472,7 @@ export const MaterialsPage: React.FC = () => {
                       <span className="absolute left-3 top-2 text-slate-500 text-xs mt-0.5">€</span>
                     </div>
 
-                    <span className="text-xs font-semibold text-slate-700 whitespace-nowrap bg-transparent border border-slate-200 px-2.5 py-2 rounded-xl">
+                    <span className="text-xs font-semibold text-slate-700 whitespace-nowrap bg-slate-50 border border-slate-200 px-2.5 py-2 rounded-xl">
                       {String(item.unit || "").replace("€/", "/ ")}
                     </span>
                   </div>
@@ -522,14 +522,14 @@ export const MaterialsPage: React.FC = () => {
             {customMaterials.map((mat) => (
               <div
                 key={mat.id}
-                className="bg-white/84 hover:bg-white/85 transition-colors p-3.5 rounded-2xl border border-slate-200 shadow-sm flex justify-between items-center"
+                className="bg-white/70 hover:bg-white/85 transition-colors p-3.5 rounded-2xl border border-slate-200 shadow-sm flex justify-between items-center"
               >
                 <div className="min-w-0">
                   <span className="font-extrabold text-slate-900 block text-sm truncate">
                     {mat.label}
                   </span>
                   <div className="text-xs text-slate-700 mt-1 flex items-center gap-2 flex-wrap">
-                    <span className="bg-transparent px-2 py-1 rounded-full uppercase border border-slate-200 font-extrabold text-[10px]">
+                    <span className="bg-slate-50 px-2 py-1 rounded-full uppercase border border-slate-200 font-extrabold text-[10px]">
                       {mat.category}
                     </span>
                     <span className="text-slate-400">•</span>
@@ -546,7 +546,7 @@ export const MaterialsPage: React.FC = () => {
                       setEditingCustom(mat);
                       setShowCustomForm(true);
                     }}
-                    className="p-2 text-slate-700 hover:bg-transparent rounded-xl border border-transparent hover:border-slate-200 transition"
+                    className="p-2 text-slate-700 hover:bg-slate-50 rounded-xl border border-transparent hover:border-slate-200 transition"
                     title={t("common.edit", { defaultValue: "Edit" })}
                     type="button"
                   >
@@ -574,7 +574,7 @@ export const MaterialsPage: React.FC = () => {
             ))}
 
             {customMaterials.length === 0 && !showCustomForm && (
-              <div className="text-center py-10 text-slate-400 border-2 border-dashed border-slate-200 rounded-2xl bg-white/84">
+              <div className="text-center py-10 text-slate-400 border-2 border-dashed border-slate-200 rounded-2xl bg-white/70">
                 <Package size={32} className="mx-auto mb-2 opacity-50" />
                 <p className="text-sm">
                   {t("materials.none_custom", { defaultValue: "No custom materials." })}
@@ -623,7 +623,7 @@ export const MaterialsPage: React.FC = () => {
                     onChange={(e) =>
                       handleLaborChange({ globalHourlyRate: parseFloat(e.target.value) })
                     }
-                    className="w-full p-2.5 pl-8 border rounded-xl bg-transparent text-slate-900 font-extrabold"
+                    className="w-full p-2.5 pl-8 border rounded-xl bg-slate-50 text-slate-900 font-extrabold"
                   />
                   <span className="absolute left-3 top-3 text-slate-400 text-xs">€</span>
                 </div>
@@ -657,7 +657,7 @@ export const MaterialsPage: React.FC = () => {
                 <select
                   value={tax.vatRate}
                   onChange={(e) => handleTaxChange({ vatRate: parseFloat(e.target.value) })}
-                  className="w-full p-2.5 border rounded-xl bg-transparent text-sm"
+                  className="w-full p-2.5 border rounded-xl bg-slate-50 text-sm"
                 >
                   <option value={20}>20%</option>
                   <option value={10}>10%</option>
@@ -677,7 +677,7 @@ export const MaterialsPage: React.FC = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <button
                 onClick={handleExport}
-                className="flex flex-col items-center justify-center p-5 border border-slate-200 rounded-2xl hover:bg-transparent transition-colors"
+                className="flex flex-col items-center justify-center p-5 border border-slate-200 rounded-2xl hover:bg-slate-50 transition-colors"
                 type="button"
               >
                 <Download size={26} className="text-blue-600 mb-2" />
@@ -686,7 +686,7 @@ export const MaterialsPage: React.FC = () => {
                 </span>
               </button>
 
-              <label className="flex flex-col items-center justify-center p-5 border border-slate-200 rounded-2xl hover:bg-transparent transition-colors cursor-pointer">
+              <label className="flex flex-col items-center justify-center p-5 border border-slate-200 rounded-2xl hover:bg-slate-50 transition-colors cursor-pointer">
                 <Upload size={26} className="text-emerald-600 mb-2" />
                 <span className="text-sm font-extrabold text-slate-700">
                   {t("materials.import_json", { defaultValue: "Import JSON" })}
@@ -726,7 +726,7 @@ export const MaterialsPage: React.FC = () => {
             <div className="flex-1 overflow-y-auto p-2">
               <button
                 onClick={() => handleMapping(mappingTarget, null)}
-                className="w-full text-left p-3 rounded hover:bg-transparent text-sm text-red-600 font-extrabold border-b border-slate-100"
+                className="w-full text-left p-3 rounded hover:bg-slate-50 text-sm text-red-600 font-extrabold border-b border-slate-100"
                 type="button"
               >
                 {t("materials.map_none", { defaultValue: "No mapping (default)" })}
