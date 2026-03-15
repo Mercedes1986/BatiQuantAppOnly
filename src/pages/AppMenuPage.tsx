@@ -21,19 +21,19 @@ type SectionCard = {
   tone: string;
 };
 
-const MainCard: React.FC<{ card: SectionCard; onClick: () => void }> = ({ card, onClick }) => (
+const MainCard: React.FC<{ card: SectionCard; onClick: () => void; cta: string }> = ({ card, onClick, cta }) => (
   <button
     onClick={onClick}
     type="button"
-    className="group app-card w-full rounded-[28px] p-4 text-left transition-all hover:-translate-y-0.5 hover:shadow-[0_24px_55px_rgba(15,23,42,0.12)]"
+    className="group app-card w-full rounded-[24px] p-4 sm:rounded-[28px] sm:p-5 text-left transition-all hover:-translate-y-0.5 hover:shadow-[0_24px_55px_rgba(15,23,42,0.12)]"
   >
-    <div className="mb-8 flex items-start justify-between gap-3">
-      <div className={`flex h-12 w-12 items-center justify-center rounded-2xl ${card.tone}`}>{card.icon}</div>
-      <ChevronRight size={18} className="text-slate-400 transition-transform group-hover:translate-x-0.5" />
+    <div className="mb-5 flex items-start justify-between gap-3 sm:mb-8">
+      <div className={`flex h-11 w-11 items-center justify-center rounded-2xl sm:h-12 sm:w-12 ${card.tone}`}>{card.icon}</div>
+      <ChevronRight size={18} className="shrink-0 text-slate-400 transition-transform group-hover:translate-x-0.5" />
     </div>
-    <div className="text-[30px] font-extrabold leading-none text-slate-900 sm:text-[32px]">{card.title}</div>
-    <p className="mt-3 text-sm leading-relaxed text-slate-500">{card.desc}</p>
-    <div className="mt-5 text-sm font-extrabold text-blue-700">Open</div>
+    <div className="text-[24px] font-extrabold leading-tight text-slate-900 sm:text-[30px] sm:leading-none">{card.title}</div>
+    <p className="mt-2.5 text-sm leading-relaxed text-slate-500 sm:mt-3">{card.desc}</p>
+    <div className="mt-4 text-sm font-extrabold text-blue-700 sm:mt-5">{cta}</div>
   </button>
 );
 
@@ -41,20 +41,22 @@ const SecondaryCard: React.FC<{ card: SectionCard; onClick: () => void }> = ({ c
   <button
     type="button"
     onClick={onClick}
-    className="group flex items-center gap-3 rounded-[22px] border border-white/70 bg-white/62 px-4 py-4 text-left shadow-[0_12px_28px_rgba(15,23,42,0.05)] backdrop-blur-xl transition-colors hover:bg-white/78"
+    className="group flex items-center gap-3 rounded-[20px] border border-white/70 bg-white/62 px-4 py-3.5 text-left shadow-[0_12px_28px_rgba(15,23,42,0.05)] backdrop-blur-xl transition-colors hover:bg-white/78 sm:rounded-[22px] sm:py-4"
   >
-    <div className={`flex h-10 w-10 items-center justify-center rounded-2xl ${card.tone}`}>{card.icon}</div>
+    <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl ${card.tone}`}>{card.icon}</div>
     <div className="min-w-0 flex-1">
-      <div className="text-sm font-extrabold text-slate-900 truncate">{card.title}</div>
-      <div className="text-xs text-slate-500 line-clamp-1">{card.desc}</div>
+      <div className="text-sm font-extrabold text-slate-900">{card.title}</div>
+      <div className="mt-0.5 text-xs leading-relaxed text-slate-500 line-clamp-2">{card.desc}</div>
     </div>
-    <ChevronRight size={18} className="text-slate-400" />
+    <ChevronRight size={18} className="shrink-0 text-slate-400" />
   </button>
 );
 
 export const AppMenuPage: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+
+  const openLabel = t("common.open", { defaultValue: "Open" });
 
   const mainCards: SectionCard[] = useMemo(
     () => [
@@ -111,19 +113,19 @@ export const AppMenuPage: React.FC = () => {
   );
 
   return (
-    <div className="app-shell app-shell--menu min-h-screen bg-transparent pb-24">
-      <div className="page-narrow">
-        <section className="glass-panel rounded-[32px] p-4 sm:p-5">
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex min-w-0 items-center gap-3">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-blue-600 text-white shadow-[0_14px_30px_rgba(37,99,235,0.28)]">
+    <div className="app-shell app-shell--menu min-h-screen bg-transparent">
+      <div className="page-narrow space-y-4">
+        <section className="glass-panel rounded-[28px] p-4 sm:rounded-[32px] sm:p-5">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex min-w-0 items-start gap-3">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-blue-600 text-white shadow-[0_14px_30px_rgba(37,99,235,0.28)] sm:h-12 sm:w-12">
                 <LayoutGrid size={20} />
               </div>
-              <div className="min-w-0">
-                <h1 className="truncate text-[30px] font-extrabold tracking-tight text-slate-900 sm:text-[32px]">
+              <div className="min-w-0 flex-1">
+                <h1 className="text-[26px] font-extrabold tracking-tight leading-tight text-slate-900 sm:text-[32px]">
                   {t("menu.title", { defaultValue: "App menu" })}
                 </h1>
-                <p className="truncate text-sm text-slate-500">
+                <p className="mt-1 text-sm leading-relaxed text-slate-500 sm:text-[15px]">
                   {t("menu.subtitle", { defaultValue: "Quick access to sections + tools" })}
                 </p>
               </div>
@@ -131,27 +133,27 @@ export const AppMenuPage: React.FC = () => {
 
             <button
               onClick={() => navigate("/app/projects")}
-              className="inline-flex shrink-0 items-center rounded-[22px] border border-white/70 bg-white/70 px-4 py-3 text-sm font-extrabold text-slate-700 shadow-[0_12px_28px_rgba(15,23,42,0.06)] backdrop-blur-xl transition-colors hover:bg-white/85"
+              className="inline-flex w-full items-center justify-center rounded-[18px] border border-white/70 bg-white/70 px-4 py-3 text-sm font-extrabold text-slate-700 shadow-[0_12px_28px_rgba(15,23,42,0.06)] backdrop-blur-xl transition-colors hover:bg-white/85 sm:w-auto sm:justify-start sm:rounded-[22px]"
               type="button"
             >
-              <ArrowLeft size={16} className="mr-2" />
-              {t("menu.back_dashboard", { defaultValue: "Dashboard" })}
+              <ArrowLeft size={16} className="mr-2 shrink-0" />
+              <span className="truncate">{t("menu.back_dashboard", { defaultValue: "Dashboard" })}</span>
             </button>
           </div>
         </section>
 
-        <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           {mainCards.map((card) => (
-            <MainCard key={card.path} card={card} onClick={() => navigate(card.path)} />
+            <MainCard key={card.path} card={card} cta={openLabel} onClick={() => navigate(card.path)} />
           ))}
         </div>
 
-        <section className="app-card-soft mt-4 rounded-[30px] p-4 sm:p-5">
+        <section className="app-card-soft rounded-[24px] p-4 sm:rounded-[30px] sm:p-5">
           <div className="mb-3">
-            <h2 className="text-xl font-extrabold text-slate-900">
+            <h2 className="text-lg font-extrabold text-slate-900 sm:text-xl">
               {t("menu.secondary.title", { defaultValue: "More options" })}
             </h2>
-            <p className="mt-1 text-sm text-slate-500">
+            <p className="mt-1 text-sm leading-relaxed text-slate-500">
               {t("menu.secondary.subtitle", { defaultValue: "Backup and app settings." })}
             </p>
           </div>

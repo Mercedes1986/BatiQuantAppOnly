@@ -8,12 +8,6 @@ interface CalculatorCardProps {
   onClick: () => void;
 }
 
-/**
- * Update goals:
- * - Keep the same i18n key: calculator.open
- * - Replace FR defaultValue -> EN to prevent FR fallback ("Franglais") if EN key is missing
- * - Minor a11y: add type="button"
- */
 export const CalculatorCard: React.FC<CalculatorCardProps> = ({ config, onClick }) => {
   const { t } = useTranslation();
   const IconComponent = (Icons as any)[config.icon] || Icons.Calculator;
@@ -23,14 +17,14 @@ export const CalculatorCard: React.FC<CalculatorCardProps> = ({ config, onClick 
     <button
       type="button"
       onClick={onClick}
-      className="group w-full text-left bg-white rounded-2xl border border-slate-100 shadow-sm hover:border-blue-200 hover:shadow-md active:scale-[0.99] transition-all overflow-hidden"
+      className="group app-card w-full overflow-hidden rounded-[24px] text-left transition-all hover:border-blue-200 hover:shadow-md active:scale-[0.99]"
     >
-      <div className="relative h-[92px] sm:h-[104px]">
+      <div className="relative h-[104px] sm:h-[112px]">
         {config.imageSrc && imgOk ? (
           <img
             src={config.imageSrc}
             alt={config.imageAlt || config.name}
-            className="absolute inset-0 w-full h-full object-cover"
+            className="absolute inset-0 h-full w-full object-cover"
             loading="lazy"
             decoding="async"
             onError={() => setImgOk(false)}
@@ -39,37 +33,33 @@ export const CalculatorCard: React.FC<CalculatorCardProps> = ({ config, onClick 
           <div className="absolute inset-0 bg-gradient-to-br from-slate-100 to-slate-200" />
         )}
 
-        <div className="absolute inset-0 bg-black/10" />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/55 via-black/25 to-transparent" />
+        <div className="absolute inset-0 bg-black/15" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent" />
 
-        <div className="relative h-full p-3 pr-14 flex flex-col justify-center">
-          <h3 className="text-[15px] sm:text-base font-extrabold text-white leading-tight drop-shadow-sm truncate">
+        <div className="relative flex h-full flex-col justify-center p-3 pr-12 sm:p-4 sm:pr-14">
+          <h3 className="line-clamp-2 text-[15px] font-extrabold leading-tight text-white drop-shadow-sm sm:text-base">
             {config.name}
           </h3>
-          <p className="text-[12px] sm:text-sm text-white/90 leading-snug line-clamp-2 drop-shadow-sm">
+          <p className="mt-1 line-clamp-2 text-[12px] leading-snug text-white/90 drop-shadow-sm sm:text-sm">
             {config.description}
           </p>
         </div>
 
-        <div
-          className={`absolute top-3 right-3 p-2 rounded-xl ${config.color} text-white shadow-md border border-white/70`}
-        >
+        <div className={`absolute right-3 top-3 rounded-xl border border-white/70 p-2 ${config.color} text-white shadow-md`}>
           <IconComponent size={16} />
         </div>
 
-        <div className="absolute bottom-3 right-3 text-white/80 group-hover:text-white transition-colors drop-shadow">
+        <div className="absolute bottom-3 right-3 text-white/80 transition-colors drop-shadow group-hover:text-white">
           <Icons.ChevronRight size={18} />
         </div>
       </div>
 
-      <div className="h-10 px-3 flex items-center justify-between">
-        <div className="flex items-center gap-2 text-xs text-slate-500">
-          <Icons.Sparkles size={14} className="text-slate-300" />
-          <span className="truncate">
-            {t("calculator.open", { defaultValue: "Open calculator" })}
-          </span>
+      <div className="flex min-h-[42px] items-center justify-between px-3 py-2.5 sm:min-h-[44px] sm:px-4">
+        <div className="flex min-w-0 items-center gap-2 text-xs text-slate-500">
+          <Icons.Sparkles size={14} className="shrink-0 text-slate-300" />
+          <span className="truncate">{t("calculator.open", { defaultValue: "Open calculator" })}</span>
         </div>
-        <span className="text-[11px] text-slate-400"> </span>
+        <span className="text-[11px] text-slate-400" />
       </div>
     </button>
   );

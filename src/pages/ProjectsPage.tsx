@@ -101,7 +101,7 @@ export const ProjectsPage: React.FC = () => {
     }));
 
     return (
-      <div className="pb-20 bg-transparent min-h-screen relative">
+      <div className="app-shell app-shell--projects min-h-screen bg-transparent relative">
         <div className="sticky top-0 z-30 border-b border-slate-200/80 bg-white/80 backdrop-blur-xl shadow-sm no-print">
           <div className="mx-auto max-w-6xl px-4 py-3 flex items-center justify-between gap-3">
             <button
@@ -144,7 +144,7 @@ export const ProjectsPage: React.FC = () => {
           </div>
         </div>
 
-        <div className="max-w-6xl mx-auto p-4 md:p-6 printable-content space-y-4">
+        <div className="page-frame printable-content space-y-4">
           <section className="rounded-[28px] border border-slate-200/80 bg-white/72 backdrop-blur-md shadow-sm overflow-hidden print:bg-white">
             <div className="p-5 md:p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div>
@@ -261,8 +261,8 @@ export const ProjectsPage: React.FC = () => {
   }
 
   return (
-    <div className="p-4 pb-24 bg-transparent min-h-screen">
-      <div className="max-w-6xl mx-auto space-y-4">
+    <div className="app-shell app-shell--projects min-h-screen bg-transparent">
+      <div className="page-frame space-y-4">
         <section className="rounded-[28px] border border-slate-200/80 bg-white/72 backdrop-blur-md shadow-sm p-5 md:p-6">
           <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 mb-4">
             <div>
@@ -333,7 +333,7 @@ export const ProjectsPage: React.FC = () => {
                 <div
                   key={project.id}
                   onClick={() => setSelectedProject(project)}
-                  className="bg-white/72 backdrop-blur-sm p-5 rounded-[24px] shadow-sm border border-slate-200/80 flex justify-between items-center active:scale-[0.98] transition-all cursor-pointer hover:border-blue-200"
+                  className="app-card p-4 sm:p-5 rounded-[24px] shadow-sm border border-slate-200/80 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between active:scale-[0.98] transition-all cursor-pointer hover:border-blue-200"
                 >
                   <div>
                     <h3 className="font-extrabold text-slate-800 text-lg">{project.name}</h3>
@@ -343,7 +343,7 @@ export const ProjectsPage: React.FC = () => {
                     </p>
                   </div>
 
-                  <div className="flex items-center space-x-3">
+                  <div className="flex items-center gap-3">
                     <span className="font-extrabold text-slate-700 bg-slate-100/90 px-3 py-1.5 rounded-xl text-sm border border-slate-200">
                       {euro.format(total)}
                     </span>

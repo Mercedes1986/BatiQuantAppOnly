@@ -219,7 +219,7 @@ export const HouseProjectPage: React.FC = () => {
     const totalBudget = getProjectTotal(currentProject);
 
     return (
-      <div className="app-shell app-shell--house min-h-screen bg-transparent pb-20">
+      <div className="app-shell app-shell--house min-h-screen bg-transparent">
         <div className="sticky top-0 z-20 border-b border-slate-200/80 bg-white/80 backdrop-blur-xl shadow-sm">
           <div className="p-4 flex items-center justify-between">
             <button
@@ -273,7 +273,7 @@ export const HouseProjectPage: React.FC = () => {
           </div>
         </div>
 
-        <div className="max-w-6xl mx-auto p-4 space-y-4">
+        <div className="page-frame space-y-4">
           {activeTab === "steps" && (
             <>
               {isEditingParams ? (
@@ -561,8 +561,8 @@ export const HouseProjectPage: React.FC = () => {
 
   // ===== LIST PAGE (same aesthetic as Projects) =====
   return (
-    <div className="app-shell app-shell--house min-h-screen bg-transparent p-4 pb-20">
-      <div className="max-w-6xl mx-auto space-y-4">
+    <div className="app-shell app-shell--house min-h-screen bg-transparent">
+      <div className="page-frame space-y-4">
       <section className="rounded-[28px] border border-slate-200/80 bg-white/72 backdrop-blur-md shadow-sm p-5 md:p-6">
       <div className="mb-3">
         <h1 className="text-2xl font-extrabold text-slate-800">
@@ -681,7 +681,7 @@ export const HouseProjectPage: React.FC = () => {
               <div
                 key={p.id}
                 onClick={() => selectProject(p)}
-                className="bg-white/72 backdrop-blur-sm p-4 rounded-[24px] shadow-sm border border-slate-200/80 flex justify-between items-center cursor-pointer active:scale-[0.98] transition-transform hover:border-blue-200"
+                className="app-card p-4 rounded-[24px] shadow-sm border border-slate-200/80 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between cursor-pointer active:scale-[0.98] transition-transform hover:border-blue-200"
               >
                 <div className="flex items-center space-x-4">
                   <div className="bg-blue-100 p-3 rounded-full text-blue-600">

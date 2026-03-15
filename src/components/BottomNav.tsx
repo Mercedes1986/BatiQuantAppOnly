@@ -29,9 +29,9 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, onChange }) =>
   );
 
   return (
-    <div className="no-print fixed bottom-3 left-1/2 z-50 w-[min(92vw,620px)] -translate-x-1/2">
+    <div className="no-print fixed bottom-3 left-1/2 z-50 w-[min(96vw,680px)] -translate-x-1/2 px-1 sm:px-0">
       <div className="rounded-[28px] border border-white/70 bg-white/72 p-1.5 shadow-[0_24px_60px_rgba(15,23,42,0.18)] backdrop-blur-2xl">
-        <div className="grid h-[68px] grid-cols-6 gap-1.5">
+        <div className="grid min-h-[72px] grid-cols-6 gap-1 sm:min-h-[68px] sm:gap-1.5">
           {navItems.map((item) => {
             const Icon = item.icon;
             const active = currentTab === item.id;
@@ -43,14 +43,20 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, onChange }) =>
                 onClick={() => onChange(item.id)}
                 aria-current={active ? "page" : undefined}
                 aria-label={item.label}
-                className={`flex h-full flex-col items-center justify-center rounded-[20px] transition-all duration-200 ${
+                className={[
+                  "flex h-full min-w-0 flex-col items-center justify-center rounded-[18px] px-1 py-2 text-center transition-all duration-200",
                   active
                     ? "bg-gradient-to-b from-blue-600 to-blue-500 text-white shadow-[0_10px_24px_rgba(37,99,235,0.35)]"
-                    : "text-slate-500 hover:bg-white/70 hover:text-slate-700"
-                }`}
+                    : "text-slate-500 hover:bg-white/70 hover:text-slate-700",
+                ].join(" ")}
               >
-                <Icon size={active ? 21 : 19} strokeWidth={active ? 2.4 : 2.1} />
-                <span className={`mt-1 text-[10px] font-bold leading-none ${active ? "text-white" : ""}`}>
+                <Icon size={active ? 20 : 18} strokeWidth={active ? 2.35 : 2.1} />
+                <span
+                  className={[
+                    "mt-1 max-w-full overflow-hidden text-ellipsis whitespace-nowrap px-0.5 text-[9px] font-extrabold leading-none sm:text-[10px]",
+                    active ? "text-white" : "",
+                  ].join(" ")}
+                >
                   {item.label}
                 </span>
               </button>
