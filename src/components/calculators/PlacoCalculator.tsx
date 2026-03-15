@@ -491,7 +491,7 @@ export const PlacoCalculator: React.FC<Props> = ({
   }, [calculationData, onCalculate, mode, frameType, t]);
 
   return (
-    <div className="space-y-6 rounded-[32px] border border-white/70 bg-white/72 p-3 sm:p-4 shadow-[0_24px_70px_rgba(15,23,42,0.10)] backdrop-blur-xl sm:p-6">
+    <div className="space-y-6 rounded-[32px] border border-white/70 bg-white/72 p-3 sm:p-4 shadow-[0_24px_70px_rgba(15,23,42,0.10)] backdrop-blur-xl lg:p-6">
       {/* Mode tabs */}
       {!hideTabs && (
         <div className="flex rounded-[24px] border border-white/80 bg-slate-100/70 p-1.5 shadow-inner backdrop-blur-xl mb-4">

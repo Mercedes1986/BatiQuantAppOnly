@@ -546,9 +546,8 @@ export const ElectricityCalculator: React.FC<Props> = ({ onCalculate }) => {
   }, [calculationData, onCalculate, t]);
 
   return (
-    <div className="space-y-6 rounded-[32px] border border-white/70 bg-white/72 p-3 sm:p-4 shadow-[0_24px_70px_rgba(15,23,42,0.10)] backdrop-blur-xl sm:p-6">
-      {/* Navigation */}
-      <div className="flex justify-between items-center mb-6 rounded-[24px] border border-white/80 bg-slate-100/70 p-1.5 shadow-inner overflow-x-auto no-scrollbar backdrop-blur-xl">
+<div className="space-y-6 rounded-[32px] border border-white/70 bg-white/72 p-3 shadow-[0_24px_70px_rgba(15,23,42,0.10)] backdrop-blur-xl sm:p-4 lg:p-6">      {/* Navigation */}
+      <div className="flex justify-between items-center mb-6 rounded-[24px] border border-white/80 bg-slate-100/70 p-1.5 shadow-inner overflow-x-auto backdrop-blur-xl">
         {[1, 2, 3, 4].map((s) => (
           <button
             key={s}
@@ -594,15 +593,15 @@ export const ElectricityCalculator: React.FC<Props> = ({ onCalculate }) => {
                   </button>
                 </div>
 
-                <div className="p-3 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div className="p-3 grid grid-cols-2 gap-2">
                   {room.points.map((p) => (
-                    <div key={p.id} className="flex flex-wrap items-center justify-between gap-2 bg-slate-50 p-2 rounded border border-slate-100">
+                    <div key={p.id} className="flex items-center justify-between bg-slate-50 p-2 rounded border border-slate-100">
                       <div className="flex items-center min-w-0">
                         {p.type === "socket" && <Power size={14} className="text-slate-400 mr-2" />}
                         {p.type === "light" && <Lightbulb size={14} className="text-yellow-500 mr-2" />}
                         {p.type === "switch" && <ToggleLeft size={14} className="text-slate-400 mr-2" />}
                         {p.type === "network" && <Wifi size={14} className="text-slate-400 mr-2" />}
-                        <span className="text-xs font-medium break-words pr-1">{p.label}</span>
+                        <span className="text-xs font-medium truncate pr-1">{p.label}</span>
                       </div>
                       <div className="flex items-center space-x-1">
                         <button
@@ -627,22 +626,22 @@ export const ElectricityCalculator: React.FC<Props> = ({ onCalculate }) => {
                   ))}
 
                   <div className="col-span-2 pt-2 flex flex-wrap gap-2 justify-center border-t border-slate-100 mt-1">
-                    <button type="button" onClick={() => addPointToRoom(room.id, "socket")} className="px-2 py-1 text-[11px] bg-white border rounded hover:bg-slate-50">
+                    <button type="button" onClick={() => addPointToRoom(room.id, "socket")} className="px-2 py-1 text-[10px] bg-white border rounded hover:bg-slate-50">
                       + {t("calc.electricity.quick_add.socket", { defaultValue: "Prise" })}
                     </button>
-                    <button type="button" onClick={() => addPointToRoom(room.id, "light")} className="px-2 py-1 text-[11px] bg-white border rounded hover:bg-slate-50">
+                    <button type="button" onClick={() => addPointToRoom(room.id, "light")} className="px-2 py-1 text-[10px] bg-white border rounded hover:bg-slate-50">
                       + {t("calc.electricity.quick_add.light", { defaultValue: "Lampe" })}
                     </button>
-                    <button type="button" onClick={() => addPointToRoom(room.id, "switch")} className="px-2 py-1 text-[11px] bg-white border rounded hover:bg-slate-50">
+                    <button type="button" onClick={() => addPointToRoom(room.id, "switch")} className="px-2 py-1 text-[10px] bg-white border rounded hover:bg-slate-50">
                       + {t("calc.electricity.quick_add.switch", { defaultValue: "Inter" })}
                     </button>
-                    <button type="button" onClick={() => addPointToRoom(room.id, "shutter")} className="px-2 py-1 text-[11px] bg-white border rounded hover:bg-slate-50">
+                    <button type="button" onClick={() => addPointToRoom(room.id, "shutter")} className="px-2 py-1 text-[10px] bg-white border rounded hover:bg-slate-50">
                       + {t("calc.electricity.quick_add.shutter", { defaultValue: "Volet" })}
                     </button>
-                    <button type="button" onClick={() => addPointToRoom(room.id, "heater")} className="px-2 py-1 text-[11px] bg-white border rounded hover:bg-slate-50">
+                    <button type="button" onClick={() => addPointToRoom(room.id, "heater")} className="px-2 py-1 text-[10px] bg-white border rounded hover:bg-slate-50">
                       + {t("calc.electricity.quick_add.heater", { defaultValue: "Chauff." })}
                     </button>
-                    <button type="button" onClick={() => addPointToRoom(room.id, "network")} className="px-2 py-1 text-[11px] bg-white border rounded hover:bg-slate-50">
+                    <button type="button" onClick={() => addPointToRoom(room.id, "network")} className="px-2 py-1 text-[10px] bg-white border rounded hover:bg-slate-50">
                       + {t("calc.electricity.quick_add.network", { defaultValue: "RJ45" })}
                     </button>
                   </div>
@@ -692,7 +691,7 @@ export const ElectricityCalculator: React.FC<Props> = ({ onCalculate }) => {
           </div>
 
           <div className="bg-white p-3 rounded-xl border border-slate-200 space-y-3">
-            <label className="flex flex-wrap items-center justify-between gap-2 p-2 hover:bg-slate-50 rounded cursor-pointer">
+            <label className="flex items-center justify-between p-2 hover:bg-slate-50 rounded cursor-pointer">
               <div>
                 <span className="text-sm font-medium block">{t("calc.electricity.config.renovation", { defaultValue: "Renovation" })}</span>
                 <span className="text-xs text-slate-400">{t("calc.electricity.config.renovation_help", { defaultValue: "Surface trunking / chases (vs in-wall)" })}</span>
@@ -739,33 +738,33 @@ export const ElectricityCalculator: React.FC<Props> = ({ onCalculate }) => {
               </button>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-[11px] text-slate-500 mb-1">{t("calc.electricity.prices.socket", { defaultValue: "Socket 16A (€)" })}</label>
+                <label className="block text-[10px] text-slate-500 mb-1">{t("calc.electricity.prices.socket", { defaultValue: "Socket 16A (€)" })}</label>
                 <input type="number" value={prices.socket} onChange={(e) => updatePrice("socket", e.target.value)} className="w-full p-1.5 border rounded text-sm" />
               </div>
               <div>
-                <label className="block text-[11px] text-slate-500 mb-1">{t("calc.electricity.prices.switch", { defaultValue: "Switch (€)" })}</label>
+                <label className="block text-[10px] text-slate-500 mb-1">{t("calc.electricity.prices.switch", { defaultValue: "Switch (€)" })}</label>
                 <input type="number" value={prices.switch} onChange={(e) => updatePrice("switch", e.target.value)} className="w-full p-1.5 border rounded text-sm" />
               </div>
               <div>
-                <label className="block text-[11px] text-slate-500 mb-1">{t("calc.electricity.prices.breaker", { defaultValue: "Breaker (€)" })}</label>
+                <label className="block text-[10px] text-slate-500 mb-1">{t("calc.electricity.prices.breaker", { defaultValue: "Breaker (€)" })}</label>
                 <input type="number" value={prices.breaker} onChange={(e) => updatePrice("breaker", e.target.value)} className="w-full p-1.5 border rounded text-sm" />
               </div>
               <div>
-                <label className="block text-[11px] text-slate-500 mb-1">{t("calc.electricity.prices.cable25", { defaultValue: "Wire 2.5mm² (€/m)" })}</label>
+                <label className="block text-[10px] text-slate-500 mb-1">{t("calc.electricity.prices.cable25", { defaultValue: "Wire 2.5mm² (€/m)" })}</label>
                 <input type="number" value={prices.cable25} onChange={(e) => updatePrice("cable25", e.target.value)} className="w-full p-1.5 border rounded text-sm" />
               </div>
             </div>
 
             {proMode && (
-              <div className="mt-4 pt-3 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="mt-4 pt-3 border-t border-slate-100 grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[11px] text-blue-600 font-bold mb-1">{t("calc.electricity.prices.labor_point", { defaultValue: "Labor per point (€)" })}</label>
+                  <label className="block text-[10px] text-blue-600 font-bold mb-1">{t("calc.electricity.prices.labor_point", { defaultValue: "Labor per point (€)" })}</label>
                   <input type="number" value={prices.laborPoint} onChange={(e) => updatePrice("laborPoint", e.target.value)} className="w-full p-1.5 border border-blue-200 rounded text-sm" />
                 </div>
                 <div>
-                  <label className="block text-[11px] text-blue-600 font-bold mb-1">{t("calc.electricity.prices.labor_panel", { defaultValue: "Panel labor (fixed) (€)" })}</label>
+                  <label className="block text-[10px] text-blue-600 font-bold mb-1">{t("calc.electricity.prices.labor_panel", { defaultValue: "Panel labor (fixed) (€)" })}</label>
                   <input type="number" value={prices.laborPanel} onChange={(e) => updatePrice("laborPanel", e.target.value)} className="w-full p-1.5 border border-blue-200 rounded text-sm" />
                 </div>
               </div>

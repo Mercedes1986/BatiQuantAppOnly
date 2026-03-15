@@ -654,7 +654,7 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
     });
 
   return (
-    <div className="space-y-6 rounded-[32px] border border-white/70 bg-white/72 p-3 sm:p-4 shadow-[0_24px_70px_rgba(15,23,42,0.10)] backdrop-blur-xl sm:p-6">
+    <div className="space-y-6 rounded-[32px] border border-white/70 bg-white/72 p-3 sm:p-4 shadow-[0_24px_70px_rgba(15,23,42,0.10)] backdrop-blur-xl lg:p-6">
       {/* Step Navigation */}
       <div className="flex justify-between items-center mb-6 bg-slate-50 p-1 rounded-lg">
         {[1, 2, 3, 4].map((s) => (
