@@ -468,9 +468,9 @@ export const ScreedCalculator: React.FC<Props> = ({ onCalculate }) => {
   }, [calculationData, onCalculate, t, zones.length]);
 
   return (
-    <div className="space-y-6 rounded-[32px] border border-white/70 bg-white/72 p-3 sm:p-4 shadow-[0_24px_70px_rgba(15,23,42,0.10)] backdrop-blur-xl sm:p-6">
+    <div className="space-y-6 rounded-[32px] border border-white/70 bg-white/72 p-3 shadow-[0_24px_70px_rgba(15,23,42,0.10)] backdrop-blur-xl sm:p-4 lg:p-6">
       {/* Navigation */}
-      <div className="flex justify-between items-center mb-6 rounded-[24px] border border-white/80 bg-slate-100/70 p-1.5 shadow-inner overflow-x-auto no-scrollbar backdrop-blur-xl">
+      <div className="flex justify-between items-center mb-6 rounded-[24px] border border-white/80 bg-slate-100/70 p-1.5 shadow-inner overflow-x-auto backdrop-blur-xl">
         {[1, 2, 3, 4].map((s) => (
           <button
             key={s}
@@ -518,12 +518,12 @@ export const ScreedCalculator: React.FC<Props> = ({ onCalculate }) => {
                   </button>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-slate-700">
+                <div className="grid grid-cols-2 gap-3 text-sm text-slate-700">
                   <div>{t("calc.screed.zone_area_line", { area: z.area })}</div>
                   <div>{t("calc.screed.zone_thick_line", { thick: z.thickness })}</div>
                 </div>
 
-                <div className="mt-2 pt-2 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2">
+                <div className="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between">
                   <label className="flex items-center text-xs text-slate-600">
                     <input
                       type="checkbox"
@@ -559,7 +559,7 @@ export const ScreedCalculator: React.FC<Props> = ({ onCalculate }) => {
             ))}
 
             <div className="bg-slate-50 p-3 rounded-lg border border-blue-200">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 mb-2">
+              <div className="grid grid-cols-3 gap-2 mb-2">
                 <div className="col-span-3">
                   <input
                     type="text"
@@ -609,18 +609,18 @@ export const ScreedCalculator: React.FC<Props> = ({ onCalculate }) => {
           </div>
 
           <div className="space-y-3 bg-white p-3 rounded-xl border border-slate-200">
-            <label className="flex flex-wrap items-center justify-between gap-2 p-2 hover:bg-slate-50 rounded cursor-pointer">
+            <label className="flex items-center justify-between p-2 hover:bg-slate-50 rounded cursor-pointer">
               <span className="text-sm font-medium">{t("calc.screed.opt_polyane")}</span>
               <input type="checkbox" checked={usePolyane} onChange={(e) => setUsePolyane(e.target.checked)} className="h-5 w-5 text-blue-600 rounded" />
             </label>
 
-            <label className="flex flex-wrap items-center justify-between gap-2 p-2 hover:bg-slate-50 rounded cursor-pointer">
+            <label className="flex items-center justify-between p-2 hover:bg-slate-50 rounded cursor-pointer">
               <span className="text-sm font-medium">{t("calc.screed.opt_strip")}</span>
               <input type="checkbox" checked={useStrip} onChange={(e) => setUseStrip(e.target.checked)} className="h-5 w-5 text-blue-600 rounded" />
             </label>
 
             <div className="border-t border-slate-100 pt-2">
-              <label className="flex flex-wrap items-center justify-between gap-2 p-2 hover:bg-slate-50 rounded cursor-pointer">
+              <label className="flex items-center justify-between p-2 hover:bg-slate-50 rounded cursor-pointer">
                 <span className="text-sm font-medium">{t("calc.screed.opt_insulation")}</span>
                 <input type="checkbox" checked={useInsulation} onChange={(e) => setUseInsulation(e.target.checked)} className="h-5 w-5 text-blue-600 rounded" />
               </label>
@@ -656,7 +656,7 @@ export const ScreedCalculator: React.FC<Props> = ({ onCalculate }) => {
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-2">{t("calc.screed.reinforce_title")}</label>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+              <div className="grid grid-cols-3 gap-2">
                 {(["none", "mesh", "fiber"] as ReinforceType[]).map((r) => (
                   <button
                     key={r}
@@ -722,7 +722,7 @@ export const ScreedCalculator: React.FC<Props> = ({ onCalculate }) => {
                 <div>
                   <label className="block text-xs font-bold text-slate-500 uppercase mb-1">{t("calc.screed.light_bag_vol")}</label>
                   <input type="number" value={lightBagVol} onChange={(e) => setLightBagVol(Math.max(1, Math.floor(toNum(e.target.value, 15))))} className="w-full p-2 border rounded bg-white text-slate-900" />
-                  <p className="text-[11px] text-slate-400 mt-1">{t("calc.screed.light_bag_help")}</p>
+                  <p className="text-[10px] text-slate-400 mt-1">{t("calc.screed.light_bag_help")}</p>
                 </div>
               )}
 
@@ -734,7 +734,7 @@ export const ScreedCalculator: React.FC<Props> = ({ onCalculate }) => {
               )}
             </div>
 
-            <label className="flex flex-wrap items-center justify-between gap-2 p-3 bg-white border rounded-lg cursor-pointer">
+            <label className="flex items-center justify-between p-3 bg-white border rounded-lg cursor-pointer">
               <span className="text-sm font-medium">{t("calc.screed.use_joints")}</span>
               <input type="checkbox" checked={useJoints} onChange={(e) => setUseJoints(e.target.checked)} className="h-5 w-5 text-blue-600 rounded" />
             </label>
@@ -767,15 +767,15 @@ export const ScreedCalculator: React.FC<Props> = ({ onCalculate }) => {
               </button>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-3">
               {(screedType === "trad" || screedType === "ravoirage") && (
                 <>
                   <div>
-                    <label className="block text-[11px] text-slate-500 mb-1">{t("calc.screed.price.cement")}</label>
+                    <label className="block text-[10px] text-slate-500 mb-1">{t("calc.screed.price.cement")}</label>
                     <input type="number" value={prices.cementBag} onChange={(e) => updatePrice("cementBag", e.target.value)} className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl" />
                   </div>
                   <div>
-                    <label className="block text-[11px] text-slate-500 mb-1">{t("calc.screed.price.sand")}</label>
+                    <label className="block text-[10px] text-slate-500 mb-1">{t("calc.screed.price.sand")}</label>
                     <input type="number" value={prices.sandTon} onChange={(e) => updatePrice("sandTon", e.target.value)} className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl" />
                   </div>
                 </>
@@ -783,70 +783,70 @@ export const ScreedCalculator: React.FC<Props> = ({ onCalculate }) => {
 
               {screedType === "light" && (
                 <div>
-                  <label className="block text-[11px] text-slate-500 mb-1">{t("calc.screed.price.premix")}</label>
+                  <label className="block text-[10px] text-slate-500 mb-1">{t("calc.screed.price.premix")}</label>
                   <input type="number" value={prices.premixBag} onChange={(e) => updatePrice("premixBag", e.target.value)} className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl" />
                 </div>
               )}
 
               {(screedType === "fluid_anh" || screedType === "fluid_cem") && (
                 <div className="col-span-2">
-                  <label className="block text-[11px] text-slate-500 mb-1">{t("calc.screed.price.fluid")}</label>
+                  <label className="block text-[10px] text-slate-500 mb-1">{t("calc.screed.price.fluid")}</label>
                   <input type="number" value={prices.bpeM3} onChange={(e) => updatePrice("bpeM3", e.target.value)} className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl" />
                 </div>
               )}
 
               {reinforceType === "mesh" && (
                 <div>
-                  <label className="block text-[11px] text-slate-500 mb-1">{t("calc.screed.price.mesh_fallback")}</label>
+                  <label className="block text-[10px] text-slate-500 mb-1">{t("calc.screed.price.mesh_fallback")}</label>
                   <input type="number" value={prices.meshPanel} onChange={(e) => updatePrice("meshPanel", e.target.value)} className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl" />
                 </div>
               )}
 
               {reinforceType === "fiber" && (
                 <div>
-                  <label className="block text-[11px] text-slate-500 mb-1">{t("calc.screed.price.fiber")}</label>
+                  <label className="block text-[10px] text-slate-500 mb-1">{t("calc.screed.price.fiber")}</label>
                   <input type="number" value={prices.fiberKg} onChange={(e) => updatePrice("fiberKg", e.target.value)} className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl" />
                 </div>
               )}
 
               {usePolyane && (
                 <div>
-                  <label className="block text-[11px] text-slate-500 mb-1">{t("calc.screed.price.polyane")}</label>
+                  <label className="block text-[10px] text-slate-500 mb-1">{t("calc.screed.price.polyane")}</label>
                   <input type="number" value={prices.polyaneM2} onChange={(e) => updatePrice("polyaneM2", e.target.value)} className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl" />
                 </div>
               )}
 
               {useStrip && (
                 <div>
-                  <label className="block text-[11px] text-slate-500 mb-1">{t("calc.screed.price.strip")}</label>
+                  <label className="block text-[10px] text-slate-500 mb-1">{t("calc.screed.price.strip")}</label>
                   <input type="number" value={prices.stripM} onChange={(e) => updatePrice("stripM", e.target.value)} className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl" />
                 </div>
               )}
 
               {useInsulation && (
                 <div>
-                  <label className="block text-[11px] text-slate-500 mb-1">{t("calc.screed.price.insulation")}</label>
+                  <label className="block text-[10px] text-slate-500 mb-1">{t("calc.screed.price.insulation")}</label>
                   <input type="number" value={prices.insulM2} onChange={(e) => updatePrice("insulM2", e.target.value)} className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl" />
                 </div>
               )}
 
               {useJoints && (
                 <div>
-                  <label className="block text-[11px] text-slate-500 mb-1">{t("calc.screed.price.joints")}</label>
+                  <label className="block text-[10px] text-slate-500 mb-1">{t("calc.screed.price.joints")}</label>
                   <input type="number" value={prices.jointM} onChange={(e) => updatePrice("jointM", e.target.value)} className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl" />
                 </div>
               )}
             </div>
 
             {proMode && (
-              <div className="mt-4 pt-3 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="mt-4 pt-3 border-t border-slate-100 grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[11px] text-blue-600 font-bold mb-1">{t("calc.screed.price.labor")}</label>
+                  <label className="block text-[10px] text-blue-600 font-bold mb-1">{t("calc.screed.price.labor")}</label>
                   <input type="number" value={prices.laborM2} onChange={(e) => updatePrice("laborM2", e.target.value)} className="w-full p-1.5 border border-blue-200 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(37,99,235,0.08)] backdrop-blur-xl" />
                 </div>
                 {(screedType === "fluid_anh" || screedType === "fluid_cem") && (
                   <div>
-                    <label className="block text-[11px] text-blue-600 font-bold mb-1">{t("calc.screed.price.pump")}</label>
+                    <label className="block text-[10px] text-blue-600 font-bold mb-1">{t("calc.screed.price.pump")}</label>
                     <input type="number" value={prices.pumpFlat} onChange={(e) => updatePrice("pumpFlat", e.target.value)} className="w-full p-1.5 border border-blue-200 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(37,99,235,0.08)] backdrop-blur-xl" />
                   </div>
                 )}

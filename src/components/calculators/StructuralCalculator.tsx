@@ -1470,7 +1470,7 @@ export const StructuralCalculator: React.FC<Props> = ({
   // UI
   // -------------------------
   return (
-    <div className="space-y-6 rounded-[32px] border border-white/70 bg-white/72 p-3 sm:p-4 shadow-[0_24px_70px_rgba(15,23,42,0.10)] backdrop-blur-xl sm:p-6">
+    <div className="space-y-6 rounded-[32px] border border-white/70 bg-white/72 p-3 shadow-[0_24px_70px_rgba(15,23,42,0.10)] backdrop-blur-xl sm:p-4 lg:p-6">
       {!hideTabs && (
         <div className="flex rounded-[24px] border border-white/80 bg-slate-100/70 p-1.5 shadow-inner backdrop-blur-xl mb-4">
           <button
@@ -1517,7 +1517,7 @@ export const StructuralCalculator: React.FC<Props> = ({
       {/* ======================= GROUNDWORK WIZARD ======================= */}
       {mode === "groundwork" && (
         <>
-          <div className="flex justify-between items-center mb-6 rounded-[24px] border border-white/80 bg-slate-100/70 p-1.5 shadow-inner overflow-x-auto no-scrollbar backdrop-blur-xl">
+          <div className="flex justify-between items-center mb-6 rounded-[24px] border border-white/80 bg-slate-100/70 p-1.5 shadow-inner overflow-x-auto backdrop-blur-xl">
             {[1, 2, 3, 4, 5].map((s) => (
               <button
                 key={s}
@@ -1540,7 +1540,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                 {tr("struct.gw.step1.hint")}
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-bold text-slate-500 mb-1">{tr("struct.common.length_m")}</label>
                   <input
@@ -1581,7 +1581,7 @@ export const StructuralCalculator: React.FC<Props> = ({
               </div>
 
               <div className="bg-slate-50 p-3 rounded-lg border border-slate-200">
-                <label className="flex flex-wrap items-center justify-between gap-2 cursor-pointer mb-2">
+                <label className="flex items-center justify-between cursor-pointer mb-2">
                   <span className="text-sm font-medium">{tr("struct.gw.keep_topsoil")}</span>
                   <input
                     type="checkbox"
@@ -1650,7 +1650,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                   </select>
                 </div>
 
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 mb-2">
+                <div className="grid grid-cols-4 gap-2 mb-2">
                   <input
                     type="number"
                     placeholder={tr("struct.common.L")}
@@ -1766,7 +1766,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                   />
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="block text-xs font-bold text-slate-500 mb-1">{tr("struct.gw.truck_cap")}</label>
                     <input
@@ -1782,7 +1782,7 @@ export const StructuralCalculator: React.FC<Props> = ({
               <div className="bg-white p-3 rounded-xl border border-slate-200">
                 <h4 className="text-xs font-bold text-slate-500 uppercase mb-3">{tr("struct.gw.fill_imports")}</h4>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-2">
+                <div className="grid grid-cols-2 gap-3 mb-2">
                   <div className="col-span-2">
                     <label className="block text-xs font-bold text-slate-500 mb-1">{tr("struct.gw.fill_type")}</label>
                     <select
@@ -1811,7 +1811,7 @@ export const StructuralCalculator: React.FC<Props> = ({
               <div className="bg-white p-3 rounded-xl border border-slate-200">
                 <h4 className="text-xs font-bold text-slate-500 uppercase mb-3">{tr("struct.gw.means")}</h4>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="block text-xs font-bold text-slate-500 mb-1">{tr("struct.gw.digger_days")}</label>
                     <input
@@ -1832,7 +1832,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                   </div>
                 </div>
 
-                <label className="flex flex-wrap items-center justify-between gap-2 mt-3">
+                <label className="flex items-center justify-between mt-3">
                   <span className="text-sm">{tr("struct.gw.difficult_access")}</span>
                   <input
                     type="checkbox"
@@ -1879,9 +1879,9 @@ export const StructuralCalculator: React.FC<Props> = ({
                   </button>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-[11px] text-slate-500 mb-1">{tr("struct.gw.price_excav")}</label>
+                    <label className="block text-[10px] text-slate-500 mb-1">{tr("struct.gw.price_excav")}</label>
                     <input
                       type="number"
                       value={gwPrices.excavM3}
@@ -1891,7 +1891,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                   </div>
 
                   <div>
-                    <label className="block text-[11px] text-slate-500 mb-1">{tr("struct.gw.price_strip")}</label>
+                    <label className="block text-[10px] text-slate-500 mb-1">{tr("struct.gw.price_strip")}</label>
                     <input
                       type="number"
                       value={gwPrices.stripM2}
@@ -1901,7 +1901,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                   </div>
 
                   <div>
-                    <label className="block text-[11px] text-slate-500 mb-1">{tr("struct.gw.price_truck")}</label>
+                    <label className="block text-[10px] text-slate-500 mb-1">{tr("struct.gw.price_truck")}</label>
                     <input
                       type="number"
                       value={gwPrices.truckRotation}
@@ -1911,7 +1911,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                   </div>
 
                   <div>
-                    <label className="block text-[11px] text-slate-500 mb-1">{tr("struct.gw.price_dump")}</label>
+                    <label className="block text-[10px] text-slate-500 mb-1">{tr("struct.gw.price_dump")}</label>
                     <input
                       type="number"
                       value={gwPrices.dumpFeeTon}
@@ -1922,9 +1922,9 @@ export const StructuralCalculator: React.FC<Props> = ({
                 </div>
 
                 {proMode && (
-                  <div className="mt-4 pt-3 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="mt-4 pt-3 border-t border-slate-100 grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-[11px] text-blue-600 font-bold mb-1">{tr("struct.gw.labor_m3")}</label>
+                      <label className="block text-[10px] text-blue-600 font-bold mb-1">{tr("struct.gw.labor_m3")}</label>
                       <input
                         type="number"
                         value={gwPrices.laborM3}
@@ -1960,7 +1960,7 @@ export const StructuralCalculator: React.FC<Props> = ({
       {/* ======================= FOUNDATIONS WIZARD ======================= */}
       {mode === "foundations" && (
         <>
-          <div className="flex justify-between items-center mb-6 rounded-[24px] border border-white/80 bg-slate-100/70 p-1.5 shadow-inner overflow-x-auto no-scrollbar backdrop-blur-xl">
+          <div className="flex justify-between items-center mb-6 rounded-[24px] border border-white/80 bg-slate-100/70 p-1.5 shadow-inner overflow-x-auto backdrop-blur-xl">
             {[1, 2, 3, 4, 5].map((s) => (
               <button
                 key={s}
@@ -1983,7 +1983,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                 {tr("struct.fd.step1.hint")}
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-bold text-slate-500 mb-1">{tr("struct.common.house_length")}</label>
                   <input
@@ -2008,7 +2008,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                 <h4 className="text-xs font-bold text-slate-500 uppercase mb-3">{tr("struct.fd.systems")}</h4>
 
                 <div className="space-y-2">
-                  <label className="flex flex-wrap items-center justify-between gap-2 p-2 border rounded hover:bg-slate-50 cursor-pointer">
+                  <label className="flex items-center justify-between p-2 border rounded hover:bg-slate-50 cursor-pointer">
                     <div>
                       <span className="font-bold text-sm block">{tr("struct.fd.strip")}</span>
                       <span className="text-xs text-slate-400">{tr("struct.fd.strip_hint")}</span>
@@ -2021,7 +2021,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                     />
                   </label>
 
-                  <label className="flex flex-wrap items-center justify-between gap-2 p-2 border rounded hover:bg-slate-50 cursor-pointer">
+                  <label className="flex items-center justify-between p-2 border rounded hover:bg-slate-50 cursor-pointer">
                     <div>
                       <span className="font-bold text-sm block">{tr("struct.fd.pads")}</span>
                       <span className="text-xs text-slate-400">{tr("struct.fd.pads_hint")}</span>
@@ -2034,7 +2034,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                     />
                   </label>
 
-                  <label className="flex flex-wrap items-center justify-between gap-2 p-2 border rounded hover:bg-slate-50 cursor-pointer">
+                  <label className="flex items-center justify-between p-2 border rounded hover:bg-slate-50 cursor-pointer">
                     <div>
                       <span className="font-bold text-sm block">{tr("struct.fd.raft")}</span>
                       <span className="text-xs text-slate-400">{tr("struct.fd.raft_hint")}</span>
@@ -2068,7 +2068,7 @@ export const StructuralCalculator: React.FC<Props> = ({
               </div>
 
               <div className="bg-white p-3 rounded-xl border border-slate-200">
-                <label className="flex flex-wrap items-center justify-between gap-2 mb-4">
+                <label className="flex items-center justify-between mb-4">
                   <span className="font-bold text-sm text-slate-700">{tr("struct.fd.count_excav")}</span>
                   <input
                     type="checkbox"
@@ -2080,7 +2080,7 @@ export const StructuralCalculator: React.FC<Props> = ({
 
                 {fdExcavEnabled && (
                   <div className="space-y-3 animate-in fade-in">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="grid grid-cols-2 gap-3">
                       <div>
                         <label className="block text-xs font-bold text-slate-500 mb-1">{tr("struct.fd.depth")}</label>
                         <input
@@ -2162,9 +2162,9 @@ export const StructuralCalculator: React.FC<Props> = ({
                     <Ruler size={14} className="mr-1" /> {tr("struct.fd.strip")}
                   </h4>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 mb-3">
+                  <div className="grid grid-cols-3 gap-2 mb-3">
                     <div>
-                      <label className="block text-[11px] text-slate-400">{tr("struct.common.length_m_short")}</label>
+                      <label className="block text-[10px] text-slate-400">{tr("struct.common.length_m_short")}</label>
                       <input
                         type="number"
                         value={fdStripL}
@@ -2173,7 +2173,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                       />
                     </div>
                     <div>
-                      <label className="block text-[11px] text-slate-400">{tr("struct.common.width_m_short")}</label>
+                      <label className="block text-[10px] text-slate-400">{tr("struct.common.width_m_short")}</label>
                       <input
                         type="number"
                         value={fdStripW}
@@ -2182,7 +2182,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                       />
                     </div>
                     <div>
-                      <label className="block text-[11px] text-slate-400">{tr("struct.common.height_m_short")}</label>
+                      <label className="block text-[10px] text-slate-400">{tr("struct.common.height_m_short")}</label>
                       <input
                         type="number"
                         value={fdStripH}
@@ -2218,7 +2218,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                   </div>
 
                   {fdPads.map((p) => (
-                    <div key={p.id} className="flex flex-wrap items-center gap-2 mb-2 text-xs">
+                    <div key={p.id} className="flex items-center gap-2 mb-2 text-xs">
                       <input
                         type="number"
                         value={p.count}
@@ -2290,7 +2290,7 @@ export const StructuralCalculator: React.FC<Props> = ({
 
                   <div className="flex gap-4">
                     <div>
-                      <label className="block text-[11px] text-slate-400">{tr("struct.fd.thickness_m")}</label>
+                      <label className="block text-[10px] text-slate-400">{tr("struct.fd.thickness_m")}</label>
                       <input
                         type="number"
                         value={fdRaftThick}
@@ -2300,7 +2300,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                     </div>
 
                     <div className="flex-1">
-                      <label className="block text-[11px] text-slate-400">{tr("struct.fd.mesh")}</label>
+                      <label className="block text-[10px] text-slate-400">{tr("struct.fd.mesh")}</label>
                       <select
                         value={fdRebarRaftType}
                         onChange={(e) => setFdRebarRaftType(e.target.value)}
@@ -2315,7 +2315,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                 </div>
               )}
 
-              <div className="bg-slate-50 p-3 rounded-lg flex flex-wrap items-center justify-between gap-2 border border-slate-200">
+              <div className="bg-slate-50 p-3 rounded-lg flex items-center justify-between border border-slate-200">
                 <span className="text-sm font-medium text-slate-700">{tr("struct.fd.clean_concrete")}</span>
                 <input
                   type="checkbox"
@@ -2345,7 +2345,7 @@ export const StructuralCalculator: React.FC<Props> = ({
               </div>
 
               <div className="space-y-2">
-                <label className="flex flex-wrap items-center justify-between gap-2 p-3 bg-white border rounded-lg cursor-pointer">
+                <label className="flex items-center justify-between p-3 bg-white border rounded-lg cursor-pointer">
                   <div>
                     <span className="font-bold text-sm block">{tr("struct.fd.formwork")}</span>
                     <span className="text-xs text-slate-400">{tr("struct.fd.formwork_hint")}</span>
@@ -2353,7 +2353,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                   <input type="checkbox" checked={fdFormwork} onChange={(e) => setFdFormwork(e.target.checked)} className="h-5 w-5 text-blue-600 rounded" />
                 </label>
 
-                <label className="flex flex-wrap items-center justify-between gap-2 p-3 bg-white border rounded-lg cursor-pointer">
+                <label className="flex items-center justify-between p-3 bg-white border rounded-lg cursor-pointer">
                   <div>
                     <span className="font-bold text-sm block">{tr("struct.fd.drain")}</span>
                     <span className="text-xs text-slate-400">{tr("struct.fd.drain_hint")}</span>
@@ -2361,7 +2361,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                   <input type="checkbox" checked={fdDrain} onChange={(e) => setFdDrain(e.target.checked)} className="h-5 w-5 text-blue-600 rounded" />
                 </label>
 
-                <label className="flex flex-wrap items-center justify-between gap-2 p-3 bg-white border rounded-lg cursor-pointer">
+                <label className="flex items-center justify-between p-3 bg-white border rounded-lg cursor-pointer">
                   <div>
                     <span className="font-bold text-sm block">{tr("struct.fd.polyane")}</span>
                     <span className="text-xs text-slate-400">{tr("struct.fd.polyane_hint")}</span>
@@ -2398,9 +2398,9 @@ export const StructuralCalculator: React.FC<Props> = ({
                   </button>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-[11px] text-slate-500 mb-1">{tr("struct.fd.price_concrete")}</label>
+                    <label className="block text-[10px] text-slate-500 mb-1">{tr("struct.fd.price_concrete")}</label>
                     <input
                       type="number"
                       value={fdPrices.concrete}
@@ -2410,7 +2410,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                   </div>
 
                   <div>
-                    <label className="block text-[11px] text-slate-500 mb-1">{tr("struct.fd.price_rebar")}</label>
+                    <label className="block text-[10px] text-slate-500 mb-1">{tr("struct.fd.price_rebar")}</label>
                     <input
                       type="number"
                       value={fdPrices.rebarCage}
@@ -2421,7 +2421,7 @@ export const StructuralCalculator: React.FC<Props> = ({
 
                   {fdExcavEnabled && (
                     <div>
-                      <label className="block text-[11px] text-slate-500 mb-1">{tr("struct.fd.price_excav")}</label>
+                      <label className="block text-[10px] text-slate-500 mb-1">{tr("struct.fd.price_excav")}</label>
                       <input
                         type="number"
                         value={fdPrices.excavation}
@@ -2433,7 +2433,7 @@ export const StructuralCalculator: React.FC<Props> = ({
 
                   {fdFormwork && (
                     <div>
-                      <label className="block text-[11px] text-slate-500 mb-1">{tr("struct.fd.price_formwork")}</label>
+                      <label className="block text-[10px] text-slate-500 mb-1">{tr("struct.fd.price_formwork")}</label>
                       <input
                         type="number"
                         value={fdPrices.formwork}
@@ -2445,9 +2445,9 @@ export const StructuralCalculator: React.FC<Props> = ({
                 </div>
 
                 {proMode && (
-                  <div className="mt-4 pt-3 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="mt-4 pt-3 border-t border-slate-100 grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-[11px] text-blue-600 font-bold mb-1">{tr("struct.fd.price_labor_conc")}</label>
+                      <label className="block text-[10px] text-blue-600 font-bold mb-1">{tr("struct.fd.price_labor_conc")}</label>
                       <input
                         type="number"
                         value={fdPrices.laborM3}
@@ -2458,7 +2458,7 @@ export const StructuralCalculator: React.FC<Props> = ({
 
                     {fdFormwork && (
                       <div>
-                        <label className="block text-[11px] text-blue-600 font-bold mb-1">{tr("struct.fd.price_labor_form")}</label>
+                        <label className="block text-[10px] text-blue-600 font-bold mb-1">{tr("struct.fd.price_labor_form")}</label>
                         <input
                           type="number"
                           value={fdPrices.laborForm}
@@ -2487,7 +2487,7 @@ export const StructuralCalculator: React.FC<Props> = ({
       {/* ======================= WALLS WIZARD ======================= */}
       {mode === "walls" && (
         <>
-          <div className="flex justify-between items-center mb-6 rounded-[24px] border border-white/80 bg-slate-100/70 p-1.5 shadow-inner overflow-x-auto no-scrollbar backdrop-blur-xl">
+          <div className="flex justify-between items-center mb-6 rounded-[24px] border border-white/80 bg-slate-100/70 p-1.5 shadow-inner overflow-x-auto backdrop-blur-xl">
             {[1, 2, 3, 4, 5, 6].map((s) => (
               <button
                 key={s}
@@ -2528,7 +2528,7 @@ export const StructuralCalculator: React.FC<Props> = ({
               </div>
 
               {wInputMode === "global" ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-4">
                   <div className="col-span-2">
                     <label className="block text-xs font-bold text-slate-500 mb-1">{tr("struct.w.perimeter_total")}</label>
                     <input
@@ -2558,7 +2558,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                     />
                   </div>
 
-                  <label className="flex flex-wrap items-center justify-between gap-2 col-span-2 p-3 bg-white border rounded-lg cursor-pointer">
+                  <label className="flex items-center justify-between col-span-2 p-3 bg-white border rounded-lg cursor-pointer">
                     <div>
                       <div className="font-bold text-sm text-slate-700">{tr("struct.w.gables")}</div>
                       <div className="text-xs text-slate-400">{tr("struct.w.gables_hint")}</div>
@@ -2567,7 +2567,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                   </label>
 
                   {wGables && (
-                    <div className="col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="col-span-2 grid grid-cols-2 gap-3">
                       <div>
                         <label className="block text-xs font-bold text-slate-500 mb-1">{tr("struct.w.gable_h")}</label>
                         <input
@@ -2663,7 +2663,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                 {tr("struct.w.step2.hint")}
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <div className="grid grid-cols-2 gap-2">
                 {(["parpaing", "brique", "cellulaire", "stepoc"] as const).map((fam) => (
                   <button
                     key={fam}
@@ -2756,7 +2756,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                   </select>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 mb-2">
+                <div className="grid grid-cols-3 gap-2 mb-2">
                   <input
                     type="number"
                     placeholder={tr("struct.common.width")}
@@ -2809,13 +2809,13 @@ export const StructuralCalculator: React.FC<Props> = ({
               </div>
 
               <div className="space-y-3 bg-white p-3 rounded-lg border border-slate-200">
-                <label className="flex flex-wrap items-center justify-between gap-2 cursor-pointer">
+                <label className="flex items-center justify-between cursor-pointer">
                   <span className="text-sm font-bold text-slate-700">{tr("struct.w.chain_h")}</span>
                   <input type="checkbox" checked={wChainageHoriz} onChange={(e) => setWChainageHoriz(e.target.checked)} className="h-5 w-5 text-blue-600 rounded" />
                 </label>
 
                 {wChainageHoriz && (
-                  <label className="flex flex-wrap items-center justify-between gap-2 cursor-pointer pl-4 border-l-2 border-slate-100">
+                  <label className="flex items-center justify-between cursor-pointer pl-4 border-l-2 border-slate-100">
                     <span className="text-xs text-slate-500">{tr("struct.w.chain_inter")}</span>
                     <input type="checkbox" checked={wChainageInter} onChange={(e) => setWChainageInter(e.target.checked)} className="h-4 w-4 text-blue-600 rounded" />
                   </label>
@@ -2826,14 +2826,14 @@ export const StructuralCalculator: React.FC<Props> = ({
                     <span className="text-sm font-bold text-slate-700">{tr("struct.w.vert")}</span>
                     <button
                       onClick={autoCalcReinforcements}
-                      className="text-[11px] bg-slate-100 px-2 py-1 rounded text-blue-600 font-bold"
+                      className="text-[10px] bg-slate-100 px-2 py-1 rounded text-blue-600 font-bold"
                       type="button"
                     >
                       {tr("struct.common.auto")}
                     </button>
                   </div>
 
-                  <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="flex items-center justify-between">
                     <span className="text-xs text-slate-500">{tr("struct.w.vert_total")}</span>
                     <input
                       type="number"
@@ -2877,26 +2877,26 @@ export const StructuralCalculator: React.FC<Props> = ({
               </div>
 
               <div className="space-y-2">
-                <label className="flex flex-wrap items-center justify-between gap-2 p-3 bg-white border rounded-lg cursor-pointer hover:bg-slate-50">
+                <label className="flex items-center justify-between p-3 bg-white border rounded-lg cursor-pointer hover:bg-slate-50">
                   <div>
                     <span className="text-sm font-bold text-slate-700">{tr("struct.w.coating_ext")}</span>
-                    <p className="text-[11px] text-slate-400">{tr("struct.w.coating_ext_hint")}</p>
+                    <p className="text-[10px] text-slate-400">{tr("struct.w.coating_ext_hint")}</p>
                   </div>
                   <input type="checkbox" checked={wCoatingExt} onChange={(e) => setWCoatingExt(e.target.checked)} className="h-5 w-5 text-blue-600 rounded" />
                 </label>
 
-                <label className="flex flex-wrap items-center justify-between gap-2 p-3 bg-white border rounded-lg cursor-pointer hover:bg-slate-50">
+                <label className="flex items-center justify-between p-3 bg-white border rounded-lg cursor-pointer hover:bg-slate-50">
                   <div>
                     <span className="text-sm font-bold text-slate-700">{tr("struct.w.coating_int")}</span>
-                    <p className="text-[11px] text-slate-400">{tr("struct.w.coating_int_hint")}</p>
+                    <p className="text-[10px] text-slate-400">{tr("struct.w.coating_int_hint")}</p>
                   </div>
                   <input type="checkbox" checked={wCoatingInt} onChange={(e) => setWCoatingInt(e.target.checked)} className="h-5 w-5 text-blue-600 rounded" />
                 </label>
 
-                <label className="flex flex-wrap items-center justify-between gap-2 p-3 bg-white border rounded-lg cursor-pointer hover:bg-slate-50">
+                <label className="flex items-center justify-between p-3 bg-white border rounded-lg cursor-pointer hover:bg-slate-50">
                   <div>
                     <span className="text-sm font-bold text-slate-700">{tr("struct.w.scaffold")}</span>
-                    <p className="text-[11px] text-slate-400">{tr("struct.w.scaffold_hint")}</p>
+                    <p className="text-[10px] text-slate-400">{tr("struct.w.scaffold_hint")}</p>
                   </div>
                   <input type="checkbox" checked={wScaffold} onChange={(e) => setWScaffold(e.target.checked)} className="h-5 w-5 text-blue-600 rounded" />
                 </label>
@@ -2930,9 +2930,9 @@ export const StructuralCalculator: React.FC<Props> = ({
                   </button>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 gap-3">
                   <div className="col-span-2">
-                    <label className="block text-[11px] text-slate-500 mb-1">
+                    <label className="block text-[10px] text-slate-500 mb-1">
                       {tr("struct.w.unit_price_variant")} — {selectedWallSpec.label}
                     </label>
 
@@ -2967,7 +2967,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                   </div>
 
                   <div>
-                    <label className="block text-[11px] text-slate-500 mb-1">
+                    <label className="block text-[10px] text-slate-500 mb-1">
                       {wallBinderKind === "mortier" ? tr("struct.w.mortar_bag") : tr("struct.w.glue_bag")}
                     </label>
                     <input
@@ -2981,7 +2981,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                     />
 
                     {wallBinderKind === "mortier" && (
-                      <label className="mt-2 flex flex-wrap items-center gap-2 text-[11px] text-slate-600 select-none">
+                      <label className="mt-2 flex items-center gap-2 text-[11px] text-slate-600 select-none">
                         <input
                           type="checkbox"
                           checked={wUseReadyMortar}
@@ -2993,7 +2993,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                   </div>
 
                   <div>
-                    <label className="block text-[11px] text-slate-500 mb-1">{tr("struct.w.lintel_m")}</label>
+                    <label className="block text-[10px] text-slate-500 mb-1">{tr("struct.w.lintel_m")}</label>
                     <input
                       type="number"
                       value={wPrices.lintelM}
@@ -3004,7 +3004,7 @@ export const StructuralCalculator: React.FC<Props> = ({
 
                   {wCoatingExt && (
                     <div>
-                      <label className="block text-[11px] text-slate-500 mb-1">{tr("struct.w.coating_ext_bag")}</label>
+                      <label className="block text-[10px] text-slate-500 mb-1">{tr("struct.w.coating_ext_bag")}</label>
                       <input
                         type="number"
                         value={wPrices.coatingExtBag}
@@ -3016,7 +3016,7 @@ export const StructuralCalculator: React.FC<Props> = ({
 
                   {wScaffold && (
                     <div>
-                      <label className="block text-[11px] text-slate-500 mb-1">{tr("struct.w.scaffold_fixed")}</label>
+                      <label className="block text-[10px] text-slate-500 mb-1">{tr("struct.w.scaffold_fixed")}</label>
                       <input
                         type="number"
                         value={wPrices.scaffoldFixed}
@@ -3028,9 +3028,9 @@ export const StructuralCalculator: React.FC<Props> = ({
                 </div>
 
                 {proMode && (
-                  <div className="mt-4 pt-3 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="mt-4 pt-3 border-t border-slate-100 grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-[11px] text-blue-600 font-bold mb-1">{tr("struct.w.labor_m2")}</label>
+                      <label className="block text-[10px] text-blue-600 font-bold mb-1">{tr("struct.w.labor_m2")}</label>
                       <input
                         type="number"
                         value={wPrices.laborM2}

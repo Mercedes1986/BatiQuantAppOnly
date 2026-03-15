@@ -744,7 +744,7 @@ export const ExteriorCalculator: React.FC<Props> = ({ onCalculate }) => {
           <h4 className="text-xs font-bold text-slate-500 uppercase">
             {t("calc.exterior.price_editor.title", { defaultValue: "Ajustement Prix Unitaires" })}
           </h4>
-          <div className="text-[11px] text-slate-400 italic">
+          <div className="text-[10px] text-slate-400 italic">
             {t("calc.exterior.price_editor.subtitle", { defaultValue: "Modifications locales au projet" })}
           </div>
         </div>
@@ -765,7 +765,7 @@ export const ExteriorCalculator: React.FC<Props> = ({ onCalculate }) => {
                 }`}
               >
                 <div className="flex-1 mr-2">
-                  <span className="font-bold text-slate-700 block break-words">{meta.label}</span>
+                  <span className="font-bold text-slate-700 block truncate">{meta.label}</span>
                   {isOverridden && (
                     <span className="text-[9px] text-amber-600 font-bold">
                       {t("calc.exterior.price_editor.overridden_catalog", {
@@ -826,9 +826,9 @@ export const ExteriorCalculator: React.FC<Props> = ({ onCalculate }) => {
 
   // --- RENDER ---
   return (
-    <div className="space-y-6 rounded-[32px] border border-white/70 bg-white/72 p-3 sm:p-4 shadow-[0_24px_70px_rgba(15,23,42,0.10)] backdrop-blur-xl sm:p-6">
+    <div className="space-y-6 rounded-[32px] border border-white/70 bg-white/72 p-4 shadow-[0_24px_70px_rgba(15,23,42,0.10)] backdrop-blur-xl sm:p-6">
       {/* Navigation */}
-      <div className="flex justify-between items-center mb-6 rounded-[24px] border border-white/80 bg-slate-100/70 p-1.5 shadow-inner overflow-x-auto no-scrollbar backdrop-blur-xl">
+      <div className="flex justify-between items-center mb-6 rounded-[24px] border border-white/80 bg-slate-100/70 p-1.5 shadow-inner overflow-x-auto backdrop-blur-xl">
         {[1, 2, 3, 4, 5].map((s) => (
           <button
             key={s}
@@ -875,7 +875,7 @@ export const ExteriorCalculator: React.FC<Props> = ({ onCalculate }) => {
                   </button>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] text-slate-500 bg-slate-50 p-2 rounded">
+                <div className="grid grid-cols-2 gap-2 text-[10px] text-slate-500 bg-slate-50 p-2 rounded">
                   <span>{t("calc.exterior.zone_fields.excav", { defaultValue: "Excavation: {{n}} cm", n: z.excavationDepth })}</span>
                   <span>{t("calc.exterior.zone_fields.foundation", { defaultValue: "Fondation: {{n}}cm", n: z.foundationThick })}</span>
                   <span>{t("calc.exterior.zone_fields.bedding", { defaultValue: "Lit pose: {{n}}cm", n: z.beddingThick })}</span>
@@ -1033,7 +1033,7 @@ export const ExteriorCalculator: React.FC<Props> = ({ onCalculate }) => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <div className="grid grid-cols-2 gap-2">
             <button
               type="button"
               onClick={addGate}
