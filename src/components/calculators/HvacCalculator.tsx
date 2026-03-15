@@ -635,9 +635,9 @@ export const HvacCalculator: React.FC<Props> = ({ onCalculate }) => {
   );
 
   return (
-    <div className="space-y-6 rounded-[32px] border border-white/70 bg-white/72 p-4 shadow-[0_24px_70px_rgba(15,23,42,0.10)] backdrop-blur-xl sm:p-6">
+    <div className="space-y-6 rounded-[32px] border border-white/70 bg-white/72 p-3 sm:p-4 shadow-[0_24px_70px_rgba(15,23,42,0.10)] backdrop-blur-xl sm:p-6">
       {/* Step Navigation */}
-      <div className="flex justify-between items-center mb-6 rounded-[24px] border border-white/80 bg-slate-100/70 p-1.5 shadow-inner overflow-x-auto backdrop-blur-xl">
+      <div className="flex justify-between items-center mb-6 rounded-[24px] border border-white/80 bg-slate-100/70 p-1.5 shadow-inner overflow-x-auto no-scrollbar backdrop-blur-xl">
         {[1, 2, 3, 4, 5].map((s) => (
           <button
             key={s}
@@ -688,7 +688,7 @@ export const HvacCalculator: React.FC<Props> = ({ onCalculate }) => {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-bold text-slate-500 mb-1">
                 {t("hvac.ceiling_height", { defaultValue: "Ceiling height (m)" })}
@@ -953,9 +953,9 @@ export const HvacCalculator: React.FC<Props> = ({ onCalculate }) => {
                 {t("hvac.vmc.network", { defaultValue: "Duct network" })}
               </h4>
 
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <div>
-                  <label className="block text-[10px] text-slate-500 mb-1">
+                  <label className="block text-[11px] text-slate-500 mb-1">
                     {t("common.type", { defaultValue: "Type" })}
                   </label>
                   <select
@@ -968,7 +968,7 @@ export const HvacCalculator: React.FC<Props> = ({ onCalculate }) => {
                   </select>
                 </div>
 
-                <label className="flex items-center justify-between mt-5">
+                <label className="flex flex-wrap items-center justify-between gap-2 mt-5">
                   <span className="text-sm">{t("hvac.vmc.insulated", { defaultValue: "Insulated ducts" })}</span>
                   <input
                     type="checkbox"
@@ -1021,9 +1021,9 @@ export const HvacCalculator: React.FC<Props> = ({ onCalculate }) => {
               </button>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="block text-[10px] text-slate-500 mb-1">
+                <label className="block text-[11px] text-slate-500 mb-1">
                   {t("hvac.prices.pac_air_water", { defaultValue: "Air-to-water HP (€)" })}
                 </label>
                 <input
@@ -1034,7 +1034,7 @@ export const HvacCalculator: React.FC<Props> = ({ onCalculate }) => {
                 />
               </div>
               <div>
-                <label className="block text-[10px] text-slate-500 mb-1">
+                <label className="block text-[11px] text-slate-500 mb-1">
                   {t("hvac.prices.boiler_gas", { defaultValue: "Gas boiler (€)" })}
                 </label>
                 <input
@@ -1046,7 +1046,7 @@ export const HvacCalculator: React.FC<Props> = ({ onCalculate }) => {
               </div>
 
               <div>
-                <label className="block text-[10px] text-slate-500 mb-1">
+                <label className="block text-[11px] text-slate-500 mb-1">
                   {t("hvac.prices.radiator_water", { defaultValue: "Water radiator (€)" })}
                 </label>
                 <input
@@ -1057,7 +1057,7 @@ export const HvacCalculator: React.FC<Props> = ({ onCalculate }) => {
                 />
               </div>
               <div>
-                <label className="block text-[10px] text-slate-500 mb-1">
+                <label className="block text-[11px] text-slate-500 mb-1">
                   {t("hvac.prices.radiator_elec", { defaultValue: "Electric radiator (€)" })}
                 </label>
                 <input
@@ -1069,7 +1069,7 @@ export const HvacCalculator: React.FC<Props> = ({ onCalculate }) => {
               </div>
 
               <div>
-                <label className="block text-[10px] text-slate-500 mb-1">
+                <label className="block text-[11px] text-slate-500 mb-1">
                   {t("hvac.prices.vmc_hygro_kit", { defaultValue: "Hygro ventilation kit (€)" })}
                 </label>
                 <input
@@ -1080,7 +1080,7 @@ export const HvacCalculator: React.FC<Props> = ({ onCalculate }) => {
                 />
               </div>
               <div>
-                <label className="block text-[10px] text-slate-500 mb-1">
+                <label className="block text-[11px] text-slate-500 mb-1">
                   {t("hvac.prices.flex_duct_m", { defaultValue: "Flexible duct (€/m)" })}
                 </label>
                 <input
@@ -1093,9 +1093,9 @@ export const HvacCalculator: React.FC<Props> = ({ onCalculate }) => {
             </div>
 
             {proMode && (
-              <div className="mt-4 pt-3 border-t border-slate-100 grid grid-cols-2 gap-3">
+              <div className="mt-4 pt-3 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[10px] text-blue-600 font-bold mb-1">
+                  <label className="block text-[11px] text-blue-600 font-bold mb-1">
                     {t("hvac.prices.labor_gen", { defaultValue: "Generator labor (€)" })}
                   </label>
                   <input
@@ -1106,7 +1106,7 @@ export const HvacCalculator: React.FC<Props> = ({ onCalculate }) => {
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] text-blue-600 font-bold mb-1">
+                  <label className="block text-[11px] text-blue-600 font-bold mb-1">
                     {t("hvac.prices.labor_vmc", { defaultValue: "Ventilation labor (€)" })}
                   </label>
                   <input

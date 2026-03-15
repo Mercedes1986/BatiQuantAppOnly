@@ -400,9 +400,9 @@ export const StairCalculator: React.FC<Props> = ({ onCalculate }) => {
   }, [computed, onCalculate]);
 
   return (
-    <div className="space-y-6 rounded-[32px] border border-white/70 bg-white/72 p-4 shadow-[0_24px_70px_rgba(15,23,42,0.10)] backdrop-blur-xl sm:p-6">
+    <div className="space-y-6 rounded-[32px] border border-white/70 bg-white/72 p-3 sm:p-4 shadow-[0_24px_70px_rgba(15,23,42,0.10)] backdrop-blur-xl sm:p-6">
       {/* Step Navigation */}
-      <div className="flex justify-between items-center mb-6 rounded-[24px] border border-white/80 bg-slate-100/70 p-1.5 shadow-inner overflow-x-auto backdrop-blur-xl">
+      <div className="flex justify-between items-center mb-6 rounded-[24px] border border-white/80 bg-slate-100/70 p-1.5 shadow-inner overflow-x-auto no-scrollbar backdrop-blur-xl">
         {[1, 2, 3, 4, 5].map((s) => (
           <button
             key={s}
@@ -429,7 +429,7 @@ export const StairCalculator: React.FC<Props> = ({ onCalculate }) => {
             <label className="block text-sm font-medium text-slate-700 mb-2">
               {t("calc.stairs.ui.shape", { defaultValue: "Shape" })}
             </label>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
               <button
                 type="button"
                 onClick={() => setStairType("straight")}
@@ -460,7 +460,7 @@ export const StairCalculator: React.FC<Props> = ({ onCalculate }) => {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-bold text-slate-500 mb-1">
                 {t("calc.stairs.ui.height_cm", { defaultValue: "Height to climb (cm)" })}
@@ -471,7 +471,7 @@ export const StairCalculator: React.FC<Props> = ({ onCalculate }) => {
                 onChange={(e) => setHeight(e.target.value)}
                 className="w-full p-3 rounded-lg border border-slate-300 bg-white text-slate-900 font-bold"
               />
-              <p className="text-[10px] text-slate-400 mt-1">
+              <p className="text-[11px] text-slate-400 mt-1">
                 {t("calc.stairs.ui.height_help", { defaultValue: "Finished floor (down) → finished floor (up)" })}
               </p>
             </div>
@@ -486,7 +486,7 @@ export const StairCalculator: React.FC<Props> = ({ onCalculate }) => {
                 onChange={(e) => setRun(e.target.value)}
                 className="w-full p-3 rounded-lg border border-slate-300 bg-white text-slate-900 font-bold"
               />
-              <p className="text-[10px] text-slate-400 mt-1">
+              <p className="text-[11px] text-slate-400 mt-1">
                 {t("calc.stairs.ui.run_help", { defaultValue: "Available horizontal projection" })}
               </p>
             </div>
@@ -551,7 +551,7 @@ export const StairCalculator: React.FC<Props> = ({ onCalculate }) => {
               </button>
               <div className="text-center">
                 <span className="block text-xl font-bold text-blue-600">{numSteps}</span>
-                <span className="text-[10px] text-slate-400 uppercase font-bold">
+                <span className="text-[11px] text-slate-400 uppercase font-bold">
                   {t("calc.stairs.ui.steps_count", { defaultValue: "Steps" })}
                 </span>
               </div>
@@ -587,7 +587,7 @@ export const StairCalculator: React.FC<Props> = ({ onCalculate }) => {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="bg-slate-50 p-3 rounded-lg border border-slate-200">
               <span className="block text-xs text-slate-500 mb-1">{t("calc.stairs.ui.tread", { defaultValue: "Tread" })}</span>
               <span className={`block text-lg font-bold ${tread < 22 ? "text-red-500" : "text-slate-800"}`}>
@@ -637,7 +637,7 @@ export const StairCalculator: React.FC<Props> = ({ onCalculate }) => {
             {t("calc.stairs.ui.step3_hint", { defaultValue: "Concrete structure parameters." })}
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-bold text-slate-500 mb-1">
                 {t("calc.stairs.ui.slab_thickness_cm", { defaultValue: "Slab thickness (cm)" })}
@@ -667,9 +667,9 @@ export const StairCalculator: React.FC<Props> = ({ onCalculate }) => {
               {t("calc.stairs.ui.rebar_title", { defaultValue: "Rebar" })}
             </h4>
 
-            <div className="grid grid-cols-2 gap-3 items-end">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-end">
               <div>
-                <label className="block text-[10px] text-slate-500 mb-1">
+                <label className="block text-[11px] text-slate-500 mb-1">
                   {t("calc.stairs.ui.steel_ratio", { defaultValue: "Ratio (kg/m³)" })}
                 </label>
                 <input
@@ -684,7 +684,7 @@ export const StairCalculator: React.FC<Props> = ({ onCalculate }) => {
               </div>
             </div>
 
-            <label className="flex items-center justify-between mt-3 p-2 bg-white border rounded cursor-pointer">
+            <label className="flex flex-wrap items-center justify-between gap-2 mt-3 p-2 bg-white border rounded cursor-pointer">
               <span className="text-sm font-medium text-slate-700">
                 {t("calc.stairs.ui.use_props", { defaultValue: "Shoring (props)" })}
               </span>
@@ -729,21 +729,21 @@ export const StairCalculator: React.FC<Props> = ({ onCalculate }) => {
           </div>
 
           <div className="space-y-2">
-            <label className="flex items-center justify-between p-3 bg-white border rounded-lg cursor-pointer hover:bg-slate-50">
+            <label className="flex flex-wrap items-center justify-between gap-2 p-3 bg-white border rounded-lg cursor-pointer hover:bg-slate-50">
               <span className="text-sm font-bold text-slate-700">
                 {t("calc.stairs.ui.finish_tiling", { defaultValue: "Tiling / flooring" })}
               </span>
               <input type="checkbox" checked={finishTiling} onChange={(e) => setFinishTiling(e.target.checked)} className="h-5 w-5 text-blue-600 rounded" />
             </label>
 
-            <label className="flex items-center justify-between p-3 bg-white border rounded-lg cursor-pointer hover:bg-slate-50">
+            <label className="flex flex-wrap items-center justify-between gap-2 p-3 bg-white border rounded-lg cursor-pointer hover:bg-slate-50">
               <span className="text-sm font-bold text-slate-700">
                 {t("calc.stairs.ui.finish_railing", { defaultValue: "Railing / guardrail" })}
               </span>
               <input type="checkbox" checked={finishRailing} onChange={(e) => setFinishRailing(e.target.checked)} className="h-5 w-5 text-blue-600 rounded" />
             </label>
 
-            <label className="flex items-center justify-between p-3 bg-white border rounded-lg cursor-pointer hover:bg-slate-50">
+            <label className="flex flex-wrap items-center justify-between gap-2 p-3 bg-white border rounded-lg cursor-pointer hover:bg-slate-50">
               <span className="text-sm font-bold text-slate-700">
                 {t("calc.stairs.ui.finish_coating", { defaultValue: "Underside coating" })}
               </span>
@@ -778,56 +778,56 @@ export const StairCalculator: React.FC<Props> = ({ onCalculate }) => {
               </button>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="block text-[10px] uppercase text-slate-500 font-bold mb-1">{t("calc.stairs.price.concrete", { defaultValue: "Concrete (€/m³)" })}</label>
+                <label className="block text-[11px] uppercase text-slate-500 font-bold mb-1">{t("calc.stairs.price.concrete", { defaultValue: "Concrete (€/m³)" })}</label>
                 <input type="number" value={prices.concrete} onChange={(e) => updatePrice("concrete", e.target.value)} className="w-full p-2 border rounded bg-white text-sm" />
               </div>
 
               <div>
-                <label className="block text-[10px] uppercase text-slate-500 font-bold mb-1">{t("calc.stairs.price.steel", { defaultValue: "Steel (€/kg)" })}</label>
+                <label className="block text-[11px] uppercase text-slate-500 font-bold mb-1">{t("calc.stairs.price.steel", { defaultValue: "Steel (€/kg)" })}</label>
                 <input type="number" value={prices.steel} onChange={(e) => updatePrice("steel", e.target.value)} className="w-full p-2 border rounded bg-white text-sm" />
               </div>
 
               <div>
-                <label className="block text-[10px] uppercase text-slate-500 font-bold mb-1">{t("calc.stairs.price.formwork", { defaultValue: "Formwork (€/m²)" })}</label>
+                <label className="block text-[11px] uppercase text-slate-500 font-bold mb-1">{t("calc.stairs.price.formwork", { defaultValue: "Formwork (€/m²)" })}</label>
                 <input type="number" value={prices.formwork} onChange={(e) => updatePrice("formwork", e.target.value)} className="w-full p-2 border rounded bg-white text-sm" />
               </div>
 
               {proMode && (
                 <div>
-                  <label className="block text-[10px] uppercase text-blue-600 font-bold mb-1">{t("calc.stairs.price.formwork_labor", { defaultValue: "Formwork labor (€/m²)" })}</label>
+                  <label className="block text-[11px] uppercase text-blue-600 font-bold mb-1">{t("calc.stairs.price.formwork_labor", { defaultValue: "Formwork labor (€/m²)" })}</label>
                   <input type="number" value={prices.formworkLabor} onChange={(e) => updatePrice("formworkLabor", e.target.value)} className="w-full p-2 border border-blue-200 rounded bg-white text-sm" />
                 </div>
               )}
 
               <div>
-                <label className="block text-[10px] uppercase text-slate-500 font-bold mb-1">{t("calc.stairs.price.props", { defaultValue: "Props (€/unit)" })}</label>
+                <label className="block text-[11px] uppercase text-slate-500 font-bold mb-1">{t("calc.stairs.price.props", { defaultValue: "Props (€/unit)" })}</label>
                 <input type="number" value={prices.prop} onChange={(e) => updatePrice("prop", e.target.value)} className="w-full p-2 border rounded bg-white text-sm" />
               </div>
 
               <div>
-                <label className="block text-[10px] uppercase text-slate-500 font-bold mb-1">{t("calc.stairs.price.pump", { defaultValue: "Pump (flat fee)" })}</label>
+                <label className="block text-[11px] uppercase text-slate-500 font-bold mb-1">{t("calc.stairs.price.pump", { defaultValue: "Pump (flat fee)" })}</label>
                 <input type="number" value={prices.pump} onChange={(e) => updatePrice("pump", e.target.value)} className="w-full p-2 border rounded bg-white text-sm" />
               </div>
 
               {finishTiling && (
                 <div>
-                  <label className="block text-[10px] uppercase text-slate-500 font-bold mb-1">{t("calc.stairs.price.tiling", { defaultValue: "Flooring (€/m²)" })}</label>
+                  <label className="block text-[11px] uppercase text-slate-500 font-bold mb-1">{t("calc.stairs.price.tiling", { defaultValue: "Flooring (€/m²)" })}</label>
                   <input type="number" value={prices.tiling} onChange={(e) => updatePrice("tiling", e.target.value)} className="w-full p-2 border rounded bg-white text-sm" />
                 </div>
               )}
 
               {finishRailing && (
                 <div>
-                  <label className="block text-[10px] uppercase text-slate-500 font-bold mb-1">{t("calc.stairs.price.railing", { defaultValue: "Railing (€/m)" })}</label>
+                  <label className="block text-[11px] uppercase text-slate-500 font-bold mb-1">{t("calc.stairs.price.railing", { defaultValue: "Railing (€/m)" })}</label>
                   <input type="number" value={prices.railing} onChange={(e) => updatePrice("railing", e.target.value)} className="w-full p-2 border rounded bg-white text-sm" />
                 </div>
               )}
 
               {finishCoating && (
                 <div>
-                  <label className="block text-[10px] uppercase text-slate-500 font-bold mb-1">{t("calc.stairs.price.coating", { defaultValue: "Coating (€/m²)" })}</label>
+                  <label className="block text-[11px] uppercase text-slate-500 font-bold mb-1">{t("calc.stairs.price.coating", { defaultValue: "Coating (€/m²)" })}</label>
                   <input type="number" value={prices.coating} onChange={(e) => updatePrice("coating", e.target.value)} className="w-full p-2 border rounded bg-white text-sm" />
                 </div>
               )}

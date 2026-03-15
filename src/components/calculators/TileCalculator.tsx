@@ -502,9 +502,9 @@ export const TileCalculator: React.FC<Props> = ({ onCalculate }) => {
   }, [calculationData, onCalculate, t, tileLength, tileWidth, patternLabel]);
 
   return (
-    <div className="space-y-6 rounded-[32px] border border-white/70 bg-white/72 p-4 shadow-[0_24px_70px_rgba(15,23,42,0.10)] backdrop-blur-xl sm:p-6">
+    <div className="space-y-6 rounded-[32px] border border-white/70 bg-white/72 p-3 sm:p-4 shadow-[0_24px_70px_rgba(15,23,42,0.10)] backdrop-blur-xl sm:p-6">
       {/* Navigation */}
-      <div className="flex justify-between items-center mb-6 rounded-[24px] border border-white/80 bg-slate-100/70 p-1.5 shadow-inner overflow-x-auto backdrop-blur-xl">
+      <div className="flex justify-between items-center mb-6 rounded-[24px] border border-white/80 bg-slate-100/70 p-1.5 shadow-inner overflow-x-auto no-scrollbar backdrop-blur-xl">
         {[1, 2, 3, 4, 5].map((s) => (
           <button
             key={s}
@@ -600,7 +600,7 @@ export const TileCalculator: React.FC<Props> = ({ onCalculate }) => {
               </button>
             </div>
 
-            <div className="grid grid-cols-2 gap-2 mb-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-2">
               <input
                 type="text"
                 placeholder={t("calc.tile.ui.ph_name", { defaultValue: "Name" })}
@@ -625,7 +625,7 @@ export const TileCalculator: React.FC<Props> = ({ onCalculate }) => {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-2 mb-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-2">
               <select
                 value={newZoneSubstrate}
                 onChange={(e) => setNewZoneSubstrate(e.target.value as any)}
@@ -675,7 +675,7 @@ export const TileCalculator: React.FC<Props> = ({ onCalculate }) => {
             {t("calc.tile.ui.step2_hint", { defaultValue: "Tile format and pattern." })}
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-bold text-slate-500 mb-1">{t("calc.tile.ui.length_cm", { defaultValue: "Length (cm)" })}</label>
               <input
@@ -716,7 +716,7 @@ export const TileCalculator: React.FC<Props> = ({ onCalculate }) => {
 
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-2">{t("calc.tile.ui.pattern", { defaultValue: "Pattern" })}</label>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
               {(TILE_PATTERNS || []).map((p: any) => {
                 const lbl = t(`calc.tile.pattern.${String(p.id)}`, { defaultValue: String(p.label ?? p.id) });
                 const w = toNum(p.waste, 10);
@@ -732,7 +732,7 @@ export const TileCalculator: React.FC<Props> = ({ onCalculate }) => {
                     }`}
                   >
                     {lbl}
-                    <span className="block text-[10px] opacity-70">
+                    <span className="block text-[11px] opacity-70">
                       {t("calc.tile.ui.waste_add", { pct: w, defaultValue: `+${w}%` })}
                     </span>
                   </button>
@@ -775,7 +775,7 @@ export const TileCalculator: React.FC<Props> = ({ onCalculate }) => {
               <input type="checkbox" checked={doubleGluing} onChange={(e) => setDoubleGluing(e.target.checked)} className="h-5 w-5 rounded text-blue-600" />
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs text-slate-500 mb-1">{t("calc.tile.ui.glue_type", { defaultValue: "Adhesive type" })}</label>
                 <select value={glueType} onChange={(e) => setGlueType(e.target.value as any)} className="w-full p-2 text-sm border rounded bg-white text-slate-900">
@@ -800,7 +800,7 @@ export const TileCalculator: React.FC<Props> = ({ onCalculate }) => {
           <div className="bg-slate-50 p-3 rounded-lg border border-slate-200 space-y-3">
             <h4 className="text-xs font-bold text-slate-500 uppercase">{t("calc.tile.ui.grout_title", { defaultValue: "Grout & accessories" })}</h4>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs text-slate-500 mb-1">{t("calc.tile.ui.joint_width_mm", { defaultValue: "Joint width (mm)" })}</label>
                 <input type="number" value={jointWidth} onChange={(e) => setJointWidth(clamp(toNum(e.target.value, 3), 1, 15))} className="w-full p-2 border rounded bg-white text-sm text-slate-900" />
@@ -840,28 +840,28 @@ export const TileCalculator: React.FC<Props> = ({ onCalculate }) => {
           </div>
 
           <div className="space-y-3">
-            <label className="flex items-center justify-between p-3 bg-white border rounded-lg cursor-pointer">
+            <label className="flex flex-wrap items-center justify-between gap-2 p-3 bg-white border rounded-lg cursor-pointer">
               <div>
                 <span className="text-sm font-bold text-slate-700">{t("calc.tile.ui.primer", { defaultValue: "Primer" })}</span>
-                <p className="text-[10px] text-slate-400">{t("calc.tile.ui.primer_help", { defaultValue: "Recommended on porous substrate / renovation" })}</p>
+                <p className="text-[11px] text-slate-400">{t("calc.tile.ui.primer_help", { defaultValue: "Recommended on porous substrate / renovation" })}</p>
               </div>
               <input type="checkbox" checked={usePrimer} onChange={(e) => setUsePrimer(e.target.checked)} className="h-5 w-5 text-blue-600 rounded" />
             </label>
 
-            <label className="flex items-center justify-between p-3 bg-white border rounded-lg cursor-pointer">
+            <label className="flex flex-wrap items-center justify-between gap-2 p-3 bg-white border rounded-lg cursor-pointer">
               <div>
                 <span className="text-sm font-bold text-slate-700 flex items-center">
                   <Droplets size={14} className="mr-1 text-blue-500" /> {t("calc.tile.ui.spec", { defaultValue: "Waterproofing (SPEC)" })}
                 </span>
-                <p className="text-[10px] text-slate-400">{t("calc.tile.ui.spec_help", { defaultValue: "Wet areas only" })}</p>
+                <p className="text-[11px] text-slate-400">{t("calc.tile.ui.spec_help", { defaultValue: "Wet areas only" })}</p>
               </div>
               <input type="checkbox" checked={useWaterproofing} onChange={(e) => setUseWaterproofing(e.target.checked)} className="h-5 w-5 text-blue-600 rounded" />
             </label>
 
-            <label className="flex items-center justify-between p-3 bg-white border rounded-lg cursor-pointer">
+            <label className="flex flex-wrap items-center justify-between gap-2 p-3 bg-white border rounded-lg cursor-pointer">
               <div>
                 <span className="text-sm font-bold text-slate-700">{t("calc.tile.ui.skirting", { defaultValue: "Skirting" })}</span>
-                <p className="text-[10px] text-slate-400">{t("calc.tile.ui.skirting_help", { defaultValue: "For floor zones" })}</p>
+                <p className="text-[11px] text-slate-400">{t("calc.tile.ui.skirting_help", { defaultValue: "For floor zones" })}</p>
               </div>
               <input type="checkbox" checked={useSkirting} onChange={(e) => setUseSkirting(e.target.checked)} className="h-5 w-5 text-blue-600 rounded" />
             </label>
@@ -895,70 +895,70 @@ export const TileCalculator: React.FC<Props> = ({ onCalculate }) => {
               </button>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="block text-[10px] text-slate-500 mb-1">{t("calc.tile.price.tile_m2", { defaultValue: "Tiles (€/m²)" })}</label>
+                <label className="block text-[11px] text-slate-500 mb-1">{t("calc.tile.price.tile_m2", { defaultValue: "Tiles (€/m²)" })}</label>
                 <input type="number" value={prices.tileM2} onChange={(e) => updatePrice("tileM2", e.target.value)} className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl" />
               </div>
 
               <div>
-                <label className="block text-[10px] text-slate-500 mb-1">{t("calc.tile.price.glue_bag", { defaultValue: "Adhesive (25kg)" })}</label>
+                <label className="block text-[11px] text-slate-500 mb-1">{t("calc.tile.price.glue_bag", { defaultValue: "Adhesive (25kg)" })}</label>
                 <input type="number" value={prices.glueBag} onChange={(e) => updatePrice("glueBag", e.target.value)} className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl" />
               </div>
 
               <div>
-                <label className="block text-[10px] text-slate-500 mb-1">{t("calc.tile.price.grout_bag", { defaultValue: "Cement grout (5kg)" })}</label>
+                <label className="block text-[11px] text-slate-500 mb-1">{t("calc.tile.price.grout_bag", { defaultValue: "Cement grout (5kg)" })}</label>
                 <input type="number" value={prices.groutBag} onChange={(e) => updatePrice("groutBag", e.target.value)} className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl" />
               </div>
 
               <div>
-                <label className="block text-[10px] text-slate-500 mb-1">{t("calc.tile.price.epoxy_kit", { defaultValue: "Epoxy (3kg kit)" })}</label>
+                <label className="block text-[11px] text-slate-500 mb-1">{t("calc.tile.price.epoxy_kit", { defaultValue: "Epoxy (3kg kit)" })}</label>
                 <input type="number" value={prices.epoxyKit} onChange={(e) => updatePrice("epoxyKit", e.target.value)} className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl" />
               </div>
 
               {usePrimer && (
                 <div>
-                  <label className="block text-[10px] text-slate-500 mb-1">{t("calc.tile.price.primer_l", { defaultValue: "Primer (€/L)" })}</label>
+                  <label className="block text-[11px] text-slate-500 mb-1">{t("calc.tile.price.primer_l", { defaultValue: "Primer (€/L)" })}</label>
                   <input type="number" value={prices.primerL} onChange={(e) => updatePrice("primerL", e.target.value)} className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl" />
                 </div>
               )}
 
               {useSkirting && (
                 <div>
-                  <label className="block text-[10px] text-slate-500 mb-1">{t("calc.tile.price.skirting_m", { defaultValue: "Skirting (€/m)" })}</label>
+                  <label className="block text-[11px] text-slate-500 mb-1">{t("calc.tile.price.skirting_m", { defaultValue: "Skirting (€/m)" })}</label>
                   <input type="number" value={prices.skirtingM} onChange={(e) => updatePrice("skirtingM", e.target.value)} className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl" />
                 </div>
               )}
 
               {useWaterproofing && (
                 <div>
-                  <label className="block text-[10px] text-slate-500 mb-1">{t("calc.tile.price.spec_kit", { defaultValue: "SPEC kit (€)" })}</label>
+                  <label className="block text-[11px] text-slate-500 mb-1">{t("calc.tile.price.spec_kit", { defaultValue: "SPEC kit (€)" })}</label>
                   <input type="number" value={prices.specKit} onChange={(e) => updatePrice("specKit", e.target.value)} className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl" />
                 </div>
               )}
 
               {useLevelingSystem && (
                 <div>
-                  <label className="block text-[10px] text-slate-500 mb-1">{t("calc.tile.price.leveling", { defaultValue: "Leveling (box)" })}</label>
+                  <label className="block text-[11px] text-slate-500 mb-1">{t("calc.tile.price.leveling", { defaultValue: "Leveling (box)" })}</label>
                   <input type="number" value={prices.levelingKit} onChange={(e) => updatePrice("levelingKit", e.target.value)} className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl" />
                 </div>
               )}
             </div>
 
             {proMode && (
-              <div className="mt-4 pt-3 border-t border-slate-100 grid grid-cols-2 gap-3">
+              <div className="mt-4 pt-3 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[10px] text-blue-600 font-bold mb-1">{t("calc.tile.price.labor_tiling", { defaultValue: "Labor tiling (€/m²)" })}</label>
+                  <label className="block text-[11px] text-blue-600 font-bold mb-1">{t("calc.tile.price.labor_tiling", { defaultValue: "Labor tiling (€/m²)" })}</label>
                   <input type="number" value={prices.laborM2} onChange={(e) => updatePrice("laborM2", e.target.value)} className="w-full p-1.5 border border-blue-200 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(37,99,235,0.08)] backdrop-blur-xl" />
                 </div>
 
                 <div>
-                  <label className="block text-[10px] text-blue-600 font-bold mb-1">{t("calc.tile.price.labor_skirting", { defaultValue: "Labor skirting (€/m)" })}</label>
+                  <label className="block text-[11px] text-blue-600 font-bold mb-1">{t("calc.tile.price.labor_skirting", { defaultValue: "Labor skirting (€/m)" })}</label>
                   <input type="number" value={prices.laborSkirting} onChange={(e) => updatePrice("laborSkirting", e.target.value)} className="w-full p-1.5 border border-blue-200 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(37,99,235,0.08)] backdrop-blur-xl" />
                 </div>
 
                 <div>
-                  <label className="block text-[10px] text-blue-600 font-bold mb-1">{t("calc.tile.price.labor_spec", { defaultValue: "Labor SPEC (€/m²)" })}</label>
+                  <label className="block text-[11px] text-blue-600 font-bold mb-1">{t("calc.tile.price.labor_spec", { defaultValue: "Labor SPEC (€/m²)" })}</label>
                   <input type="number" value={prices.laborSpec} onChange={(e) => updatePrice("laborSpec", e.target.value)} className="w-full p-1.5 border border-blue-200 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(37,99,235,0.08)] backdrop-blur-xl" />
                 </div>
               </div>

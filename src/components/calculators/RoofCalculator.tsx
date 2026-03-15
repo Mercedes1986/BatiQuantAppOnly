@@ -465,9 +465,9 @@ export const RoofCalculator: React.FC<Props> = ({ onCalculate }) => {
   const stepTitle = (s: number) => t(`calc.roof.steps.${s}`, { defaultValue: String(s) });
 
   return (
-    <div className="space-y-6 rounded-[32px] border border-white/70 bg-white/72 p-4 shadow-[0_24px_70px_rgba(15,23,42,0.10)] backdrop-blur-xl sm:p-6">
+    <div className="space-y-6 rounded-[32px] border border-white/70 bg-white/72 p-3 sm:p-4 shadow-[0_24px_70px_rgba(15,23,42,0.10)] backdrop-blur-xl sm:p-6">
       {/* Navigation */}
-      <div className="flex justify-between items-center mb-6 rounded-[24px] border border-white/80 bg-slate-100/70 p-1.5 shadow-inner overflow-x-auto backdrop-blur-xl">
+      <div className="flex justify-between items-center mb-6 rounded-[24px] border border-white/80 bg-slate-100/70 p-1.5 shadow-inner overflow-x-auto no-scrollbar backdrop-blur-xl">
         {[1, 2, 3, 4, 5].map((s) => (
           <button
             key={s}
@@ -494,7 +494,7 @@ export const RoofCalculator: React.FC<Props> = ({ onCalculate }) => {
             <label className="block text-sm font-medium text-slate-700 mb-2">
               {t("calc.roof.ui.roof_type", { defaultValue: "Roof type" })}
             </label>
-            <div className="grid grid-cols-4 gap-2">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
               {(["1pan", "2pans", "4pans", "flat"] as RoofType[]).map((rt) => (
                 <button
                   key={rt}
@@ -511,7 +511,7 @@ export const RoofCalculator: React.FC<Props> = ({ onCalculate }) => {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-bold text-slate-500 mb-1">{t("calc.roof.ui.length_m", { defaultValue: "Length (m)" })}</label>
               <input
@@ -571,7 +571,7 @@ export const RoofCalculator: React.FC<Props> = ({ onCalculate }) => {
             </select>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-bold text-slate-500 mb-1">{t("calc.roof.ui.waste_pct", { defaultValue: "Waste (%)" })}</label>
               <input
@@ -603,12 +603,12 @@ export const RoofCalculator: React.FC<Props> = ({ onCalculate }) => {
           </div>
 
           <div className="space-y-3">
-            <label className="flex items-center justify-between p-3 bg-white border rounded-lg cursor-pointer">
+            <label className="flex flex-wrap items-center justify-between gap-2 p-3 bg-white border rounded-lg cursor-pointer">
               <span className="text-sm font-bold text-slate-700">{t("calc.roof.ui.screen", { defaultValue: "Underlay screen (HPV)" })}</span>
               <input type="checkbox" checked={useScreen} onChange={(e) => setUseScreen(e.target.checked)} className="h-5 w-5 text-blue-600 rounded" />
             </label>
 
-            <label className="flex items-center justify-between p-3 bg-white border rounded-lg cursor-pointer">
+            <label className="flex flex-wrap items-center justify-between gap-2 p-3 bg-white border rounded-lg cursor-pointer">
               <span className="text-sm font-bold text-slate-700">{t("calc.roof.ui.insulation", { defaultValue: "Rafter insulation" })}</span>
               <input type="checkbox" checked={useInsulation} onChange={(e) => setUseInsulation(e.target.checked)} className="h-5 w-5 text-blue-600 rounded" />
             </label>
@@ -620,10 +620,10 @@ export const RoofCalculator: React.FC<Props> = ({ onCalculate }) => {
                   <input type="number" value={insulThick} onChange={(e) => setInsulThick(e.target.value)} className="w-full p-2 text-sm border rounded bg-white text-slate-900" />
                 </div>
 
-                <label className="flex items-center justify-between cursor-pointer">
+                <label className="flex flex-wrap items-center justify-between gap-2 cursor-pointer">
                   <div>
                     <span className="text-sm font-bold text-slate-700 block">{t("calc.roof.ui.vapor", { defaultValue: "Vapor barrier" })}</span>
-                    <span className="text-[10px] text-slate-400">{t("calc.roof.ui.vapor_help", { defaultValue: "Included only if enabled" })}</span>
+                    <span className="text-[11px] text-slate-400">{t("calc.roof.ui.vapor_help", { defaultValue: "Included only if enabled" })}</span>
                   </div>
                   <input type="checkbox" checked={useVapor} onChange={(e) => setUseVapor(e.target.checked)} className="h-5 w-5 text-blue-600 rounded" />
                 </label>
@@ -661,7 +661,7 @@ export const RoofCalculator: React.FC<Props> = ({ onCalculate }) => {
             </select>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-bold text-slate-500 mb-1">{t("calc.roof.ui.downspouts", { defaultValue: "Downspouts" })}</label>
               <input
@@ -706,46 +706,46 @@ export const RoofCalculator: React.FC<Props> = ({ onCalculate }) => {
               </button>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="block text-[10px] uppercase text-slate-500 font-bold mb-1">{t("calc.roof.price.cover_m2", { defaultValue: "Covering (€/m²)" })}</label>
+                <label className="block text-[11px] uppercase text-slate-500 font-bold mb-1">{t("calc.roof.price.cover_m2", { defaultValue: "Covering (€/m²)" })}</label>
                 <input type="number" value={prices.coverM2} onChange={(e) => updatePrice("coverM2", e.target.value)} className="w-full p-2 border rounded bg-white text-sm" />
               </div>
 
               <div>
-                <label className="block text-[10px] uppercase text-slate-500 font-bold mb-1">{t("calc.roof.price.gutter_m", { defaultValue: "Gutter (€/m)" })}</label>
+                <label className="block text-[11px] uppercase text-slate-500 font-bold mb-1">{t("calc.roof.price.gutter_m", { defaultValue: "Gutter (€/m)" })}</label>
                 <input type="number" value={prices.gutterM} onChange={(e) => updatePrice("gutterM", e.target.value)} className="w-full p-2 border rounded bg-white text-sm" />
               </div>
 
               <div>
-                <label className="block text-[10px] uppercase text-slate-500 font-bold mb-1">{t("calc.roof.price.ridge_m", { defaultValue: "Ridge (€/m)" })}</label>
+                <label className="block text-[11px] uppercase text-slate-500 font-bold mb-1">{t("calc.roof.price.ridge_m", { defaultValue: "Ridge (€/m)" })}</label>
                 <input type="number" value={prices.ridgeM} onChange={(e) => updatePrice("ridgeM", e.target.value)} className="w-full p-2 border rounded bg-white text-sm" />
               </div>
 
               <div>
-                <label className="block text-[10px] uppercase text-slate-500 font-bold mb-1">{t("calc.roof.price.valley_m", { defaultValue: "Valleys (€/m)" })}</label>
+                <label className="block text-[11px] uppercase text-slate-500 font-bold mb-1">{t("calc.roof.price.valley_m", { defaultValue: "Valleys (€/m)" })}</label>
                 <input type="number" value={prices.valleyM} onChange={(e) => updatePrice("valleyM", e.target.value)} className="w-full p-2 border rounded bg-white text-sm" />
               </div>
 
               {useScreen && roofType !== "flat" && (
                 <div>
-                  <label className="block text-[10px] uppercase text-slate-500 font-bold mb-1">{t("calc.roof.price.screen_m2", { defaultValue: "Underlay (€/m²)" })}</label>
+                  <label className="block text-[11px] uppercase text-slate-500 font-bold mb-1">{t("calc.roof.price.screen_m2", { defaultValue: "Underlay (€/m²)" })}</label>
                   <input type="number" value={prices.screenM2} onChange={(e) => updatePrice("screenM2", e.target.value)} className="w-full p-2 border rounded bg-white text-sm" />
                 </div>
               )}
 
               {useInsulation && (
                 <div>
-                  <label className="block text-[10px] uppercase text-slate-500 font-bold mb-1">{t("calc.roof.price.insul_m2", { defaultValue: "Insulation (€/m²)" })}</label>
+                  <label className="block text-[11px] uppercase text-slate-500 font-bold mb-1">{t("calc.roof.price.insul_m2", { defaultValue: "Insulation (€/m²)" })}</label>
                   <input type="number" value={prices.insulM2} onChange={(e) => updatePrice("insulM2", e.target.value)} className="w-full p-2 border rounded bg-white text-sm" />
                 </div>
               )}
             </div>
 
             {proMode && (
-              <div className="mt-4 pt-3 border-t border-slate-100 grid grid-cols-2 gap-3">
+              <div className="mt-4 pt-3 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[10px] text-blue-600 font-bold mb-1">{t("calc.roof.price.labor_m2", { defaultValue: "Labor (€/m²)" })}</label>
+                  <label className="block text-[11px] text-blue-600 font-bold mb-1">{t("calc.roof.price.labor_m2", { defaultValue: "Labor (€/m²)" })}</label>
                   <input type="number" value={prices.laborM2} onChange={(e) => updatePrice("laborM2", e.target.value)} className="w-full p-2 border border-blue-200 rounded bg-white text-sm" />
                 </div>
               </div>

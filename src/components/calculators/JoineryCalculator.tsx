@@ -554,7 +554,7 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate }) => {
                 <div key={item.id} className="bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
                   <div className="flex justify-between items-start mb-1">
                     <div className="min-w-0">
-                      <span className="font-bold text-slate-800 block truncate">
+                      <span className="font-bold text-slate-800 block break-words">
                         {item.quantity}× {item.label}
                       </span>
                       <div className="text-xs text-slate-500 mt-0.5">
@@ -568,7 +568,7 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate }) => {
                           </span>
                         )}
                         {item.priceOverride !== undefined && (
-                          <span className="ml-2 text-[10px] font-bold text-amber-700 bg-amber-50 px-1 rounded">
+                          <span className="ml-2 text-[11px] font-bold text-amber-700 bg-amber-50 px-1 rounded">
                             {t("joinery.price_override", { defaultValue: "override" })}
                           </span>
                         )}
@@ -680,7 +680,7 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate }) => {
                     </div>
                   )}
 
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                       <label className="block text-xs font-bold text-slate-500 mb-1">
                         {t("struct.common.width_m", { defaultValue: "Width (m)" })}
@@ -705,7 +705,7 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate }) => {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                       <label className="block text-xs font-bold text-slate-500 mb-1">
                         {t("struct.common.qty", { defaultValue: "Qty" })}
@@ -779,7 +779,7 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate }) => {
                   <div>
                     <label className="block text-xs font-bold text-slate-500 mb-1">
                       {t("joinery.override_supply", { defaultValue: "Override supply price (€/unit)" })}{" "}
-                      <span className="text-[10px] font-normal text-slate-400">
+                      <span className="text-[11px] font-normal text-slate-400">
                         {t("common.optional", { defaultValue: "(optional)" })}
                       </span>
                     </label>
@@ -827,7 +827,7 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate }) => {
             <label className="block text-sm font-medium text-slate-700 mb-2">
               {t("joinery.install_type", { defaultValue: "Install type" })}
             </label>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
               <button
                 type="button"
                 onClick={() => setInstallType("new")}
@@ -870,7 +870,7 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate }) => {
             </h4>
 
             <div className="space-y-2">
-              <label className="flex items-center justify-between p-2 border rounded hover:bg-slate-50 cursor-pointer">
+              <label className="flex flex-wrap items-center justify-between gap-2 p-2 border rounded hover:bg-slate-50 cursor-pointer">
                 <span className="text-sm">{t("joinery.supplies.compriband", { defaultValue: "Compriband" })}</span>
                 <input
                   type="checkbox"
@@ -880,7 +880,7 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate }) => {
                 />
               </label>
 
-              <label className="flex items-center justify-between p-2 border rounded hover:bg-slate-50 cursor-pointer">
+              <label className="flex flex-wrap items-center justify-between gap-2 p-2 border rounded hover:bg-slate-50 cursor-pointer">
                 <span className="text-sm">{t("joinery.supplies.silicone", { defaultValue: "Silicone" })}</span>
                 <input
                   type="checkbox"
@@ -890,7 +890,7 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate }) => {
                 />
               </label>
 
-              <label className="flex items-center justify-between p-2 border rounded hover:bg-slate-50 cursor-pointer">
+              <label className="flex flex-wrap items-center justify-between gap-2 p-2 border rounded hover:bg-slate-50 cursor-pointer">
                 <span className="text-sm">{t("joinery.supplies.foam", { defaultValue: "PU foam" })}</span>
                 <input
                   type="checkbox"
@@ -900,7 +900,7 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate }) => {
                 />
               </label>
 
-              <label className="flex items-center justify-between p-2 border rounded hover:bg-slate-50 cursor-pointer">
+              <label className="flex flex-wrap items-center justify-between gap-2 p-2 border rounded hover:bg-slate-50 cursor-pointer">
                 <span className="text-sm">{t("joinery.supplies.fixings", { defaultValue: "Fixings" })}</span>
                 <input
                   type="checkbox"
@@ -975,10 +975,10 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate }) => {
               </button>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {(["window", "door", "bay", "velux", "garage"] as const).map((k) => (
                 <div key={k}>
-                  <label className="block text-[10px] text-slate-500 mb-1">
+                  <label className="block text-[11px] text-slate-500 mb-1">
                     {getTypeLabel(t, k)} (€/u)
                   </label>
                   <input
@@ -991,7 +991,7 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate }) => {
               ))}
 
               <div>
-                <label className="block text-[10px] text-slate-500 mb-1">
+                <label className="block text-[11px] text-slate-500 mb-1">
                   {t("joinery.shutter.rolling", { defaultValue: "Rolling shutter" })} (+€/u)
                 </label>
                 <input
@@ -1002,7 +1002,7 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate }) => {
                 />
               </div>
               <div>
-                <label className="block text-[10px] text-slate-500 mb-1">
+                <label className="block text-[11px] text-slate-500 mb-1">
                   {t("joinery.shutter.swing", { defaultValue: "Swing shutter" })} (+€/u)
                 </label>
                 <input
@@ -1014,7 +1014,7 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate }) => {
               </div>
 
               <div>
-                <label className="block text-[10px] text-slate-500 mb-1">
+                <label className="block text-[11px] text-slate-500 mb-1">
                   {t("joinery.prices.coef_alu", { defaultValue: "ALU coefficient (x)" })}
                 </label>
                 <input
@@ -1025,7 +1025,7 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate }) => {
                 />
               </div>
               <div>
-                <label className="block text-[10px] text-slate-500 mb-1">
+                <label className="block text-[11px] text-slate-500 mb-1">
                   {t("joinery.prices.coef_wood", { defaultValue: "WOOD coefficient (x)" })}
                 </label>
                 <input
@@ -1038,9 +1038,9 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate }) => {
             </div>
 
             {proMode && (
-              <div className="mt-4 pt-3 border-t border-slate-100 grid grid-cols-2 gap-3">
+              <div className="mt-4 pt-3 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[10px] text-blue-600 font-bold mb-1">
+                  <label className="block text-[11px] text-blue-600 font-bold mb-1">
                     {t("joinery.prices.install_window", { defaultValue: "Install window (€/u)" })}
                   </label>
                   <input
@@ -1051,7 +1051,7 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate }) => {
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] text-blue-600 font-bold mb-1">
+                  <label className="block text-[11px] text-blue-600 font-bold mb-1">
                     {t("joinery.prices.install_door", { defaultValue: "Install door (€/u)" })}
                   </label>
                   <input
@@ -1062,7 +1062,7 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate }) => {
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] text-blue-600 font-bold mb-1">
+                  <label className="block text-[11px] text-blue-600 font-bold mb-1">
                     {t("joinery.prices.install_bay", { defaultValue: "Install bay (€/u)" })}
                   </label>
                   <input
@@ -1073,7 +1073,7 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate }) => {
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] text-blue-600 font-bold mb-1">
+                  <label className="block text-[11px] text-blue-600 font-bold mb-1">
                     {t("joinery.prices.install_velux", { defaultValue: "Install roof window (€/u)" })}
                   </label>
                   <input
@@ -1084,7 +1084,7 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate }) => {
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] text-blue-600 font-bold mb-1">
+                  <label className="block text-[11px] text-blue-600 font-bold mb-1">
                     {t("joinery.prices.install_garage", { defaultValue: "Install garage door (€/u)" })}
                   </label>
                   <input
@@ -1095,7 +1095,7 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate }) => {
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] text-blue-600 font-bold mb-1">
+                  <label className="block text-[11px] text-blue-600 font-bold mb-1">
                     {t("joinery.prices.reno_surcharge", { defaultValue: "Renovation surcharge (€/u)" })}
                   </label>
                   <input
@@ -1108,9 +1108,9 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate }) => {
               </div>
             )}
 
-            <div className="mt-4 pt-3 border-t border-slate-100 grid grid-cols-2 gap-3">
+            <div className="mt-4 pt-3 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="block text-[10px] text-slate-500 mb-1">
+                <label className="block text-[11px] text-slate-500 mb-1">
                   {t("joinery.prices.compriband_m", { defaultValue: "Compriband (€/m)" })}
                 </label>
                 <input
@@ -1121,7 +1121,7 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate }) => {
                 />
               </div>
               <div>
-                <label className="block text-[10px] text-slate-500 mb-1">
+                <label className="block text-[11px] text-slate-500 mb-1">
                   {t("joinery.prices.silicone_cart", { defaultValue: "Silicone (€/cart.)" })}
                 </label>
                 <input
@@ -1132,7 +1132,7 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate }) => {
                 />
               </div>
               <div>
-                <label className="block text-[10px] text-slate-500 mb-1">
+                <label className="block text-[11px] text-slate-500 mb-1">
                   {t("joinery.prices.foam_cart", { defaultValue: "PU foam (€/cart.)" })}
                 </label>
                 <input
@@ -1143,7 +1143,7 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate }) => {
                 />
               </div>
               <div>
-                <label className="block text-[10px] text-slate-500 mb-1">
+                <label className="block text-[11px] text-slate-500 mb-1">
                   {t("joinery.prices.fixing_kit", { defaultValue: "Fixing kit (€/unit)" })}
                 </label>
                 <input

@@ -571,9 +571,9 @@ export const PlumbingCalculator: React.FC<Props> = ({ onCalculate }) => {
   const stepLabel = (s: number) => (s === 1 ? t("calc.plumbing.step_1") : s === 2 ? t("calc.plumbing.step_2") : s === 3 ? t("calc.plumbing.step_3") : t("calc.plumbing.step_4"));
 
   return (
-    <div className="space-y-6 rounded-[32px] border border-white/70 bg-white/72 p-4 shadow-[0_24px_70px_rgba(15,23,42,0.10)] backdrop-blur-xl sm:p-6">
+    <div className="space-y-6 rounded-[32px] border border-white/70 bg-white/72 p-3 sm:p-4 shadow-[0_24px_70px_rgba(15,23,42,0.10)] backdrop-blur-xl sm:p-6">
       {/* Navigation */}
-      <div className="flex justify-between items-center mb-6 rounded-[24px] border border-white/80 bg-slate-100/70 p-1.5 shadow-inner overflow-x-auto backdrop-blur-xl">
+      <div className="flex justify-between items-center mb-6 rounded-[24px] border border-white/80 bg-slate-100/70 p-1.5 shadow-inner overflow-x-auto no-scrollbar backdrop-blur-xl">
         {[1, 2, 3, 4].map((s) => (
           <button
             key={s}
@@ -624,11 +624,11 @@ export const PlumbingCalculator: React.FC<Props> = ({ onCalculate }) => {
                         ) : (
                           <span className="w-2 h-2 rounded-full bg-blue-400 mr-2 shrink-0" title={t("calc.plumbing.cold")} />
                         )}
-                        <span className="text-slate-700 truncate">{app.label}</span>
-                        {app.drainDiameter > 0 && <span className="ml-2 text-[10px] text-slate-400">Ø{app.drainDiameter}</span>}
+                        <span className="text-slate-700 break-words">{app.label}</span>
+                        {app.drainDiameter > 0 && <span className="ml-2 text-[11px] text-slate-400">Ø{app.drainDiameter}</span>}
                       </div>
 
-                      <div className="flex items-center gap-2">
+                      <div className="flex flex-wrap items-center gap-2">
                         <div className="flex items-center gap-1">
                           <button
                             type="button"
@@ -677,7 +677,7 @@ export const PlumbingCalculator: React.FC<Props> = ({ onCalculate }) => {
                         key={tp}
                         type="button"
                         onClick={() => addApplianceToRoom(room.id, tp)}
-                        className="px-2 py-1 bg-slate-100 rounded text-[10px] hover:bg-slate-200"
+                        className="px-2 py-1 bg-slate-100 rounded text-[11px] hover:bg-slate-200"
                       >
                         {t(key)}
                       </button>
@@ -733,9 +733,9 @@ export const PlumbingCalculator: React.FC<Props> = ({ onCalculate }) => {
           <div className="bg-white p-3 rounded-xl border border-slate-200 space-y-3">
             <h4 className="text-xs font-bold text-slate-500 uppercase">{t("calc.plumbing.supply_title")}</h4>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="block text-[10px] text-slate-500 mb-1">{t("calc.plumbing.material")}</label>
+                <label className="block text-[11px] text-slate-500 mb-1">{t("calc.plumbing.material")}</label>
                 <select value={supplyMaterial} onChange={(e) => setSupplyMaterial(e.target.value as any)} className={selectBase}>
                   <option value="per">{t("calc.plumbing.material_per")}</option>
                   <option value="multiskin">{t("calc.plumbing.material_multiskin")}</option>
@@ -743,7 +743,7 @@ export const PlumbingCalculator: React.FC<Props> = ({ onCalculate }) => {
                 </select>
               </div>
               <div>
-                <label className="block text-[10px] text-slate-500 mb-1">{t("calc.plumbing.distribution_title")}</label>
+                <label className="block text-[11px] text-slate-500 mb-1">{t("calc.plumbing.distribution_title")}</label>
                 <select value={distributionMode} onChange={(e) => setDistributionMode(e.target.value as any)} className={selectBase}>
                   <option value="manifold">{t("calc.plumbing.distribution.manifold")}</option>
                   <option value="series">{t("calc.plumbing.distribution.series")}</option>
@@ -752,14 +752,14 @@ export const PlumbingCalculator: React.FC<Props> = ({ onCalculate }) => {
             </div>
 
             <div>
-              <label className="block text-[10px] text-slate-500 mb-1">{t("calc.plumbing.avg_distance_supply_m")}</label>
+              <label className="block text-[11px] text-slate-500 mb-1">{t("calc.plumbing.avg_distance_supply_m")}</label>
               <input
                 type="number"
                 value={avgDistManifold}
                 onChange={(e) => setAvgDistManifold(clamp(toNum(e.target.value, 6), 0, 50))}
                 className={selectBase}
               />
-              <p className="text-[10px] text-slate-400 mt-1">
+              <p className="text-[11px] text-slate-400 mt-1">
                 {distributionMode === "series" ? t("calc.plumbing.series_help") : t("calc.plumbing.manifold_help")}
               </p>
             </div>
@@ -768,7 +768,7 @@ export const PlumbingCalculator: React.FC<Props> = ({ onCalculate }) => {
           <div className="bg-white p-3 rounded-xl border border-slate-200 space-y-2">
             <h4 className="text-xs font-bold text-slate-500 uppercase">{t("calc.plumbing.drain_title")}</h4>
             <div>
-              <label className="block text-[10px] text-slate-500 mb-1">{t("calc.plumbing.avg_distance_drain_m")}</label>
+              <label className="block text-[11px] text-slate-500 mb-1">{t("calc.plumbing.avg_distance_drain_m")}</label>
               <input
                 type="number"
                 value={avgDistDrain}
@@ -810,9 +810,9 @@ export const PlumbingCalculator: React.FC<Props> = ({ onCalculate }) => {
 
             {waterHeater.active && (
               <div className="space-y-3 animate-in fade-in">
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-[10px] text-slate-500 mb-1">{t("calc.plumbing.heater_type_title")}</label>
+                    <label className="block text-[11px] text-slate-500 mb-1">{t("calc.plumbing.heater_type_title")}</label>
                     <select
                       value={waterHeater.type}
                       onChange={(e) => setWaterHeater({ ...waterHeater, type: e.target.value as any })}
@@ -823,7 +823,7 @@ export const PlumbingCalculator: React.FC<Props> = ({ onCalculate }) => {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-[10px] text-slate-500 mb-1">{t("calc.plumbing.heater_capacity_l")}</label>
+                    <label className="block text-[11px] text-slate-500 mb-1">{t("calc.plumbing.heater_capacity_l")}</label>
                     <select
                       value={waterHeater.capacity}
                       onChange={(e) => setWaterHeater({ ...waterHeater, capacity: toNum(e.target.value, 200) })}
@@ -884,9 +884,9 @@ export const PlumbingCalculator: React.FC<Props> = ({ onCalculate }) => {
               </button>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="block text-[10px] text-slate-500 mb-1">
+                <label className="block text-[11px] text-slate-500 mb-1">
                   {t("calc.plumbing.price_pipe_selected", { pipe: pipeLabel(supplyMaterial) })} (€/m)
                 </label>
                 <input
@@ -903,30 +903,30 @@ export const PlumbingCalculator: React.FC<Props> = ({ onCalculate }) => {
               </div>
 
               <div>
-                <label className="block text-[10px] text-slate-500 mb-1">{t("calc.plumbing.price_pvc40")} (€/m)</label>
+                <label className="block text-[11px] text-slate-500 mb-1">{t("calc.plumbing.price_pvc40")} (€/m)</label>
                 <input type="number" value={prices.pvc40} onChange={(e) => updatePrice("pvc40", e.target.value)} className={inputBase} />
               </div>
 
               <div>
-                <label className="block text-[10px] text-slate-500 mb-1">{t("calc.plumbing.price_wc_pack")} (€)</label>
+                <label className="block text-[11px] text-slate-500 mb-1">{t("calc.plumbing.price_wc_pack")} (€)</label>
                 <input type="number" value={prices.wcPack} onChange={(e) => updatePrice("wcPack", e.target.value)} className={inputBase} />
               </div>
 
               <div>
-                <label className="block text-[10px] text-slate-500 mb-1">{t("calc.plumbing.price_heater_base_200")} (€)</label>
+                <label className="block text-[11px] text-slate-500 mb-1">{t("calc.plumbing.price_heater_base_200")} (€)</label>
                 <input type="number" value={prices.waterHeater200} onChange={(e) => updatePrice("waterHeater200", e.target.value)} className={inputBase} />
-                <p className="text-[10px] text-slate-400 mt-1">{t("calc.plumbing.heater_coef_help")}</p>
+                <p className="text-[11px] text-slate-400 mt-1">{t("calc.plumbing.heater_coef_help")}</p>
               </div>
             </div>
 
             {proMode && (
-              <div className="mt-4 pt-3 border-t border-slate-100 grid grid-cols-2 gap-3">
+              <div className="mt-4 pt-3 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[10px] text-blue-600 font-bold mb-1">{t("calc.plumbing.price_labor_point")} (€)</label>
+                  <label className="block text-[11px] text-blue-600 font-bold mb-1">{t("calc.plumbing.price_labor_point")} (€)</label>
                   <input type="number" value={prices.laborPoint} onChange={(e) => updatePrice("laborPoint", e.target.value)} className={inputPro} />
                 </div>
                 <div>
-                  <label className="block text-[10px] text-blue-600 font-bold mb-1">{t("calc.plumbing.price_labor_network")} (€/m)</label>
+                  <label className="block text-[11px] text-blue-600 font-bold mb-1">{t("calc.plumbing.price_labor_network")} (€/m)</label>
                   <input type="number" value={prices.laborNetwork} onChange={(e) => updatePrice("laborNetwork", e.target.value)} className={inputPro} />
                 </div>
               </div>

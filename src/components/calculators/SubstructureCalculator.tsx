@@ -1,5 +1,28 @@
 import React, { useEffect, useMemo, useState } from "react";
-  const formatWallSpecOption = (s: WallBlockSpec) => {
+  
+import { useTranslation } from "react-i18next";
+import { CalculatorType, CalculationResult, Unit } from "../../../types";
+import { DEFAULT_PRICES, getWallUnitPriceKey } from "../../constants";
+import { getUnitPrice } from "../../services/materialsService";
+import {
+  Droplets,
+  Info,
+  ScanLine,
+  ArrowRight,
+  Settings,
+  Check,
+  CircleDollarSign,
+  AlertTriangle,
+} from "lucide-react";
+
+import {
+  WALL_BLOCK_SPECS,
+  getWallBlockSpec,
+  getSpecsByFamily,
+  type WallBlockSpec,
+} from "../../data/blockSpecs";
+
+const formatWallSpecOption = (s: WallBlockSpec) => {
     const anyS = s as any;
     const parts: string[] = [];
 
@@ -28,28 +51,6 @@ import React, { useEffect, useMemo, useState } from "react";
     return parts.join(" — ");
   };
 
-
-import { useTranslation } from "react-i18next";
-import { CalculatorType, CalculationResult, Unit } from "../../../types";
-import { DEFAULT_PRICES, getWallUnitPriceKey } from "../../constants";
-import { getUnitPrice } from "../../services/materialsService";
-import {
-  Droplets,
-  Info,
-  ScanLine,
-  ArrowRight,
-  Settings,
-  Check,
-  CircleDollarSign,
-  AlertTriangle,
-} from "lucide-react";
-
-import {
-  WALL_BLOCK_SPECS,
-  getWallBlockSpec,
-  getSpecsByFamily,
-  type WallBlockSpec,
-} from "../../data/blockSpecs";
 
 interface Props {
   onCalculate: (result: CalculationResult) => void;
@@ -635,14 +636,14 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
     const v = getP(k, fallback);
     return (
       <div>
-        <label className="block text-[10px] uppercase text-slate-500 font-bold mb-1">{label}</label>
+        <label className="block text-[11px] uppercase text-slate-500 font-bold mb-1">{label}</label>
         <input
           type="number"
           value={v}
           onChange={(e) => setOverride(k, toNum(e.target.value, 0))}
           className="w-full p-2 border rounded bg-white text-sm"
         />
-        {hint ? <p className="text-[10px] text-slate-400 mt-1">{hint}</p> : null}
+        {hint ? <p className="text-[11px] text-slate-400 mt-1">{hint}</p> : null}
       </div>
     );
   };
@@ -653,7 +654,7 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
     });
 
   return (
-    <div className="space-y-6 rounded-[32px] border border-white/70 bg-white/72 p-4 shadow-[0_24px_70px_rgba(15,23,42,0.10)] backdrop-blur-xl sm:p-6">
+    <div className="space-y-6 rounded-[32px] border border-white/70 bg-white/72 p-3 sm:p-4 shadow-[0_24px_70px_rgba(15,23,42,0.10)] backdrop-blur-xl sm:p-6">
       {/* Step Navigation */}
       <div className="flex justify-between items-center mb-6 bg-slate-50 p-1 rounded-lg">
         {[1, 2, 3, 4].map((s) => (
@@ -691,7 +692,7 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
             })}
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-bold text-slate-500 mb-1">
                 {t("calc.substructure.ui.perimeter_m", { defaultValue: "Perimeter (m)" })}
@@ -720,7 +721,7 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
             <label className="block text-sm font-medium text-slate-700 mb-2">
               {t("calc.substructure.ui.wall_type", { defaultValue: "Wall type" })}
             </label>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {(["masonry", "concrete"] as WallMode[]).map((m) => (
                 <button
                   key={m}
@@ -744,7 +745,7 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
                 <label className="block text-xs font-bold text-slate-500 mb-1">
                   {t("calc.substructure.ui.family", { defaultValue: "Family" })}
                 </label>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {(["parpaing", "brique", "cellulaire", "stepoc"] as WallFamily[]).map((fam) => (
                     <button
                       key={fam}
@@ -815,9 +816,9 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
             </button>
 
             {advanced ? (
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[10px] text-slate-500 uppercase">
+                  <label className="block text-[11px] text-slate-500 uppercase">
                     {t("calc.substructure.ui.deductions_m2", { defaultValue: "Deductions (m²)" })}
                   </label>
                   <input
@@ -829,7 +830,7 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
                 </div>
 
                 <div>
-                  <label className="block text-[10px] text-slate-500 uppercase">
+                  <label className="block text-[11px] text-slate-500 uppercase">
                     {t("calc.substructure.ui.waste_pct", { defaultValue: "Waste (%)" })}
                   </label>
                   <input
@@ -842,7 +843,7 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
 
                 {wallMode === "masonry" && selectedSpec?.family === "stepoc" && (
                   <div className="col-span-2">
-                    <label className="block text-[10px] text-slate-500 uppercase">
+                    <label className="block text-[11px] text-slate-500 uppercase">
                       {t("calc.substructure.ui.stepoc_fill_fallback", {
                         defaultValue: "Stepoc fill (L/m²) — fallback",
                       })}
@@ -907,7 +908,7 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
               />
             </label>
 
-            <label className="flex items-center justify-between p-3 bg-white border rounded-lg cursor-pointer hover:bg-slate-50">
+            <label className="flex flex-wrap items-center justify-between gap-2 p-3 bg-white border rounded-lg cursor-pointer hover:bg-slate-50">
               <div>
                 <span className="text-sm font-bold text-slate-700">
                   {t("calc.substructure.ui.dpc", { defaultValue: "DPC strip" })}
@@ -924,7 +925,7 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
               />
             </label>
 
-            <label className="flex items-center justify-between p-3 bg-white border rounded-lg cursor-pointer hover:bg-slate-50">
+            <label className="flex flex-wrap items-center justify-between gap-2 p-3 bg-white border rounded-lg cursor-pointer hover:bg-slate-50">
               <div>
                 <span className="text-sm font-bold text-slate-700">
                   {t("calc.substructure.ui.bitumen", { defaultValue: "Bitumen coating" })}
@@ -965,7 +966,7 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
               </div>
             )}
 
-            <label className="flex items-center justify-between p-3 bg-white border rounded-lg cursor-pointer hover:bg-slate-50">
+            <label className="flex flex-wrap items-center justify-between gap-2 p-3 bg-white border rounded-lg cursor-pointer hover:bg-slate-50">
               <div>
                 <span className="text-sm font-bold text-slate-700">
                   {t("calc.substructure.ui.delta_ms", { defaultValue: "Delta MS membrane" })}
@@ -1012,7 +1013,7 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
             })}
           </div>
 
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
             <span className="font-bold text-slate-800">
               {t("calc.substructure.ui.install_drain", { defaultValue: "Install drain?" })}
             </span>
@@ -1033,7 +1034,7 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
                 <h4 className="text-xs font-bold text-slate-500 uppercase mb-3">
                   {t("calc.substructure.ui.trench", { defaultValue: "Drain trench" })}
                 </h4>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <label className="block text-xs text-slate-500 mb-1">
                       {t("calc.substructure.ui.trench_width_m", { defaultValue: "Width (m)" })}
@@ -1059,7 +1060,7 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
                 </div>
               </div>
 
-              <label className="flex items-center justify-between p-3 border rounded bg-white">
+              <label className="flex flex-wrap items-center justify-between gap-2 p-3 border rounded bg-white">
                 <span className="text-sm font-medium">
                   {t("calc.substructure.ui.geotextile", { defaultValue: "Geotextile" })}
                 </span>
@@ -1071,7 +1072,7 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
                 />
               </label>
 
-              <div className="flex items-center justify-between p-3 border rounded bg-white">
+              <div className="flex flex-wrap items-center justify-between gap-2 p-3 border rounded bg-white">
                 <span className="text-sm font-medium">
                   {t("calc.substructure.ui.manholes", { defaultValue: "Inspection chambers" })}
                 </span>
@@ -1128,7 +1129,7 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
           </div>
 
           <div className="bg-white p-3 rounded-xl border border-slate-200">
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {/* Block */}
               {wallMode === "masonry" && selectedSpec ? (
                 <div className="col-span-2">

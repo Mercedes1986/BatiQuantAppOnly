@@ -420,9 +420,9 @@ export const PaintCalculator: React.FC<Props> = ({ onCalculate }) => {
   const paintTypeLabel = (type: string) => t(`calc.paint.paint_type.${type}`, { defaultValue: type });
 
   return (
-    <div className="space-y-6 rounded-[32px] border border-white/70 bg-white/72 p-4 shadow-[0_24px_70px_rgba(15,23,42,0.10)] backdrop-blur-xl sm:p-6">
+    <div className="space-y-6 rounded-[32px] border border-white/70 bg-white/72 p-3 sm:p-4 shadow-[0_24px_70px_rgba(15,23,42,0.10)] backdrop-blur-xl sm:p-6">
       {/* Navigation */}
-      <div className="flex justify-between items-center mb-6 rounded-[24px] border border-white/80 bg-slate-100/70 p-1.5 shadow-inner overflow-x-auto backdrop-blur-xl">
+      <div className="flex justify-between items-center mb-6 rounded-[24px] border border-white/80 bg-slate-100/70 p-1.5 shadow-inner overflow-x-auto no-scrollbar backdrop-blur-xl">
         {[1, 2, 3, 4, 5].map((s) => (
           <button
             key={s}
@@ -459,8 +459,8 @@ export const PaintCalculator: React.FC<Props> = ({ onCalculate }) => {
                   {t("calc.paint.room_dims_line", { l: r.length, w: r.width, h: r.height })}
                 </div>
 
-                <div className="grid grid-cols-2 gap-2 text-xs">
-                  <label className="flex items-center justify-between bg-slate-50 border rounded p-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                  <label className="flex flex-wrap items-center justify-between gap-2 bg-slate-50 border rounded p-2">
                     <span>{t("calc.paint.doors")}</span>
                     <input
                       type="number"
@@ -470,7 +470,7 @@ export const PaintCalculator: React.FC<Props> = ({ onCalculate }) => {
                       className="w-16 p-1 border rounded bg-white text-right"
                     />
                   </label>
-                  <label className="flex items-center justify-between bg-slate-50 border rounded p-2">
+                  <label className="flex flex-wrap items-center justify-between gap-2 bg-slate-50 border rounded p-2">
                     <span>{t("calc.paint.windows")}</span>
                     <input
                       type="number"
@@ -513,7 +513,7 @@ export const PaintCalculator: React.FC<Props> = ({ onCalculate }) => {
                 onChange={(e) => setNewRoomLabel(e.target.value)}
                 className="w-full p-2 mb-2 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl"
               />
-              <div className="grid grid-cols-3 gap-2 mb-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 mb-2">
                 <input
                   type="number"
                   placeholder={t("calc.paint.ph_len")}
@@ -559,7 +559,7 @@ export const PaintCalculator: React.FC<Props> = ({ onCalculate }) => {
 
           <div className="space-y-3">
             <label className="block text-sm font-medium text-slate-700">{t("calc.paint.state_title")}</label>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
               <button
                 type="button"
                 onClick={() => setSubstrateState("good")}
@@ -593,20 +593,20 @@ export const PaintCalculator: React.FC<Props> = ({ onCalculate }) => {
           <div className="bg-white p-3 rounded-xl border border-slate-200 space-y-3">
             <h4 className="text-xs font-bold text-slate-500 uppercase">{t("calc.paint.prep_title")}</h4>
 
-            <label className="flex items-center justify-between">
+            <label className="flex flex-wrap items-center justify-between gap-2">
               <span className="text-sm">{t("calc.paint.prep_filler")}</span>
               <input type="checkbox" checked={useFiller} onChange={(e) => setUseFiller(e.target.checked)} className="h-5 w-5 text-blue-600 rounded" />
             </label>
 
-            <label className="flex items-center justify-between">
+            <label className="flex flex-wrap items-center justify-between gap-2">
               <span className="text-sm">{t("calc.paint.prep_smoothing")}</span>
               <input type="checkbox" checked={useSmoothing} onChange={(e) => setUseSmoothing(e.target.checked)} className="h-5 w-5 text-blue-600 rounded" />
             </label>
 
-            <label className="flex items-center justify-between">
+            <label className="flex flex-wrap items-center justify-between gap-2">
               <div>
                 <span className="text-sm block">{t("calc.paint.prep_primer")}</span>
-                <span className="text-[10px] text-slate-400">{t("calc.paint.prep_primer_help")}</span>
+                <span className="text-[11px] text-slate-400">{t("calc.paint.prep_primer_help")}</span>
               </div>
               <input type="checkbox" checked={usePrimer} onChange={(e) => setUsePrimer(e.target.checked)} className="h-5 w-5 text-blue-600 rounded" />
             </label>
@@ -667,7 +667,7 @@ export const PaintCalculator: React.FC<Props> = ({ onCalculate }) => {
           </div>
 
           <div className="bg-white p-3 rounded-lg border border-slate-200">
-            <label className="flex items-center justify-between cursor-pointer">
+            <label className="flex flex-wrap items-center justify-between gap-2 cursor-pointer">
               <span className="text-sm font-bold text-slate-700">{t("calc.paint.opt_wood")}</span>
               <input type="checkbox" checked={paintWood} onChange={(e) => setPaintWood(e.target.checked)} className="h-5 w-5 text-blue-600 rounded" />
             </label>
@@ -693,18 +693,18 @@ export const PaintCalculator: React.FC<Props> = ({ onCalculate }) => {
           </div>
 
           <div className="space-y-3 bg-white p-3 rounded-xl border border-slate-200">
-            <label className="flex items-center justify-between p-2 hover:bg-slate-50 rounded cursor-pointer">
+            <label className="flex flex-wrap items-center justify-between gap-2 p-2 hover:bg-slate-50 rounded cursor-pointer">
               <div>
                 <span className="text-sm font-medium block">{t("calc.paint.opt_floor_protection")}</span>
-                <span className="text-[10px] text-slate-400">{t("calc.paint.opt_floor_protection_help")}</span>
+                <span className="text-[11px] text-slate-400">{t("calc.paint.opt_floor_protection_help")}</span>
               </div>
               <input type="checkbox" checked={protectFloor} onChange={(e) => setProtectFloor(e.target.checked)} className="h-5 w-5 text-blue-600 rounded" />
             </label>
 
-            <label className="flex items-center justify-between p-2 hover:bg-slate-50 rounded cursor-pointer">
+            <label className="flex flex-wrap items-center justify-between gap-2 p-2 hover:bg-slate-50 rounded cursor-pointer">
               <div>
                 <span className="text-sm font-medium block">{t("calc.paint.opt_tape")}</span>
-                <span className="text-[10px] text-slate-400">{t("calc.paint.opt_tape_help")}</span>
+                <span className="text-[11px] text-slate-400">{t("calc.paint.opt_tape_help")}</span>
               </div>
               <input type="checkbox" checked={useTape} onChange={(e) => setUseTape(e.target.checked)} className="h-5 w-5 text-blue-600 rounded" />
             </label>
@@ -741,64 +741,64 @@ export const PaintCalculator: React.FC<Props> = ({ onCalculate }) => {
               </button>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="block text-[10px] text-slate-500 mb-1">{t("calc.paint.price_wall_paint")}</label>
+                <label className="block text-[11px] text-slate-500 mb-1">{t("calc.paint.price_wall_paint")}</label>
                 <input type="number" value={prices.paintWallL} onChange={(e) => updatePrice("paintWallL", e.target.value)} className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl" />
               </div>
 
               <div>
-                <label className="block text-[10px] text-slate-500 mb-1">{t("calc.paint.price_ceiling_paint")}</label>
+                <label className="block text-[11px] text-slate-500 mb-1">{t("calc.paint.price_ceiling_paint")}</label>
                 <input type="number" value={prices.paintCeilingL} onChange={(e) => updatePrice("paintCeilingL", e.target.value)} className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl" />
               </div>
 
               {usePrimer && (
                 <div>
-                  <label className="block text-[10px] text-slate-500 mb-1">{t("calc.paint.price_primer")}</label>
+                  <label className="block text-[11px] text-slate-500 mb-1">{t("calc.paint.price_primer")}</label>
                   <input type="number" value={prices.primerL} onChange={(e) => updatePrice("primerL", e.target.value)} className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl" />
                 </div>
               )}
 
               {useFiller && (
                 <div>
-                  <label className="block text-[10px] text-slate-500 mb-1">{t("calc.paint.price_filler")}</label>
+                  <label className="block text-[11px] text-slate-500 mb-1">{t("calc.paint.price_filler")}</label>
                   <input type="number" value={prices.fillerKg} onChange={(e) => updatePrice("fillerKg", e.target.value)} className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl" />
                 </div>
               )}
 
               {useSmoothing && (
                 <div>
-                  <label className="block text-[10px] text-slate-500 mb-1">{t("calc.paint.price_smoothing")}</label>
+                  <label className="block text-[11px] text-slate-500 mb-1">{t("calc.paint.price_smoothing")}</label>
                   <input type="number" value={prices.smoothingKg} onChange={(e) => updatePrice("smoothingKg", e.target.value)} className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl" />
                 </div>
               )}
 
               <div>
-                <label className="block text-[10px] text-slate-500 mb-1">{t("calc.paint.price_tarp")}</label>
+                <label className="block text-[11px] text-slate-500 mb-1">{t("calc.paint.price_tarp")}</label>
                 <input type="number" value={prices.tarpUnit} onChange={(e) => updatePrice("tarpUnit", e.target.value)} className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl" />
               </div>
 
               <div>
-                <label className="block text-[10px] text-slate-500 mb-1">{t("calc.paint.price_tape")}</label>
+                <label className="block text-[11px] text-slate-500 mb-1">{t("calc.paint.price_tape")}</label>
                 <input type="number" value={prices.tapeRoll} onChange={(e) => updatePrice("tapeRoll", e.target.value)} className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl" />
               </div>
 
               {paintWood && (
                 <div>
-                  <label className="block text-[10px] text-slate-500 mb-1">{t("calc.paint.price_wood_paint")}</label>
+                  <label className="block text-[11px] text-slate-500 mb-1">{t("calc.paint.price_wood_paint")}</label>
                   <input type="number" value={prices.paintWoodL} onChange={(e) => updatePrice("paintWoodL", e.target.value)} className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl" />
                 </div>
               )}
             </div>
 
             {proMode && (
-              <div className="mt-4 pt-3 border-t border-slate-100 grid grid-cols-2 gap-3">
+              <div className="mt-4 pt-3 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[10px] text-blue-600 font-bold mb-1">{t("calc.paint.price_labor_prep")}</label>
+                  <label className="block text-[11px] text-blue-600 font-bold mb-1">{t("calc.paint.price_labor_prep")}</label>
                   <input type="number" value={prices.laborPrepM2} onChange={(e) => updatePrice("laborPrepM2", e.target.value)} className="w-full p-1.5 border border-blue-200 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(37,99,235,0.08)] backdrop-blur-xl" />
                 </div>
                 <div>
-                  <label className="block text-[10px] text-blue-600 font-bold mb-1">{t("calc.paint.price_labor_paint")}</label>
+                  <label className="block text-[11px] text-blue-600 font-bold mb-1">{t("calc.paint.price_labor_paint")}</label>
                   <input type="number" value={prices.laborPaintM2} onChange={(e) => updatePrice("laborPaintM2", e.target.value)} className="w-full p-1.5 border border-blue-200 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(37,99,235,0.08)] backdrop-blur-xl" />
                 </div>
               </div>
