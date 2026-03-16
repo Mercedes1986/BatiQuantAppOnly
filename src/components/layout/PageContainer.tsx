@@ -16,7 +16,7 @@ export const PageContainer: React.FC<PageContainerProps> = ({
       <div
         className={[
           "glass-panel rounded-[26px] sm:rounded-[30px]",
-          compactOnMobile ? "p-3.5 sm:p-5 lg:p-6" : "p-4 sm:p-5 lg:p-6",
+          compactOnMobile ? "p-3 sm:p-5 lg:p-6" : "p-3.5 sm:p-5 lg:p-6",
         ].join(" ")}
       >
         {children}

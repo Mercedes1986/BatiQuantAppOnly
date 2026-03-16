@@ -247,12 +247,12 @@ export const MaterialsPage: React.FC = () => {
     <div className="app-shell app-shell--materials min-h-screen bg-transparent">
       <div className="glass-panel sticky top-0 z-20 border-b border-slate-200/70 shadow-sm">
         <div className="page-frame !pt-4 !pb-4">
-          <div className="flex justify-between items-center gap-3 mb-4">
+          <div className="flex flex-col items-start gap-3 mb-4 sm:flex-row sm:items-center sm:justify-between">
             <h1 className="text-2xl font-extrabold text-slate-800">
               {t("materials.title", { defaultValue: "Materials & Pricing" })}
             </h1>
 
-            <div className="flex items-center space-x-1.5 bg-slate-100 p-1 rounded-lg shrink-0">
+            <div className="flex items-center space-x-1.5 bg-slate-100 p-1 rounded-lg shrink-0 self-stretch sm:self-auto">
               <button
                 onClick={() => handleTaxChange({ mode: "HT" })}
                 className={`text-xs font-extrabold px-3 py-1.5 rounded-md transition ${
@@ -407,7 +407,7 @@ export const MaterialsPage: React.FC = () => {
                       </div>
 
                       <div className="min-w-0">
-                        <span className="font-extrabold text-slate-900 block text-sm leading-snug truncate">
+                        <span className="font-extrabold text-slate-900 block text-sm leading-snug break-words line-clamp-2">
                           {item.label}
                         </span>
 
@@ -452,8 +452,8 @@ export const MaterialsPage: React.FC = () => {
                   </div>
 
                   {/* Price row */}
-                  <div className="mt-3.5 flex items-center justify-between gap-3">
-                    <div className="relative w-[150px] sm:w-[165px]">
+                  <div className="mt-3.5 flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="relative w-full max-w-[190px]">
                       <input
                         type="number"
                         min="0"
@@ -472,7 +472,7 @@ export const MaterialsPage: React.FC = () => {
                       <span className="absolute left-3 top-2 text-slate-500 text-xs mt-0.5">€</span>
                     </div>
 
-                    <span className="text-xs font-semibold text-slate-700 whitespace-nowrap bg-slate-50 border border-slate-200 px-2.5 py-2 rounded-xl">
+                    <span className="text-xs font-semibold text-slate-700 bg-slate-50 border border-slate-200 px-2.5 py-2 rounded-xl break-words">
                       {String(item.unit || "").replace("€/", "/ ")}
                     </span>
                   </div>
@@ -736,7 +736,7 @@ export const MaterialsPage: React.FC = () => {
                 <button
                   key={m.id}
                   onClick={() => handleMapping(mappingTarget, m.id)}
-                  className="w-full text-left p-3 rounded hover:bg-blue-50 text-sm flex justify-between items-center"
+                  className="w-full text-left p-3 rounded hover:bg-blue-50 text-sm flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between"
                   type="button"
                 >
                   <span className="font-medium text-slate-700">{m.label}</span>

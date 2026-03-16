@@ -45,7 +45,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onSelectCalc }) =>
           <div className="page-header-chip mb-3">
             {t("dashboard.header_chip", { defaultValue: "Construction calculators" })}
           </div>
-          <h1 className="text-[30px] font-extrabold leading-tight tracking-tight text-slate-900 sm:text-[34px]">
+          <h1 className="text-[28px] font-extrabold leading-tight tracking-tight text-slate-900 sm:text-[34px]">
             {t("app.name", { defaultValue: "Bati" })}
             <span className="text-blue-600">{t("app.name_suffix", { defaultValue: "Quant" })}</span>
           </h1>

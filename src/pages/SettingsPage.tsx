@@ -147,7 +147,7 @@ export const SettingsPage: React.FC = () => {
         <section className="glass-panel rounded-[28px] p-4 sm:rounded-[32px] sm:p-5 md:p-6">
           <div className="flex flex-col gap-4">
             <div>
-              <h1 className="text-[26px] font-extrabold leading-tight text-slate-800 sm:text-2xl">{t("settings.title", { defaultValue: "Settings" })}</h1>
+              <h1 className="text-[24px] font-extrabold leading-tight text-slate-800 sm:text-2xl">{t("settings.title", { defaultValue: "Settings" })}</h1>
             </div>
             <div className="max-w-full overflow-x-auto no-scrollbar">
               <div className="mx-auto flex w-fit items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-200/80 p-1.5 shadow-sm">
@@ -202,13 +202,13 @@ export const SettingsPage: React.FC = () => {
               <div className="divide-y divide-slate-100">
                 <div className={rowClass}>
                   <span className="flex items-center gap-2 text-sm font-medium text-slate-700"><Coins size={16} className="text-slate-400" />{t("settings.app.currency", { defaultValue: "Currency" })}</span>
-                  <select value={currency} onChange={(e) => onCurrencyChange(e.target.value as Currency)} className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-600 focus:ring-0 sm:w-auto">
+                  <select value={currency} onChange={(e) => onCurrencyChange(e.target.value as Currency)} className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-600 focus:ring-0 sm:w-auto sm:min-w-[140px]">
                     <option value="EUR">EUR (€)</option><option value="USD">USD ($)</option><option value="CAD">CAD ($)</option><option value="CHF">CHF</option>
                   </select>
                 </div>
                 <div className={rowClass}>
                   <span className="flex items-center gap-2 text-sm font-medium text-slate-700"><Languages size={16} className="text-slate-400" />{t("settings.app.language", { defaultValue: "Language" })}</span>
-                  <select value={(i18n.language || "fr").split("-")[0]} onChange={(e) => changeLanguage(e.target.value)} className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-600 focus:ring-0 sm:w-auto">
+                  <select value={(i18n.language || "fr").split("-")[0]} onChange={(e) => changeLanguage(e.target.value)} className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-600 focus:ring-0 sm:w-auto sm:min-w-[140px]">
                     <option value="fr">Français</option><option value="en">English</option>
                   </select>
                 </div>

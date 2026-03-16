@@ -19,7 +19,7 @@ export const CalculatorCard: React.FC<CalculatorCardProps> = ({ config, onClick 
       onClick={onClick}
       className="group app-card w-full overflow-hidden rounded-[24px] text-left transition-all hover:border-blue-200 hover:shadow-md active:scale-[0.99]"
     >
-      <div className="relative h-[104px] sm:h-[112px]">
+      <div className="relative h-[102px] sm:h-[112px]">
         {config.imageSrc && imgOk ? (
           <img
             src={config.imageSrc}
@@ -54,10 +54,10 @@ export const CalculatorCard: React.FC<CalculatorCardProps> = ({ config, onClick 
         </div>
       </div>
 
-      <div className="flex min-h-[42px] items-center justify-between px-3 py-2.5 sm:min-h-[44px] sm:px-4">
+      <div className="flex min-h-[46px] items-center justify-between px-3 py-2.5 sm:min-h-[48px] sm:px-4">
         <div className="flex min-w-0 items-center gap-2 text-xs text-slate-500">
           <Icons.Sparkles size={14} className="shrink-0 text-slate-300" />
-          <span className="truncate">{t("calculator.open", { defaultValue: "Open calculator" })}</span>
+          <span className="line-clamp-2 leading-tight">{t("calculator.open", { defaultValue: "Open calculator" })}</span>
         </div>
         <span className="text-[11px] text-slate-400" />
       </div>

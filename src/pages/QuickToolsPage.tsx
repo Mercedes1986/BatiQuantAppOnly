@@ -66,7 +66,7 @@ const ToolCard = ({
       </div>
       <ChevronRight size={18} className="text-slate-400" />
     </div>
-    <div className="text-lg font-extrabold leading-tight text-slate-900 sm:text-xl">{title}</div>
+    <div className="text-[17px] font-extrabold leading-tight text-slate-900 sm:text-xl">{title}</div>
     <p className="mt-2.5 text-sm leading-relaxed text-slate-500 sm:mt-3">{description}</p>
     <div className="mt-4 text-sm font-extrabold text-blue-700 sm:mt-5">{cta}</div>
   </button>
@@ -153,7 +153,7 @@ export const QuickToolsPage: React.FC = () => {
                       <li key={m.id} className="border-b border-slate-50 pb-2 last:border-0">
                         <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
                           <span className="min-w-0 break-words font-medium text-slate-700">{m.name}</span>
-                          <span className="w-fit whitespace-nowrap rounded-xl bg-slate-100 px-2.5 py-1 font-extrabold text-slate-800">
+                          <span className="inline-flex max-w-full items-center justify-center rounded-xl bg-slate-100 px-2.5 py-1 font-extrabold text-slate-800">
                             {m.quantity} {m.unit}
                           </span>
                         </div>
@@ -179,7 +179,7 @@ export const QuickToolsPage: React.FC = () => {
               <ArrowRightLeft size={20} />
             </div>
             <div className="min-w-0">
-              <h1 className="text-[26px] font-extrabold tracking-tight text-slate-900 sm:text-[30px]">
+              <h1 className="text-[24px] font-extrabold tracking-tight text-slate-900 sm:text-[30px]">
                 {t("quick.page_title", { defaultValue: "Quick site tools" })}
               </h1>
               <p className="mt-1 text-sm leading-relaxed text-slate-500 sm:text-[15px]">

@@ -103,7 +103,7 @@ export const ProjectsPage: React.FC = () => {
     return (
       <div className="app-shell app-shell--projects min-h-screen bg-transparent relative">
         <div className="sticky top-0 z-30 border-b border-slate-200/80 bg-white/80 backdrop-blur-xl shadow-sm no-print">
-          <div className="mx-auto max-w-6xl px-4 py-3 flex items-center justify-between gap-3">
+          <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
             <button
               onClick={() => setSelectedProject(null)}
               className="text-slate-500 font-extrabold flex items-center hover:text-blue-600 transition-colors"
@@ -113,10 +113,10 @@ export const ProjectsPage: React.FC = () => {
               {t("common.back", { defaultValue: "Back" })}
             </button>
 
-            <div className="flex gap-2">
+            <div className="flex w-full gap-2 sm:w-auto">
               <button
                 onClick={handleGenerateQuote}
-                className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-xl text-sm font-extrabold shadow-md hover:bg-blue-700 active:scale-95 transition-all"
+                className="flex flex-1 items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-xl text-sm font-extrabold shadow-md hover:bg-blue-700 active:scale-95 transition-all sm:flex-none"
                 type="button"
               >
                 <FileText size={18} className="mr-2" />
@@ -186,13 +186,13 @@ export const ProjectsPage: React.FC = () => {
                     className="flex justify-between items-center gap-3 p-3.5 bg-white/85 rounded-2xl border border-slate-200/80 print:border-slate-300"
                   >
                     <div className="min-w-0">
-                      <span className="font-extrabold text-slate-700 block text-sm truncate">{item.name}</span>
+                      <span className="font-extrabold text-slate-700 block text-sm break-words">{item.name}</span>
                       <span className="text-xs text-slate-500 font-medium">
                         {item.quantity} {item.unit} × {euro.format(item.unitPrice)}
                       </span>
                     </div>
 
-                    <span className="font-extrabold text-slate-800 whitespace-nowrap">{euro.format(item.totalPrice)}</span>
+                    <span className="font-extrabold text-slate-800 text-right">{euro.format(item.totalPrice)}</span>
                   </li>
                 ))}
               </ul>
@@ -297,7 +297,7 @@ export const ProjectsPage: React.FC = () => {
             </div>
 
             <div className="relative z-10 w-full p-5 flex items-center justify-between">
-              <div className="flex items-center gap-3">
+              <div className="flex flex-wrap items-center gap-3 justify-end">
                 <div className="w-11 h-11 rounded-full bg-white/90 border border-white/60 flex items-center justify-center shadow-sm">
                   <Plus className="text-blue-600" size={22} />
                 </div>
@@ -344,7 +344,7 @@ export const ProjectsPage: React.FC = () => {
                   </div>
 
                   <div className="flex items-center gap-3">
-                    <span className="font-extrabold text-slate-700 bg-slate-100/90 px-3 py-1.5 rounded-xl text-sm border border-slate-200">
+                    <span className="font-extrabold text-slate-700 bg-slate-100/90 px-3 py-1.5 rounded-xl text-sm border border-slate-200 break-words">
                       {euro.format(total)}
                     </span>
                     <ChevronRight className="text-slate-300" size={20} />

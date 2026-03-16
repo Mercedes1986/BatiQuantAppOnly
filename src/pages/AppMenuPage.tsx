@@ -25,14 +25,14 @@ const MainCard: React.FC<{ card: SectionCard; onClick: () => void; cta: string }
   <button
     onClick={onClick}
     type="button"
-    className="group app-card w-full rounded-[24px] p-4 sm:rounded-[28px] sm:p-5 text-left transition-all hover:-translate-y-0.5 hover:shadow-[0_24px_55px_rgba(15,23,42,0.12)]"
+    className="group app-card w-full rounded-[24px] p-4 text-left transition-all hover:-translate-y-0.5 hover:shadow-[0_24px_55px_rgba(15,23,42,0.12)] sm:rounded-[28px] sm:p-5"
   >
-    <div className="mb-5 flex items-start justify-between gap-3 sm:mb-8">
+    <div className="mb-4 flex items-start justify-between gap-3 sm:mb-6">
       <div className={`flex h-11 w-11 items-center justify-center rounded-2xl sm:h-12 sm:w-12 ${card.tone}`}>{card.icon}</div>
       <ChevronRight size={18} className="shrink-0 text-slate-400 transition-transform group-hover:translate-x-0.5" />
     </div>
-    <div className="text-[24px] font-extrabold leading-tight text-slate-900 sm:text-[30px] sm:leading-none">{card.title}</div>
-    <p className="mt-2.5 text-sm leading-relaxed text-slate-500 sm:mt-3">{card.desc}</p>
+    <div className="text-[22px] font-extrabold leading-tight text-slate-900 sm:text-[28px]">{card.title}</div>
+    <p className="mt-2 text-sm leading-relaxed text-slate-500 line-clamp-3 sm:mt-3">{card.desc}</p>
     <div className="mt-4 text-sm font-extrabold text-blue-700 sm:mt-5">{cta}</div>
   </button>
 );
@@ -45,7 +45,7 @@ const SecondaryCard: React.FC<{ card: SectionCard; onClick: () => void }> = ({ c
   >
     <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl ${card.tone}`}>{card.icon}</div>
     <div className="min-w-0 flex-1">
-      <div className="text-sm font-extrabold text-slate-900">{card.title}</div>
+      <div className="text-sm font-extrabold text-slate-900 break-words">{card.title}</div>
       <div className="mt-0.5 text-xs leading-relaxed text-slate-500 line-clamp-2">{card.desc}</div>
     </div>
     <ChevronRight size={18} className="shrink-0 text-slate-400" />
@@ -122,7 +122,7 @@ export const AppMenuPage: React.FC = () => {
                 <LayoutGrid size={20} />
               </div>
               <div className="min-w-0 flex-1">
-                <h1 className="text-[26px] font-extrabold tracking-tight leading-tight text-slate-900 sm:text-[32px]">
+                <h1 className="text-[24px] font-extrabold leading-tight tracking-tight text-slate-900 sm:text-[30px]">
                   {t("menu.title", { defaultValue: "App menu" })}
                 </h1>
                 <p className="mt-1 text-sm leading-relaxed text-slate-500 sm:text-[15px]">
@@ -133,11 +133,11 @@ export const AppMenuPage: React.FC = () => {
 
             <button
               onClick={() => navigate("/app/projects")}
-              className="inline-flex w-full items-center justify-center rounded-[18px] border border-white/70 bg-white/70 px-4 py-3 text-sm font-extrabold text-slate-700 shadow-[0_12px_28px_rgba(15,23,42,0.06)] backdrop-blur-xl transition-colors hover:bg-white/85 sm:w-auto sm:justify-start sm:rounded-[22px]"
+              className="inline-flex w-full items-center justify-center rounded-[18px] border border-white/70 bg-white/70 px-4 py-3 text-sm font-extrabold text-slate-700 shadow-[0_12px_28px_rgba(15,23,42,0.06)] backdrop-blur-xl transition-colors hover:bg-white/85 sm:w-auto sm:max-w-[180px] sm:justify-start sm:rounded-[22px]"
               type="button"
             >
               <ArrowLeft size={16} className="mr-2 shrink-0" />
-              <span className="truncate">{t("menu.back_dashboard", { defaultValue: "Dashboard" })}</span>
+              <span className="break-words text-left leading-tight">{t("menu.back_dashboard", { defaultValue: "Dashboard" })}</span>
             </button>
           </div>
         </section>
