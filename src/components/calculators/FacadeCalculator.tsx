@@ -532,9 +532,9 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
   }, [calculationData, onCalculate, doCleaning, doCoating, doPaint, doITE, doCladding, t]);
 
   return (
-    <div className="space-y-6 animate-in fade-in">
+    <div className="space-y-5 rounded-[28px] border border-white/70 bg-white/74 p-3.5 shadow-[0_22px_60px_rgba(15,23,42,0.10)] backdrop-blur-xl sm:p-5 animate-in fade-in">
       {/* Navigation */}
-      <div className="flex justify-between items-center mb-6 bg-slate-50 p-1 rounded-lg overflow-x-auto no-scrollbar">
+      <div className="mb-5 flex items-center gap-1.5 overflow-x-auto rounded-[20px] border border-white/80 bg-slate-50/90 p-1.5 shadow-inner no-scrollbar">
         {[1, 2, 3, 4, 5].map((s) => (
           <button
             key={s}
@@ -582,7 +582,7 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
             </button>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-4">
             {geoMode === "rect" ? (
               <>
                 <div>
@@ -640,9 +640,9 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
               </label>
 
               {hasGables && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pl-6 animate-in slide-in-from-top-2">
+                <div className="grid grid-cols-2 gap-3 pl-6 animate-in slide-in-from-top-2">
                   <div>
-                    <label className="block text-[11px] text-slate-500 mb-1">{t("facade.geo.gable_height", { defaultValue: "Gable height (m)" })}</label>
+                    <label className="block text-[10px] text-slate-500 mb-1">{t("facade.geo.gable_height", { defaultValue: "Gable height (m)" })}</label>
                     <input
                       type="number"
                       value={gableHeight}
@@ -651,7 +651,7 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
                     />
                   </div>
                   <div>
-                    <label className="block text-[11px] text-slate-500 mb-1">{t("facade.geo.gable_count", { defaultValue: "Nombre" })}</label>
+                    <label className="block text-[10px] text-slate-500 mb-1">{t("facade.geo.gable_count", { defaultValue: "Nombre" })}</label>
                     <select
                       value={numGables}
                       onChange={(e) => setNumGables(Number(e.target.value))}
@@ -693,7 +693,7 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
             {openings.map((op) => (
               <div key={op.id} className="flex justify-between items-center p-2 bg-white border rounded shadow-sm">
                 <div className="min-w-0">
-                  <span className="font-bold text-sm block break-words">
+                  <span className="font-bold text-sm block truncate">
                     {op.label} ×{op.quantity}
                   </span>
                   <span className="text-xs text-slate-500">
@@ -759,7 +759,7 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
               </button>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 mb-2">
+            <div className="grid grid-cols-1 gap-2 mb-2 sm:grid-cols-3">
               <input
                 type="number"
                 placeholder={t("facade.opening.width", { defaultValue: "Larg" })}
@@ -793,7 +793,7 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
             </button>
           </div>
 
-          <div className="flex gap-3">
+          <div className="flex flex-col gap-3 sm:flex-row">
             <button type="button" onClick={() => setStep(1)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
               {t("common.back", { defaultValue: "Retour" })}
             </button>
@@ -812,7 +812,7 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
             {t("facade.step3.hint", { defaultValue: "Select the works to carry out." })}
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-3">
             <label className={`p-3 border rounded-xl flex flex-col items-center justify-center cursor-pointer transition-all ${doCleaning ? "bg-blue-50 border-blue-500 text-blue-700" : "bg-white text-slate-500"}`}>
               <Eraser size={24} className="mb-2" />
               <span className="font-bold text-sm">{t("facade.work.cleaning", { defaultValue: "Cleaning" })}</span>
@@ -850,7 +850,7 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
             </label>
           </div>
 
-          <div className="flex gap-3">
+          <div className="flex flex-col gap-3 sm:flex-row">
             <button type="button" onClick={() => setStep(2)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
               {t("common.back", { defaultValue: "Retour" })}
             </button>
@@ -891,7 +891,7 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
           {doCoating && (
             <div className="bg-white p-3 rounded-lg border border-slate-200">
               <h4 className="text-xs font-bold text-slate-500 uppercase mb-2">{t("facade.coating.title", { defaultValue: "Render" })}</h4>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-3">
                 <select value={coatingType} onChange={(e) => setCoatingType(e.target.value as any)} className="p-2 text-sm border rounded bg-white text-slate-900">
                   <option value="mono">{t("facade.coating.mono_opt", { defaultValue: "Monocouche" })}</option>
                   <option value="rpe">{t("facade.coating.rpe_opt", { defaultValue: "RPE" })}</option>
@@ -908,7 +908,7 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
           {doPaint && (
             <div className="bg-white p-3 rounded-lg border border-slate-200">
               <h4 className="text-xs font-bold text-slate-500 uppercase mb-2">{t("facade.paint.title", { defaultValue: "Paint" })}</h4>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-3">
                 <select value={paintType} onChange={(e) => setPaintType(e.target.value as any)} className="p-2 text-sm border rounded bg-white text-slate-900">
                   <option value="acry">{t("facade.paint.acry", { defaultValue: "Acrylique" })}</option>
                   <option value="plio">{t("facade.paint.plio", { defaultValue: "Pliolite" })}</option>
@@ -929,7 +929,7 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
           {doITE && (
             <div className="bg-white p-3 rounded-lg border border-slate-200">
               <h4 className="text-xs font-bold text-slate-500 uppercase mb-2">{t("facade.ite.title", { defaultValue: "Isolation (ITE)" })}</h4>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-3">
                 <select value={iteType} onChange={(e) => setIteType(e.target.value)} className="p-2 text-sm border rounded bg-white text-slate-900">
                   <option value="pse">{t("facade.ite.pse", { defaultValue: "Polystyrene (EPS)" })}</option>
                   <option value="rock">{t("facade.ite.rock", { defaultValue: "Laine de roche" })}</option>
@@ -954,13 +954,13 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
           )}
 
           <div className="bg-slate-50 p-3 rounded-lg border border-slate-200 mt-2">
-            <label className="flex flex-wrap items-center justify-between gap-2 cursor-pointer">
+            <label className="flex items-center justify-between cursor-pointer">
               <span className="text-sm font-bold text-slate-700">{t("facade.scaffold.toggle", { defaultValue: "Scaffolding" })}</span>
               <input type="checkbox" checked={scaffold} onChange={(e) => setScaffold(e.target.checked)} className="h-5 w-5 text-blue-600 rounded" />
             </label>
           </div>
 
-          <div className="flex gap-3">
+          <div className="flex flex-col gap-3 sm:flex-row">
             <button type="button" onClick={() => setStep(3)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
               {t("common.back", { defaultValue: "Retour" })}
             </button>
@@ -987,10 +987,10 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
               </button>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-3">
               {doCleaning && (
                 <div>
-                  <label className="block text-[11px] text-slate-500 mb-1">
+                  <label className="block text-[10px] text-slate-500 mb-1">
                     {cleanType === "moss"
                       ? t("facade.prices.moss", { defaultValue: "Moss treatment (€/m²)" })
                       : cleanType === "strip"
@@ -1014,7 +1014,7 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
 
               {doRepair && (
                 <div>
-                  <label className="block text-[11px] text-slate-500 mb-1">{t("facade.prices.repair", { defaultValue: "Crack repairs (€/lm)" })}</label>
+                  <label className="block text-[10px] text-slate-500 mb-1">{t("facade.prices.repair", { defaultValue: "Crack repairs (€/lm)" })}</label>
                   <input type="number" value={prices.repairMl} onChange={(e) => updatePrice("repairMl", e.target.value)} className="w-full p-1.5 border rounded text-sm bg-white text-slate-900" />
                 </div>
               )}
@@ -1022,11 +1022,11 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
               {doCoating && (
                 <>
                   <div>
-                    <label className="block text-[11px] text-slate-500 mb-1">{t("facade.prices.coating_bag", { defaultValue: "Sac enduit (€/u)" })}</label>
+                    <label className="block text-[10px] text-slate-500 mb-1">{t("facade.prices.coating_bag", { defaultValue: "Sac enduit (€/u)" })}</label>
                     <input type="number" value={prices.coatingBag} onChange={(e) => updatePrice("coatingBag", e.target.value)} className="w-full p-1.5 border rounded text-sm bg-white text-slate-900" />
                   </div>
                   <div>
-                    <label className="block text-[11px] text-slate-500 mb-1">{t("facade.prices.angle", { defaultValue: "Angle bead 3m (€/u)" })}</label>
+                    <label className="block text-[10px] text-slate-500 mb-1">{t("facade.prices.angle", { defaultValue: "Angle bead 3m (€/u)" })}</label>
                     <input type="number" value={prices.angleBar} onChange={(e) => updatePrice("angleBar", e.target.value)} className="w-full p-1.5 border rounded text-sm bg-white text-slate-900" />
                   </div>
                 </>
@@ -1034,7 +1034,7 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
 
               {doPaint && (
                 <div>
-                  <label className="block text-[11px] text-slate-500 mb-1">{t("facade.prices.paint", { defaultValue: "Paint (€/L)" })}</label>
+                  <label className="block text-[10px] text-slate-500 mb-1">{t("facade.prices.paint", { defaultValue: "Paint (€/L)" })}</label>
                   <input type="number" value={prices.paintL} onChange={(e) => updatePrice("paintL", e.target.value)} className="w-full p-1.5 border rounded text-sm bg-white text-slate-900" />
                 </div>
               )}
@@ -1042,11 +1042,11 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
               {doITE && (
                 <>
                   <div>
-                    <label className="block text-[11px] text-slate-500 mb-1">{t("facade.prices.ite_m2", { defaultValue: "ITE complet (€/m²)" })}</label>
+                    <label className="block text-[10px] text-slate-500 mb-1">{t("facade.prices.ite_m2", { defaultValue: "ITE complet (€/m²)" })}</label>
                     <input type="number" value={prices.iteM2} onChange={(e) => updatePrice("iteM2", e.target.value)} className="w-full p-1.5 border rounded text-sm bg-white text-slate-900" />
                   </div>
                   <div>
-                    <label className="block text-[11px] text-slate-500 mb-1">{t("facade.prices.ite_rail", { defaultValue: "Starter rail 2.5m (€/u)" })}</label>
+                    <label className="block text-[10px] text-slate-500 mb-1">{t("facade.prices.ite_rail", { defaultValue: "Starter rail 2.5m (€/u)" })}</label>
                     <input type="number" value={prices.iteRail} onChange={(e) => updatePrice("iteRail", e.target.value)} className="w-full p-1.5 border rounded text-sm bg-white text-slate-900" />
                   </div>
                 </>
@@ -1055,11 +1055,11 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
               {doCladding && (
                 <>
                   <div>
-                    <label className="block text-[11px] text-slate-500 mb-1">{t("facade.prices.cladding_m2", { defaultValue: "Cladding (€/m²)" })}</label>
+                    <label className="block text-[10px] text-slate-500 mb-1">{t("facade.prices.cladding_m2", { defaultValue: "Cladding (€/m²)" })}</label>
                     <input type="number" value={prices.claddingM2} onChange={(e) => updatePrice("claddingM2", e.target.value)} className="w-full p-1.5 border rounded text-sm bg-white text-slate-900" />
                   </div>
                   <div>
-                    <label className="block text-[11px] text-slate-500 mb-1">{t("facade.prices.batten_ml", { defaultValue: "Tasseaux (€/ml)" })}</label>
+                    <label className="block text-[10px] text-slate-500 mb-1">{t("facade.prices.batten_ml", { defaultValue: "Tasseaux (€/ml)" })}</label>
                     <input type="number" value={prices.battenMl} onChange={(e) => updatePrice("battenMl", e.target.value)} className="w-full p-1.5 border rounded text-sm bg-white text-slate-900" />
                   </div>
                 </>
@@ -1067,20 +1067,20 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
 
               {(scaffold || parseFloat(dimH) > 3) && (
                 <div>
-                  <label className="block text-[11px] text-slate-500 mb-1">{t("facade.prices.scaffold", { defaultValue: "Scaffolding (fixed)" })}</label>
+                  <label className="block text-[10px] text-slate-500 mb-1">{t("facade.prices.scaffold", { defaultValue: "Scaffolding (fixed)" })}</label>
                   <input type="number" value={prices.scaffoldFixed} onChange={(e) => updatePrice("scaffoldFixed", e.target.value)} className="w-full p-1.5 border rounded text-sm bg-white text-slate-900" />
                 </div>
               )}
             </div>
 
             {proMode && (
-              <div className="mt-4 pt-3 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="mt-4 pt-3 border-t border-slate-100 grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[11px] text-blue-600 font-bold mb-1">{t("facade.prices.labor_m2", { defaultValue: "Facade labor (€/m²)" })}</label>
+                  <label className="block text-[10px] text-blue-600 font-bold mb-1">{t("facade.prices.labor_m2", { defaultValue: "Facade labor (€/m²)" })}</label>
                   <input type="number" value={prices.laborM2} onChange={(e) => updatePrice("laborM2", e.target.value)} className="w-full p-1.5 border border-blue-200 rounded text-sm bg-white text-slate-900" />
                 </div>
                 <div>
-                  <label className="block text-[11px] text-blue-600 font-bold mb-1">{t("facade.prices.labor_scaffold", { defaultValue: "Scaffolding labor (€/m²)" })}</label>
+                  <label className="block text-[10px] text-blue-600 font-bold mb-1">{t("facade.prices.labor_scaffold", { defaultValue: "Scaffolding labor (€/m²)" })}</label>
                   <input type="number" value={prices.laborScaffold} onChange={(e) => updatePrice("laborScaffold", e.target.value)} className="w-full p-1.5 border border-blue-200 rounded text-sm bg-white text-slate-900" />
                 </div>
               </div>
@@ -1097,7 +1097,7 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
             </div>
           )}
 
-          <div className="flex gap-3 pt-2">
+          <div className="flex flex-col gap-3 pt-2 sm:flex-row">
             <button type="button" onClick={() => setStep(4)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold">
               {t("common.back", { defaultValue: "Retour" })}
             </button>

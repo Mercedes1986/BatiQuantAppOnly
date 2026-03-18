@@ -1470,7 +1470,7 @@ export const StructuralCalculator: React.FC<Props> = ({
   // UI
   // -------------------------
   return (
-    <div className="space-y-6 rounded-[32px] border border-white/70 bg-white/72 p-3 shadow-[0_24px_70px_rgba(15,23,42,0.10)] backdrop-blur-xl sm:p-4 lg:p-6">
+    <div className="space-y-5 rounded-[28px] border border-white/70 bg-white/74 p-3.5 shadow-[0_22px_60px_rgba(15,23,42,0.10)] backdrop-blur-xl sm:p-5">
       {!hideTabs && (
         <div className="flex rounded-[24px] border border-white/80 bg-slate-100/70 p-1.5 shadow-inner backdrop-blur-xl mb-4">
           <button
@@ -1517,7 +1517,7 @@ export const StructuralCalculator: React.FC<Props> = ({
       {/* ======================= GROUNDWORK WIZARD ======================= */}
       {mode === "groundwork" && (
         <>
-          <div className="flex justify-between items-center mb-6 rounded-[24px] border border-white/80 bg-slate-100/70 p-1.5 shadow-inner overflow-x-auto backdrop-blur-xl">
+          <div className="mb-5 flex items-center gap-1.5 overflow-x-auto rounded-[24px] border border-white/80 bg-slate-100/70 p-1.5 shadow-inner backdrop-blur-xl no-scrollbar">
             {[1, 2, 3, 4, 5].map((s) => (
               <button
                 key={s}
@@ -1678,7 +1678,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                 </div>
               </div>
 
-              <div className="flex gap-3">
+              <div className="flex flex-col gap-3 sm:flex-row">
                 <button
                   onClick={() => setStep(1)}
                   className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-extrabold shadow-sm"
@@ -1720,7 +1720,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                 </select>
               </div>
 
-              <div className="flex gap-3">
+              <div className="flex flex-col gap-3 sm:flex-row">
                 <button
                   onClick={() => setStep(2)}
                   className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-extrabold shadow-sm"
@@ -1843,7 +1843,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                 </label>
               </div>
 
-              <div className="flex gap-3">
+              <div className="flex flex-col gap-3 sm:flex-row">
                 <button
                   onClick={() => setStep(3)}
                   className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-extrabold shadow-sm"
@@ -1936,7 +1936,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                 )}
               </div>
 
-              <div className="flex gap-3 pt-4">
+              <div className="flex flex-col gap-3 pt-4 sm:flex-row">
                 <button
                   onClick={() => setStep(4)}
                   className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-extrabold shadow-sm"
@@ -1960,7 +1960,7 @@ export const StructuralCalculator: React.FC<Props> = ({
       {/* ======================= FOUNDATIONS WIZARD ======================= */}
       {mode === "foundations" && (
         <>
-          <div className="flex justify-between items-center mb-6 rounded-[24px] border border-white/80 bg-slate-100/70 p-1.5 shadow-inner overflow-x-auto backdrop-blur-xl">
+          <div className="mb-5 flex items-center gap-1.5 overflow-x-auto rounded-[24px] border border-white/80 bg-slate-100/70 p-1.5 shadow-inner backdrop-blur-xl no-scrollbar">
             {[1, 2, 3, 4, 5].map((s) => (
               <button
                 key={s}
@@ -2129,7 +2129,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                 )}
               </div>
 
-              <div className="flex gap-3">
+              <div className="flex flex-col gap-3 sm:flex-row">
                 <button
                   onClick={() => setStep(1)}
                   className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-extrabold shadow-sm"
@@ -2162,7 +2162,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                     <Ruler size={14} className="mr-1" /> {tr("struct.fd.strip")}
                   </h4>
 
-                  <div className="grid grid-cols-3 gap-2 mb-3">
+                  <div className="grid grid-cols-1 gap-2 mb-3 sm:grid-cols-3">
                     <div>
                       <label className="block text-[10px] text-slate-400">{tr("struct.common.length_m_short")}</label>
                       <input
@@ -2325,7 +2325,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                 />
               </div>
 
-              <div className="flex gap-3">
+              <div className="flex flex-col gap-3 sm:flex-row">
                 <button onClick={() => setStep(2)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-extrabold shadow-sm" type="button">
                   {tr("common.back")}
                 </button>
@@ -2370,7 +2370,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                 </label>
               </div>
 
-              <div className="flex gap-3">
+              <div className="flex flex-col gap-3 sm:flex-row">
                 <button onClick={() => setStep(3)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-extrabold shadow-sm" type="button">
                   {tr("common.back")}
                 </button>
@@ -2471,7 +2471,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                 )}
               </div>
 
-              <div className="flex gap-3 pt-4">
+              <div className="flex flex-col gap-3 pt-4 sm:flex-row">
                 <button onClick={() => setStep(4)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-extrabold shadow-sm" type="button">
                   {tr("common.back")}
                 </button>
@@ -2487,7 +2487,7 @@ export const StructuralCalculator: React.FC<Props> = ({
       {/* ======================= WALLS WIZARD ======================= */}
       {mode === "walls" && (
         <>
-          <div className="flex justify-between items-center mb-6 rounded-[24px] border border-white/80 bg-slate-100/70 p-1.5 shadow-inner overflow-x-auto backdrop-blur-xl">
+          <div className="mb-5 flex items-center gap-1.5 overflow-x-auto rounded-[24px] border border-white/80 bg-slate-100/70 p-1.5 shadow-inner backdrop-blur-xl no-scrollbar">
             {[1, 2, 3, 4, 5, 6].map((s) => (
               <button
                 key={s}
@@ -2703,7 +2703,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                 </p>
               </div>
 
-              <div className="flex gap-3">
+              <div className="flex flex-col gap-3 sm:flex-row">
                 <button onClick={() => setStep(1)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-extrabold shadow-sm" type="button">
                   {tr("common.back")}
                 </button>
@@ -2756,7 +2756,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                   </select>
                 </div>
 
-                <div className="grid grid-cols-3 gap-2 mb-2">
+                <div className="grid grid-cols-1 gap-2 mb-2 sm:grid-cols-3">
                   <input
                     type="number"
                     placeholder={tr("struct.common.width")}
@@ -2789,7 +2789,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                 </button>
               </div>
 
-              <div className="flex gap-3">
+              <div className="flex flex-col gap-3 sm:flex-row">
                 <button onClick={() => setStep(2)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-extrabold shadow-sm" type="button">
                   {tr("common.back")}
                 </button>
@@ -2857,7 +2857,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                 </div>
               </div>
 
-              <div className="flex gap-3">
+              <div className="flex flex-col gap-3 sm:flex-row">
                 <button onClick={() => setStep(3)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-extrabold shadow-sm" type="button">
                   {tr("common.back")}
                 </button>
@@ -2902,7 +2902,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                 </label>
               </div>
 
-              <div className="flex gap-3">
+              <div className="flex flex-col gap-3 sm:flex-row">
                 <button onClick={() => setStep(4)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-extrabold shadow-sm" type="button">
                   {tr("common.back")}
                 </button>
@@ -3042,7 +3042,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                 )}
               </div>
 
-              <div className="flex gap-3 pt-4">
+              <div className="flex flex-col gap-3 pt-4 sm:flex-row">
                 <button onClick={() => setStep(5)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-extrabold shadow-sm" type="button">
                   {tr("common.back")}
                 </button>

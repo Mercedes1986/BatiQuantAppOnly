@@ -491,7 +491,7 @@ export const PlacoCalculator: React.FC<Props> = ({
   }, [calculationData, onCalculate, mode, frameType, t]);
 
   return (
-    <div className="space-y-6 rounded-[32px] border border-white/70 bg-white/72 p-3 sm:p-4 shadow-[0_24px_70px_rgba(15,23,42,0.10)] backdrop-blur-xl lg:p-6">
+    <div className="space-y-5 rounded-[28px] border border-white/70 bg-white/74 p-3.5 shadow-[0_22px_60px_rgba(15,23,42,0.10)] backdrop-blur-xl sm:p-5">
       {/* Mode tabs */}
       {!hideTabs && (
         <div className="flex rounded-[24px] border border-white/80 bg-slate-100/70 p-1.5 shadow-inner backdrop-blur-xl mb-4">
@@ -526,7 +526,7 @@ export const PlacoCalculator: React.FC<Props> = ({
       )}
 
       {/* Step nav */}
-      <div className="flex justify-between items-center mb-6 rounded-[24px] border border-white/80 bg-slate-100/70 p-1.5 shadow-inner overflow-x-auto no-scrollbar backdrop-blur-xl">
+      <div className="mb-5 flex items-center gap-1.5 overflow-x-auto rounded-[24px] border border-white/80 bg-slate-100/70 p-1.5 shadow-inner backdrop-blur-xl no-scrollbar">
         {[1, 2, 3, 4, 5].map((s) => (
           <button
             key={s}
@@ -560,7 +560,7 @@ export const PlacoCalculator: React.FC<Props> = ({
             {t("calc.placo.help_step1")}
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-bold text-slate-500 mb-1">{t("calc.placo.len_m")}</label>
               <input
@@ -680,9 +680,9 @@ export const PlacoCalculator: React.FC<Props> = ({
           {mode === "ceiling" && (
             <div className="bg-white p-3 rounded-lg border border-slate-200">
               <div className="text-xs font-bold text-slate-500 uppercase mb-2">{t("calc.placo.ceiling_grid_title")}</div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[11px] text-slate-500 mb-1">{t("calc.placo.ceiling_furring_spacing_cm")}</label>
+                  <label className="block text-[10px] text-slate-500 mb-1">{t("calc.placo.ceiling_furring_spacing_cm")}</label>
                   <select
                     value={ceilingFurringSpacing}
                     onChange={(e) => setCeilingFurringSpacing(toNum(e.target.value, 50))}
@@ -696,7 +696,7 @@ export const PlacoCalculator: React.FC<Props> = ({
                   </select>
                 </div>
                 <div>
-                  <label className="block text-[11px] text-slate-500 mb-1">{t("calc.placo.hanger_spacing_m")}</label>
+                  <label className="block text-[10px] text-slate-500 mb-1">{t("calc.placo.hanger_spacing_m")}</label>
                   <select
                     value={hangerSpacing}
                     onChange={(e) => setHangerSpacing(toNum(e.target.value, 1.2))}
@@ -753,7 +753,7 @@ export const PlacoCalculator: React.FC<Props> = ({
             </div>
 
             {mode !== "ceiling" && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-bold text-slate-500 mb-1">{t("calc.placo.frame")}</label>
                   <select
@@ -785,8 +785,8 @@ export const PlacoCalculator: React.FC<Props> = ({
               </div>
             )}
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <label className="flex flex-wrap items-center justify-between gap-2 p-3 bg-white border rounded-lg">
+            <div className="grid grid-cols-2 gap-4">
+              <label className="flex items-center justify-between p-3 bg-white border rounded-lg">
                 <span className="text-sm font-medium">{t("calc.placo.double_skin")}</span>
                 <input
                   type="checkbox"
@@ -807,7 +807,7 @@ export const PlacoCalculator: React.FC<Props> = ({
             </div>
           </div>
 
-          <div className="flex gap-3">
+          <div className="flex flex-col gap-3 sm:flex-row">
             <button type="button" onClick={() => setStep(1)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-extrabold shadow-sm">
               {t("common.back")}
             </button>
@@ -827,7 +827,7 @@ export const PlacoCalculator: React.FC<Props> = ({
           </div>
 
           <div className="bg-white p-3 rounded-xl border border-slate-200">
-            <label className="flex flex-wrap items-center justify-between gap-2 mb-4 cursor-pointer">
+            <label className="flex items-center justify-between mb-4 cursor-pointer">
               <span className="font-bold text-slate-800">{t("calc.placo.use_insulation")}</span>
               <input
                 type="checkbox"
@@ -876,7 +876,7 @@ export const PlacoCalculator: React.FC<Props> = ({
             </label>
           </div>
 
-          <div className="flex gap-3">
+          <div className="flex flex-col gap-3 sm:flex-row">
             <button type="button" onClick={() => setStep(2)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-extrabold shadow-sm">
               {t("common.back")}
             </button>
@@ -915,7 +915,7 @@ export const PlacoCalculator: React.FC<Props> = ({
               </button>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-3">
               {[
                 ["board_BA13", "calc.placo.price.ba13"],
                 ["board_HYDRO", "calc.placo.price.hydro"],
@@ -929,7 +929,7 @@ export const PlacoCalculator: React.FC<Props> = ({
                 ["membraneM2", "calc.placo.price.membrane_m2"],
               ].map(([k, key]) => (
                 <div key={k}>
-                  <label className="block text-[11px] text-slate-500 mb-1">{t(key)}</label>
+                  <label className="block text-[10px] text-slate-500 mb-1">{t(key)}</label>
                   <input
                     type="number"
                     value={(prices as any)[k]}
@@ -942,7 +942,7 @@ export const PlacoCalculator: React.FC<Props> = ({
               {mode === "ceiling" && (
                 <>
                   <div>
-                    <label className="block text-[11px] text-slate-500 mb-1">{t("calc.placo.price.furring_3m")}</label>
+                    <label className="block text-[10px] text-slate-500 mb-1">{t("calc.placo.price.furring_3m")}</label>
                     <input
                       type="number"
                       value={prices.furring3m}
@@ -951,7 +951,7 @@ export const PlacoCalculator: React.FC<Props> = ({
                     />
                   </div>
                   <div>
-                    <label className="block text-[11px] text-slate-500 mb-1">{t("calc.placo.price.hanger_unit")}</label>
+                    <label className="block text-[10px] text-slate-500 mb-1">{t("calc.placo.price.hanger_unit")}</label>
                     <input
                       type="number"
                       value={prices.hangerUnit}
@@ -964,9 +964,9 @@ export const PlacoCalculator: React.FC<Props> = ({
             </div>
 
             {proMode && (
-              <div className="mt-4 pt-3 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="mt-4 pt-3 border-t border-slate-100 grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[11px] text-blue-600 font-bold mb-1">{t("calc.placo.price.labor_m2")}</label>
+                  <label className="block text-[10px] text-blue-600 font-bold mb-1">{t("calc.placo.price.labor_m2")}</label>
                   <input
                     type="number"
                     value={prices.laborM2}
@@ -978,7 +978,7 @@ export const PlacoCalculator: React.FC<Props> = ({
             )}
           </div>
 
-          <div className="flex gap-3 pt-2">
+          <div className="flex flex-col gap-3 pt-2 sm:flex-row">
             <button type="button" onClick={() => setStep(4)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-extrabold shadow-sm">
               {t("common.back")}
             </button>

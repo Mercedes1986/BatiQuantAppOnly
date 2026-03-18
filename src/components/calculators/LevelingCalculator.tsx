@@ -392,9 +392,9 @@ export const LevelingCalculator: React.FC<Props> = ({ onCalculate }) => {
   };
 
   return (
-    <div className="space-y-6 rounded-[32px] border border-white/70 bg-white/72 p-3 sm:p-4 shadow-[0_24px_70px_rgba(15,23,42,0.10)] backdrop-blur-xl lg:p-6">
+    <div className="space-y-5 rounded-[28px] border border-white/70 bg-white/74 p-3.5 shadow-[0_22px_60px_rgba(15,23,42,0.10)] backdrop-blur-xl sm:p-5">
       {/* Navigation */}
-      <div className="flex justify-between items-center mb-6 rounded-[24px] border border-white/80 bg-slate-100/70 p-1.5 shadow-inner overflow-x-auto no-scrollbar backdrop-blur-xl">
+      <div className="mb-5 flex items-center gap-1.5 overflow-x-auto rounded-[24px] border border-white/80 bg-slate-100/70 p-1.5 shadow-inner backdrop-blur-xl no-scrollbar">
         {[1, 2, 3, 4].map((s) => (
           <button
             key={s}
@@ -421,7 +421,7 @@ export const LevelingCalculator: React.FC<Props> = ({ onCalculate }) => {
             {zones.map((z) => (
               <div key={z.id} className="bg-white border border-slate-200 rounded-lg p-3 flex justify-between items-center">
                 <div className="min-w-0">
-                  <span className="font-bold text-slate-700 block break-words">{z.label}</span>
+                  <span className="font-bold text-slate-700 block truncate">{z.label}</span>
                   <span className="text-xs text-slate-500">
                     {t("calc.leveling.zone_line", {
                       area: z.area,
@@ -455,7 +455,7 @@ export const LevelingCalculator: React.FC<Props> = ({ onCalculate }) => {
               className="w-full p-2 text-xs border rounded bg-white text-slate-900"
             />
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <div className="grid grid-cols-2 gap-2">
               <input
                 type="number"
                 placeholder={t("calc.leveling.ph_area")}
@@ -503,7 +503,7 @@ export const LevelingCalculator: React.FC<Props> = ({ onCalculate }) => {
                 className="w-full p-2 text-xs border rounded bg-white text-slate-900"
               />
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <div className="grid grid-cols-2 gap-2">
                 <input
                   type="number"
                   placeholder={t("calc.leveling.ph_thickness_min")}
@@ -552,7 +552,7 @@ export const LevelingCalculator: React.FC<Props> = ({ onCalculate }) => {
           <div className="bg-white p-3 rounded-xl border border-slate-200">
             <div className="flex justify-between items-center mb-3">
               <h4 className="text-xs font-bold text-slate-500 uppercase">{t("calc.leveling.product_title")}</h4>
-              <label className="flex flex-wrap items-center gap-2 text-xs text-slate-600">
+              <label className="flex items-center gap-2 text-xs text-slate-600">
                 <input type="checkbox" checked={autoProductLocked} onChange={(e) => setAutoProductLocked(e.target.checked)} />
                 {t("common.auto")}
               </label>
@@ -573,7 +573,7 @@ export const LevelingCalculator: React.FC<Props> = ({ onCalculate }) => {
                 >
                   <div>
                     <span className="font-bold block text-sm">{productLabel(String(p.id))}</span>
-                    <span className="text-[11px] opacity-75">
+                    <span className="text-[10px] opacity-75">
                       {t("calc.leveling.product_specs", {
                         min: p.minThick,
                         max: p.maxThick,
@@ -586,7 +586,7 @@ export const LevelingCalculator: React.FC<Props> = ({ onCalculate }) => {
               ))}
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+            <div className="grid grid-cols-2 gap-4 mt-4">
               <div>
                 <label className="block text-xs font-bold text-slate-500 mb-1">{t("calc.leveling.bag_size")}</label>
                 <select value={bagSize} onChange={(e) => setBagSize(toNum(e.target.value, 25))} className="w-full p-2 border rounded bg-white text-sm text-slate-900">
@@ -613,7 +613,7 @@ export const LevelingCalculator: React.FC<Props> = ({ onCalculate }) => {
             </div>
           </div>
 
-          <div className="flex gap-3">
+          <div className="flex flex-col gap-3 sm:flex-row">
             <button type="button" onClick={() => setStep(1)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-extrabold shadow-sm">
               {t("common.back")}
             </button>
@@ -634,7 +634,7 @@ export const LevelingCalculator: React.FC<Props> = ({ onCalculate }) => {
 
           <div className="space-y-3">
             <div className="p-3 bg-white border rounded-lg">
-              <label className="flex flex-wrap items-center justify-between gap-2 cursor-pointer mb-2">
+              <label className="flex items-center justify-between cursor-pointer mb-2">
                 <span className="text-sm font-bold text-slate-700">{t("calc.leveling.opt_primer")}</span>
                 <input type="checkbox" checked={usePrimer} onChange={(e) => setUsePrimer(e.target.checked)} className="h-5 w-5 text-blue-600 rounded" />
               </label>
@@ -654,18 +654,18 @@ export const LevelingCalculator: React.FC<Props> = ({ onCalculate }) => {
               )}
             </div>
 
-            <label className="flex flex-wrap items-center justify-between gap-2 p-3 bg-white border rounded-lg cursor-pointer">
+            <label className="flex items-center justify-between p-3 bg-white border rounded-lg cursor-pointer">
               <div>
                 <span className="text-sm font-bold text-slate-700">{t("calc.leveling.opt_band")}</span>
-                <p className="text-[11px] text-slate-400">{t("calc.leveling.opt_band_help")}</p>
+                <p className="text-[10px] text-slate-400">{t("calc.leveling.opt_band_help")}</p>
               </div>
               <input type="checkbox" checked={usePeripheralBand} onChange={(e) => setUsePeripheralBand(e.target.checked)} className="h-5 w-5 text-blue-600 rounded" />
             </label>
 
-            <label className="flex flex-wrap items-center justify-between gap-2 p-3 bg-white border rounded-lg cursor-pointer">
+            <label className="flex items-center justify-between p-3 bg-white border rounded-lg cursor-pointer">
               <div>
                 <span className="text-sm font-bold text-slate-700">{t("calc.leveling.opt_mesh")}</span>
-                <p className="text-[11px] text-slate-400">{t("calc.leveling.opt_mesh_help")}</p>
+                <p className="text-[10px] text-slate-400">{t("calc.leveling.opt_mesh_help")}</p>
               </div>
               <input type="checkbox" checked={useMesh} onChange={(e) => setUseMesh(e.target.checked)} className="h-5 w-5 text-blue-600 rounded" />
             </label>
@@ -683,7 +683,7 @@ export const LevelingCalculator: React.FC<Props> = ({ onCalculate }) => {
             </div>
           </div>
 
-          <div className="flex gap-3">
+          <div className="flex flex-col gap-3 sm:flex-row">
             <button type="button" onClick={() => setStep(2)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-extrabold shadow-sm">
               {t("common.back")}
             </button>
@@ -710,45 +710,45 @@ export const LevelingCalculator: React.FC<Props> = ({ onCalculate }) => {
               </button>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-[11px] text-slate-500 mb-1">{t("calc.leveling.price_compound_std")}</label>
+                <label className="block text-[10px] text-slate-500 mb-1">{t("calc.leveling.price_compound_std")}</label>
                 <input type="number" value={prices.compoundBag} onChange={(e) => updatePrice("compoundBag", e.target.value)} className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl" />
               </div>
 
               <div>
-                <label className="block text-[11px] text-slate-500 mb-1">{t("calc.leveling.price_compound_fibre")}</label>
+                <label className="block text-[10px] text-slate-500 mb-1">{t("calc.leveling.price_compound_fibre")}</label>
                 <input type="number" value={prices.compoundFibre} onChange={(e) => updatePrice("compoundFibre", e.target.value)} className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl" />
               </div>
 
               <div>
-                <label className="block text-[11px] text-slate-500 mb-1">{t("calc.leveling.price_primer")}</label>
+                <label className="block text-[10px] text-slate-500 mb-1">{t("calc.leveling.price_primer")}</label>
                 <input type="number" value={prices.primerL} onChange={(e) => updatePrice("primerL", e.target.value)} className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl" />
               </div>
 
               {useMesh && (
                 <div>
-                  <label className="block text-[11px] text-slate-500 mb-1">{t("calc.leveling.price_mesh")}</label>
+                  <label className="block text-[10px] text-slate-500 mb-1">{t("calc.leveling.price_mesh")}</label>
                   <input type="number" value={prices.meshRoll} onChange={(e) => updatePrice("meshRoll", e.target.value)} className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl" />
                 </div>
               )}
 
               {usePeripheralBand && (
                 <div>
-                  <label className="block text-[11px] text-slate-500 mb-1">{t("calc.leveling.price_band")}</label>
+                  <label className="block text-[10px] text-slate-500 mb-1">{t("calc.leveling.price_band")}</label>
                   <input type="number" value={prices.bandM} onChange={(e) => updatePrice("bandM", e.target.value)} className="w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl" />
                 </div>
               )}
             </div>
 
             {proMode && (
-              <div className="mt-4 pt-3 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="mt-4 pt-3 border-t border-slate-100 grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[11px] text-blue-600 font-bold mb-1">{t("calc.leveling.price_labor_pour")}</label>
+                  <label className="block text-[10px] text-blue-600 font-bold mb-1">{t("calc.leveling.price_labor_pour")}</label>
                   <input type="number" value={prices.laborM2} onChange={(e) => updatePrice("laborM2", e.target.value)} className="w-full p-1.5 border border-blue-200 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(37,99,235,0.08)] backdrop-blur-xl" />
                 </div>
                 <div>
-                  <label className="block text-[11px] text-blue-600 font-bold mb-1">{t("calc.leveling.price_labor_prep")}</label>
+                  <label className="block text-[10px] text-blue-600 font-bold mb-1">{t("calc.leveling.price_labor_prep")}</label>
                   <input type="number" value={prices.laborPrep} onChange={(e) => updatePrice("laborPrep", e.target.value)} className="w-full p-1.5 border border-blue-200 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(37,99,235,0.08)] backdrop-blur-xl" />
                 </div>
               </div>
@@ -765,7 +765,7 @@ export const LevelingCalculator: React.FC<Props> = ({ onCalculate }) => {
             </div>
           )}
 
-          <div className="flex gap-3 pt-2">
+          <div className="flex flex-col gap-3 pt-2 sm:flex-row">
             <button type="button" onClick={() => setStep(3)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-extrabold shadow-sm">
               {t("common.back")}
             </button>

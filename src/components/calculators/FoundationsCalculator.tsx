@@ -243,9 +243,9 @@ export const FoundationsCalculator: React.FC<Props> = ({ onCalculate, initialMod
 
   // --- RENDER ---
   return (
-    <div className="space-y-6 pb-20">
+    <div className="space-y-5 rounded-[28px] border border-white/70 bg-white/74 p-3.5 shadow-[0_22px_60px_rgba(15,23,42,0.10)] backdrop-blur-xl sm:p-5 pb-20">
       {/* Navigation */}
-      <div className="flex flex-wrap items-center justify-between gap-2 bg-white p-2 rounded-xl shadow-sm border border-slate-100 overflow-x-auto no-scrollbar">
+      <div className="flex items-center justify-between bg-white p-2 rounded-xl shadow-sm border border-slate-100 overflow-x-auto no-scrollbar">
         {[1, 2, 3, 4, 5, 6].map((s) => (
           <button
             key={s}
@@ -326,7 +326,7 @@ export const FoundationsCalculator: React.FC<Props> = ({ onCalculate, initialMod
             </button>
           </div>
 
-          <div className="flex flex-wrap items-center justify-between gap-2 p-4 bg-white rounded-xl border border-slate-200">
+          <div className="flex items-center justify-between p-4 bg-white rounded-xl border border-slate-200">
             <div className="flex items-center space-x-2">
               <Settings size={20} className={proMode ? "text-blue-600" : "text-slate-400"} />
               <span className="font-bold text-slate-700">{t("struct.common.pro_mode", { defaultValue: "Pro mode" })}</span>
@@ -362,7 +362,7 @@ export const FoundationsCalculator: React.FC<Props> = ({ onCalculate, initialMod
                   <input type="number" value={totalLengthMl} onChange={(e) => setTotalLengthMl(e.target.value)} className={inputClass} />
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className={labelClass}>{t("struct.common.width_cm", { defaultValue: "Largeur (cm)" })}</label>
                     <input type="number" value={stripWidthCm} onChange={(e) => setStripWidthCm(e.target.value)} className={inputClass} />
@@ -390,7 +390,7 @@ export const FoundationsCalculator: React.FC<Props> = ({ onCalculate, initialMod
                       )}
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-2">
+                    <div className="grid grid-cols-2 gap-3 mb-2">
                       <div>
                         <label className={labelClass}>{t("struct.common.qty", { defaultValue: "Quantity" })}</label>
                         <input type="number" value={pad.count} onChange={(e) => updatePad(pad.id, "count", Number(e.target.value))} className={inputClass} />
@@ -401,7 +401,7 @@ export const FoundationsCalculator: React.FC<Props> = ({ onCalculate, initialMod
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                    <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
                       <div>
                         <label className={labelClass}>L (cm)</label>
                         <input type="number" value={pad.lengthCm} onChange={(e) => updatePad(pad.id, "lengthCm", Number(e.target.value))} className={inputClass} />
@@ -447,7 +447,7 @@ export const FoundationsCalculator: React.FC<Props> = ({ onCalculate, initialMod
             </div>
           </div>
 
-          <div className="flex gap-3 pt-4">
+          <div className="flex flex-col gap-3 pt-4 sm:flex-row">
             <button type="button" onClick={() => setStep(step - 1)} className="p-3 rounded-xl bg-white border border-slate-200 text-slate-500" aria-label={t("common.back", { defaultValue: "Retour" })}>
               <ArrowLeft />
             </button>
@@ -484,7 +484,7 @@ export const FoundationsCalculator: React.FC<Props> = ({ onCalculate, initialMod
           <div className={sectionClass}>
             <h3 className="font-bold text-slate-800 text-lg mb-4">{t("struct.common.constraints", { defaultValue: "Contraintes" })}</h3>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className={labelClass}>{t("struct.fd.frost_depth", { defaultValue: "Hors-gel (cm)" })}</label>
                 <input type="number" value={frostDepthCm} onChange={(e) => setFrostDepthCm(e.target.value)} className={inputClass} placeholder="0" />
@@ -509,7 +509,7 @@ export const FoundationsCalculator: React.FC<Props> = ({ onCalculate, initialMod
               )}
           </div>
 
-          <div className="flex gap-3 pt-4">
+          <div className="flex flex-col gap-3 pt-4 sm:flex-row">
             <button type="button" onClick={() => setStep(step - 1)} className="p-3 rounded-xl bg-white border border-slate-200 text-slate-500" aria-label={t("common.back", { defaultValue: "Retour" })}>
               <ArrowLeft />
             </button>
@@ -546,7 +546,7 @@ export const FoundationsCalculator: React.FC<Props> = ({ onCalculate, initialMod
             </div>
           </div>
 
-          <div className="flex gap-3 pt-4">
+          <div className="flex flex-col gap-3 pt-4 sm:flex-row">
             <button type="button" onClick={() => setStep(step - 1)} className="p-3 rounded-xl bg-white border border-slate-200 text-slate-500" aria-label={t("common.back", { defaultValue: "Retour" })}>
               <ArrowLeft />
             </button>
@@ -564,7 +564,7 @@ export const FoundationsCalculator: React.FC<Props> = ({ onCalculate, initialMod
             <h3 className="font-bold text-slate-800 text-lg mb-2">{t("struct.common.options", { defaultValue: "Options" })}</h3>
 
             <div className="space-y-3">
-              <label className="flex flex-wrap items-center justify-between gap-2 p-3 border rounded-lg hover:bg-slate-50 cursor-pointer">
+              <label className="flex items-center justify-between p-3 border rounded-lg hover:bg-slate-50 cursor-pointer">
                 <div>
                   <span className="font-bold text-sm text-slate-700 block">{t("struct.fd.clean_concrete", { defaultValue: "Blinding concrete" })}</span>
                   <span className="text-xs text-slate-400">{t("struct.fd.clean_concrete_hint", { defaultValue: "Sous fondations (rec. 5cm)" })}</span>
@@ -573,7 +573,7 @@ export const FoundationsCalculator: React.FC<Props> = ({ onCalculate, initialMod
               </label>
 
               {cleanConcrete && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className={labelClass}>{t("struct.common.thickness", { defaultValue: "Thickness" })} (cm)</label>
                     <input type="number" value={cleanConcreteThickCm} onChange={(e) => setCleanConcreteThickCm(e.target.value)} className={inputClass} />
@@ -581,7 +581,7 @@ export const FoundationsCalculator: React.FC<Props> = ({ onCalculate, initialMod
                 </div>
               )}
 
-              <label className="flex flex-wrap items-center justify-between gap-2 p-3 border rounded-lg hover:bg-slate-50 cursor-pointer">
+              <label className="flex items-center justify-between p-3 border rounded-lg hover:bg-slate-50 cursor-pointer">
                 <div>
                   <span className="font-bold text-sm text-slate-700 block">{t("struct.fd.formwork", { defaultValue: "Formwork" })}</span>
                   <span className="text-xs text-slate-400">{t("struct.fd.formwork_hint", { defaultValue: "Si terrain instable ou hors-sol" })}</span>
@@ -589,7 +589,7 @@ export const FoundationsCalculator: React.FC<Props> = ({ onCalculate, initialMod
                 <input type="checkbox" checked={formwork} onChange={(e) => setFormwork(e.target.checked)} className="h-5 w-5 text-blue-600 rounded" />
               </label>
 
-              <label className="flex flex-wrap items-center justify-between gap-2 p-3 border rounded-lg hover:bg-slate-50 cursor-pointer">
+              <label className="flex items-center justify-between p-3 border rounded-lg hover:bg-slate-50 cursor-pointer">
                 <div>
                   <span className="font-bold text-sm text-slate-700 block">{t("struct.fd.drain", { defaultValue: "Perimeter drainage" })}</span>
                   <span className="text-xs text-slate-400">{t("struct.fd.drain_hint", { defaultValue: "Drain + gravel + geotextile" })}</span>
@@ -598,7 +598,7 @@ export const FoundationsCalculator: React.FC<Props> = ({ onCalculate, initialMod
               </label>
 
               {drainage && (
-                <label className="flex flex-wrap items-center justify-between gap-2 p-3 border rounded-lg hover:bg-slate-50 cursor-pointer">
+                <label className="flex items-center justify-between p-3 border rounded-lg hover:bg-slate-50 cursor-pointer">
                   <div>
                     <span className="font-bold text-sm text-slate-700 block">{t("struct.fd.drain_gravel", { defaultValue: "Drain gravel" })}</span>
                     <span className="text-xs text-slate-400">{t("struct.fd.drain_gravel_hint", { defaultValue: "Lit drainant autour du drain" })}</span>
@@ -607,7 +607,7 @@ export const FoundationsCalculator: React.FC<Props> = ({ onCalculate, initialMod
                 </label>
               )}
 
-              <label className="flex flex-wrap items-center justify-between gap-2 p-3 border rounded-lg hover:bg-slate-50 cursor-pointer">
+              <label className="flex items-center justify-between p-3 border rounded-lg hover:bg-slate-50 cursor-pointer">
                 <div>
                   <span className="font-bold text-sm text-slate-700 block">{t("struct.fd.evac", { defaultValue: "Soil disposal" })}</span>
                   <span className="text-xs text-slate-400">{t("struct.fd.evac_hint", { defaultValue: "Disposal (bulked)" })}</span>
@@ -615,7 +615,7 @@ export const FoundationsCalculator: React.FC<Props> = ({ onCalculate, initialMod
                 <input type="checkbox" checked={evacuateSpoil} onChange={(e) => setEvacuateSpoil(e.target.checked)} className="h-5 w-5 text-blue-600 rounded" />
               </label>
 
-              <label className="flex flex-wrap items-center justify-between gap-2 p-3 border rounded-lg hover:bg-slate-50 cursor-pointer">
+              <label className="flex items-center justify-between p-3 border rounded-lg hover:bg-slate-50 cursor-pointer">
                 <div>
                   <span className="font-bold text-sm text-slate-700 block">{t("struct.fd.reuse", { defaultValue: "Reuse on site" })}</span>
                   <span className="text-xs text-slate-400">{t("struct.fd.reuse_hint", { defaultValue: "Garder une partie pour remblai" })}</span>
@@ -625,7 +625,7 @@ export const FoundationsCalculator: React.FC<Props> = ({ onCalculate, initialMod
             </div>
           </div>
 
-          <div className="flex gap-3 pt-4">
+          <div className="flex flex-col gap-3 pt-4 sm:flex-row">
             <button type="button" onClick={() => setStep(step - 1)} className="p-3 rounded-xl bg-white border border-slate-200 text-slate-500" aria-label={t("common.back", { defaultValue: "Retour" })}>
               <ArrowLeft />
             </button>
@@ -645,7 +645,7 @@ export const FoundationsCalculator: React.FC<Props> = ({ onCalculate, initialMod
               <div className="text-xs text-slate-400 italic">{t("struct.common.local_overrides", { defaultValue: "Modifiables pour ce calcul" })}</div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className={labelClass}>{t("struct.fd.price_concrete", { defaultValue: "Concrete (€/m³)" })}</label>
                 <input type="number" value={prices.CONC_M3} onChange={(e) => updatePrice("CONC_M3", e.target.value)} className={inputClass} />
@@ -704,7 +704,7 @@ export const FoundationsCalculator: React.FC<Props> = ({ onCalculate, initialMod
             </div>
           ) : null}
 
-          <div className="flex gap-3 pt-4">
+          <div className="flex flex-col gap-3 pt-4 sm:flex-row">
             <button type="button" onClick={() => setStep(step - 1)} className="p-3 rounded-xl bg-white border border-slate-200 text-slate-500" aria-label={t("common.back", { defaultValue: "Retour" })}>
               <ArrowLeft />
             </button>

@@ -546,8 +546,9 @@ export const ElectricityCalculator: React.FC<Props> = ({ onCalculate }) => {
   }, [calculationData, onCalculate, t]);
 
   return (
-<div className="space-y-6 rounded-[32px] border border-white/70 bg-white/72 p-3 shadow-[0_24px_70px_rgba(15,23,42,0.10)] backdrop-blur-xl sm:p-4 lg:p-6">      {/* Navigation */}
-      <div className="flex justify-between items-center mb-6 rounded-[24px] border border-white/80 bg-slate-100/70 p-1.5 shadow-inner overflow-x-auto backdrop-blur-xl">
+    <div className="space-y-5 rounded-[28px] border border-white/70 bg-white/74 p-3.5 shadow-[0_22px_60px_rgba(15,23,42,0.10)] backdrop-blur-xl sm:p-5">
+      {/* Navigation */}
+      <div className="mb-5 flex items-center gap-1.5 overflow-x-auto rounded-[24px] border border-white/80 bg-slate-100/70 p-1.5 shadow-inner backdrop-blur-xl no-scrollbar">
         {[1, 2, 3, 4].map((s) => (
           <button
             key={s}
@@ -710,7 +711,7 @@ export const ElectricityCalculator: React.FC<Props> = ({ onCalculate }) => {
             </div>
           </div>
 
-          <div className="flex gap-3">
+          <div className="flex flex-col gap-3 sm:flex-row">
             <button type="button" onClick={() => setStep(1)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-extrabold shadow-sm">
               {t("common.back", { defaultValue: "Retour" })}
             </button>
@@ -771,7 +772,7 @@ export const ElectricityCalculator: React.FC<Props> = ({ onCalculate }) => {
             )}
           </div>
 
-          <div className="flex gap-3 pt-2">
+          <div className="flex flex-col gap-3 pt-2 sm:flex-row">
             <button type="button" onClick={() => setStep(2)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-extrabold shadow-sm">
               {t("common.back", { defaultValue: "Retour" })}
             </button>
@@ -790,7 +791,7 @@ export const ElectricityCalculator: React.FC<Props> = ({ onCalculate }) => {
             {t("calc.electricity.step4.hint", { defaultValue: "Done. The summary is sent to the results panel." })}
           </div>
 
-          <div className="flex gap-3 pt-2">
+          <div className="flex flex-col gap-3 pt-2 sm:flex-row">
             <button type="button" onClick={() => setStep(3)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-extrabold shadow-sm">
               {t("common.back", { defaultValue: "Retour" })}
             </button>
