@@ -8,7 +8,10 @@
   --panel-bg: rgba(255, 255, 255, 0.60);
   --panel-border: rgba(255, 255, 255, 0.50);
   --panel-shadow: 0 22px 60px rgba(15, 23, 42, 0.16);
-  --bottom-nav-space: calc(6.75rem + env(safe-area-inset-bottom));
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --bottom-nav-space: calc(6.75rem + var(--safe-bottom));
+  --page-top-space: max(0.95rem, calc(var(--safe-top) + 0.55rem));
 }
 
 *, *::before, *::after {
@@ -86,7 +89,6 @@ a {
   z-index: 1;
 }
 
-/* Variantes par page */
 .app-shell--menu::before {
   background:
     radial-gradient(820px 500px at 7% 8%, rgba(37, 99, 235, 0.46), transparent 60%),
@@ -162,15 +164,13 @@ a {
 .page-frame {
   width: min(100%, 1180px);
   margin-inline: auto;
-  padding: 0.95rem;
-  padding-bottom: var(--bottom-nav-space);
+  padding: var(--page-top-space) 0.95rem var(--bottom-nav-space);
 }
 
 .page-narrow {
   width: min(100%, 1040px);
   margin-inline: auto;
-  padding: 0.95rem;
-  padding-bottom: var(--bottom-nav-space);
+  padding: var(--page-top-space) 0.95rem var(--bottom-nav-space);
 }
 
 .page-header-chip {
@@ -185,6 +185,22 @@ a {
   font-weight: 800;
   color: #334155;
   backdrop-filter: blur(14px);
+}
+
+.safe-top-header {
+  padding-top: max(0.4rem, calc(var(--safe-top) + 0.35rem));
+}
+
+.safe-top-content {
+  padding-top: max(0.15rem, calc(var(--safe-top) + 0.1rem));
+}
+
+.safe-bottom-nav {
+  bottom: max(0.5rem, calc(var(--safe-bottom) + 0.35rem));
+}
+
+.safe-bottom-pad {
+  padding-bottom: calc(var(--bottom-nav-space) + 0.35rem);
 }
 
 .no-scrollbar::-webkit-scrollbar {
@@ -213,8 +229,7 @@ a {
 @media (min-width: 640px) {
   .page-frame,
   .page-narrow {
-    padding: 1rem;
-    padding-bottom: var(--bottom-nav-space);
+    padding-inline: 1rem;
   }
 }
 

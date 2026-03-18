@@ -102,8 +102,8 @@ export const ProjectsPage: React.FC = () => {
 
     return (
       <div className="app-shell app-shell--projects min-h-screen bg-transparent relative">
-        <div className="sticky top-0 z-30 border-b border-slate-200/80 bg-white/80 backdrop-blur-xl shadow-sm no-print">
-          <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="safe-top-header sticky top-0 z-30 border-b border-slate-200/80 bg-white/80 backdrop-blur-xl shadow-sm no-print">
+          <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 pb-3 sm:flex-row sm:items-center sm:justify-between">
             <button
               onClick={() => setSelectedProject(null)}
               className="text-slate-500 font-extrabold flex items-center hover:text-blue-600 transition-colors"
@@ -152,10 +152,8 @@ export const ProjectsPage: React.FC = () => {
                   <Calculator size={14} />
                   {t("projects.title", { defaultValue: "My projects (calculations)" })}
                 </div>
-                <h1 className="text-3xl font-extrabold text-slate-900 mb-1 break-words">
-                  {selectedProject.name}
-                </h1>
-                <p className="text-sm text-slate-600 font-medium">
+                <h1 className="text-3xl font-extrabold text-slate-900 mb-1">{selectedProject.name}</h1>
+                <p className="text-sm text-slate-500 font-medium">
                   {t("projects.created_on", { defaultValue: "Created on" })}{" "}
                   {new Date(selectedProject.date).toLocaleDateString(i18n.language || undefined)}
                 </p>
@@ -188,7 +186,7 @@ export const ProjectsPage: React.FC = () => {
                     className="flex justify-between items-center gap-3 p-3.5 bg-white/85 rounded-2xl border border-slate-200/80 print:border-slate-300"
                   >
                     <div className="min-w-0">
-                      <span className="font-extrabold text-slate-700 block text-sm break-words">{item.name}</span>
+                      <span className="block break-words text-sm font-extrabold text-slate-700">{item.name}</span>
                       <span className="text-xs text-slate-500 font-medium">
                         {item.quantity} {item.unit} × {euro.format(item.unitPrice)}
                       </span>
@@ -271,7 +269,7 @@ export const ProjectsPage: React.FC = () => {
               <h1 className="text-2xl font-extrabold text-slate-800">
                 {t("projects.title", { defaultValue: "My projects (calculations)" })}
               </h1>
-              <p className="mt-1 text-sm text-slate-600 font-medium">
+              <p className="mt-1 text-sm text-slate-500 font-medium">
                 {t("projects.subtitle", {
                   defaultValue: "Saved from individual calculators (single calculations).",
                 })}
@@ -294,8 +292,8 @@ export const ProjectsPage: React.FC = () => {
                   (e.currentTarget as HTMLImageElement).src = "/images/menu/fallback.jpg";
                 }}
               />
-              <div className="absolute inset-0 bg-black/30" />
-              <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/35 to-black/10" />
+              <div className="absolute inset-0 bg-black/25" />
+              <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/35 to-black/10" />
             </div>
 
             <div className="relative z-10 w-full p-5 flex items-center justify-between">
@@ -337,21 +335,21 @@ export const ProjectsPage: React.FC = () => {
                 <div
                   key={project.id}
                   onClick={() => setSelectedProject(project)}
-                  className="app-card p-4 sm:p-5 rounded-[24px] shadow-sm border border-slate-200/80 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between active:scale-[0.98] transition-all cursor-pointer hover:border-blue-200"
+                  className="bg-white/72 backdrop-blur-sm p-5 rounded-[24px] shadow-sm border border-slate-200/80 flex justify-between items-center active:scale-[0.98] transition-all cursor-pointer hover:border-blue-200"
                 >
-                  <div className="min-w-0">
-                    <h3 className="font-extrabold text-slate-800 text-lg break-words">{project.name}</h3>
+                  <div>
+                    <h3 className="break-words text-lg font-extrabold text-slate-800">{project.name}</h3>
                     <p className="text-xs text-slate-500 mt-1 font-medium">
                       {new Date(project.date).toLocaleDateString(i18n.language || undefined)} • {project.items.length}{" "}
                       {t("projects.items", { defaultValue: "items" })}
                     </p>
                   </div>
 
-                  <div className="flex items-center gap-3 self-end sm:self-auto">
-                    <span className="font-extrabold text-slate-700 bg-slate-100/90 px-3 py-1.5 rounded-xl text-sm border border-slate-200 break-words">
+                  <div className="flex items-center space-x-3">
+                    <span className="font-extrabold text-slate-700 bg-slate-100/90 px-3 py-1.5 rounded-xl text-sm border border-slate-200">
                       {euro.format(total)}
                     </span>
-                    <ChevronRight className="text-slate-300 shrink-0" size={20} />
+                    <ChevronRight className="text-slate-300" size={20} />
                   </div>
                 </div>
               );

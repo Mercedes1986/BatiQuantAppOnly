@@ -96,8 +96,10 @@ export const CalculatorPage: React.FC<Props> = ({ type, onBack, onNavigateProjec
 
   if (!config) {
     return (
-      <div className="min-h-screen bg-transparent flex items-center justify-center p-6 text-center text-slate-600">
-        {t("calculator.missing_config", { defaultValue: "Calculator unavailable." })}
+      <div className="app-shell app-shell--calculator min-h-screen bg-transparent">
+        <div className="page-narrow flex min-h-[60vh] items-center justify-center text-center text-slate-600">
+          {t("calculator.missing_config", { defaultValue: "Calculator unavailable." })}
+        </div>
       </div>
     );
   }
@@ -229,7 +231,7 @@ ${tips.map((x: string) => `- ${x}`).join("\n")}`
   return (
     <div className="app-shell app-shell--calculator min-h-screen bg-transparent">
       <div className="page-narrow space-y-4">
-        <section className={`glass-panel sticky top-0 z-10 rounded-[28px] p-4 text-white shadow-md ${config.color}`}>
+        <section className={`safe-top-header glass-panel sticky top-0 z-20 rounded-[28px] p-4 text-white shadow-md ${config.color}`}>
           <div className="flex items-center gap-3">
             <button
               onClick={onBack}
@@ -241,8 +243,8 @@ ${tips.map((x: string) => `- ${x}`).join("\n")}`
             </button>
 
             <div className="min-w-0 flex-1">
-              <h1 className="text-xl font-extrabold break-words">{config.name}</h1>
-              <p className="text-xs opacity-90">
+              <h1 className="break-words text-xl font-extrabold leading-tight sm:text-[22px]">{config.name}</h1>
+              <p className="mt-0.5 text-xs opacity-90">
                 {t("calculator.precision", { defaultValue: "Precision calculator" })}
               </p>
             </div>
@@ -267,7 +269,7 @@ ${tips.map((x: string) => `- ${x}`).join("\n")}`
                 {result.details.map((d, i) => (
                   <div key={i} className="min-w-0">
                     <span className="block text-slate-500">{d.label}</span>
-                    <span className="font-semibold text-slate-800 break-words">
+                    <span className="break-words font-semibold text-slate-800">
                       {d.value} {d.unit}
                     </span>
                   </div>
@@ -275,12 +277,12 @@ ${tips.map((x: string) => `- ${x}`).join("\n")}`
               </div>
 
               {result.warnings && result.warnings.length > 0 && (
-                <div className="mt-4 bg-red-50 border border-red-200 p-3 rounded-lg text-sm text-red-700">
+                <div className="mt-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
                   <div className="mb-1 flex items-center font-extrabold">
                     <AlertTriangle size={16} className="mr-2" />
                     {t("common.attention", { defaultValue: "Warning" })}
                   </div>
-                  <ul className="list-disc pl-4 space-y-1">
+                  <ul className="list-disc space-y-1 pl-4">
                     {result.warnings.map((w, i) => (
                       <li key={i}>{w}</li>
                     ))}
@@ -301,11 +303,9 @@ ${tips.map((x: string) => `- ${x}`).join("\n")}`
 
               <ul className="space-y-4 text-sm">
                 {result.materials.map((m) => (
-                  <li key={m.id} className="border-b border-slate-50 last:border-0 pb-2">
+                  <li key={m.id} className="border-b border-slate-50 pb-2 last:border-0">
                     <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
-                      <span className="min-w-0 break-words font-medium text-slate-700">
-                        {m.name}
-                      </span>
+                      <span className="min-w-0 break-words font-medium text-slate-700">{m.name}</span>
                       <span className="inline-flex max-w-full items-center justify-center rounded-xl bg-slate-100 px-2.5 py-1 font-extrabold text-slate-800">
                         {m.quantity} {m.unit}
                       </span>
@@ -326,10 +326,10 @@ ${tips.map((x: string) => `- ${x}`).join("\n")}`
                 <button
                   type="button"
                   onClick={() => setShowTips(!showTips)}
-                  className={`sm:col-span-2 flex items-center justify-center space-x-2 p-3 rounded-xl font-extrabold shadow-md active:scale-95 transition-all ${
+                  className={`sm:col-span-2 flex items-center justify-center space-x-2 rounded-xl p-3 font-extrabold shadow-md active:scale-95 transition-all ${
                     showTips
-                      ? "bg-amber-100 text-amber-800 border-amber-200"
-                      : "bg-white text-slate-700 border border-slate-200"
+                      ? "border border-amber-200 bg-amber-100 text-amber-800"
+                      : "border border-slate-200 bg-white text-slate-700"
                   }`}
                 >
                   <Lightbulb
@@ -345,7 +345,7 @@ ${tips.map((x: string) => `- ${x}`).join("\n")}`
               )}
 
               {showTips && tips.length > 0 && (
-                <div className="sm:col-span-2 bg-amber-50 p-4 rounded-xl border border-amber-100 text-sm text-amber-900 animate-in fade-in slide-in-from-top-2">
+                <div className="sm:col-span-2 animate-in slide-in-from-top-2 rounded-xl border border-amber-100 bg-amber-50 p-4 text-sm text-amber-900 fade-in">
                   <h4 className="mb-2 flex items-center font-extrabold">
                     <CheckCircle2 size={16} className="mr-2" />
                     {t("calculator.best_practices", { defaultValue: "Best practices" })}
@@ -364,7 +364,7 @@ ${tips.map((x: string) => `- ${x}`).join("\n")}`
               <button
                 type="button"
                 onClick={() => setShowSaveModal(true)}
-                className="flex items-center justify-center space-x-2 bg-blue-600 text-white p-3 rounded-xl font-extrabold shadow-md active:scale-95 transition-transform"
+                className="flex items-center justify-center space-x-2 rounded-xl bg-blue-600 p-3 font-extrabold text-white shadow-md transition-transform active:scale-95"
               >
                 <Plus size={20} />
                 <span>{t("common.save", { defaultValue: "Save" })}</span>
@@ -373,20 +373,20 @@ ${tips.map((x: string) => `- ${x}`).join("\n")}`
               <button
                 type="button"
                 onClick={handleShare}
-                className="flex items-center justify-center space-x-2 bg-white text-slate-700 border border-slate-200 p-3 rounded-xl font-extrabold active:scale-95 transition-transform"
+                className="flex items-center justify-center space-x-2 rounded-xl border border-slate-200 bg-white p-3 font-extrabold text-slate-700 transition-transform active:scale-95"
               >
                 <Share2 size={20} />
                 <span>{t("common.share", { defaultValue: "Share" })}</span>
               </button>
             </div>
 
-            <div className="pt-2">
+            <div className="pt-1">
               <MobileAdPlaceholder
                 title={t("ads.placeholderTitle", { defaultValue: "Reserved ad placement" })}
                 description={t("ads.placeholderDescription", {
                   defaultValue: "This area is kept for future mobile ad integration.",
                 })}
-                minHeight={156}
+                minHeight={132}
               />
             </div>
           </div>
@@ -394,9 +394,9 @@ ${tips.map((x: string) => `- ${x}`).join("\n")}`
       </div>
 
       {showSaveModal && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl p-6 w-full max-w-sm">
-            <h3 className="text-lg font-extrabold mb-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl">
+            <h3 className="mb-4 text-lg font-extrabold">
               {t("calculator.project_name", { defaultValue: "Project name" })}
             </h3>
 
@@ -406,7 +406,7 @@ ${tips.map((x: string) => `- ${x}`).join("\n")}`
               placeholder={t("calculator.project_placeholder", {
                 defaultValue: "e.g. Living room renovation",
               })}
-              className="w-full p-3 border border-slate-300 rounded-lg mb-4 bg-white text-slate-900"
+              className="mb-4 w-full rounded-lg border border-slate-300 bg-white p-3 text-slate-900"
               value={newProjectName}
               onChange={(e) => setNewProjectName(e.target.value)}
             />
@@ -415,7 +415,7 @@ ${tips.map((x: string) => `- ${x}`).join("\n")}`
               <button
                 type="button"
                 onClick={() => setShowSaveModal(false)}
-                className="flex-1 p-3 text-slate-600 font-extrabold"
+                className="flex-1 p-3 font-extrabold text-slate-600"
               >
                 {t("common.cancel", { defaultValue: "Cancel" })}
               </button>
@@ -423,7 +423,7 @@ ${tips.map((x: string) => `- ${x}`).join("\n")}`
               <button
                 type="button"
                 onClick={handleAddToProject}
-                className="flex-1 p-3 bg-blue-600 text-white rounded-lg font-extrabold shadow-lg"
+                className="flex-1 rounded-lg bg-blue-600 p-3 font-extrabold text-white shadow-lg"
               >
                 {t("common.save", { defaultValue: "Save" })}
               </button>

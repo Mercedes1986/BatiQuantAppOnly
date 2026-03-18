@@ -83,6 +83,7 @@ export const QuickToolsPage: React.FC = () => {
     () => new Intl.NumberFormat(i18n.language || undefined, { style: "currency", currency: "EUR" }),
     [i18n.language]
   );
+  const openLabel = t("common.open", { defaultValue: "Open" });
 
   React.useEffect(() => {
     setResult(null);
@@ -179,26 +180,15 @@ export const QuickToolsPage: React.FC = () => {
               <ArrowRightLeft size={20} />
             </div>
             <div className="min-w-0">
-              <h1 className="text-[24px] font-extrabold tracking-tight text-slate-900 sm:text-[30px]">
-                {t("quick.page_title", { defaultValue: "Quick site tools" })}
-              </h1>
-              <p className="mt-1 text-sm leading-relaxed text-slate-600 sm:text-[15px]">
-                {t("quick.page_subtitle", { defaultValue: "Standalone tools for conversions, net areas, packaging, timber decking, detailed drywall, detailed tiling, roofing, fencing, gravel / fill and insulation." })}
-              </p>
+              <h1 className="text-[24px] font-extrabold tracking-tight text-slate-900 sm:text-[28px]">{t("quick.page_title", { defaultValue: "Quick site tools" })}</h1>
+              <p className="mt-1 text-sm leading-relaxed text-slate-600">{t("quick.page_subtitle", { defaultValue: "Standalone tools for conversions, net areas, packaging, timber decking, detailed drywall, detailed tiling, roofing, fencing, gravel / fill and insulation." })}</p>
             </div>
           </div>
         </section>
 
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           {tools.map((item) => (
-            <ToolCard
-              key={item.key}
-              title={item.title}
-              description={item.description}
-              icon={item.icon}
-              cta={t("common.open", { defaultValue: "Open" })}
-              onClick={() => navigate(`/app/quick-tools/${item.key}`)}
-            />
+            <ToolCard key={item.key} title={item.title} description={item.description} icon={item.icon} cta={openLabel} onClick={() => navigate(`/app/quick-tools/${item.key}`)} />
           ))}
         </div>
       </div>

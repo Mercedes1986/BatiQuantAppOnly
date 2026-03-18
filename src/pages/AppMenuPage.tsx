@@ -74,12 +74,8 @@ const SecondaryCard: React.FC<{ card: SectionCard; onClick: () => void; cta: str
     </div>
 
     <div className="min-w-0 flex-1">
-      <div className="text-sm font-extrabold leading-tight text-slate-900 break-words">
-        {card.title}
-      </div>
-      <div className="mt-0.5 line-clamp-2 text-xs leading-relaxed text-slate-600">
-        {card.desc}
-      </div>
+      <div className="break-words text-sm font-extrabold leading-tight text-slate-900">{card.title}</div>
+      <div className="mt-0.5 line-clamp-2 text-xs leading-relaxed text-slate-600">{card.desc}</div>
     </div>
 
     <div className="flex shrink-0 items-center gap-1 text-xs font-extrabold text-blue-700">
@@ -210,15 +206,9 @@ export const AppMenuPage: React.FC = () => {
               {t("menu.secondary.subtitle", { defaultValue: "Backup and app settings." })}
             </p>
           </div>
-
           <div className="grid gap-2.5">
             {secondaryCards.map((card) => (
-              <SecondaryCard
-                key={card.path}
-                card={card}
-                cta={openLabel}
-                onClick={() => navigate(card.path)}
-              />
+              <SecondaryCard key={card.path} card={card} cta={openLabel} onClick={() => navigate(card.path)} />
             ))}
           </div>
         </section>

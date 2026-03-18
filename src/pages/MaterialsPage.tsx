@@ -244,15 +244,15 @@ export const MaterialsPage: React.FC = () => {
       : t("materials.tabs.data", { defaultValue: "Data" });
 
   return (
-    <div className="app-shell app-shell--materials min-h-screen bg-transparent">
-      <div className="glass-panel sticky top-0 z-20 border-b border-slate-200/70 shadow-sm">
-        <div className="page-frame !pt-4 !pb-4">
-          <div className="flex flex-col items-start gap-3 mb-4 sm:flex-row sm:items-center sm:justify-between">
+    <div className="pb-20 min-h-screen bg-transparent">
+      <div className="bg-white sticky top-0 z-20 border-b border-slate-200 shadow-sm">
+        <div className="p-4 max-w-7xl mx-auto">
+          <div className="flex justify-between items-center gap-3 mb-4">
             <h1 className="text-2xl font-extrabold text-slate-800">
               {t("materials.title", { defaultValue: "Materials & Pricing" })}
             </h1>
 
-            <div className="flex items-center space-x-1.5 bg-slate-100 p-1 rounded-lg shrink-0 self-stretch sm:self-auto">
+            <div className="flex items-center space-x-1.5 bg-slate-100 p-1 rounded-lg shrink-0">
               <button
                 onClick={() => handleTaxChange({ mode: "HT" })}
                 className={`text-xs font-extrabold px-3 py-1.5 rounded-md transition ${
@@ -298,7 +298,7 @@ export const MaterialsPage: React.FC = () => {
       </div>
 
       {activeTab === "system" && (
-        <div className="page-frame space-y-4 animate-in fade-in">
+        <div className="p-4 space-y-4 animate-in fade-in max-w-7xl mx-auto">
           {/* Search + favorites */}
           <div className="flex flex-col sm:flex-row gap-2">
             <div className="relative flex-1">
@@ -331,7 +331,7 @@ export const MaterialsPage: React.FC = () => {
 
           {/* Categories: 2 rows, nicer chip sizing */}
           <div className="rounded-xl bg-slate-200/70 p-2 shadow-sm border border-slate-200">
-            <div className="flex flex-nowrap gap-2 overflow-x-auto no-scrollbar">
+            <div className="grid grid-rows-2 grid-flow-col auto-cols-max gap-2 overflow-x-auto no-scrollbar">
               <button
                 onClick={() => setCategory("All")}
                 className={`px-3 py-2 rounded-full text-xs font-extrabold whitespace-nowrap border transition-colors ${
@@ -362,7 +362,7 @@ export const MaterialsPage: React.FC = () => {
           </div>
 
           {/* Products grid: aesthetic sizes */}
-          <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
             {filteredSystemList.map((item) => (
               <div
                 key={item.key}
@@ -393,7 +393,7 @@ export const MaterialsPage: React.FC = () => {
                       </button>
 
                       {/* Bigger image */}
-                      <div className="w-18 h-18 sm:w-20 sm:h-20 rounded-2xl bg-white border border-slate-200 overflow-hidden flex items-center justify-center shrink-0">
+                      <div className="w-20 h-20 rounded-2xl bg-white border border-slate-200 overflow-hidden flex items-center justify-center shrink-0">
                         <img
                           src={item.imageUrl || getMaterialImageUrl(String(item.key || ""))}
                           alt={item.label || String(item.key || "") }
@@ -407,7 +407,7 @@ export const MaterialsPage: React.FC = () => {
                       </div>
 
                       <div className="min-w-0">
-                        <span className="font-extrabold text-slate-900 block text-sm leading-snug break-words line-clamp-2">
+                        <span className="font-extrabold text-slate-900 block text-sm leading-snug truncate">
                           {item.label}
                         </span>
 
@@ -452,8 +452,8 @@ export const MaterialsPage: React.FC = () => {
                   </div>
 
                   {/* Price row */}
-                  <div className="mt-3.5 flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
-                    <div className="relative w-full max-w-[190px]">
+                  <div className="mt-3.5 flex items-center justify-between gap-3">
+                    <div className="relative w-[150px] sm:w-[165px]">
                       <input
                         type="number"
                         min="0"
@@ -472,7 +472,7 @@ export const MaterialsPage: React.FC = () => {
                       <span className="absolute left-3 top-2 text-slate-500 text-xs mt-0.5">€</span>
                     </div>
 
-                    <span className="text-xs font-semibold text-slate-700 bg-slate-50 border border-slate-200 px-2.5 py-2 rounded-xl break-words">
+                    <span className="text-xs font-semibold text-slate-700 whitespace-nowrap bg-slate-50 border border-slate-200 px-2.5 py-2 rounded-xl">
                       {String(item.unit || "").replace("€/", "/ ")}
                     </span>
                   </div>
@@ -490,7 +490,7 @@ export const MaterialsPage: React.FC = () => {
       )}
 
       {activeTab === "custom" && (
-        <div className="page-narrow animate-in fade-in">
+        <div className="p-4 animate-in fade-in max-w-5xl mx-auto">
           {showCustomForm ? (
             <CustomMaterialForm
               initial={editingCustom}
@@ -586,7 +586,7 @@ export const MaterialsPage: React.FC = () => {
       )}
 
       {activeTab === "labor" && (
-        <div className="page-narrow animate-in fade-in">
+        <div className="p-4 animate-in fade-in max-w-3xl mx-auto">
           <div className="bg-white/80 p-4 rounded-2xl border border-slate-200 shadow-sm mb-4">
             <div className="flex justify-between items-center mb-4">
               <div className="flex items-center">
@@ -642,7 +642,7 @@ export const MaterialsPage: React.FC = () => {
       )}
 
       {activeTab === "data" && (
-        <div className="page-narrow space-y-4 animate-in fade-in">
+        <div className="p-4 space-y-4 animate-in fade-in max-w-3xl mx-auto">
           <div className="bg-white/80 p-4 rounded-2xl border border-slate-200 shadow-sm">
             <h3 className="font-extrabold text-slate-800 mb-3 flex items-center">
               <Settings size={18} className="mr-2" />{" "}
@@ -736,7 +736,7 @@ export const MaterialsPage: React.FC = () => {
                 <button
                   key={m.id}
                   onClick={() => handleMapping(mappingTarget, m.id)}
-                  className="w-full text-left p-3 rounded hover:bg-blue-50 text-sm flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between"
+                  className="w-full text-left p-3 rounded hover:bg-blue-50 text-sm flex justify-between items-center"
                   type="button"
                 >
                   <span className="font-medium text-slate-700">{m.label}</span>
