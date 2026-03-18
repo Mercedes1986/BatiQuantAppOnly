@@ -49,7 +49,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onSelectCalc }) =>
             {t("app.name", { defaultValue: "Bati" })}
             <span className="text-blue-600">{t("app.name_suffix", { defaultValue: "Quant" })}</span>
           </h1>
-          <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-slate-500 sm:text-[15px]">
+          <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-slate-600 sm:text-[15px]">
             {t("dashboard.subtitle", {
               defaultValue: "The go-to tool for your job sites.",
             })}
@@ -64,13 +64,13 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onSelectCalc }) =>
             ))}
         </div>
 
-        <div className="pt-2">
+        <div className="pt-1">
           <MobileAdPlaceholder
             title={t("ads.placeholderTitle", { defaultValue: "Reserved ad placement" })}
             description={t("ads.placeholderDescription", {
               defaultValue: "This area is kept for future mobile ad integration.",
             })}
-            minHeight={140}
+            minHeight={132}
           />
         </div>
       </div>

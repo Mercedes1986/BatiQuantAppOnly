@@ -15,8 +15,8 @@ export const PageContainer: React.FC<PageContainerProps> = ({
     <div className={`page-narrow ${className}`}>
       <div
         className={[
-          "glass-panel rounded-[26px] sm:rounded-[30px]",
-          compactOnMobile ? "p-3 sm:p-5 lg:p-6" : "p-3.5 sm:p-5 lg:p-6",
+          "glass-panel overflow-hidden rounded-[24px] sm:rounded-[28px]",
+          compactOnMobile ? "p-3 sm:p-4 lg:p-5" : "p-3.5 sm:p-4 lg:p-5",
         ].join(" ")}
       >
         {children}

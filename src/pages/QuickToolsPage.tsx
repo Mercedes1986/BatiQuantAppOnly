@@ -58,17 +58,17 @@ const ToolCard = ({
   <button
     type="button"
     onClick={onClick}
-    className="group app-card w-full rounded-[24px] p-4 text-left transition-all hover:-translate-y-0.5 hover:shadow-[0_22px_50px_rgba(37,99,235,0.14)] sm:rounded-[28px] sm:p-5"
+    className="group app-card w-full rounded-[22px] p-3.5 text-left transition-all hover:-translate-y-0.5 hover:shadow-[0_22px_50px_rgba(37,99,235,0.14)] sm:rounded-[26px] sm:p-4"
   >
-    <div className="mb-5 flex items-start justify-between gap-3 sm:mb-8">
-      <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-blue-100 bg-blue-50 text-blue-700 sm:h-12 sm:w-12">
+    <div className="mb-4 flex items-start justify-between gap-3 sm:mb-5">
+      <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-blue-100 bg-blue-50 text-blue-700 sm:h-11 sm:w-11">
         <Icon size={20} />
       </div>
       <ChevronRight size={18} className="text-slate-400" />
     </div>
     <div className="text-[17px] font-extrabold leading-tight text-slate-900 sm:text-xl">{title}</div>
-    <p className="mt-2.5 text-sm leading-relaxed text-slate-500 sm:mt-3">{description}</p>
-    <div className="mt-4 text-sm font-extrabold text-blue-700 sm:mt-5">{cta}</div>
+    <p className="mt-2 text-sm leading-relaxed text-slate-600 line-clamp-2 sm:mt-2.5">{description}</p>
+    <div className="mt-3 text-sm font-extrabold text-blue-700 sm:mt-4">{cta}</div>
   </button>
 );
 
@@ -111,7 +111,7 @@ export const QuickToolsPage: React.FC = () => {
               </button>
               <div className="min-w-0 flex-1">
                 <h1 className="text-[24px] font-extrabold leading-tight tracking-tight text-slate-900 sm:text-[28px]">{activeTool.title}</h1>
-                <p className="mt-1 text-sm text-slate-500">{t("quick.page_precision", { defaultValue: "Dedicated quick calculator" })}</p>
+                <p className="mt-1 text-sm text-slate-600">{t("quick.page_precision", { defaultValue: "Dedicated quick calculator" })}</p>
               </div>
               <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-blue-100 bg-blue-50 text-blue-700">
                 <ActiveIcon size={18} />
@@ -182,7 +182,7 @@ export const QuickToolsPage: React.FC = () => {
               <h1 className="text-[24px] font-extrabold tracking-tight text-slate-900 sm:text-[30px]">
                 {t("quick.page_title", { defaultValue: "Quick site tools" })}
               </h1>
-              <p className="mt-1 text-sm leading-relaxed text-slate-500 sm:text-[15px]">
+              <p className="mt-1 text-sm leading-relaxed text-slate-600 sm:text-[15px]">
                 {t("quick.page_subtitle", { defaultValue: "Standalone tools for conversions, net areas, packaging, timber decking, detailed drywall, detailed tiling, roofing, fencing, gravel / fill and insulation." })}
               </p>
             </div>

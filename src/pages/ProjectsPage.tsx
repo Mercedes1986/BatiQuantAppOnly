@@ -152,8 +152,10 @@ export const ProjectsPage: React.FC = () => {
                   <Calculator size={14} />
                   {t("projects.title", { defaultValue: "My projects (calculations)" })}
                 </div>
-                <h1 className="text-3xl font-extrabold text-slate-900 mb-1">{selectedProject.name}</h1>
-                <p className="text-sm text-slate-500 font-medium">
+                <h1 className="text-3xl font-extrabold text-slate-900 mb-1 break-words">
+                  {selectedProject.name}
+                </h1>
+                <p className="text-sm text-slate-600 font-medium">
                   {t("projects.created_on", { defaultValue: "Created on" })}{" "}
                   {new Date(selectedProject.date).toLocaleDateString(i18n.language || undefined)}
                 </p>
@@ -269,7 +271,7 @@ export const ProjectsPage: React.FC = () => {
               <h1 className="text-2xl font-extrabold text-slate-800">
                 {t("projects.title", { defaultValue: "My projects (calculations)" })}
               </h1>
-              <p className="mt-1 text-sm text-slate-500 font-medium">
+              <p className="mt-1 text-sm text-slate-600 font-medium">
                 {t("projects.subtitle", {
                   defaultValue: "Saved from individual calculators (single calculations).",
                 })}
@@ -292,12 +294,12 @@ export const ProjectsPage: React.FC = () => {
                   (e.currentTarget as HTMLImageElement).src = "/images/menu/fallback.jpg";
                 }}
               />
-              <div className="absolute inset-0 bg-black/25" />
-              <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/35 to-black/10" />
+              <div className="absolute inset-0 bg-black/30" />
+              <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/35 to-black/10" />
             </div>
 
             <div className="relative z-10 w-full p-5 flex items-center justify-between">
-              <div className="flex flex-wrap items-center gap-3 justify-end">
+              <div className="flex items-center gap-3">
                 <div className="w-11 h-11 rounded-full bg-white/90 border border-white/60 flex items-center justify-center shadow-sm">
                   <Plus className="text-blue-600" size={22} />
                 </div>
@@ -306,7 +308,9 @@ export const ProjectsPage: React.FC = () => {
                     {t("projects.create_new", { defaultValue: "Create a calculation" })}
                   </div>
                   <div className="text-white/80 text-xs font-semibold mt-0.5">
-                    {t("projects.create_new_hint", { defaultValue: "Choose a calculator and save the result here" })}
+                    {t("projects.create_new_hint", {
+                      defaultValue: "Choose a calculator and save the result here",
+                    })}
                   </div>
                 </div>
               </div>
@@ -335,19 +339,19 @@ export const ProjectsPage: React.FC = () => {
                   onClick={() => setSelectedProject(project)}
                   className="app-card p-4 sm:p-5 rounded-[24px] shadow-sm border border-slate-200/80 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between active:scale-[0.98] transition-all cursor-pointer hover:border-blue-200"
                 >
-                  <div>
-                    <h3 className="font-extrabold text-slate-800 text-lg">{project.name}</h3>
+                  <div className="min-w-0">
+                    <h3 className="font-extrabold text-slate-800 text-lg break-words">{project.name}</h3>
                     <p className="text-xs text-slate-500 mt-1 font-medium">
                       {new Date(project.date).toLocaleDateString(i18n.language || undefined)} • {project.items.length}{" "}
                       {t("projects.items", { defaultValue: "items" })}
                     </p>
                   </div>
 
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 self-end sm:self-auto">
                     <span className="font-extrabold text-slate-700 bg-slate-100/90 px-3 py-1.5 rounded-xl text-sm border border-slate-200 break-words">
                       {euro.format(total)}
                     </span>
-                    <ChevronRight className="text-slate-300" size={20} />
+                    <ChevronRight className="text-slate-300 shrink-0" size={20} />
                   </div>
                 </div>
               );

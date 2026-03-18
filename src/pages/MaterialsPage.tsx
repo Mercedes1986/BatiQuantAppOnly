@@ -331,7 +331,7 @@ export const MaterialsPage: React.FC = () => {
 
           {/* Categories: 2 rows, nicer chip sizing */}
           <div className="rounded-xl bg-slate-200/70 p-2 shadow-sm border border-slate-200">
-            <div className="grid grid-rows-2 grid-flow-col auto-cols-max gap-2 overflow-x-auto no-scrollbar">
+            <div className="flex flex-nowrap gap-2 overflow-x-auto no-scrollbar">
               <button
                 onClick={() => setCategory("All")}
                 className={`px-3 py-2 rounded-full text-xs font-extrabold whitespace-nowrap border transition-colors ${
@@ -362,7 +362,7 @@ export const MaterialsPage: React.FC = () => {
           </div>
 
           {/* Products grid: aesthetic sizes */}
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
             {filteredSystemList.map((item) => (
               <div
                 key={item.key}
@@ -393,7 +393,7 @@ export const MaterialsPage: React.FC = () => {
                       </button>
 
                       {/* Bigger image */}
-                      <div className="w-20 h-20 rounded-2xl bg-white border border-slate-200 overflow-hidden flex items-center justify-center shrink-0">
+                      <div className="w-18 h-18 sm:w-20 sm:h-20 rounded-2xl bg-white border border-slate-200 overflow-hidden flex items-center justify-center shrink-0">
                         <img
                           src={item.imageUrl || getMaterialImageUrl(String(item.key || ""))}
                           alt={item.label || String(item.key || "") }

@@ -8,6 +8,7 @@
   --panel-bg: rgba(255, 255, 255, 0.60);
   --panel-border: rgba(255, 255, 255, 0.50);
   --panel-shadow: 0 22px 60px rgba(15, 23, 42, 0.16);
+  --bottom-nav-space: calc(6.75rem + env(safe-area-inset-bottom));
 }
 
 *, *::before, *::after {
@@ -33,6 +34,18 @@ body {
     radial-gradient(820px 520px at 18% 82%, rgba(16, 185, 129, 0.24), transparent 56%),
     linear-gradient(180deg, #edf4ff 0%, #d8eaff 46%, #c7ddff 100%);
   color: #0f172a;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
 }
 
 .app-shell {
@@ -149,15 +162,15 @@ body {
 .page-frame {
   width: min(100%, 1180px);
   margin-inline: auto;
-  padding: 1rem;
-  padding-bottom: 6rem;
+  padding: 0.95rem;
+  padding-bottom: var(--bottom-nav-space);
 }
 
 .page-narrow {
   width: min(100%, 1040px);
   margin-inline: auto;
-  padding: 1rem;
-  padding-bottom: 6rem;
+  padding: 0.95rem;
+  padding-bottom: var(--bottom-nav-space);
 }
 
 .page-header-chip {
@@ -197,10 +210,18 @@ body {
   }
 }
 
+@media (min-width: 640px) {
+  .page-frame,
+  .page-narrow {
+    padding: 1rem;
+    padding-bottom: var(--bottom-nav-space);
+  }
+}
+
 input,
 select,
 textarea {
-  background-color: rgba(255, 255, 255, 0.86) !important;
+  background-color: rgba(255, 255, 255, 0.88) !important;
   color: #0f172a !important;
   border-color: rgba(203, 213, 225, 0.9) !important;
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.7) inset;
