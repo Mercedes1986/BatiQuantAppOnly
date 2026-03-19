@@ -67,7 +67,7 @@ const ToolCard = ({
       <ChevronRight size={18} className="text-slate-400" />
     </div>
     <div className="text-[17px] font-extrabold leading-tight text-slate-900 sm:text-xl">{title}</div>
-    <p className="mt-2 text-sm leading-relaxed text-slate-600 line-clamp-2 sm:mt-2.5">{description}</p>
+    <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-slate-600 sm:mt-2.5">{description}</p>
     <div className="mt-3 text-sm font-extrabold text-blue-700 sm:mt-4">{cta}</div>
   </button>
 );
@@ -77,6 +77,7 @@ export const QuickToolsPage: React.FC = () => {
   const navigate = useNavigate();
   const { tool } = useParams<{ tool?: string }>();
   const [result, setResult] = React.useState<CalculationResult | null>(null);
+
   const tools = React.useMemo(() => getToolConfigs(t), [t]);
   const activeTool = tools.find((item) => item.key === tool);
   const euro = React.useMemo(
@@ -98,7 +99,7 @@ export const QuickToolsPage: React.FC = () => {
     const ActiveIcon = activeTool.icon;
 
     return (
-      <div className="app-shell app-shell--quick min-h-screen">
+      <div className="app-shell app-shell--quick min-h-screen bg-transparent safe-bottom-pad">
         <div className="page-narrow space-y-4">
           <section className="glass-panel rounded-[28px] p-4 sm:rounded-[32px] sm:p-5">
             <div className="flex items-center gap-3">
@@ -111,8 +112,12 @@ export const QuickToolsPage: React.FC = () => {
                 <ArrowLeft size={20} />
               </button>
               <div className="min-w-0 flex-1">
-                <h1 className="text-[24px] font-extrabold leading-tight tracking-tight text-slate-900 sm:text-[28px]">{activeTool.title}</h1>
-                <p className="mt-1 text-sm text-slate-600">{t("quick.page_precision", { defaultValue: "Dedicated quick calculator" })}</p>
+                <h1 className="text-[24px] font-extrabold leading-tight tracking-tight text-slate-900 sm:text-[28px]">
+                  {activeTool.title}
+                </h1>
+                <p className="mt-1 text-sm text-slate-600">
+                  {t("quick.page_precision", { defaultValue: "Dedicated quick calculator" })}
+                </p>
               </div>
               <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-blue-100 bg-blue-50 text-blue-700">
                 <ActiveIcon size={18} />
@@ -130,7 +135,9 @@ export const QuickToolsPage: React.FC = () => {
                 <h2 className="mb-1 text-[11px] font-extrabold uppercase tracking-[0.18em] text-slate-500">
                   {t("calculator.result_estimated", { defaultValue: "Estimated result" })}
                 </h2>
-                <p className="mb-5 break-words text-3xl font-extrabold leading-tight text-blue-600 sm:text-4xl">{result.summary}</p>
+                <p className="mb-5 break-words text-3xl font-extrabold leading-tight text-blue-600 sm:text-4xl">
+                  {result.summary}
+                </p>
                 <div className="grid grid-cols-1 gap-3 border-t border-slate-100 pt-4 text-sm sm:grid-cols-2 sm:gap-4">
                   {result.details.map((d, i) => (
                     <div key={i} className="min-w-0">
@@ -146,15 +153,17 @@ export const QuickToolsPage: React.FC = () => {
               {result.materials.length > 0 && (
                 <section className="app-card rounded-[24px] p-4 sm:rounded-[28px] sm:p-5">
                   <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                    <h3 className="font-extrabold text-slate-800">{t("calculator.materials_estimated", { defaultValue: "Estimated materials" })}</h3>
+                    <h3 className="font-extrabold text-slate-800">
+                      {t("calculator.materials_estimated", { defaultValue: "Estimated materials" })}
+                    </h3>
                     <span className="text-lg font-extrabold text-emerald-600">~ {euro.format(Number(result.totalCost || 0))}</span>
                   </div>
                   <ul className="space-y-4 text-sm">
                     {result.materials.map((m) => (
                       <li key={m.id} className="border-b border-slate-50 pb-2 last:border-0">
-                        <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
+                        <div className="flex items-start justify-between gap-3">
                           <span className="min-w-0 break-words font-medium text-slate-700">{m.name}</span>
-                          <span className="inline-flex max-w-full items-center justify-center rounded-xl bg-slate-100 px-2.5 py-1 font-extrabold text-slate-800">
+                          <span className="whitespace-nowrap rounded-xl bg-slate-100 px-2.5 py-1 font-extrabold text-slate-800">
                             {m.quantity} {m.unit}
                           </span>
                         </div>
@@ -172,23 +181,37 @@ export const QuickToolsPage: React.FC = () => {
   }
 
   return (
-    <div className="app-shell app-shell--quick min-h-screen">
+    <div className="app-shell app-shell--quick min-h-screen bg-transparent safe-bottom-pad">
       <div className="page-narrow space-y-4">
         <section className="glass-panel rounded-[28px] p-4 sm:rounded-[32px] sm:p-5">
           <div className="flex items-start gap-3">
             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-blue-100 bg-blue-50 text-blue-700 sm:h-12 sm:w-12">
               <ArrowRightLeft size={20} />
             </div>
-            <div className="min-w-0">
-              <h1 className="text-[24px] font-extrabold tracking-tight text-slate-900 sm:text-[28px]">{t("quick.page_title", { defaultValue: "Quick site tools" })}</h1>
-              <p className="mt-1 text-sm leading-relaxed text-slate-600">{t("quick.page_subtitle", { defaultValue: "Standalone tools for conversions, net areas, packaging, timber decking, detailed drywall, detailed tiling, roofing, fencing, gravel / fill and insulation." })}</p>
+            <div>
+              <h1 className="text-[26px] font-extrabold tracking-tight text-slate-900 sm:text-[30px]">
+                {t("quick.page_title", { defaultValue: "Quick site tools" })}
+              </h1>
+              <p className="mt-1 text-sm leading-relaxed text-slate-600">
+                {t("quick.page_subtitle", {
+                  defaultValue:
+                    "Standalone tools for conversions, net areas, packaging, timber decking, detailed drywall, detailed tiling, roofing, fencing, gravel / fill and insulation.",
+                })}
+              </p>
             </div>
           </div>
         </section>
 
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           {tools.map((item) => (
-            <ToolCard key={item.key} title={item.title} description={item.description} icon={item.icon} cta={openLabel} onClick={() => navigate(`/app/quick-tools/${item.key}`)} />
+            <ToolCard
+              key={item.key}
+              title={item.title}
+              description={item.description}
+              icon={item.icon}
+              cta={openLabel}
+              onClick={() => navigate(`/app/quick-tools/${item.key}`)}
+            />
           ))}
         </div>
       </div>

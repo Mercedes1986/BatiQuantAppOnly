@@ -10,7 +10,7 @@
   --panel-shadow: 0 22px 60px rgba(15, 23, 42, 0.16);
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
-  --bottom-nav-space: calc(6.75rem + var(--safe-bottom));
+  --bottom-nav-space: calc(6.9rem + var(--safe-bottom));
   --page-top-space: max(0.95rem, calc(var(--safe-top) + 0.55rem));
 }
 
@@ -39,6 +39,7 @@ body {
   color: #0f172a;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  overflow-x: hidden;
 }
 
 img {
@@ -188,7 +189,7 @@ a {
 }
 
 .safe-top-header {
-  padding-top: max(0.4rem, calc(var(--safe-top) + 0.35rem));
+  padding-top: max(0.45rem, calc(var(--safe-top) + 0.45rem));
 }
 
 .safe-top-content {
@@ -201,6 +202,15 @@ a {
 
 .safe-bottom-pad {
   padding-bottom: calc(var(--bottom-nav-space) + 0.35rem);
+}
+
+
+.line-clamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
 }
 
 .no-scrollbar::-webkit-scrollbar {

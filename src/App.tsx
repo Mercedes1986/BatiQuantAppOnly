@@ -370,36 +370,38 @@ const ProjectCalculatorWrapper: React.FC = () => {
   const euro = new Intl.NumberFormat(undefined, { style: "currency", currency: "EUR" });
 
   return (
-    <div className="flex flex-col h-screen bg-slate-50">
-      <div className="bg-white text-slate-800 p-4 flex justify-between items-center shadow-sm border-b border-slate-200">
-        <button onClick={handleBack} className="flex items-center text-sm font-medium text-slate-500 hover:text-blue-600">
-          <ArrowLeft size={18} className="mr-1" />
-          {t("common.back", { defaultValue: "Back" })}
-        </button>
+    <div className="app-shell app-shell--calculator min-h-screen bg-transparent safe-bottom-pad">
+      <div className="safe-top-header sticky top-0 z-30 border-b border-slate-200/80 bg-white/84 px-4 pb-3 backdrop-blur-xl shadow-sm">
+        <div className="mx-auto flex max-w-5xl items-center justify-between gap-3">
+          <button onClick={handleBack} className="flex items-center text-sm font-medium text-slate-500 hover:text-blue-600">
+            <ArrowLeft size={18} className="mr-1" />
+            {t("common.back", { defaultValue: "Back" })}
+          </button>
 
-        <h1 className="font-bold text-slate-900">{project?.name || t("calculator.title_fallback", { defaultValue: "Calculator" })}</h1>
+          <h1 className="font-bold text-slate-900">{project?.name || t("calculator.title_fallback", { defaultValue: "Calculator" })}</h1>
 
-        <button
-          onClick={handleSave}
-          disabled={!result}
-          className={[
-            "flex items-center px-3 py-1.5 rounded-lg font-extrabold text-sm",
-            result ? "bg-blue-600 text-white" : "bg-slate-100 text-slate-400",
-          ].join(" ")}
-        >
-          <Save size={16} className="mr-1" />
-          {t("common.save", { defaultValue: "Save" })}
-        </button>
+          <button
+            onClick={handleSave}
+            disabled={!result}
+            className={[
+              "flex items-center px-3 py-1.5 rounded-lg font-extrabold text-sm",
+              result ? "bg-blue-600 text-white" : "bg-slate-100 text-slate-400",
+            ].join(" ")}
+          >
+            <Save size={16} className="mr-1" />
+            {t("common.save", { defaultValue: "Save" })}
+          </button>
+        </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4">
-        <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+      <div className="page-narrow space-y-4">
+        <div className="app-card rounded-[24px] border border-slate-200/80 p-4 shadow-sm sm:rounded-[30px] sm:p-5">
           <Suspense fallback={<PageLoader />}>{renderCalculator()}</Suspense>
         </div>
 
         {result && (
           <div className="mt-4 space-y-4 animate-in slide-in-from-bottom-2">
-            <div className="bg-white p-6 rounded-2xl shadow-md border-l-4 border-blue-600">
+            <div className="app-card rounded-[24px] border-l-4 border-blue-600 p-6 shadow-md">
               <h2 className="text-sm uppercase tracking-wider text-slate-500 mb-1">
                 {t("calculator.result_estimated", { defaultValue: "Estimated result" })}
               </h2>
@@ -432,7 +434,7 @@ const ProjectCalculatorWrapper: React.FC = () => {
               )}
             </div>
 
-            <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+            <div className="app-card rounded-[24px] border border-slate-200/80 p-4 shadow-sm">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="font-extrabold text-slate-800">
                   {t("calculator.materials_estimated", { defaultValue: "Estimated materials" })}
@@ -463,7 +465,7 @@ const ProjectCalculatorWrapper: React.FC = () => {
               </ul>
             </div>
 
-            <div className="p-4 bg-blue-50 rounded-xl border border-blue-100 flex justify-between items-center">
+            <div className="rounded-[24px] border border-blue-100 bg-blue-50/90 p-4 shadow-sm flex justify-between items-center gap-3">
               <span className="text-sm text-blue-800">
                 {t("calculator.click_to_validate_step", { defaultValue: "Click to validate this step" })}
               </span>
@@ -488,26 +490,6 @@ const AppLayout = () => {
   const location = useLocation();
   const [currentCalc, setCurrentCalc] = useState<CalculatorType | null>(null);
 
-  // Background image per section (served from /public/backgrounds)
-  const bgUrl = useMemo(() => {
-    // IMPORTANT: ensure absolute URLs in dev/prod.
-    // If BASE_URL is empty (common in dev), we still want `/backgrounds/...` (not `backgrounds/...`).
-    const rawBase = (import.meta.env.BASE_URL ?? "/") || "/";
-    const base = rawBase.replace(/\/+$/, "");
-    const p = location.pathname;
-
-    const pick = (name: string) => `${base}/backgrounds/${name}`;
-
-    if (p.includes("/app/house")) return pick("bg-house.png");
-    if (p.includes("/app/materials")) return pick("bg-materials.png");
-    if (p.includes("/app/settings")) return pick("bg-settings.png");
-    if (p.includes("/app/quotes") || p.includes("/app/invoices") || p.includes("/app/print")) return pick("bg-docs.png");
-    if (p.includes("/app/menu")) return pick("bg-menu.png");
-    if (p.includes("/app/quick-tools")) return pick("bg-menu.png");
-    // projects + calculators + calculator wrapper
-    if (p.includes("/app/projects") || p.includes("/app/calculators") || p.includes("/app/calculator")) return pick("bg-projects.png");
-    return pick("bg-menu.png");
-  }, [location.pathname]);
 
   const currentTab = location.pathname.startsWith("/app/menu")
     ? "menu"
@@ -542,36 +524,29 @@ const AppLayout = () => {
     if (resolved) setCurrentCalc(resolved);
   }, [location.pathname, location.search]);
 
-  if (currentCalc) {
-    return (
-      <Suspense
-        fallback={
-          <div className="h-screen bg-slate-50 flex items-center justify-center">
-            <PageLoader />
-          </div>
-        }
-      >
-        <CalculatorPage
-          type={currentCalc}
-          onBack={() => setCurrentCalc(null)}
-          onNavigateProjects={() => {
-            setCurrentCalc(null);
-            navigate("/app/projects");
-          }}
-        />
-      </Suspense>
-    );
-  }
-
   return (
-    <div className="app-bg min-h-screen relative">
-      {/* background layers */}
-      <div className="app-bg__image" style={{ backgroundImage: `url('${bgUrl}')` }} aria-hidden="true" />
-      <div className="app-bg__veil" aria-hidden="true" />
-
-      {/* content */}
+    <div className="min-h-screen">
       <div className="relative z-10">
-        <Outlet context={{ setCurrentCalc }} />
+        {currentCalc ? (
+          <Suspense
+            fallback={
+              <div className="flex min-h-[55vh] items-center justify-center px-4">
+                <PageLoader />
+              </div>
+            }
+          >
+            <CalculatorPage
+              type={currentCalc}
+              onBack={() => setCurrentCalc(null)}
+              onNavigateProjects={() => {
+                setCurrentCalc(null);
+                navigate("/app/projects");
+              }}
+            />
+          </Suspense>
+        ) : (
+          <Outlet context={{ setCurrentCalc }} />
+        )}
       </div>
 
       <BottomNav currentTab={currentTab} onChange={handleNavChange} />

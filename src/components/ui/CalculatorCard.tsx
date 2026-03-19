@@ -19,7 +19,7 @@ export const CalculatorCard: React.FC<CalculatorCardProps> = ({ config, onClick 
       onClick={onClick}
       className="group app-card w-full overflow-hidden rounded-[24px] text-left transition-all hover:border-blue-200 hover:shadow-md active:scale-[0.99]"
     >
-      <div className="relative h-[98px] sm:h-[108px]">
+      <div className="relative h-[108px] sm:h-[118px]">
         {config.imageSrc && imgOk ? (
           <img
             src={config.imageSrc}
