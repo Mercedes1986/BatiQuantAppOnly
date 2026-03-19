@@ -149,8 +149,8 @@ export const QuotePanel: React.FC<Props> = ({ project, onUpdate }) => {
   };
 
   return (
-    <div className="space-y-5 animate-in fade-in">
-      <div className="app-card rounded-[24px] border border-slate-200/80 p-4">
+    <div className="space-y-6 animate-in fade-in panel-safe-bottom scroll-safe-bottom">
+      <div className="flex flex-wrap justify-between items-center gap-3 bg-white p-4 rounded-xl shadow-sm border border-slate-200">
         <div>
           <h2 className="text-lg font-extrabold text-slate-800">
             {t("quote.title", { defaultValue: "Devis estimatif" })}
@@ -241,8 +241,8 @@ export const QuotePanel: React.FC<Props> = ({ project, onUpdate }) => {
         </div>
       )}
 
-      <div className="app-card relative overflow-hidden rounded-[24px] border-2 border-blue-600 p-4 text-slate-900 shadow-lg sm:p-6">
-        <div className="relative z-10 grid grid-cols-[minmax(0,1fr)_auto] gap-y-2 text-sm">
+      <div className="bg-white border-2 border-blue-600 text-slate-900 p-6 rounded-2xl shadow-lg relative overflow-hidden">
+        <div className="grid grid-cols-2 gap-y-2 text-sm relative z-10">
           <span className="text-slate-500">{t("quote.total_materials_ht", { defaultValue: "Total Matériaux HT" })}</span>
           <span className="text-right font-medium">{euro.format(computed.totalMaterialsHT)}</span>
 
@@ -281,7 +281,7 @@ export const QuotePanel: React.FC<Props> = ({ project, onUpdate }) => {
 
       <div className="space-y-4">
         {computed.sections.map((section) => (
-          <div key={section.id} className="app-card rounded-[22px] border border-slate-200/80 overflow-hidden shadow-sm">
+          <div key={section.id} className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
             <button
               onClick={() => toggleSection(section.id)}
               type="button"
@@ -303,7 +303,7 @@ export const QuotePanel: React.FC<Props> = ({ project, onUpdate }) => {
 
             {expandedSections[section.id] && (
               <div className="p-0">
-                <div className="overflow-x-auto"><table className="min-w-[640px] w-full text-sm text-left">
+                <table className="w-full text-sm text-left">
                   <thead className="bg-slate-50 text-slate-500 font-medium text-xs uppercase">
                     <tr>
                       <th className="p-3 pl-4">{t("quote.table.designation", { defaultValue: "Désignation" })}</th>
@@ -372,7 +372,7 @@ export const QuotePanel: React.FC<Props> = ({ project, onUpdate }) => {
                       </tr>
                     ))}
                   </tbody>
-                </table></div>
+                </table>
 
                 <div className="p-3 bg-slate-50 border-t border-slate-100">
                   {showAddLine === section.id ? (
@@ -423,6 +423,7 @@ export const QuotePanel: React.FC<Props> = ({ project, onUpdate }) => {
             <AddLineForm onCancel={() => setShowAddLine(null)} onAdd={(line) => handleAddLine("global", line)} />
           </div>
         )}
+        <div className="mobile-bottom-spacer" aria-hidden="true" />
       </div>
     </div>
   );
@@ -514,6 +515,7 @@ const AddLineForm: React.FC<{ onCancel: () => void; onAdd: (l: Partial<QuoteManu
         <button onClick={handleSubmit} type="button" className="px-3 py-1.5 text-xs font-extrabold bg-blue-600 text-white rounded">
           {t("common.save", { defaultValue: "Enregistrer" })}
         </button>
+        <div className="mobile-bottom-spacer" aria-hidden="true" />
       </div>
     </div>
   );
