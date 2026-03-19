@@ -256,8 +256,7 @@ export const InvoiceEditorPage: React.FC = () => {
 
         {/* Lines View */}
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="min-w-[720px] w-full text-sm text-left">
+          <table className="w-full text-sm text-left">
             <thead className="bg-slate-50 text-slate-500 uppercase text-xs font-bold border-b border-slate-200">
               <tr>
                 <th className="p-4 pl-6 w-[50%]">{t("doc.line.desc", { defaultValue: "Désignation" })}</th>
@@ -303,8 +302,7 @@ export const InvoiceEditorPage: React.FC = () => {
                 </tr>
               ))}
             </tbody>
-            </table>
-          </div>
+          </table>
 
           <div className="p-6 bg-slate-50 border-t border-slate-200 flex flex-col items-end gap-1">
             <div className="flex justify-between w-64 text-sm text-slate-500">
@@ -323,8 +321,6 @@ export const InvoiceEditorPage: React.FC = () => {
             </div>
           </div>
         </div>
-
-        <div className="mobile-bottom-spacer" aria-hidden="true" />
       </div>
     </div>
   );

@@ -219,9 +219,9 @@ export const HouseProjectPage: React.FC = () => {
     const totalBudget = getProjectTotal(currentProject);
 
     return (
-      <div className="app-shell app-shell--house min-h-screen bg-transparent">
-        <div className="safe-top-header sticky top-0 z-20 border-b border-slate-200/80 bg-white/80 backdrop-blur-xl shadow-sm">
-          <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 pb-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className="app-shell app-shell--house min-h-screen bg-transparent pb-20">
+        <div className="sticky top-0 z-20 border-b border-slate-200/80 bg-white/80 backdrop-blur-xl shadow-sm">
+          <div className="p-4 flex items-center justify-between">
             <button
               onClick={closeProject}
               className="flex items-center text-slate-500 font-medium hover:text-blue-600"
@@ -231,7 +231,7 @@ export const HouseProjectPage: React.FC = () => {
               {t("common.back", { defaultValue: "Back" })}
             </button>
 
-            <div className="text-left sm:text-right">
+            <div className="text-right">
               <h1 className="text-lg font-extrabold text-slate-800">{currentProject.name}</h1>
               <p className="text-xs text-slate-500">
                 {t("house.budget_steps", { defaultValue: "Steps budget" })}:{" "}
@@ -273,7 +273,7 @@ export const HouseProjectPage: React.FC = () => {
           </div>
         </div>
 
-        <div className="page-frame safe-top-content space-y-4">
+        <div className="max-w-6xl mx-auto p-4 space-y-4">
           {activeTab === "steps" && (
             <>
               {isEditingParams ? (
@@ -287,7 +287,7 @@ export const HouseProjectPage: React.FC = () => {
                     </button>
                   </div>
 
-                  <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <div className="grid grid-cols-2 gap-4 mb-4">
                     <div>
                       <label className="block text-xs font-extrabold text-slate-500 mb-1">
                         {t("house.surface", { defaultValue: "Area (m²)" })}
@@ -352,7 +352,7 @@ export const HouseProjectPage: React.FC = () => {
                     </button>
                   </div>
 
-                  <div className="grid grid-cols-1 gap-4 text-sm sm:grid-cols-2">
+                  <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
                       <span className="block text-slate-500 text-xs">
                         {t("house.surface_living", { defaultValue: "Living area" })}
@@ -539,7 +539,7 @@ export const HouseProjectPage: React.FC = () => {
 
               <hr className="border-slate-200" />
 
-              <section>
+              <section style={{ paddingBottom: "calc(var(--bottom-nav-space) + 0.75rem)" }}>
                 <h3 className="font-extrabold text-slate-800 text-lg mb-4 flex items-center">
                   <AlertTriangle className="mr-2 text-amber-500" size={20} />{" "}
                   {t("house.quick_estimator", { defaultValue: "Quick estimator" })}
@@ -561,8 +561,8 @@ export const HouseProjectPage: React.FC = () => {
 
   // ===== LIST PAGE (same aesthetic as Projects) =====
   return (
-    <div className="app-shell app-shell--house min-h-screen bg-transparent">
-      <div className="page-frame space-y-4">
+    <div className="app-shell app-shell--house min-h-screen bg-transparent p-4 pb-20">
+      <div className="max-w-6xl mx-auto space-y-4">
       <section className="rounded-[28px] border border-slate-200/80 bg-white/72 backdrop-blur-md shadow-sm p-5 md:p-6">
       <div className="mb-3">
         <h1 className="text-2xl font-extrabold text-slate-800">
@@ -570,7 +570,7 @@ export const HouseProjectPage: React.FC = () => {
         </h1>
         <p className="text-sm text-slate-500 mt-1">
           {t("house.my_sites_subtitle", {
-            defaultValue: "Créez un chantier et enregistrez les résultats étape par étape (suivi complet).",
+            defaultValue: "Create a site and save results step-by-step (full tracking).",
           })}
         </p>
       </div>
@@ -688,7 +688,7 @@ export const HouseProjectPage: React.FC = () => {
                     <Home size={24} />
                   </div>
                   <div>
-                    <h3 className="break-words font-extrabold text-slate-800">{p.name}</h3>
+                    <h3 className="font-extrabold text-slate-800">{p.name}</h3>
                     <p className="text-xs text-slate-500">
                       {p.params.surfaceArea} m² •{" "}
                       {new Date(p.date).toLocaleDateString(i18n.language || undefined)}
@@ -697,7 +697,7 @@ export const HouseProjectPage: React.FC = () => {
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <span className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-1 font-extrabold text-slate-700">
+                  <span className="font-extrabold text-slate-700 bg-slate-50 border border-slate-200 px-3 py-1 rounded-lg">
                     {euro.format(total)}
                   </span>
 

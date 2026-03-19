@@ -29,9 +29,12 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, onChange }) =>
   );
 
   return (
-    <div className="no-print fixed bottom-2 left-1/2 z-50 w-[min(97vw,700px)] -translate-x-1/2 px-1 sm:bottom-3 sm:px-0">
-      <div className="rounded-[28px] border border-white/70 bg-white/76 p-1.5 shadow-[0_24px_60px_rgba(15,23,42,0.18)] backdrop-blur-2xl">
-        <div className="grid min-h-[78px] grid-cols-6 gap-1 sm:min-h-[76px] sm:gap-1.5">
+    <div className="safe-bottom-nav no-print pointer-events-none fixed left-1/2 z-40 w-[min(calc(100vw-0.75rem),760px)] -translate-x-1/2 px-1 sm:px-0">
+      <nav
+        aria-label={t("nav.main", { defaultValue: "Main navigation" })}
+        className="pointer-events-auto rounded-[28px] border border-white/70 bg-white/82 p-1.5 shadow-[0_16px_36px_rgba(15,23,42,0.14)] backdrop-blur-xl"
+      >
+        <div className="grid grid-cols-6 gap-1 sm:gap-1.5" style={{ minHeight: "var(--bottom-nav-height)" }}>
           {navItems.map((item) => {
             const Icon = item.icon;
             const active = currentTab === item.id;
@@ -63,7 +66,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, onChange }) =>
             );
           })}
         </div>
-      </div>
+      </nav>
     </div>
   );
 };

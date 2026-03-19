@@ -15,7 +15,7 @@ export const PageContainer: React.FC<PageContainerProps> = ({
     <div className={`page-narrow safe-top-content safe-bottom-pad ${className}`}>
       <div
         className={[
-          "glass-panel overflow-hidden rounded-[24px] sm:rounded-[28px]",
+          "glass-panel min-h-[calc(100dvh-var(--page-top-space)-var(--bottom-nav-space))] overflow-hidden rounded-[24px] sm:rounded-[28px]",
           compactOnMobile ? "p-3 sm:p-4 lg:p-5" : "p-3.5 sm:p-4 lg:p-5",
         ].join(" ")}
       >

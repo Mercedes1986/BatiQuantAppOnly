@@ -5,10 +5,45 @@
 :root {
   color-scheme: light;
   --app-bg: #d8e7ff;
-  --panel-bg: rgba(255, 255, 255, 0.60);
-  --panel-border: rgba(255, 255, 255, 0.50);
-  --panel-shadow: 0 22px 60px rgba(15, 23, 42, 0.16);
-  --bottom-nav-space: calc(6.75rem + env(safe-area-inset-bottom));
+  --panel-bg: rgba(255, 255, 255, 0.64);
+  --panel-border: rgba(255, 255, 255, 0.54);
+  --panel-shadow: 0 18px 42px rgba(15, 23, 42, 0.12);
+
+  --safe-top-env: var(--safe-area-inset-top, env(safe-area-inset-top, 0px));
+  --safe-bottom-env: var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px));
+  --safe-left-env: var(--safe-area-inset-left, env(safe-area-inset-left, 0px));
+  --safe-right-env: var(--safe-area-inset-right, env(safe-area-inset-right, 0px));
+
+  --visual-safe-top: 0px;
+  --visual-safe-bottom: 0px;
+
+  --safe-top: max(var(--safe-top-env), var(--visual-safe-top));
+  --safe-bottom: max(var(--safe-bottom-env), var(--visual-safe-bottom));
+  --safe-left: var(--safe-left-env);
+  --safe-right: var(--safe-right-env);
+
+  --bottom-nav-height: 86px;
+  --bottom-nav-gap: 0.9rem;
+  --bottom-nav-space: calc(var(--bottom-nav-height) + var(--bottom-nav-gap) + var(--safe-bottom) + 0.9rem);
+
+  --page-top-space: max(1rem, calc(var(--safe-top) + 0.8rem));
+  --header-safe-padding: max(1rem, calc(var(--safe-top) + 0.65rem));
+  --content-safe-padding: max(0.45rem, calc(var(--safe-top) + 0.2rem));
+  --sticky-top-offset: max(0.35rem, calc(var(--safe-top) + 0.2rem));
+}
+
+@media (pointer: coarse) and (max-width: 1024px) {
+  :root {
+    --safe-top: max(var(--safe-top-env), var(--visual-safe-top), 34px);
+    --safe-bottom: max(var(--safe-bottom-env), var(--visual-safe-bottom), 8px);
+    --bottom-nav-height: 88px;
+    --bottom-nav-gap: 1rem;
+    --bottom-nav-space: calc(var(--bottom-nav-height) + var(--bottom-nav-gap) + var(--safe-bottom) + 1.15rem);
+    --page-top-space: calc(var(--safe-top) + 0.9rem);
+    --header-safe-padding: calc(var(--safe-top) + 0.7rem);
+    --content-safe-padding: calc(var(--safe-top) + 0.3rem);
+    --sticky-top-offset: calc(var(--safe-top) + 0.15rem);
+  }
 }
 
 *, *::before, *::after {
@@ -23,20 +58,23 @@ body,
 
 html {
   background: var(--app-bg);
+  scroll-padding-top: calc(var(--safe-top) + 1rem);
+  scroll-padding-bottom: calc(var(--bottom-nav-space) + 1rem);
 }
 
 body {
   margin: 0;
-  overscroll-behavior-y: none;
   background:
-    radial-gradient(1400px 900px at -12% -12%, rgba(37, 99, 235, 0.52), transparent 54%),
-    radial-gradient(1100px 760px at 112% -4%, rgba(6, 182, 212, 0.42), transparent 52%),
-    radial-gradient(1000px 640px at 50% 110%, rgba(139, 92, 246, 0.34), transparent 58%),
-    radial-gradient(820px 520px at 18% 82%, rgba(16, 185, 129, 0.24), transparent 56%),
+    radial-gradient(1400px 900px at -12% -12%, rgba(37, 99, 235, 0.44), transparent 54%),
+    radial-gradient(1100px 760px at 112% -4%, rgba(6, 182, 212, 0.34), transparent 52%),
+    radial-gradient(1000px 640px at 50% 110%, rgba(139, 92, 246, 0.26), transparent 58%),
+    radial-gradient(820px 520px at 18% 82%, rgba(16, 185, 129, 0.18), transparent 56%),
     linear-gradient(180deg, #edf4ff 0%, #d8eaff 46%, #c7ddff 100%);
   color: #0f172a;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+  overscroll-behavior-y: none;
 }
 
 img {
@@ -49,9 +87,21 @@ a {
   -webkit-tap-highlight-color: transparent;
 }
 
+.app-layout-shell {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.app-layout-content {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
 .app-shell {
   position: relative;
   min-height: 100vh;
+  min-height: 100dvh;
   isolation: isolate;
 }
 
@@ -66,20 +116,19 @@ a {
 
 .app-shell::before {
   background:
-    radial-gradient(760px 460px at 10% 12%, rgba(59, 130, 246, 0.30), transparent 60%),
-    radial-gradient(620px 360px at 88% 14%, rgba(139, 92, 246, 0.28), transparent 58%),
-    radial-gradient(640px 340px at 52% 100%, rgba(16, 185, 129, 0.22), transparent 58%);
+    radial-gradient(760px 460px at 10% 12%, rgba(59, 130, 246, 0.26), transparent 60%),
+    radial-gradient(620px 360px at 88% 14%, rgba(139, 92, 246, 0.24), transparent 58%),
+    radial-gradient(640px 340px at 52% 100%, rgba(16, 185, 129, 0.18), transparent 58%);
 }
 
 .app-shell::after {
   background:
     linear-gradient(
       to bottom,
-      rgba(255, 255, 255, 0.14),
-      rgba(255, 255, 255, 0.06) 24%,
+      rgba(255, 255, 255, 0.1),
+      rgba(255, 255, 255, 0.04) 24%,
       rgba(255, 255, 255, 0.02) 100%
     );
-  backdrop-filter: blur(3px);
 }
 
 .app-shell > * {
@@ -87,91 +136,88 @@ a {
   z-index: 1;
 }
 
-/* Variantes par page */
 .app-shell--menu::before {
   background:
-    radial-gradient(820px 500px at 7% 8%, rgba(37, 99, 235, 0.46), transparent 60%),
-    radial-gradient(640px 360px at 92% 10%, rgba(14, 165, 233, 0.34), transparent 58%),
-    radial-gradient(700px 380px at 50% 100%, rgba(16, 185, 129, 0.28), transparent 56%);
+    radial-gradient(820px 500px at 7% 8%, rgba(37, 99, 235, 0.4), transparent 60%),
+    radial-gradient(640px 360px at 92% 10%, rgba(14, 165, 233, 0.28), transparent 58%),
+    radial-gradient(700px 380px at 50% 100%, rgba(16, 185, 129, 0.22), transparent 56%);
 }
 
 .app-shell--quick::before {
   background:
-    radial-gradient(860px 520px at 7% 8%, rgba(37, 99, 235, 0.48), transparent 60%),
-    radial-gradient(660px 380px at 92% 12%, rgba(6, 182, 212, 0.38), transparent 58%),
-    radial-gradient(700px 360px at 50% 100%, rgba(59, 130, 246, 0.28), transparent 56%);
+    radial-gradient(860px 520px at 7% 8%, rgba(37, 99, 235, 0.4), transparent 60%),
+    radial-gradient(660px 380px at 92% 12%, rgba(6, 182, 212, 0.3), transparent 58%),
+    radial-gradient(700px 360px at 50% 100%, rgba(59, 130, 246, 0.22), transparent 56%);
 }
 
 .app-shell--projects::before {
   background:
-    radial-gradient(840px 520px at 8% 8%, rgba(99, 102, 241, 0.44), transparent 60%),
-    radial-gradient(620px 360px at 90% 14%, rgba(59, 130, 246, 0.30), transparent 58%),
-    radial-gradient(700px 360px at 50% 100%, rgba(139, 92, 246, 0.28), transparent 56%);
+    radial-gradient(840px 520px at 8% 8%, rgba(99, 102, 241, 0.36), transparent 60%),
+    radial-gradient(620px 360px at 90% 14%, rgba(59, 130, 246, 0.26), transparent 58%),
+    radial-gradient(700px 360px at 50% 100%, rgba(139, 92, 246, 0.22), transparent 56%);
 }
 
 .app-shell--house::before,
 .app-shell--site::before {
   background:
-    radial-gradient(840px 520px at 8% 8%, rgba(245, 158, 11, 0.42), transparent 60%),
-    radial-gradient(620px 360px at 90% 14%, rgba(249, 115, 22, 0.34), transparent 58%),
-    radial-gradient(700px 360px at 50% 100%, rgba(234, 179, 8, 0.26), transparent 56%);
+    radial-gradient(840px 520px at 8% 8%, rgba(245, 158, 11, 0.34), transparent 60%),
+    radial-gradient(620px 360px at 90% 14%, rgba(249, 115, 22, 0.28), transparent 58%),
+    radial-gradient(700px 360px at 50% 100%, rgba(234, 179, 8, 0.22), transparent 56%);
 }
 
 .app-shell--materials::before {
   background:
-    radial-gradient(840px 520px at 8% 8%, rgba(16, 185, 129, 0.44), transparent 60%),
-    radial-gradient(620px 360px at 90% 14%, rgba(34, 197, 94, 0.32), transparent 58%),
-    radial-gradient(700px 360px at 50% 100%, rgba(20, 184, 166, 0.28), transparent 56%);
+    radial-gradient(840px 520px at 8% 8%, rgba(16, 185, 129, 0.34), transparent 60%),
+    radial-gradient(620px 360px at 90% 14%, rgba(34, 197, 94, 0.26), transparent 58%),
+    radial-gradient(700px 360px at 50% 100%, rgba(20, 184, 166, 0.22), transparent 56%);
 }
 
 .app-shell--settings::before {
   background:
-    radial-gradient(840px 520px at 8% 8%, rgba(139, 92, 246, 0.44), transparent 60%),
-    radial-gradient(620px 360px at 90% 14%, rgba(167, 139, 250, 0.34), transparent 58%),
-    radial-gradient(700px 360px at 50% 100%, rgba(99, 102, 241, 0.28), transparent 56%);
+    radial-gradient(840px 520px at 8% 8%, rgba(139, 92, 246, 0.34), transparent 60%),
+    radial-gradient(620px 360px at 90% 14%, rgba(167, 139, 250, 0.28), transparent 58%),
+    radial-gradient(700px 360px at 50% 100%, rgba(99, 102, 241, 0.22), transparent 56%);
 }
 
 .app-shell--dashboard::before,
 .app-shell--calculator::before {
   background:
-    radial-gradient(840px 520px at 8% 8%, rgba(37, 99, 235, 0.40), transparent 60%),
-    radial-gradient(620px 360px at 90% 14%, rgba(6, 182, 212, 0.30), transparent 58%),
-    radial-gradient(700px 360px at 50% 100%, rgba(16, 185, 129, 0.24), transparent 56%);
+    radial-gradient(840px 520px at 8% 8%, rgba(37, 99, 235, 0.34), transparent 60%),
+    radial-gradient(620px 360px at 90% 14%, rgba(6, 182, 212, 0.24), transparent 58%),
+    radial-gradient(700px 360px at 50% 100%, rgba(16, 185, 129, 0.18), transparent 56%);
 }
 
 .glass-panel {
   border: 1px solid var(--panel-border);
   background: var(--panel-bg);
   box-shadow: var(--panel-shadow);
-  backdrop-filter: blur(24px);
+  backdrop-filter: blur(10px);
 }
 
 .app-card {
-  border: 1px solid rgba(255, 255, 255, 0.48);
-  background: rgba(255, 255, 255, 0.52);
-  box-shadow: 0 16px 42px rgba(15, 23, 42, 0.12);
-  backdrop-filter: blur(22px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.6);
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.09);
+  backdrop-filter: blur(8px);
 }
 
 .app-card-soft {
-  border: 1px solid rgba(255, 255, 255, 0.42);
-  background: rgba(255, 255, 255, 0.40);
-  box-shadow: 0 12px 34px rgba(15, 23, 42, 0.10);
-  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.44);
+  background: rgba(255, 255, 255, 0.48);
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.07);
+  backdrop-filter: blur(7px);
 }
 
 .page-frame {
   width: min(100%, 1180px);
   margin-inline: auto;
-  padding: 0.95rem;
-  padding-bottom: var(--bottom-nav-space);
+  padding: var(--page-top-space) 0.95rem var(--bottom-nav-space);
 }
 
 .page-narrow {
   width: min(100%, 1040px);
   margin-inline: auto;
-  padding: 0.95rem;
-  padding-bottom: var(--bottom-nav-space);
+  padding: var(--page-top-space) 0.95rem var(--bottom-nav-space);
 }
 
 .page-header-chip {
@@ -185,7 +231,39 @@ a {
   font-size: 0.75rem;
   font-weight: 800;
   color: #334155;
-  backdrop-filter: blur(14px);
+  backdrop-filter: blur(10px);
+}
+
+.safe-top-header {
+  padding-top: var(--header-safe-padding);
+}
+
+.safe-top-content {
+  padding-top: var(--content-safe-padding);
+}
+
+.top-safe-offset {
+  top: var(--sticky-top-offset);
+}
+
+.safe-bottom-nav {
+  bottom: max(0.55rem, calc(var(--safe-bottom) + 0.35rem));
+}
+
+.safe-bottom-pad {
+  padding-bottom: calc(var(--bottom-nav-space) + 0.35rem);
+}
+
+.sheet-safe-bottom {
+  padding-bottom: calc(var(--bottom-nav-space) + 1rem);
+}
+
+.line-clamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
 }
 
 .no-scrollbar::-webkit-scrollbar {
@@ -214,15 +292,14 @@ a {
 @media (min-width: 640px) {
   .page-frame,
   .page-narrow {
-    padding: 1rem;
-    padding-bottom: var(--bottom-nav-space);
+    padding-inline: 1rem;
   }
 }
 
 input,
 select,
 textarea {
-  background-color: rgba(255, 255, 255, 0.88) !important;
+  background-color: rgba(255, 255, 255, 0.92) !important;
   color: #0f172a !important;
   border-color: rgba(203, 213, 225, 0.9) !important;
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.7) inset;

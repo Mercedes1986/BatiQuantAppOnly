@@ -160,6 +160,38 @@ const ScrollToTop: React.FC = () => {
   return null;
 };
 
+const ViewportInsetBridge: React.FC = () => {
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const root = document.documentElement;
+    const viewport = window.visualViewport;
+
+    const updateInsets = () => {
+      const layoutHeight = window.innerHeight || 0;
+      const visualHeight = viewport?.height ?? layoutHeight;
+      const offsetTop = Math.max(0, Math.round(viewport?.offsetTop ?? 0));
+      const bottomInset = Math.max(0, Math.round(layoutHeight - visualHeight - offsetTop));
+
+      root.style.setProperty("--visual-safe-top", `${offsetTop}px`);
+      root.style.setProperty("--visual-safe-bottom", `${bottomInset}px`);
+    };
+
+    updateInsets();
+    window.addEventListener("resize", updateInsets);
+    viewport?.addEventListener("resize", updateInsets);
+    viewport?.addEventListener("scroll", updateInsets);
+
+    return () => {
+      window.removeEventListener("resize", updateInsets);
+      viewport?.removeEventListener("resize", updateInsets);
+      viewport?.removeEventListener("scroll", updateInsets);
+    };
+  }, []);
+
+  return null;
+};
+
 // -------------------------
 // ✅ calc resolver (alias + validation)
 // -------------------------
@@ -370,38 +402,36 @@ const ProjectCalculatorWrapper: React.FC = () => {
   const euro = new Intl.NumberFormat(undefined, { style: "currency", currency: "EUR" });
 
   return (
-    <div className="app-shell app-shell--calculator min-h-screen bg-transparent safe-bottom-pad">
-      <div className="safe-top-header sticky top-0 z-30 border-b border-slate-200/80 bg-white/84 px-4 pb-3 backdrop-blur-xl shadow-sm">
-        <div className="mx-auto flex max-w-5xl items-center justify-between gap-3">
-          <button onClick={handleBack} className="flex items-center text-sm font-medium text-slate-500 hover:text-blue-600">
-            <ArrowLeft size={18} className="mr-1" />
-            {t("common.back", { defaultValue: "Back" })}
-          </button>
+    <div className="flex flex-col h-screen bg-slate-50">
+      <div className="bg-white text-slate-800 p-4 flex justify-between items-center shadow-sm border-b border-slate-200">
+        <button onClick={handleBack} className="flex items-center text-sm font-medium text-slate-500 hover:text-blue-600">
+          <ArrowLeft size={18} className="mr-1" />
+          {t("common.back", { defaultValue: "Back" })}
+        </button>
 
-          <h1 className="font-bold text-slate-900">{project?.name || t("calculator.title_fallback", { defaultValue: "Calculator" })}</h1>
+        <h1 className="font-bold text-slate-900">{project?.name || t("calculator.title_fallback", { defaultValue: "Calculator" })}</h1>
 
-          <button
-            onClick={handleSave}
-            disabled={!result}
-            className={[
-              "flex items-center px-3 py-1.5 rounded-lg font-extrabold text-sm",
-              result ? "bg-blue-600 text-white" : "bg-slate-100 text-slate-400",
-            ].join(" ")}
-          >
-            <Save size={16} className="mr-1" />
-            {t("common.save", { defaultValue: "Save" })}
-          </button>
-        </div>
+        <button
+          onClick={handleSave}
+          disabled={!result}
+          className={[
+            "flex items-center px-3 py-1.5 rounded-lg font-extrabold text-sm",
+            result ? "bg-blue-600 text-white" : "bg-slate-100 text-slate-400",
+          ].join(" ")}
+        >
+          <Save size={16} className="mr-1" />
+          {t("common.save", { defaultValue: "Save" })}
+        </button>
       </div>
 
-      <div className="page-narrow space-y-4">
-        <div className="app-card rounded-[24px] border border-slate-200/80 p-4 shadow-sm sm:rounded-[30px] sm:p-5">
+      <div className="flex-1 overflow-y-auto p-4">
+        <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
           <Suspense fallback={<PageLoader />}>{renderCalculator()}</Suspense>
         </div>
 
         {result && (
           <div className="mt-4 space-y-4 animate-in slide-in-from-bottom-2">
-            <div className="app-card rounded-[24px] border-l-4 border-blue-600 p-6 shadow-md">
+            <div className="bg-white p-6 rounded-2xl shadow-md border-l-4 border-blue-600">
               <h2 className="text-sm uppercase tracking-wider text-slate-500 mb-1">
                 {t("calculator.result_estimated", { defaultValue: "Estimated result" })}
               </h2>
@@ -434,7 +464,7 @@ const ProjectCalculatorWrapper: React.FC = () => {
               )}
             </div>
 
-            <div className="app-card rounded-[24px] border border-slate-200/80 p-4 shadow-sm">
+            <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="font-extrabold text-slate-800">
                   {t("calculator.materials_estimated", { defaultValue: "Estimated materials" })}
@@ -465,7 +495,7 @@ const ProjectCalculatorWrapper: React.FC = () => {
               </ul>
             </div>
 
-            <div className="rounded-[24px] border border-blue-100 bg-blue-50/90 p-4 shadow-sm flex justify-between items-center gap-3">
+            <div className="p-4 bg-blue-50 rounded-xl border border-blue-100 flex justify-between items-center">
               <span className="text-sm text-blue-800">
                 {t("calculator.click_to_validate_step", { defaultValue: "Click to validate this step" })}
               </span>
@@ -490,20 +520,19 @@ const AppLayout = () => {
   const location = useLocation();
   const [currentCalc, setCurrentCalc] = useState<CalculatorType | null>(null);
 
-
   const currentTab = location.pathname.startsWith("/app/menu")
     ? "menu"
     : location.pathname.includes("quick-tools")
       ? "quick-tools"
       : location.pathname.includes("settings")
-      ? "settings"
-      : location.pathname.includes("house") || location.pathname.includes("quotes") || location.pathname.includes("invoices")
-        ? "house"
-        : location.pathname.includes("projects") || location.pathname.includes("calculators")
-          ? "projects"
-          : location.pathname.includes("materials")
-            ? "materials"
-            : "projects";
+        ? "settings"
+        : location.pathname.includes("house") || location.pathname.includes("quotes") || location.pathname.includes("invoices")
+          ? "house"
+          : location.pathname.includes("projects") || location.pathname.includes("calculators") || location.pathname.includes("calculator")
+            ? "projects"
+            : location.pathname.includes("materials")
+              ? "materials"
+              : "projects";
 
   const handleNavChange = (tab: string) => {
     setCurrentCalc(null);
@@ -516,7 +545,6 @@ const AppLayout = () => {
     if (tab === "settings") navigate("/app/settings");
   };
 
-  // ✅ /app/calculators?calc=... -> opens calculator (safe)
   useEffect(() => {
     if (location.pathname !== "/app/calculators") return;
     const sp = new URLSearchParams(location.search);
@@ -525,8 +553,8 @@ const AppLayout = () => {
   }, [location.pathname, location.search]);
 
   return (
-    <div className="min-h-screen">
-      <div className="relative z-10">
+    <div className="app-layout-shell">
+      <div className="app-layout-content">
         {currentCalc ? (
           <Suspense
             fallback={
@@ -576,6 +604,7 @@ const NotFoundPage: React.FC = () => {
 const App: React.FC = () => {
   return (
     <BrowserRouter basename={import.meta.env.BASE_URL}>
+      <ViewportInsetBridge />
       <ScrollToTop />
       <ErrorBoundary>
         <Routes>

@@ -120,62 +120,64 @@ export const QuoteEditorPage: React.FC = () => {
   if (!quote) return <div className="p-10 text-center text-slate-500">{t("common.loading", { defaultValue: "Chargement..." })}</div>;
 
   return (
-    <div className="min-h-screen bg-transparent pb-24">
+    <div className="app-shell app-shell--projects min-h-screen bg-transparent safe-bottom-pad">
       {/* Sticky Header */}
-      <div className="bg-white border-b border-slate-200 sticky top-0 z-20 px-4 py-3 shadow-sm flex justify-between items-center">
-        <div className="flex items-center">
-          <button
-            type="button"
-            onClick={() => navigate(-1)}
-            className="mr-3 text-slate-500 hover:text-blue-600 p-1 rounded hover:bg-slate-100 transition-colors"
-            aria-label={t("common.back", { defaultValue: "Retour" })}
-          >
-            <ArrowLeft size={20} />
-          </button>
+      <div className="safe-top-header sticky top-safe-offset z-20 border-b border-slate-200/80 bg-white/84 px-4 py-3 shadow-sm backdrop-blur-xl">
+        <div className="mx-auto flex max-w-5xl items-center justify-between gap-3">
+          <div className="flex items-center min-w-0">
+            <button
+              type="button"
+              onClick={() => navigate(-1)}
+              className="mr-3 text-slate-500 hover:text-blue-600 p-1 rounded hover:bg-slate-100 transition-colors"
+              aria-label={t("common.back", { defaultValue: "Retour" })}
+            >
+              <ArrowLeft size={20} />
+            </button>
 
-          <div className="flex items-center">
-            {company?.logoUrl ? (
-              <img
-                src={company.logoUrl}
-                alt={t("company.logo", { defaultValue: "Logo" })}
-                className="h-8 w-8 object-contain mr-3 rounded border border-slate-100"
-              />
-            ) : null}
+            <div className="flex items-center min-w-0">
+              {company?.logoUrl ? (
+                <img
+                  src={company.logoUrl}
+                  alt={t("company.logo", { defaultValue: "Logo" })}
+                  className="h-8 w-8 object-contain mr-3 rounded border border-slate-100"
+                />
+              ) : null}
 
-            <div>
-              <h1 className="text-lg font-bold text-slate-800 flex items-center">{quote.number}</h1>
-              <p className="text-xs text-slate-500">
-                {company?.name || t("company.default_name", { defaultValue: "Mon Entreprise" })} &bull;{" "}
-                {new Date(quote.date).toLocaleDateString()}
-              </p>
+              <div className="min-w-0">
+                <h1 className="text-lg font-bold text-slate-800 truncate">{quote.number}</h1>
+                <p className="text-xs text-slate-500 truncate">
+                  {company?.name || t("company.default_name", { defaultValue: "Mon Entreprise" })} &bull;{" "}
+                  {new Date(quote.date).toLocaleDateString()}
+                </p>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div className="flex gap-2">
-          <button
-            id="save-btn"
-            type="button"
-            onClick={handleSave}
-            className={`flex items-center px-3 py-2 rounded-lg transition-colors font-bold text-sm ${
-              saveFlash ? "bg-green-100 text-green-700" : "bg-blue-50 text-blue-600 hover:bg-blue-100"
-            }`}
-          >
-            <Save size={18} className="mr-2" /> {t("common.save", { defaultValue: "Sauvegarder" })}
-          </button>
+          <div className="flex gap-2 shrink-0">
+            <button
+              id="save-btn"
+              type="button"
+              onClick={handleSave}
+              className={`flex items-center px-3 py-2 rounded-lg transition-colors font-bold text-sm ${
+                saveFlash ? "bg-green-100 text-green-700" : "bg-blue-50 text-blue-600 hover:bg-blue-100"
+              }`}
+            >
+              <Save size={18} className="mr-2" /> {t("common.save", { defaultValue: "Sauvegarder" })}
+            </button>
 
-          <button
-            type="button"
-            onClick={handlePrint}
-            className="p-2 bg-slate-800 text-white rounded-lg hover:bg-slate-700 transition-colors shadow-md"
-            aria-label={t("common.print", { defaultValue: "Imprimer" })}
-          >
-            <Printer size={20} />
-          </button>
+            <button
+              type="button"
+              onClick={handlePrint}
+              className="p-2 bg-slate-800 text-white rounded-lg hover:bg-slate-700 transition-colors shadow-md"
+              aria-label={t("common.print", { defaultValue: "Imprimer" })}
+            >
+              <Printer size={20} />
+            </button>
+          </div>
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto p-4 space-y-6">
+      <div className="page-narrow space-y-6">
         {/* Actions Bar */}
         <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-wrap gap-3 items-center justify-between">
           <div className="flex items-center gap-2">
@@ -300,8 +302,8 @@ export const QuoteEditorPage: React.FC = () => {
 
         {/* Lines Editor */}
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="min-w-[760px] w-full text-sm text-left">
+          <div className="overflow-x-auto no-scrollbar">
+          <table className="w-full text-sm text-left">
             <thead className="bg-slate-50 text-slate-500 uppercase text-xs font-bold border-b border-slate-200">
               <tr>
                 <th className="p-4 pl-6 w-[50%]">{t("doc.line.desc", { defaultValue: "Désignation" })}</th>
@@ -366,8 +368,7 @@ export const QuoteEditorPage: React.FC = () => {
                 </tr>
               ))}
             </tbody>
-            </table>
-          </div>
+          </table>
 
           <div className="p-6 bg-slate-50 border-t border-slate-200 flex flex-col items-end gap-1">
             <div className="flex justify-between w-64 text-sm text-slate-500">
@@ -383,6 +384,7 @@ export const QuoteEditorPage: React.FC = () => {
               <span className="text-blue-600">{quote.totalTTC.toFixed(2)} €</span>
             </div>
           </div>
+          </div>
         </div>
 
         {/* Notes */}
@@ -397,8 +399,6 @@ export const QuoteEditorPage: React.FC = () => {
             placeholder={t("doc.notes_placeholder", { defaultValue: "Ex: Acompte de 30% à la commande..." })}
           />
         </div>
-
-        <div className="mobile-bottom-spacer" aria-hidden="true" />
       </div>
     </div>
   );

@@ -1,8 +1,3 @@
-import React from "react";
-import { useTranslation } from "react-i18next";
-import { CalculatorCard } from "../components/ui/CalculatorCard";
-import { getCalculators } from "../constants";
-import { CalculatorType } from "../types";
 
 function MobileAdPlaceholder({
   title,
@@ -15,7 +10,7 @@ function MobileAdPlaceholder({
 }) {
   return (
     <div
-      className="w-full rounded-2xl border border-slate-200 bg-slate-50/85 px-3 py-3 text-center text-sm text-slate-500"
+      className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-center text-sm text-slate-500"
       style={{ minHeight }}
       data-ad-platform="mobile-ready-placeholder"
       role="complementary"
@@ -31,6 +26,11 @@ function MobileAdPlaceholder({
   );
 }
 
+import React from "react";
+import { useTranslation } from "react-i18next";
+import { CalculatorCard } from "../components/ui/CalculatorCard";
+import { getCalculators } from "../constants";
+import { CalculatorType } from "../types";
 interface DashboardPageProps {
   onSelectCalc: (id: CalculatorType) => void;
 }
@@ -39,38 +39,41 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onSelectCalc }) =>
   const { t } = useTranslation();
 
   return (
-    <div className="app-shell app-shell--dashboard min-h-screen bg-transparent animate-in fade-in">
-      <div className="page-frame safe-top-content space-y-4">
-        <section className="glass-panel rounded-[28px] px-4 py-4 sm:rounded-[32px] sm:px-5 sm:py-5">
-          <div className="page-header-chip mb-3">
-            {t("dashboard.header_chip", { defaultValue: "Construction calculators" })}
-          </div>
-          <h1 className="text-[28px] font-extrabold leading-tight tracking-tight text-slate-900 sm:text-[34px]">
+    <div className="min-h-screen bg-transparent animate-in fade-in">
+      <div className="max-w-7xl mx-auto p-4 pb-24">
+        <section className="glass-panel rounded-[32px] px-5 py-5 mb-4">
+          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
             {t("app.name", { defaultValue: "Bati" })}
-            <span className="text-blue-600">{t("app.name_suffix", { defaultValue: "Quant" })}</span>
+            <span className="text-blue-600">
+              {t("app.name_suffix", { defaultValue: "Quant" })}
+            </span>
           </h1>
-          <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-slate-600 sm:text-[15px]">
+          <p className="text-slate-500 text-sm">
             {t("dashboard.subtitle", {
               defaultValue: "The go-to tool for your job sites.",
             })}
           </p>
         </section>
 
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 mb-10 sm:grid-cols-2">
           {getCalculators()
             .filter((calc) => calc.id !== CalculatorType.QUICK_TOOLS)
             .map((calc) => (
-              <CalculatorCard key={calc.id} config={calc} onClick={() => onSelectCalc(calc.id)} />
+              <CalculatorCard
+                key={calc.id}
+                config={calc}
+                onClick={() => onSelectCalc(calc.id)}
+              />
             ))}
         </div>
 
-        <div className="pt-1">
+        <div className="mt-10">
           <MobileAdPlaceholder
             title={t("ads.placeholderTitle", { defaultValue: "Reserved ad placement" })}
             description={t("ads.placeholderDescription", {
               defaultValue: "This area is kept for future mobile ad integration.",
             })}
-            minHeight={132}
+            minHeight={180}
           />
         </div>
       </div>

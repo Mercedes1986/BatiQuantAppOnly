@@ -101,9 +101,9 @@ export const ProjectsPage: React.FC = () => {
     }));
 
     return (
-      <div className="app-shell app-shell--projects min-h-screen bg-transparent relative">
-        <div className="safe-top-header sticky top-0 z-30 border-b border-slate-200/80 bg-white/80 backdrop-blur-xl shadow-sm no-print">
-          <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 pb-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className="pb-20 bg-transparent min-h-screen relative">
+        <div className="sticky top-0 z-30 border-b border-slate-200/80 bg-white/80 backdrop-blur-xl shadow-sm no-print">
+          <div className="mx-auto max-w-6xl px-4 py-3 flex items-center justify-between gap-3">
             <button
               onClick={() => setSelectedProject(null)}
               className="text-slate-500 font-extrabold flex items-center hover:text-blue-600 transition-colors"
@@ -113,10 +113,10 @@ export const ProjectsPage: React.FC = () => {
               {t("common.back", { defaultValue: "Back" })}
             </button>
 
-            <div className="flex w-full gap-2 sm:w-auto">
+            <div className="flex gap-2">
               <button
                 onClick={handleGenerateQuote}
-                className="flex flex-1 items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-xl text-sm font-extrabold shadow-md hover:bg-blue-700 active:scale-95 transition-all sm:flex-none"
+                className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-xl text-sm font-extrabold shadow-md hover:bg-blue-700 active:scale-95 transition-all"
                 type="button"
               >
                 <FileText size={18} className="mr-2" />
@@ -144,7 +144,7 @@ export const ProjectsPage: React.FC = () => {
           </div>
         </div>
 
-        <div className="page-frame printable-content space-y-4">
+        <div className="max-w-6xl mx-auto p-4 md:p-6 printable-content space-y-4">
           <section className="rounded-[28px] border border-slate-200/80 bg-white/72 backdrop-blur-md shadow-sm overflow-hidden print:bg-white">
             <div className="p-5 md:p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div>
@@ -186,13 +186,13 @@ export const ProjectsPage: React.FC = () => {
                     className="flex justify-between items-center gap-3 p-3.5 bg-white/85 rounded-2xl border border-slate-200/80 print:border-slate-300"
                   >
                     <div className="min-w-0">
-                      <span className="block break-words text-sm font-extrabold text-slate-700">{item.name}</span>
+                      <span className="font-extrabold text-slate-700 block text-sm truncate">{item.name}</span>
                       <span className="text-xs text-slate-500 font-medium">
                         {item.quantity} {item.unit} × {euro.format(item.unitPrice)}
                       </span>
                     </div>
 
-                    <span className="font-extrabold text-slate-800 text-right">{euro.format(item.totalPrice)}</span>
+                    <span className="font-extrabold text-slate-800 whitespace-nowrap">{euro.format(item.totalPrice)}</span>
                   </li>
                 ))}
               </ul>
@@ -261,8 +261,8 @@ export const ProjectsPage: React.FC = () => {
   }
 
   return (
-    <div className="app-shell app-shell--projects min-h-screen bg-transparent">
-      <div className="page-frame safe-top-content space-y-4">
+    <div className="p-4 pb-24 bg-transparent min-h-screen">
+      <div className="max-w-6xl mx-auto space-y-4">
         <section className="rounded-[28px] border border-slate-200/80 bg-white/72 backdrop-blur-md shadow-sm p-5 md:p-6">
           <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 mb-4">
             <div>
@@ -306,9 +306,7 @@ export const ProjectsPage: React.FC = () => {
                     {t("projects.create_new", { defaultValue: "Create a calculation" })}
                   </div>
                   <div className="text-white/80 text-xs font-semibold mt-0.5">
-                    {t("projects.create_new_hint", {
-                      defaultValue: "Choose a calculator and save the result here",
-                    })}
+                    {t("projects.create_new_hint", { defaultValue: "Choose a calculator and save the result here" })}
                   </div>
                 </div>
               </div>
@@ -338,7 +336,7 @@ export const ProjectsPage: React.FC = () => {
                   className="bg-white/72 backdrop-blur-sm p-5 rounded-[24px] shadow-sm border border-slate-200/80 flex justify-between items-center active:scale-[0.98] transition-all cursor-pointer hover:border-blue-200"
                 >
                   <div>
-                    <h3 className="break-words text-lg font-extrabold text-slate-800">{project.name}</h3>
+                    <h3 className="font-extrabold text-slate-800 text-lg">{project.name}</h3>
                     <p className="text-xs text-slate-500 mt-1 font-medium">
                       {new Date(project.date).toLocaleDateString(i18n.language || undefined)} • {project.items.length}{" "}
                       {t("projects.items", { defaultValue: "items" })}
