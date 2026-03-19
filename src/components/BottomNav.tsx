@@ -29,12 +29,9 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, onChange }) =>
   );
 
   return (
-    <div className="safe-bottom-nav no-print pointer-events-none fixed left-1/2 z-40 w-[min(calc(100vw-0.75rem),760px)] -translate-x-1/2 px-1 sm:px-0">
-      <nav
-        aria-label={t("nav.main", { defaultValue: "Main navigation" })}
-        className="pointer-events-auto rounded-[28px] border border-white/70 bg-white/82 p-1.5 shadow-[0_16px_36px_rgba(15,23,42,0.14)] backdrop-blur-xl"
-      >
-        <div className="grid grid-cols-6 gap-1 sm:gap-1.5" style={{ minHeight: "var(--bottom-nav-height)" }}>
+    <div className="no-print mx-auto w-full max-w-[620px]">
+      <div className="rounded-[28px] border border-white/70 bg-white/78 p-1.5 shadow-[0_18px_44px_rgba(15,23,42,0.16)] backdrop-blur-xl">
+        <div className="grid h-[72px] grid-cols-6 gap-1.5">
           {navItems.map((item) => {
             const Icon = item.icon;
             const active = currentTab === item.id;
@@ -46,19 +43,15 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, onChange }) =>
                 onClick={() => onChange(item.id)}
                 aria-current={active ? "page" : undefined}
                 aria-label={item.label}
-                className={[
-                  "flex h-full min-w-0 flex-col items-center justify-center rounded-[18px] px-1 py-2 text-center transition-all duration-200",
+                className={`flex h-full min-w-0 flex-col items-center justify-center rounded-[20px] px-1 transition-all duration-200 ${
                   active
                     ? "bg-gradient-to-b from-blue-600 to-blue-500 text-white shadow-[0_10px_24px_rgba(37,99,235,0.35)]"
-                    : "text-slate-500 hover:bg-white/70 hover:text-slate-700",
-                ].join(" ")}
+                    : "text-slate-500 hover:bg-white/70 hover:text-slate-700"
+                }`}
               >
-                <Icon size={active ? 19 : 18} strokeWidth={active ? 2.3 : 2.1} />
+                <Icon size={active ? 20 : 18} strokeWidth={active ? 2.35 : 2.05} />
                 <span
-                  className={[
-                    "mt-1 line-clamp-2 min-h-[22px] max-w-full px-0.5 text-center text-[9px] font-extrabold leading-[1.08] sm:min-h-[24px] sm:text-[10px]",
-                    active ? "text-white" : "text-slate-500",
-                  ].join(" ")}
+                  className={`mt-1 line-clamp-2 text-center text-[9px] font-bold leading-tight ${active ? "text-white" : ""}`}
                 >
                   {item.label}
                 </span>
@@ -66,7 +59,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, onChange }) =>
             );
           })}
         </div>
-      </nav>
+      </div>
     </div>
   );
 };

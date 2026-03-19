@@ -154,40 +154,12 @@ const PageLoader: React.FC = () => {
 // ✅ Scroll to top on route change
 const ScrollToTop: React.FC = () => {
   const location = useLocation();
+
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "auto" });
+    const scroller = document.querySelector<HTMLElement>(".app-main");
+    if (scroller) scroller.scrollTo({ top: 0, behavior: "auto" });
+    else window.scrollTo({ top: 0, behavior: "auto" });
   }, [location.pathname, location.search]);
-  return null;
-};
-
-const ViewportInsetBridge: React.FC = () => {
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    const root = document.documentElement;
-    const viewport = window.visualViewport;
-
-    const updateInsets = () => {
-      const layoutHeight = window.innerHeight || 0;
-      const visualHeight = viewport?.height ?? layoutHeight;
-      const offsetTop = Math.max(0, Math.round(viewport?.offsetTop ?? 0));
-      const bottomInset = Math.max(0, Math.round(layoutHeight - visualHeight - offsetTop));
-
-      root.style.setProperty("--visual-safe-top", `${offsetTop}px`);
-      root.style.setProperty("--visual-safe-bottom", `${bottomInset}px`);
-    };
-
-    updateInsets();
-    window.addEventListener("resize", updateInsets);
-    viewport?.addEventListener("resize", updateInsets);
-    viewport?.addEventListener("scroll", updateInsets);
-
-    return () => {
-      window.removeEventListener("resize", updateInsets);
-      viewport?.removeEventListener("resize", updateInsets);
-      viewport?.removeEventListener("scroll", updateInsets);
-    };
-  }, []);
 
   return null;
 };
@@ -520,19 +492,40 @@ const AppLayout = () => {
   const location = useLocation();
   const [currentCalc, setCurrentCalc] = useState<CalculatorType | null>(null);
 
+  // Background image per section (served from /public/backgrounds)
+  const bgUrl = useMemo(() => {
+    // IMPORTANT: ensure absolute URLs in dev/prod.
+    // If BASE_URL is empty (common in dev), we still want `/backgrounds/...` (not `backgrounds/...`).
+    const rawBase = (import.meta.env.BASE_URL ?? "/") || "/";
+    const base = rawBase.replace(/\/+$/, "");
+    const p = location.pathname;
+
+    const pick = (name: string) => `${base}/backgrounds/${name}`;
+
+    if (p.includes("/app/house")) return pick("bg-house.png");
+    if (p.includes("/app/materials")) return pick("bg-materials.png");
+    if (p.includes("/app/settings")) return pick("bg-settings.png");
+    if (p.includes("/app/quotes") || p.includes("/app/invoices") || p.includes("/app/print")) return pick("bg-docs.png");
+    if (p.includes("/app/menu")) return pick("bg-menu.png");
+    if (p.includes("/app/quick-tools")) return pick("bg-menu.png");
+    // projects + calculators + calculator wrapper
+    if (p.includes("/app/projects") || p.includes("/app/calculators") || p.includes("/app/calculator")) return pick("bg-projects.png");
+    return pick("bg-menu.png");
+  }, [location.pathname]);
+
   const currentTab = location.pathname.startsWith("/app/menu")
     ? "menu"
     : location.pathname.includes("quick-tools")
       ? "quick-tools"
       : location.pathname.includes("settings")
-        ? "settings"
-        : location.pathname.includes("house") || location.pathname.includes("quotes") || location.pathname.includes("invoices")
-          ? "house"
-          : location.pathname.includes("projects") || location.pathname.includes("calculators") || location.pathname.includes("calculator")
-            ? "projects"
-            : location.pathname.includes("materials")
-              ? "materials"
-              : "projects";
+      ? "settings"
+      : location.pathname.includes("house") || location.pathname.includes("quotes") || location.pathname.includes("invoices")
+        ? "house"
+        : location.pathname.includes("projects") || location.pathname.includes("calculators")
+          ? "projects"
+          : location.pathname.includes("materials")
+            ? "materials"
+            : "projects";
 
   const handleNavChange = (tab: string) => {
     setCurrentCalc(null);
@@ -545,39 +538,46 @@ const AppLayout = () => {
     if (tab === "settings") navigate("/app/settings");
   };
 
+  // ✅ /app/calculators?calc=... -> opens calculator (safe)
   useEffect(() => {
     if (location.pathname !== "/app/calculators") return;
     const sp = new URLSearchParams(location.search);
     const resolved = resolveCalcFromParam(sp.get("calc"));
     if (resolved) setCurrentCalc(resolved);
   }, [location.pathname, location.search]);
+  const layoutContent = currentCalc ? (
+    <Suspense
+      fallback={
+        <div className="h-full flex items-center justify-center">
+          <PageLoader />
+        </div>
+      }
+    >
+      <CalculatorPage
+        type={currentCalc}
+        onBack={() => setCurrentCalc(null)}
+        onNavigateProjects={() => {
+          setCurrentCalc(null);
+          navigate("/app/projects");
+        }}
+      />
+    </Suspense>
+  ) : (
+    <Outlet context={{ setCurrentCalc }} />
+  );
 
   return (
-    <div className="app-layout-shell">
-      <div className="app-layout-content">
-        {currentCalc ? (
-          <Suspense
-            fallback={
-              <div className="flex min-h-[55vh] items-center justify-center px-4">
-                <PageLoader />
-              </div>
-            }
-          >
-            <CalculatorPage
-              type={currentCalc}
-              onBack={() => setCurrentCalc(null)}
-              onNavigateProjects={() => {
-                setCurrentCalc(null);
-                navigate("/app/projects");
-              }}
-            />
-          </Suspense>
-        ) : (
-          <Outlet context={{ setCurrentCalc }} />
-        )}
-      </div>
+    <div className="app-bg app-shell-grid relative">
+      <div className="app-bg__image" style={{ backgroundImage: `url('${bgUrl}')` }} aria-hidden="true" />
+      <div className="app-bg__veil" aria-hidden="true" />
 
-      <BottomNav currentTab={currentTab} onChange={handleNavChange} />
+      <main className="app-main relative z-10">
+        {layoutContent}
+      </main>
+
+      <div className="app-bottom-nav-host relative z-20">
+        <BottomNav currentTab={currentTab} onChange={handleNavChange} />
+      </div>
     </div>
   );
 };
@@ -604,7 +604,6 @@ const NotFoundPage: React.FC = () => {
 const App: React.FC = () => {
   return (
     <BrowserRouter basename={import.meta.env.BASE_URL}>
-      <ViewportInsetBridge />
       <ScrollToTop />
       <ErrorBoundary>
         <Routes>
