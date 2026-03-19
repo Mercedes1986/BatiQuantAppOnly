@@ -262,7 +262,7 @@ export const ProjectsPage: React.FC = () => {
 
   return (
     <div className="app-shell app-shell--projects min-h-screen bg-transparent">
-      <div className="page-frame space-y-4">
+      <div className="page-frame safe-top-content space-y-4">
         <section className="rounded-[28px] border border-slate-200/80 bg-white/72 backdrop-blur-md shadow-sm p-5 md:p-6">
           <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 mb-4">
             <div>

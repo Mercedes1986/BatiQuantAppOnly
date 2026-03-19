@@ -230,7 +230,7 @@ ${tips.map((x: string) => `- ${x}`).join("\n")}`
 
   return (
     <div className="app-shell app-shell--calculator min-h-screen bg-transparent">
-      <div className="page-narrow space-y-4">
+      <div className="page-narrow safe-top-content space-y-4">
         <section className={`safe-top-header glass-panel sticky top-0 z-20 rounded-[28px] p-4 text-white shadow-md ${config.color}`}>
           <div className="flex items-center gap-3">
             <button

@@ -273,7 +273,7 @@ export const HouseProjectPage: React.FC = () => {
           </div>
         </div>
 
-        <div className="page-frame space-y-4">
+        <div className="page-frame safe-top-content space-y-4">
           {activeTab === "steps" && (
             <>
               {isEditingParams ? (

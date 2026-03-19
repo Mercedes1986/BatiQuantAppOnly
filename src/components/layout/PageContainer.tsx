@@ -12,7 +12,7 @@ export const PageContainer: React.FC<PageContainerProps> = ({
   compactOnMobile = false,
 }) => {
   return (
-    <div className={`page-narrow safe-bottom-pad ${className}`}>
+    <div className={`page-narrow safe-top-content safe-bottom-pad ${className}`}>
       <div
         className={[
           "glass-panel overflow-hidden rounded-[24px] sm:rounded-[28px]",

@@ -100,7 +100,7 @@ export const QuickToolsPage: React.FC = () => {
 
     return (
       <div className="app-shell app-shell--quick min-h-screen bg-transparent safe-bottom-pad">
-        <div className="page-narrow space-y-4">
+        <div className="page-narrow safe-top-content space-y-4">
           <section className="glass-panel rounded-[28px] p-4 sm:rounded-[32px] sm:p-5">
             <div className="flex items-center gap-3">
               <button

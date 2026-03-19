@@ -5,13 +5,20 @@
 :root {
   color-scheme: light;
   --app-bg: #d8e7ff;
-  --panel-bg: rgba(255, 255, 255, 0.60);
-  --panel-border: rgba(255, 255, 255, 0.50);
-  --panel-shadow: 0 22px 60px rgba(15, 23, 42, 0.16);
-  --safe-top: env(safe-area-inset-top, 0px);
-  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --panel-bg: rgba(255, 255, 255, 0.64);
+  --panel-border: rgba(255, 255, 255, 0.54);
+  --panel-shadow: 0 20px 48px rgba(15, 23, 42, 0.14);
+
+  /* Android 15+ / older WebView safe area fallback */
+  --safe-top: var(--safe-area-inset-top, env(safe-area-inset-top, 0px));
+  --safe-bottom: var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px));
+  --safe-left: var(--safe-area-inset-left, env(safe-area-inset-left, 0px));
+  --safe-right: var(--safe-area-inset-right, env(safe-area-inset-right, 0px));
+
   --bottom-nav-space: calc(6.9rem + var(--safe-bottom));
-  --page-top-space: max(0.95rem, calc(var(--safe-top) + 0.55rem));
+  --page-top-space: max(1rem, calc(var(--safe-top) + 0.9rem));
+  --header-safe-padding: max(0.85rem, calc(var(--safe-top) + 0.75rem));
+  --content-safe-padding: max(0.35rem, calc(var(--safe-top) + 0.2rem));
 }
 
 *, *::before, *::after {
@@ -26,6 +33,7 @@ body,
 
 html {
   background: var(--app-bg);
+  scroll-padding-top: calc(var(--safe-top) + 1rem);
 }
 
 body {
@@ -55,6 +63,7 @@ a {
 .app-shell {
   position: relative;
   min-height: 100vh;
+  min-height: 100dvh;
   isolation: isolate;
 }
 
@@ -78,11 +87,10 @@ a {
   background:
     linear-gradient(
       to bottom,
-      rgba(255, 255, 255, 0.14),
-      rgba(255, 255, 255, 0.06) 24%,
+      rgba(255, 255, 255, 0.12),
+      rgba(255, 255, 255, 0.05) 24%,
       rgba(255, 255, 255, 0.02) 100%
     );
-  backdrop-filter: blur(3px);
 }
 
 .app-shell > * {
@@ -145,21 +153,21 @@ a {
   border: 1px solid var(--panel-border);
   background: var(--panel-bg);
   box-shadow: var(--panel-shadow);
-  backdrop-filter: blur(24px);
+  backdrop-filter: blur(14px);
 }
 
 .app-card {
-  border: 1px solid rgba(255, 255, 255, 0.48);
-  background: rgba(255, 255, 255, 0.52);
-  box-shadow: 0 16px 42px rgba(15, 23, 42, 0.12);
-  backdrop-filter: blur(22px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.58);
+  box-shadow: 0 14px 34px rgba(15, 23, 42, 0.10);
+  backdrop-filter: blur(12px);
 }
 
 .app-card-soft {
-  border: 1px solid rgba(255, 255, 255, 0.42);
-  background: rgba(255, 255, 255, 0.40);
-  box-shadow: 0 12px 34px rgba(15, 23, 42, 0.10);
-  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.44);
+  background: rgba(255, 255, 255, 0.46);
+  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.08);
+  backdrop-filter: blur(10px);
 }
 
 .page-frame {
@@ -185,15 +193,15 @@ a {
   font-size: 0.75rem;
   font-weight: 800;
   color: #334155;
-  backdrop-filter: blur(14px);
+  backdrop-filter: blur(12px);
 }
 
 .safe-top-header {
-  padding-top: max(0.45rem, calc(var(--safe-top) + 0.45rem));
+  padding-top: var(--header-safe-padding);
 }
 
 .safe-top-content {
-  padding-top: max(0.15rem, calc(var(--safe-top) + 0.1rem));
+  padding-top: var(--content-safe-padding);
 }
 
 .safe-bottom-nav {
@@ -203,7 +211,6 @@ a {
 .safe-bottom-pad {
   padding-bottom: calc(var(--bottom-nav-space) + 0.35rem);
 }
-
 
 .line-clamp-2 {
   overflow: hidden;
@@ -246,7 +253,7 @@ a {
 input,
 select,
 textarea {
-  background-color: rgba(255, 255, 255, 0.88) !important;
+  background-color: rgba(255, 255, 255, 0.9) !important;
   color: #0f172a !important;
   border-color: rgba(203, 213, 225, 0.9) !important;
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.7) inset;

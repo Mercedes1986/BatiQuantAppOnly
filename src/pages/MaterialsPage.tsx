@@ -298,7 +298,7 @@ export const MaterialsPage: React.FC = () => {
       </div>
 
       {activeTab === "system" && (
-        <div className="p-4 space-y-4 animate-in fade-in max-w-7xl mx-auto">
+        <div className="safe-top-content p-4 space-y-4 animate-in fade-in max-w-7xl mx-auto">
           {/* Search + favorites */}
           <div className="flex flex-col sm:flex-row gap-2">
             <div className="relative flex-1">
@@ -490,7 +490,7 @@ export const MaterialsPage: React.FC = () => {
       )}
 
       {activeTab === "custom" && (
-        <div className="p-4 animate-in fade-in max-w-5xl mx-auto">
+        <div className="safe-top-content p-4 animate-in fade-in max-w-5xl mx-auto">
           {showCustomForm ? (
             <CustomMaterialForm
               initial={editingCustom}
@@ -586,7 +586,7 @@ export const MaterialsPage: React.FC = () => {
       )}
 
       {activeTab === "labor" && (
-        <div className="p-4 animate-in fade-in max-w-3xl mx-auto">
+        <div className="safe-top-content p-4 animate-in fade-in max-w-3xl mx-auto">
           <div className="bg-white/80 p-4 rounded-2xl border border-slate-200 shadow-sm mb-4">
             <div className="flex justify-between items-center mb-4">
               <div className="flex items-center">
@@ -642,7 +642,7 @@ export const MaterialsPage: React.FC = () => {
       )}
 
       {activeTab === "data" && (
-        <div className="p-4 space-y-4 animate-in fade-in max-w-3xl mx-auto">
+        <div className="safe-top-content p-4 space-y-4 animate-in fade-in max-w-3xl mx-auto">
           <div className="bg-white/80 p-4 rounded-2xl border border-slate-200 shadow-sm">
             <h3 className="font-extrabold text-slate-800 mb-3 flex items-center">
               <Settings size={18} className="mr-2" />{" "}

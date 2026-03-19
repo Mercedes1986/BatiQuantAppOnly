@@ -40,7 +40,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onSelectCalc }) =>
 
   return (
     <div className="app-shell app-shell--dashboard min-h-screen bg-transparent animate-in fade-in">
-      <div className="page-frame space-y-4">
+      <div className="page-frame safe-top-content space-y-4">
         <section className="glass-panel rounded-[28px] px-4 py-4 sm:rounded-[32px] sm:px-5 sm:py-5">
           <div className="page-header-chip mb-3">
             {t("dashboard.header_chip", { defaultValue: "Construction calculators" })}
