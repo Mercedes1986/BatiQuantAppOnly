@@ -2,7 +2,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { CalculationResult, Unit, FoundationProjectInputs, PadConfig, FoundationType, CalculatorType, CalculatorSnapshot } from "../../../types";
+import { CalculationResult, Unit, FoundationProjectInputs, PadConfig, FoundationType, CalculatorType, CalculatorSnapshot } from "@/types";
 
 import { SOIL_PROPERTIES, DEFAULT_PRICES } from "../../constants";
 import { calculateFoundations } from "../../services/foundationsEngine";

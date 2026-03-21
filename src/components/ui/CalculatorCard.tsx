@@ -1,6 +1,6 @@
 import React from "react";
 import * as Icons from "lucide-react";
-import { CalculatorConfig } from "../../../types";
+import { CalculatorConfig } from "@/types";
 import { useTranslation } from "react-i18next";
 
 interface CalculatorCardProps {

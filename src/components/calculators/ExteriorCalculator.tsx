@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { CalculatorType, CalculationResult, Unit, CalculatorSnapshot } from "../../../types";
+import { CalculatorType, CalculationResult, Unit, CalculatorSnapshot } from "@/types";
 import { MATERIAL_METADATA, DEFAULT_PRICES } from "../../constants";
 import { getUnitPrice, incrementUsage } from "../../services/materialsService";
 import {
@@ -692,34 +692,6 @@ export const ExteriorCalculator: React.FC<Props> = ({ onCalculate,
   }, [zones, walls, items, networks, gardenItems, overrides, t]);
 
   useEffect(() => {
-    onCalculate({
-      snapshot,
-      summary: t("calc.exterior.summary", { defaultValue: "Exterior estimate" }),
-      details: [
-        { label: t("calc.exterior.kpi.zones", { defaultValue: "Sols" }), value: zones.length, unit: t("calc.exterior.units.zones", { defaultValue: "zones" }) },
-        {
-          label: t("calc.exterior.kpi.fences_walls", { defaultValue: "Fences/Walls" }),
-          value: items.filter((i) => i.category === "fence").length + walls.length,
-          unit: t("calc.exterior.units.items", { defaultValue: "items" }),
-        },
-        {
-          label: t("calc.exterior.kpi.networks", { defaultValue: "Networks" }),
-          value: fmt2(networks.reduce((a, b) => a + b.length, 0)),
-          unit: t("calc.exterior.units.mlin", { defaultValue: "ml" }),
-        },
-      ],
-      materials: calculationData.materials,
-      totalCost: calculationData.totalCost,
-      warnings: calculationData.warnings,
-    });
-  }, [calculationData, onCalculate, zones.length, walls.length, items, networks, t]);
-
-  // --- SUB-COMPONENT: Price Editor ---
-  const PriceEditor: React.FC = () => {
-    const [editingKey, setEditingKey] = useState<string | null>(null);
-    const [editValue, setEditValue] = useState("");
-
-  useEffect(() => {
     const values = initialSnapshot?.values as Record<string, any> | undefined;
     if (!values) return;
     if (values.step !== undefined) setStep(values.step as any);
@@ -743,8 +715,6 @@ export const ExteriorCalculator: React.FC<Props> = ({ onCalculate,
     if (values.lawnArea !== undefined) setLawnArea(values.lawnArea as any);
     if (values.plantCount !== undefined) setPlantCount(values.plantCount as any);
     if (values.plantType !== undefined) setPlantType(values.plantType as any);
-    if (values.editingKey !== undefined) setEditingKey(values.editingKey as any);
-    if (values.editValue !== undefined) setEditValue(values.editValue as any);
   }, [initialSnapshot]);
 
   const snapshot: CalculatorSnapshot = {
@@ -772,10 +742,38 @@ export const ExteriorCalculator: React.FC<Props> = ({ onCalculate,
       lawnArea,
       plantCount,
       plantType,
-      editingKey,
-      editValue,
     },
   };
+
+
+  useEffect(() => {
+    onCalculate({
+      snapshot,
+      summary: t("calc.exterior.summary", { defaultValue: "Exterior estimate" }),
+      details: [
+        { label: t("calc.exterior.kpi.zones", { defaultValue: "Sols" }), value: zones.length, unit: t("calc.exterior.units.zones", { defaultValue: "zones" }) },
+        {
+          label: t("calc.exterior.kpi.fences_walls", { defaultValue: "Fences/Walls" }),
+          value: items.filter((i) => i.category === "fence").length + walls.length,
+          unit: t("calc.exterior.units.items", { defaultValue: "items" }),
+        },
+        {
+          label: t("calc.exterior.kpi.networks", { defaultValue: "Networks" }),
+          value: fmt2(networks.reduce((a, b) => a + b.length, 0)),
+          unit: t("calc.exterior.units.mlin", { defaultValue: "ml" }),
+        },
+      ],
+      materials: calculationData.materials,
+      totalCost: calculationData.totalCost,
+      warnings: calculationData.warnings,
+    });
+  }, [calculationData, onCalculate, zones.length, walls.length, items, networks, t]);
+
+  // --- SUB-COMPONENT: Price Editor ---
+  const PriceEditor: React.FC = () => {
+    const [editingKey, setEditingKey] = useState<string | null>(null);
+    const [editValue, setEditValue] = useState("");
+
 
 
     const startEdit = (key: string, current: number) => {

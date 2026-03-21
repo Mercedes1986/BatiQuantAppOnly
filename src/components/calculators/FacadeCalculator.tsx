@@ -2,7 +2,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { CalculatorType, CalculationResult, Unit, CalculatorSnapshot } from "../../../types";
+import { CalculatorType, CalculationResult, Unit, CalculatorSnapshot } from "@/types";
 import { DEFAULT_PRICES, OPENING_PRESETS } from "../../constants";
 import { getUnitPrice } from "../../services/materialsService";
 
