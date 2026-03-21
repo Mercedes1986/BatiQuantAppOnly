@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { CalculatorType, CalculationResult, Unit } from "../../../types";
+import { CalculatorType, CalculationResult, Unit, CalculatorSnapshot } from "../../../types";
 import { DEFAULT_PRICES } from "../../constants";
 import { getUnitPrice } from "../../services/materialsService";
 import {
@@ -18,6 +18,7 @@ import {
 
 interface Props {
   onCalculate: (result: CalculationResult) => void;
+  initialSnapshot?: CalculatorSnapshot;
 }
 
 type RoofType = "1pan" | "2pans" | "4pans" | "flat";
@@ -40,7 +41,9 @@ const priceOr = (key: string, fallback: number) => {
   return fallback;
 };
 
-export const RoofCalculator: React.FC<Props> = ({ onCalculate }) => {
+export const RoofCalculator: React.FC<Props> = ({ onCalculate,
+  initialSnapshot
+}) => {
   const { t } = useTranslation();
 
   const [step, setStep] = useState(1);
@@ -90,6 +93,53 @@ export const RoofCalculator: React.FC<Props> = ({ onCalculate }) => {
     laborM2: 45,
     counterBattenM: priceOr("COUNTER_BATTEN_M", 0.8),
   }));
+
+  useEffect(() => {
+    const values = initialSnapshot?.values as Record<string, any> | undefined;
+    if (!values) return;
+    if (values.step !== undefined) setStep(values.step as any);
+    if (values.proMode !== undefined) setProMode(values.proMode as any);
+    if (values.roofType !== undefined) setRoofType(values.roofType as any);
+    if (values.dimL !== undefined) setDimL(values.dimL as any);
+    if (values.dimW !== undefined) setDimW(values.dimW as any);
+    if (values.overhang !== undefined) setOverhang(values.overhang as any);
+    if (values.slope !== undefined) setSlope(values.slope as any);
+    if (values.coverMaterial !== undefined) setCoverMaterial(values.coverMaterial as any);
+    if (values.wastePct !== undefined) setWastePct(values.wastePct as any);
+    if (values.useScreen !== undefined) setUseScreen(values.useScreen as any);
+    if (values.useInsulation !== undefined) setUseInsulation(values.useInsulation as any);
+    if (values.insulThick !== undefined) setInsulThick(values.insulThick as any);
+    if (values.useVapor !== undefined) setUseVapor(values.useVapor as any);
+    if (values.gutterType !== undefined) setGutterType(values.gutterType as any);
+    if (values.downspouts !== undefined) setDownspouts(values.downspouts as any);
+    if (values.valleyLen !== undefined) setValleyLen(values.valleyLen as any);
+    if (values.prices !== undefined) setPrices(values.prices as any);
+  }, [initialSnapshot]);
+
+  const snapshot: CalculatorSnapshot = {
+    version: 1,
+    calculatorType: CalculatorType.ROOF,
+    values: {
+      step,
+      proMode,
+      roofType,
+      dimL,
+      dimW,
+      overhang,
+      slope,
+      coverMaterial,
+      wastePct,
+      useScreen,
+      useInsulation,
+      insulThick,
+      useVapor,
+      gutterType,
+      downspouts,
+      valleyLen,
+      prices,
+    },
+  };
+
 
   // --- Auto-update Defaults based on Cover Material (non-destructive) ---
   useEffect(() => {
@@ -435,6 +485,7 @@ export const RoofCalculator: React.FC<Props> = ({ onCalculate }) => {
   useEffect(() => {
     if (!calculationData.ok) {
       onCalculate({
+      snapshot,
         summary: t("calc.roof.title", { defaultValue: "Roof" }),
         details: [],
         materials: [],

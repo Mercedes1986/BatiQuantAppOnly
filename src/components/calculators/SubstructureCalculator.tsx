@@ -30,7 +30,7 @@ import React, { useEffect, useMemo, useState } from "react";
 
 
 import { useTranslation } from "react-i18next";
-import { CalculatorType, CalculationResult, Unit } from "../../../types";
+import { CalculatorType, CalculationResult, Unit, CalculatorSnapshot } from "../../../types";
 import { DEFAULT_PRICES, getWallUnitPriceKey } from "../../constants";
 import { getUnitPrice } from "../../services/materialsService";
 import {
@@ -53,6 +53,7 @@ import {
 
 interface Props {
   onCalculate: (result: CalculationResult) => void;
+  initialSnapshot?: CalculatorSnapshot;
 }
 
 type WallFamily = WallBlockSpec["family"];
@@ -91,7 +92,9 @@ const KEYS = {
   DELTA_PROFILE: "DELTA_PROFILE_UNIT",
 } as const;
 
-export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
+export const SubstructureCalculator: React.FC<Props> = ({ onCalculate,
+  initialSnapshot
+}) => {
   const { t } = useTranslation();
 
   const [step, setStep] = useState(1);
@@ -136,6 +139,63 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
    * ex: BPE_M3, DELTA_MS_ROLL_20M, DRAIN_PIPE_50M, etc.
    */
   const [unitOverrides, setUnitOverrides] = useState<Record<string, number>>({});
+
+  useEffect(() => {
+    const values = initialSnapshot?.values as Record<string, any> | undefined;
+    if (!values) return;
+    if (values.step !== undefined) setStep(values.step as any);
+    if (values.advanced !== undefined) setAdvanced(values.advanced as any);
+    if (values.perimeter !== undefined) setPerimeter(values.perimeter as any);
+    if (values.height !== undefined) setHeight(values.height as any);
+    if (values.openingsArea !== undefined) setOpeningsArea(values.openingsArea as any);
+    if (values.wallMode !== undefined) setWallMode(values.wallMode as any);
+    if (values.wallFamily !== undefined) setWallFamily(values.wallFamily as any);
+    if (values.wallBlockId !== undefined) setWallBlockId(values.wallBlockId as any);
+    if (values.wallThickness !== undefined) setWallThickness(values.wallThickness as any);
+    if (values.wasteBlock !== undefined) setWasteBlock(values.wasteBlock as any);
+    if (values.stepocFillRate !== undefined) setStepocFillRate(values.stepocFillRate as any);
+    if (values.percentBuried !== undefined) setPercentBuried(values.percentBuried as any);
+    if (values.useArase !== undefined) setUseArase(values.useArase as any);
+    if (values.useBitumen !== undefined) setUseBitumen(values.useBitumen as any);
+    if (values.bitumenLayers !== undefined) setBitumenLayers(values.bitumenLayers as any);
+    if (values.useDeltaMS !== undefined) setUseDeltaMS(values.useDeltaMS as any);
+    if (values.useDrain !== undefined) setUseDrain(values.useDrain as any);
+    if (values.trenchWidth !== undefined) setTrenchWidth(values.trenchWidth as any);
+    if (values.gravelHeight !== undefined) setGravelHeight(values.gravelHeight as any);
+    if (values.useGeo !== undefined) setUseGeo(values.useGeo as any);
+    if (values.manholes !== undefined) setManholes(values.manholes as any);
+    if (values.unitOverrides !== undefined) setUnitOverrides(values.unitOverrides as any);
+  }, [initialSnapshot]);
+
+  const snapshot: CalculatorSnapshot = {
+    version: 1,
+    calculatorType: CalculatorType.SUBSTRUCTURE,
+    values: {
+      step,
+      advanced,
+      perimeter,
+      height,
+      openingsArea,
+      wallMode,
+      wallFamily,
+      wallBlockId,
+      wallThickness,
+      wasteBlock,
+      stepocFillRate,
+      percentBuried,
+      useArase,
+      useBitumen,
+      bitumenLayers,
+      useDeltaMS,
+      useDrain,
+      trenchWidth,
+      gravelHeight,
+      useGeo,
+      manholes,
+      unitOverrides,
+    },
+  };
+
 
   const setOverride = (key: string, val: number) => setUnitOverrides((prev) => ({ ...prev, [key]: val }));
 
@@ -612,6 +672,7 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate }) => {
 
   useEffect(() => {
     onCalculate({
+      snapshot,
       summary: calculationData.summary,
       details: calculationData.details,
       materials: calculationData.materials,

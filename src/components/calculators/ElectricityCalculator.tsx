@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { CalculatorType, CalculationResult, Unit } from "../../../types";
+import { CalculatorType, CalculationResult, Unit, CalculatorSnapshot } from "../../../types";
 import { DEFAULT_PRICES } from "../../constants";
 import {
   Zap,
@@ -54,9 +54,12 @@ interface ElecCircuit {
 
 interface Props {
   onCalculate: (result: CalculationResult) => void;
+  initialSnapshot?: CalculatorSnapshot;
 }
 
-export const ElectricityCalculator: React.FC<Props> = ({ onCalculate }) => {
+export const ElectricityCalculator: React.FC<Props> = ({ onCalculate,
+  initialSnapshot
+}) => {
   const { t } = useTranslation();
 
   const [step, setStep] = useState(1);
@@ -88,6 +91,35 @@ export const ElectricityCalculator: React.FC<Props> = ({ onCalculate }) => {
     laborPoint: 45.0,
     laborPanel: 250.0,
   });
+
+  useEffect(() => {
+    const values = initialSnapshot?.values as Record<string, any> | undefined;
+    if (!values) return;
+    if (values.step !== undefined) setStep(values.step as any);
+    if (values.proMode !== undefined) setProMode(values.proMode as any);
+    if (values.rooms !== undefined) setRooms(values.rooms as any);
+    if (values.newRoomType !== undefined) setNewRoomType(values.newRoomType as any);
+    if (values.renovation !== undefined) setRenovation(values.renovation as any);
+    if (values.avgDistPanel !== undefined) setAvgDistPanel(values.avgDistPanel as any);
+    if (values.avgDistPoint !== undefined) setAvgDistPoint(values.avgDistPoint as any);
+    if (values.prices !== undefined) setPrices(values.prices as any);
+  }, [initialSnapshot]);
+
+  const snapshot: CalculatorSnapshot = {
+    version: 1,
+    calculatorType: CalculatorType.ELECTRICITY,
+    values: {
+      step,
+      proMode,
+      rooms,
+      newRoomType,
+      renovation,
+      avgDistPanel,
+      avgDistPoint,
+      prices,
+    },
+  };
+
 
   const updatePrice = (key: keyof typeof prices, val: string) => {
     setPrices((prev) => ({ ...prev, [key]: parseFloat(val) || 0 }));
@@ -530,6 +562,7 @@ export const ElectricityCalculator: React.FC<Props> = ({ onCalculate }) => {
 
   useEffect(() => {
     onCalculate({
+      snapshot,
       summary: t("calc.electricity.summary", {
         defaultValue: "{{p}} Points • {{c}} Circuits",
         p: calculationData.summaryStats.points,

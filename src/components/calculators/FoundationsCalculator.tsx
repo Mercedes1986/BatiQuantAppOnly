@@ -2,13 +2,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import {
-  CalculationResult,
-  Unit,
-  FoundationProjectInputs,
-  PadConfig,
-  FoundationType,
-} from "../../../types";
+import { CalculationResult, Unit, FoundationProjectInputs, PadConfig, FoundationType, CalculatorType, CalculatorSnapshot } from "../../../types";
 
 import { SOIL_PROPERTIES, DEFAULT_PRICES } from "../../constants";
 import { calculateFoundations } from "../../services/foundationsEngine";
@@ -32,6 +26,7 @@ import {
 interface Props {
   onCalculate: (result: CalculationResult) => void;
   initialMode?: "simple" | "pro";
+  initialSnapshot?: CalculatorSnapshot;
 }
 
 const inputClass =
@@ -57,7 +52,9 @@ type PriceKeys =
   | "DRAIN_ML"
   | "GRAVEL_M3";
 
-export const FoundationsCalculator: React.FC<Props> = ({ onCalculate, initialMode = "simple" }) => {
+export const FoundationsCalculator: React.FC<Props> = ({ onCalculate, initialMode = "simple",
+  initialSnapshot
+}) => {
   const { t } = useTranslation();
 
   const [step, setStep] = useState(1);
@@ -121,6 +118,61 @@ export const FoundationsCalculator: React.FC<Props> = ({ onCalculate, initialMod
     DRAIN_ML: (priceOr("DRAIN_PIPE_50M", 70) / 50) || 1.4,
     GRAVEL_M3: (priceOr("GRAVEL_FOUNDATION_TON", 45) * 1.5) || 67.5, // ton -> m3 approx
   }));
+
+  useEffect(() => {
+    const values = initialSnapshot?.values as Record<string, any> | undefined;
+    if (!values) return;
+    if (values.step !== undefined) setStep(values.step as any);
+    if (values.proMode !== undefined) setProMode(values.proMode as any);
+    if (values.type !== undefined) setType(values.type as any);
+    if (values.totalLengthMl !== undefined) setTotalLengthMl(values.totalLengthMl as any);
+    if (values.stripWidthCm !== undefined) setStripWidthCm(values.stripWidthCm as any);
+    if (values.stripHeightCm !== undefined) setStripHeightCm(values.stripHeightCm as any);
+    if (values.pads !== undefined) setPads(values.pads as any);
+    if (values.excavationDepthCm !== undefined) setExcavationDepthCm(values.excavationDepthCm as any);
+    if (values.trenchOverwidthCm !== undefined) setTrenchOverwidthCm(values.trenchOverwidthCm as any);
+    if (values.soilType !== undefined) setSoilType(values.soilType as any);
+    if (values.frostDepthCm !== undefined) setFrostDepthCm(values.frostDepthCm as any);
+    if (values.groundwater !== undefined) setGroundwater(values.groundwater as any);
+    if (values.cleanConcrete !== undefined) setCleanConcrete(values.cleanConcrete as any);
+    if (values.cleanConcreteThickCm !== undefined) setCleanConcreteThickCm(values.cleanConcreteThickCm as any);
+    if (values.formwork !== undefined) setFormwork(values.formwork as any);
+    if (values.drainage !== undefined) setDrainage(values.drainage as any);
+    if (values.drainageGravel !== undefined) setDrainageGravel(values.drainageGravel as any);
+    if (values.evacuateSpoil !== undefined) setEvacuateSpoil(values.evacuateSpoil as any);
+    if (values.reuseSpoil !== undefined) setReuseSpoil(values.reuseSpoil as any);
+    if (values.steelRatio !== undefined) setSteelRatio(values.steelRatio as any);
+    if (values.prices !== undefined) setPrices(values.prices as any);
+  }, [initialSnapshot]);
+
+  const snapshot: CalculatorSnapshot = {
+    version: 1,
+    calculatorType: CalculatorType.FOUNDATIONS,
+    values: {
+      step,
+      proMode,
+      type,
+      totalLengthMl,
+      stripWidthCm,
+      stripHeightCm,
+      pads,
+      excavationDepthCm,
+      trenchOverwidthCm,
+      soilType,
+      frostDepthCm,
+      groundwater,
+      cleanConcrete,
+      cleanConcreteThickCm,
+      formwork,
+      drainage,
+      drainageGravel,
+      evacuateSpoil,
+      reuseSpoil,
+      steelRatio,
+      prices,
+    },
+  };
+
 
   const updatePrice = (key: PriceKeys, val: string) => {
     setPrices((prev) => ({ ...prev, [key]: toNum(val, 0) }));
@@ -223,6 +275,7 @@ export const FoundationsCalculator: React.FC<Props> = ({ onCalculate, initialMod
     );
 
     onCalculate({
+      snapshot,
       summary: `${(results.volumes?.concrete ?? 0).toFixed(1)} m³`,
       details: [
         { label: t("common.type", { defaultValue: "Type" }), value: foundationTypeLabel(type), unit: "" },

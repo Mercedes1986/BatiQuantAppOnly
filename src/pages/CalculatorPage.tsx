@@ -26,7 +26,8 @@ function MobileAdPlaceholder({
   );
 }
 
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
   ArrowLeft,
@@ -63,7 +64,7 @@ import { ExteriorCalculator } from "../components/calculators/ExteriorCalculator
 import { StairCalculator } from "../components/calculators/StairCalculator";
 import { FoundationsCalculator } from "../components/calculators/FoundationsCalculator";
 import { QuickToolsCalculator } from "../components/calculators/QuickToolsCalc";
-import { saveProject, generateId } from "../services/storage";
+import { getProjects, saveProject, generateId } from "../services/storage";
 
 interface Props {
   type: CalculatorType;
@@ -73,6 +74,10 @@ interface Props {
 
 export const CalculatorPage: React.FC<Props> = ({ type, onBack, onNavigateProjects }) => {
   const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const projectId = searchParams.get("projectId");
+  const returnQuoteId = searchParams.get("returnQuoteId");
 
   const config = useMemo(() => {
     const c = getCalculators().find((x) => x.id === type) as CalculatorConfig | undefined;
@@ -86,6 +91,30 @@ export const CalculatorPage: React.FC<Props> = ({ type, onBack, onNavigateProjec
 
   const tips = (getStaticTips()[type] || []) as string[];
   const hasTips = tips.length > 0;
+
+
+  const existingProject = useMemo(() => {
+    if (!projectId) return null;
+    return getProjects().find((project) => project.id === projectId) || null;
+  }, [projectId]);
+
+  const initialSnapshot = existingProject?.calculatorSnapshot;
+
+  useEffect(() => {
+    if (existingProject?.name) setNewProjectName(existingProject.name);
+  }, [existingProject?.name]);
+
+  const handleBack = () => {
+    if (returnQuoteId) {
+      navigate(`/app/quotes/${returnQuoteId}`);
+      return;
+    }
+    if (projectId) {
+      navigate(`/app/projects?projectId=${projectId}`);
+      return;
+    }
+    onBack();
+  };
 
   const euro = useMemo(
     () =>
@@ -107,66 +136,66 @@ export const CalculatorPage: React.FC<Props> = ({ type, onBack, onNavigateProjec
   const renderCalculator = () => {
     switch (type) {
       case CalculatorType.PAINT:
-        return <PaintCalculator onCalculate={setResult} />;
+        return <PaintCalculator onCalculate={setResult} initialSnapshot={initialSnapshot} />;
 
       case CalculatorType.CONCRETE:
-        return <ConcreteCalculator onCalculate={setResult} />;
+        return <ConcreteCalculator onCalculate={setResult} initialSnapshot={initialSnapshot} />;
 
       case CalculatorType.TILES:
-        return <TileCalculator onCalculate={setResult} />;
+        return <TileCalculator onCalculate={setResult} initialSnapshot={initialSnapshot} />;
 
       case CalculatorType.RAGREAGE:
-        return <LevelingCalculator onCalculate={setResult} />;
+        return <LevelingCalculator onCalculate={setResult} initialSnapshot={initialSnapshot} />;
 
       case CalculatorType.PLACO:
-        return <PlacoCalculator onCalculate={setResult} />;
+        return <PlacoCalculator onCalculate={setResult} initialSnapshot={initialSnapshot} />;
 
       // Legacy fallback
       case CalculatorType.STRUCTURAL:
-        return <StructuralCalculator onCalculate={setResult} />;
+        return <StructuralCalculator onCalculate={setResult} initialSnapshot={initialSnapshot} />;
 
       // Specific structural modes
       case CalculatorType.GROUNDWORK:
-        return <StructuralCalculator onCalculate={setResult} initialMode="groundwork" hideTabs />;
+        return <StructuralCalculator onCalculate={setResult} initialMode="groundwork" hideTabs initialSnapshot={initialSnapshot} />;
 
       case CalculatorType.FOUNDATIONS:
-        return <FoundationsCalculator onCalculate={setResult} />;
+        return <FoundationsCalculator onCalculate={setResult} initialSnapshot={initialSnapshot} />;
 
       case CalculatorType.WALLS:
-        return <StructuralCalculator onCalculate={setResult} initialMode="walls" hideTabs />;
+        return <StructuralCalculator onCalculate={setResult} initialMode="walls" hideTabs initialSnapshot={initialSnapshot} />;
 
       case CalculatorType.SUBSTRUCTURE:
-        return <SubstructureCalculator onCalculate={setResult} />;
+        return <SubstructureCalculator onCalculate={setResult} initialSnapshot={initialSnapshot} />;
 
       case CalculatorType.STAIRS:
-        return <StairCalculator onCalculate={setResult} />;
+        return <StairCalculator onCalculate={setResult} initialSnapshot={initialSnapshot} />;
 
       case CalculatorType.ROOF:
-        return <RoofCalculator onCalculate={setResult} />;
+        return <RoofCalculator onCalculate={setResult} initialSnapshot={initialSnapshot} />;
 
       case CalculatorType.JOINERY:
-        return <JoineryCalculator onCalculate={setResult} />;
+        return <JoineryCalculator onCalculate={setResult} initialSnapshot={initialSnapshot} />;
 
       case CalculatorType.ELECTRICITY:
-        return <ElectricityCalculator onCalculate={setResult} />;
+        return <ElectricityCalculator onCalculate={setResult} initialSnapshot={initialSnapshot} />;
 
       case CalculatorType.PLUMBING:
-        return <PlumbingCalculator onCalculate={setResult} />;
+        return <PlumbingCalculator onCalculate={setResult} initialSnapshot={initialSnapshot} />;
 
       case CalculatorType.HVAC:
-        return <HvacCalculator onCalculate={setResult} />;
+        return <HvacCalculator onCalculate={setResult} initialSnapshot={initialSnapshot} />;
 
       case CalculatorType.SCREED:
-        return <ScreedCalculator onCalculate={setResult} />;
+        return <ScreedCalculator onCalculate={setResult} initialSnapshot={initialSnapshot} />;
 
       case CalculatorType.FACADE:
-        return <FacadeCalculator onCalculate={setResult} />;
+        return <FacadeCalculator onCalculate={setResult} initialSnapshot={initialSnapshot} />;
 
       case CalculatorType.EXTERIOR:
-        return <ExteriorCalculator onCalculate={setResult} />;
+        return <ExteriorCalculator onCalculate={setResult} initialSnapshot={initialSnapshot} />;
 
       case CalculatorType.QUICK_TOOLS:
-        return <QuickToolsCalculator onCalculate={setResult} />;
+        return <QuickToolsCalculator onCalculate={setResult} initialSnapshot={initialSnapshot} />;
 
       default:
         return (
@@ -190,15 +219,29 @@ ${tips
         : "";
 
     const project: Project = {
-      id: generateId(),
-      name: newProjectName || `${config.name} - ${dateLabel}`,
-      date: new Date().toISOString(),
+      id: existingProject?.id || generateId(),
+      name: newProjectName || existingProject?.name || `${config.name} - ${dateLabel}`,
+      date: existingProject?.date || new Date().toISOString(),
       items: result.materials,
-      notes: projectNotes,
+      notes: projectNotes || existingProject?.notes || "",
+      calculatorType: type,
+      calculatorLabel: config.name,
+      calculatorSnapshot: result.snapshot,
     };
 
     saveProject(project);
     setShowSaveModal(false);
+
+    if (returnQuoteId) {
+      navigate(`/app/quotes/${returnQuoteId}`);
+      return;
+    }
+
+    if (existingProject) {
+      navigate(`/app/projects?projectId=${project.id}`);
+      return;
+    }
+
     onNavigateProjects();
   };
 
@@ -259,7 +302,7 @@ ${result.warnings.join("\n")}`
     <div className="flex flex-col h-full bg-slate-50 pb-20 overflow-y-auto no-scrollbar">
       <div className={`sticky top-0 z-10 flex items-center p-4 ${config.color} text-white shadow-md`}>
         <button
-          onClick={onBack}
+          onClick={handleBack}
           className="mr-4 p-2 hover:bg-white/20 rounded-full transition-colors"
           type="button"
           aria-label={t("common.back", { defaultValue: "Back" })}
@@ -272,6 +315,15 @@ ${result.warnings.join("\n")}`
           <p className="text-xs opacity-90">
             {t("calculator.precision", { defaultValue: "Precision calculator" })}
           </p>
+          {returnQuoteId ? (
+            <button
+              type="button"
+              onClick={() => navigate(`/app/quotes/${returnQuoteId}`)}
+              className="mt-1 text-[11px] font-semibold text-white/90 underline underline-offset-2"
+            >
+              {t("common.back_to_quote", { defaultValue: "Back to quote" })}
+            </button>
+          ) : null}
         </div>
       </div>
 
@@ -388,11 +440,11 @@ ${result.warnings.join("\n")}`
 
               <button
                 type="button"
-                onClick={() => setShowSaveModal(true)}
+                onClick={() => (existingProject ? handleAddToProject() : setShowSaveModal(true))}
                 className="flex items-center justify-center space-x-2 bg-blue-600 text-white p-3 rounded-xl font-extrabold shadow-md active:scale-95 transition-transform"
               >
                 <Plus size={20} />
-                <span>{t("common.save", { defaultValue: "Save" })}</span>
+                <span>{existingProject ? t("common.update", { defaultValue: "Update" }) : t("common.save", { defaultValue: "Save" })}</span>
               </button>
 
               <button

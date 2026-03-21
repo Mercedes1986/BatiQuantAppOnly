@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { CalculatorType, CalculationResult, Unit } from "../../../types";
+import { CalculatorType, CalculationResult, Unit, CalculatorSnapshot } from "../../../types";
 import { DEFAULT_PRICES } from "../../constants";
 import { getUnitPrice } from "../../services/materialsService";
 import {
@@ -31,6 +31,7 @@ interface PaintRoom {
 
 interface Props {
   onCalculate: (result: CalculationResult) => void;
+  initialSnapshot?: CalculatorSnapshot;
 }
 
 const toNum = (v: unknown, fallback = 0) => {
@@ -40,7 +41,9 @@ const toNum = (v: unknown, fallback = 0) => {
 const round2 = (n: number) => Math.round((n + Number.EPSILON) * 100) / 100;
 const clamp = (n: number, min: number, max: number) => Math.min(max, Math.max(min, n));
 
-export const PaintCalculator: React.FC<Props> = ({ onCalculate }) => {
+export const PaintCalculator: React.FC<Props> = ({ onCalculate,
+  initialSnapshot
+}) => {
   const { t } = useTranslation();
 
   const [step, setStep] = useState(1);
@@ -96,6 +99,57 @@ export const PaintCalculator: React.FC<Props> = ({ onCalculate }) => {
     laborPrepM2: priceOr("LABOR_PREP_M2", 15),
     laborPaintM2: priceOr("LABOR_PAINT_M2", 25),
   }));
+
+  useEffect(() => {
+    const values = initialSnapshot?.values as Record<string, any> | undefined;
+    if (!values) return;
+    if (values.step !== undefined) setStep(values.step as any);
+    if (values.proMode !== undefined) setProMode(values.proMode as any);
+    if (values.rooms !== undefined) setRooms(values.rooms as any);
+    if (values.newRoomLabel !== undefined) setNewRoomLabel(values.newRoomLabel as any);
+    if (values.newL !== undefined) setNewL(values.newL as any);
+    if (values.newW !== undefined) setNewW(values.newW as any);
+    if (values.newH !== undefined) setNewH(values.newH as any);
+    if (values.substrateState !== undefined) setSubstrateState(values.substrateState as any);
+    if (values.usePrimer !== undefined) setUsePrimer(values.usePrimer as any);
+    if (values.useFiller !== undefined) setUseFiller(values.useFiller as any);
+    if (values.useSmoothing !== undefined) setUseSmoothing(values.useSmoothing as any);
+    if (values.ceilingLayers !== undefined) setCeilingLayers(values.ceilingLayers as any);
+    if (values.wallLayers !== undefined) setWallLayers(values.wallLayers as any);
+    if (values.paintTypeWall !== undefined) setPaintTypeWall(values.paintTypeWall as any);
+    if (values.paintTypeCeiling !== undefined) setPaintTypeCeiling(values.paintTypeCeiling as any);
+    if (values.paintWood !== undefined) setPaintWood(values.paintWood as any);
+    if (values.protectFloor !== undefined) setProtectFloor(values.protectFloor as any);
+    if (values.useTape !== undefined) setUseTape(values.useTape as any);
+    if (values.prices !== undefined) setPrices(values.prices as any);
+  }, [initialSnapshot]);
+
+  const snapshot: CalculatorSnapshot = {
+    version: 1,
+    calculatorType: CalculatorType.PAINT,
+    values: {
+      step,
+      proMode,
+      rooms,
+      newRoomLabel,
+      newL,
+      newW,
+      newH,
+      substrateState,
+      usePrimer,
+      useFiller,
+      useSmoothing,
+      ceilingLayers,
+      wallLayers,
+      paintTypeWall,
+      paintTypeCeiling,
+      paintWood,
+      protectFloor,
+      useTape,
+      prices,
+    },
+  };
+
 
   const updatePrice = (key: keyof typeof prices, val: string) => setPrices((prev) => ({ ...prev, [key]: toNum(val, 0) }));
 
@@ -397,6 +451,7 @@ export const PaintCalculator: React.FC<Props> = ({ onCalculate }) => {
   useEffect(() => {
     const totalSurface = calculationData.areaWalls + calculationData.areaCeiling;
     onCalculate({
+      snapshot,
       summary: t("calc.paint.summary", { area: totalSurface.toFixed(1) }),
       details: [
         { label: t("calc.paint.detail_walls"), value: calculationData.areaWalls.toFixed(1), unit: "m²" },

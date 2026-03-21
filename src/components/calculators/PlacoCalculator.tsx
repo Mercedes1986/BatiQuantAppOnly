@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { CalculatorType, CalculationResult, Unit } from "../../../types";
+import { CalculatorType, CalculationResult, Unit, CalculatorSnapshot } from "../../../types";
 import { DEFAULT_PRICES, getPlacoBoardTypes, getPlacoInsulationTypes } from "../../constants";
 import { getUnitPrice } from "../../services/materialsService";
 import {
@@ -31,6 +31,7 @@ interface Props {
   onCalculate: (result: CalculationResult) => void;
   initialMode?: "partition" | "lining" | "ceiling";
   hideTabs?: boolean;
+  initialSnapshot?: CalculatorSnapshot;
 }
 
 // --- helpers ---
@@ -51,6 +52,7 @@ export const PlacoCalculator: React.FC<Props> = ({
   onCalculate,
   initialMode = "partition",
   hideTabs = false,
+  initialSnapshot
 }) => {
   const { t, i18n } = useTranslation();
 
@@ -129,6 +131,65 @@ export const PlacoCalculator: React.FC<Props> = ({
 
     laborM2: priceOr("LABOR_PLACO_M2", 35),
   }));
+
+  useEffect(() => {
+    const values = initialSnapshot?.values as Record<string, any> | undefined;
+    if (!values) return;
+    if (values.step !== undefined) setStep(values.step as any);
+    if (values.proMode !== undefined) setProMode(values.proMode as any);
+    if (values.mode !== undefined) setMode(values.mode as any);
+    if (values.dimL !== undefined) setDimL(values.dimL as any);
+    if (values.dimH !== undefined) setDimH(values.dimH as any);
+    if (values.dimW !== undefined) setDimW(values.dimW as any);
+    if (values.openings !== undefined) setOpenings(values.openings as any);
+    if (values.showAddOpening !== undefined) setShowAddOpening(values.showAddOpening as any);
+    if (values.newOpType !== undefined) setNewOpType(values.newOpType as any);
+    if (values.newOpW !== undefined) setNewOpW(values.newOpW as any);
+    if (values.newOpH !== undefined) setNewOpH(values.newOpH as any);
+    if (values.boardId !== undefined) setBoardId(values.boardId as any);
+    if (values.doubleSkin !== undefined) setDoubleSkin(values.doubleSkin as any);
+    if (values.frameType !== undefined) setFrameType(values.frameType as any);
+    if (values.studSpacing !== undefined) setStudSpacing(values.studSpacing as any);
+    if (values.wastePct !== undefined) setWastePct(values.wastePct as any);
+    if (values.ceilingFurringSpacing !== undefined) setCeilingFurringSpacing(values.ceilingFurringSpacing as any);
+    if (values.hangerSpacing !== undefined) setHangerSpacing(values.hangerSpacing as any);
+    if (values.useInsulation !== undefined) setUseInsulation(values.useInsulation as any);
+    if (values.insulType !== undefined) setInsulType(values.insulType as any);
+    if (values.insulThick !== undefined) setInsulThick(values.insulThick as any);
+    if (values.useMembrane !== undefined) setUseMembrane(values.useMembrane as any);
+    if (values.prices !== undefined) setPrices(values.prices as any);
+  }, [initialSnapshot]);
+
+  const snapshot: CalculatorSnapshot = {
+    version: 1,
+    calculatorType: CalculatorType.PLACO,
+    values: {
+      step,
+      proMode,
+      mode,
+      dimL,
+      dimH,
+      dimW,
+      openings,
+      showAddOpening,
+      newOpType,
+      newOpW,
+      newOpH,
+      boardId,
+      doubleSkin,
+      frameType,
+      studSpacing,
+      wastePct,
+      ceilingFurringSpacing,
+      hangerSpacing,
+      useInsulation,
+      insulType,
+      insulThick,
+      useMembrane,
+      prices,
+    },
+  };
+
 
   const updatePrice = (key: keyof typeof prices, val: string) => {
     setPrices((prev) => ({ ...prev, [key]: toNum(val, 0) }));
@@ -478,6 +539,7 @@ export const PlacoCalculator: React.FC<Props> = ({
 
   useEffect(() => {
     onCalculate({
+      snapshot,
       summary: t("calc.placo.summary", { area: calculationData.surfaceNette.toFixed(1), mode: modeLabel(mode) }),
       details: [
         { label: t("calc.placo.detail.mode"), value: modeLabel(mode), unit: "" },

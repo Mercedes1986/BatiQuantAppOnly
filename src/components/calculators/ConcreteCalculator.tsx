@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { CalculatorType, CalculationResult, Unit } from "../../../types";
+import { CalculatorType, CalculationResult, Unit, CalculatorSnapshot } from "../../../types";
 import { DEFAULT_PRICES, MESH_TYPES, CONCRETE_MIX_RATIOS } from "../../constants";
 import { getUnitPrice } from "../../services/materialsService";
 
@@ -11,12 +11,15 @@ interface Props {
   onCalculate: (result: CalculationResult) => void;
   initialArea?: number;
   initialPerimeter?: number;
+  initialSnapshot?: CalculatorSnapshot;
 }
 
 type Usage = "interior" | "terrace" | "driveway";
 type ShapeMode = "rect" | "area";
 
-export const ConcreteCalculator: React.FC<Props> = ({ onCalculate, initialArea, initialPerimeter }) => {
+export const ConcreteCalculator: React.FC<Props> = ({ onCalculate, initialArea, initialPerimeter,
+  initialSnapshot
+}) => {
   const { t } = useTranslation();
 
   const [step, setStep] = useState(1);
@@ -98,6 +101,69 @@ export const ConcreteCalculator: React.FC<Props> = ({ onCalculate, initialArea, 
     // pro
     laborM2: 28,
   }));
+
+  useEffect(() => {
+    const values = initialSnapshot?.values as Record<string, any> | undefined;
+    if (!values) return;
+    if (values.step !== undefined) setStep(values.step as any);
+    if (values.proMode !== undefined) setProMode(values.proMode as any);
+    if (values.usage !== undefined) setUsage(values.usage as any);
+    if (values.shapeMode !== undefined) setShapeMode(values.shapeMode as any);
+    if (values.dimL !== undefined) setDimL(values.dimL as any);
+    if (values.dimW !== undefined) setDimW(values.dimW as any);
+    if (values.areaInput !== undefined) setAreaInput(values.areaInput as any);
+    if (values.perimInput !== undefined) setPerimInput(values.perimInput as any);
+    if (values.layerHerisson !== undefined) setLayerHerisson(values.layerHerisson as any);
+    if (values.usePolyane !== undefined) setUsePolyane(values.usePolyane as any);
+    if (values.useInsulation !== undefined) setUseInsulation(values.useInsulation as any);
+    if (values.insulThick !== undefined) setInsulThick(values.insulThick as any);
+    if (values.useEdgeStrip !== undefined) setUseEdgeStrip(values.useEdgeStrip as any);
+    if (values.slabThick !== undefined) setSlabThick(values.slabThick as any);
+    if (values.wastePct !== undefined) setWastePct(values.wastePct as any);
+    if (values.isBPE !== undefined) setIsBPE(values.isBPE as any);
+    if (values.mixDosage !== undefined) setMixDosage(values.mixDosage as any);
+    if (values.bagSize !== undefined) setBagSize(values.bagSize as any);
+    if (values.useMesh !== undefined) setUseMesh(values.useMesh as any);
+    if (values.meshTypeId !== undefined) setMeshTypeId(values.meshTypeId as any);
+    if (values.useFormwork !== undefined) setUseFormwork(values.useFormwork as any);
+    if (values.useJoints !== undefined) setUseJoints(values.useJoints as any);
+    if (values.jointSpacing !== undefined) setJointSpacing(values.jointSpacing as any);
+    if (values.usePump !== undefined) setUsePump(values.usePump as any);
+    if (values.prices !== undefined) setPrices(values.prices as any);
+  }, [initialSnapshot]);
+
+  const snapshot: CalculatorSnapshot = {
+    version: 1,
+    calculatorType: CalculatorType.CONCRETE,
+    values: {
+      step,
+      proMode,
+      usage,
+      shapeMode,
+      dimL,
+      dimW,
+      areaInput,
+      perimInput,
+      layerHerisson,
+      usePolyane,
+      useInsulation,
+      insulThick,
+      useEdgeStrip,
+      slabThick,
+      wastePct,
+      isBPE,
+      mixDosage,
+      bagSize,
+      useMesh,
+      meshTypeId,
+      useFormwork,
+      useJoints,
+      jointSpacing,
+      usePump,
+      prices,
+    },
+  };
+
 
   const updatePrice = (key: keyof typeof prices, val: string) => {
     setPrices((prev) => ({ ...prev, [key]: parseFloat(val) || 0 }));
@@ -455,6 +521,7 @@ export const ConcreteCalculator: React.FC<Props> = ({ onCalculate, initialArea, 
 
   useEffect(() => {
     onCalculate({
+      snapshot,
       summary: calculationData.summary,
       details: calculationData.details,
       materials: calculationData.materials,

@@ -13,7 +13,7 @@ import {
   PaintBucket,
 } from "lucide-react";
 
-import { CalculatorType, CalculationResult, MaterialItem, Unit } from "../../types";
+import { CalculatorType, CalculationResult, MaterialItem, Unit, CalculatorSnapshot } from "../../types";
 import { Input } from "../ui/Input";
 import { Select } from "../ui/Select";
 
@@ -39,6 +39,7 @@ interface Props {
   initialPerimeter?: number;
   forcedTool?: ToolKey;
   hideToolSelector?: boolean;
+  initialSnapshot?: CalculatorSnapshot;
 }
 
 const round2 = (n: number) => Math.round((n + Number.EPSILON) * 100) / 100;
@@ -168,6 +169,7 @@ export const QuickToolsCalculator: React.FC<Props> = ({
   initialPerimeter,
   forcedTool,
   hideToolSelector = false,
+  initialSnapshot
 }) => {
   const { t } = useTranslation();
   const [tool, setTool] = useState<ToolKey>(forcedTool ?? "convert");
@@ -287,6 +289,213 @@ export const QuickToolsCalculator: React.FC<Props> = ({
   const [insulationLambda, setInsulationLambda] = useState("0.038");
   const [insulationCoverageRoll, setInsulationCoverageRoll] = useState("10");
   const [insulationWastePercent, setInsulationWastePercent] = useState("8");
+
+  useEffect(() => {
+    const values = initialSnapshot?.values as Record<string, any> | undefined;
+    if (!values) return;
+    if (values.tool !== undefined) setTool(values.tool as any);
+    if (values.area !== undefined) setArea(values.area as any);
+    if (values.thicknessCm !== undefined) setThicknessCm(values.thicknessCm as any);
+    if (values.liters !== undefined) setLiters(values.liters as any);
+    if (values.bagYieldM3 !== undefined) setBagYieldM3(values.bagYieldM3 as any);
+    if (values.wallLength !== undefined) setWallLength(values.wallLength as any);
+    if (values.wallHeight !== undefined) setWallHeight(values.wallHeight as any);
+    if (values.openingsCount !== undefined) setOpeningsCount(values.openingsCount as any);
+    if (values.openingArea !== undefined) setOpeningArea(values.openingArea as any);
+    if (values.wastePercent !== undefined) setWastePercent(values.wastePercent as any);
+    if (values.consumptionBase !== undefined) setConsumptionBase(values.consumptionBase as any);
+    if (values.consumptionRate !== undefined) setConsumptionRate(values.consumptionRate as any);
+    if (values.packSize !== undefined) setPackSize(values.packSize as any);
+    if (values.packUnitPrice !== undefined) setPackUnitPrice(values.packUnitPrice as any);
+    if (values.baseUnit !== undefined) setBaseUnit(values.baseUnit as any);
+    if (values.consumptionUnit !== undefined) setConsumptionUnit(values.consumptionUnit as any);
+    if (values.packageUnit !== undefined) setPackageUnit(values.packageUnit as any);
+    if (values.run !== undefined) setRun(values.run as any);
+    if (values.rise !== undefined) setRise(values.rise as any);
+    if (values.totalLength !== undefined) setTotalLength(values.totalLength as any);
+    if (values.pieceLength !== undefined) setPieceLength(values.pieceLength as any);
+    if (values.overlapCm !== undefined) setOverlapCm(values.overlapCm as any);
+    if (values.linearWastePercent !== undefined) setLinearWastePercent(values.linearWastePercent as any);
+    if (values.phase !== undefined) setPhase(values.phase as any);
+    if (values.power !== undefined) setPower(values.power as any);
+    if (values.voltage !== undefined) setVoltage(values.voltage as any);
+    if (values.cableLength !== undefined) setCableLength(values.cableLength as any);
+    if (values.section !== undefined) setSection(values.section as any);
+    if (values.conductor !== undefined) setConductor(values.conductor as any);
+    if (values.deckLength !== undefined) setDeckLength(values.deckLength as any);
+    if (values.deckWidth !== undefined) setDeckWidth(values.deckWidth as any);
+    if (values.boardWidthMm !== undefined) setBoardWidthMm(values.boardWidthMm as any);
+    if (values.boardGapMm !== undefined) setBoardGapMm(values.boardGapMm as any);
+    if (values.boardLengthM !== undefined) setBoardLengthM(values.boardLengthM as any);
+    if (values.joistSpacingCm !== undefined) setJoistSpacingCm(values.joistSpacingCm as any);
+    if (values.joistLengthM !== undefined) setJoistLengthM(values.joistLengthM as any);
+    if (values.pedestalSpacingCm !== undefined) setPedestalSpacingCm(values.pedestalSpacingCm as any);
+    if (values.screwsPerSupport !== undefined) setScrewsPerSupport(values.screwsPerSupport as any);
+    if (values.deckWastePercent !== undefined) setDeckWastePercent(values.deckWastePercent as any);
+    if (values.drywallMode !== undefined) setDrywallMode(values.drywallMode as any);
+    if (values.drywallLength !== undefined) setDrywallLength(values.drywallLength as any);
+    if (values.drywallHeight !== undefined) setDrywallHeight(values.drywallHeight as any);
+    if (values.drywallArea !== undefined) setDrywallArea(values.drywallArea as any);
+    if (values.studSpacingCm !== undefined) setStudSpacingCm(values.studSpacingCm as any);
+    if (values.boardWidthM !== undefined) setBoardWidthM(values.boardWidthM as any);
+    if (values.boardHeightM !== undefined) setBoardHeightM(values.boardHeightM as any);
+    if (values.boardLayers !== undefined) setBoardLayers(values.boardLayers as any);
+    if (values.railLengthM !== undefined) setRailLengthM(values.railLengthM as any);
+    if (values.studLengthM !== undefined) setStudLengthM(values.studLengthM as any);
+    if (values.screwsPerBoard !== undefined) setScrewsPerBoard(values.screwsPerBoard as any);
+    if (values.tileLength !== undefined) setTileLength(values.tileLength as any);
+    if (values.tileWidth !== undefined) setTileWidth(values.tileWidth as any);
+    if (values.tileAreaOpenings !== undefined) setTileAreaOpenings(values.tileAreaOpenings as any);
+    if (values.tileWastePercent !== undefined) setTileWastePercent(values.tileWastePercent as any);
+    if (values.poseType !== undefined) setPoseType(values.poseType as any);
+    if (values.tileLenCm !== undefined) setTileLenCm(values.tileLenCm as any);
+    if (values.tileWidCm !== undefined) setTileWidCm(values.tileWidCm as any);
+    if (values.adhesiveRate !== undefined) setAdhesiveRate(values.adhesiveRate as any);
+    if (values.groutRate !== undefined) setGroutRate(values.groutRate as any);
+    if (values.skirtingHeightCm !== undefined) setSkirtingHeightCm(values.skirtingHeightCm as any);
+    if (values.packPreset !== undefined) setPackPreset(values.packPreset as any);
+    if (values.advBaseQty !== undefined) setAdvBaseQty(values.advBaseQty as any);
+    if (values.advBaseUnit !== undefined) setAdvBaseUnit(values.advBaseUnit as any);
+    if (values.advConsumptionRate !== undefined) setAdvConsumptionRate(values.advConsumptionRate as any);
+    if (values.advConsumptionUnit !== undefined) setAdvConsumptionUnit(values.advConsumptionUnit as any);
+    if (values.advPackSize !== undefined) setAdvPackSize(values.advPackSize as any);
+    if (values.advPackUnit !== undefined) setAdvPackUnit(values.advPackUnit as any);
+    if (values.advUnitPrice !== undefined) setAdvUnitPrice(values.advUnitPrice as any);
+    if (values.advCoats !== undefined) setAdvCoats(values.advCoats as any);
+    if (values.advWaste !== undefined) setAdvWaste(values.advWaste as any);
+    if (values.roofSpanM !== undefined) setRoofSpanM(values.roofSpanM as any);
+    if (values.roofLengthM !== undefined) setRoofLengthM(values.roofLengthM as any);
+    if (values.roofRiseM !== undefined) setRoofRiseM(values.roofRiseM as any);
+    if (values.roofOverhangCm !== undefined) setRoofOverhangCm(values.roofOverhangCm as any);
+    if (values.rafterSpacingCm !== undefined) setRafterSpacingCm(values.rafterSpacingCm as any);
+    if (values.battenGapCm !== undefined) setBattenGapCm(values.battenGapCm as any);
+    if (values.battenLengthM !== undefined) setBattenLengthM(values.battenLengthM as any);
+    if (values.underlayRollM2 !== undefined) setUnderlayRollM2(values.underlayRollM2 as any);
+    if (values.tileCoveragePerM2 !== undefined) setTileCoveragePerM2(values.tileCoveragePerM2 as any);
+    if (values.fenceLength !== undefined) setFenceLength(values.fenceLength as any);
+    if (values.fenceHeight !== undefined) setFenceHeight(values.fenceHeight as any);
+    if (values.panelWidth !== undefined) setPanelWidth(values.panelWidth as any);
+    if (values.concretePerPostM3 !== undefined) setConcretePerPostM3(values.concretePerPostM3 as any);
+    if (values.fenceWastePercent !== undefined) setFenceWastePercent(values.fenceWastePercent as any);
+    if (values.bulkLength !== undefined) setBulkLength(values.bulkLength as any);
+    if (values.bulkWidth !== undefined) setBulkWidth(values.bulkWidth as any);
+    if (values.bulkDepthCm !== undefined) setBulkDepthCm(values.bulkDepthCm as any);
+    if (values.bulkWastePercent !== undefined) setBulkWastePercent(values.bulkWastePercent as any);
+    if (values.bulkDensity !== undefined) setBulkDensity(values.bulkDensity as any);
+    if (values.bigBagSizeTons !== undefined) setBigBagSizeTons(values.bigBagSizeTons as any);
+    if (values.geoOverlapPercent !== undefined) setGeoOverlapPercent(values.geoOverlapPercent as any);
+    if (values.insulationMode !== undefined) setInsulationMode(values.insulationMode as any);
+    if (values.insulationArea !== undefined) setInsulationArea(values.insulationArea as any);
+    if (values.insulationThicknessMm !== undefined) setInsulationThicknessMm(values.insulationThicknessMm as any);
+    if (values.insulationLambda !== undefined) setInsulationLambda(values.insulationLambda as any);
+    if (values.insulationCoverageRoll !== undefined) setInsulationCoverageRoll(values.insulationCoverageRoll as any);
+    if (values.insulationWastePercent !== undefined) setInsulationWastePercent(values.insulationWastePercent as any);
+  }, [initialSnapshot]);
+
+  const snapshot: CalculatorSnapshot = {
+    version: 1,
+    calculatorType: CalculatorType.QUICK_TOOLS,
+    values: {
+      tool,
+      area,
+      thicknessCm,
+      liters,
+      bagYieldM3,
+      wallLength,
+      wallHeight,
+      openingsCount,
+      openingArea,
+      wastePercent,
+      consumptionBase,
+      consumptionRate,
+      packSize,
+      packUnitPrice,
+      baseUnit,
+      consumptionUnit,
+      packageUnit,
+      run,
+      rise,
+      totalLength,
+      pieceLength,
+      overlapCm,
+      linearWastePercent,
+      phase,
+      power,
+      voltage,
+      cableLength,
+      section,
+      conductor,
+      deckLength,
+      deckWidth,
+      boardWidthMm,
+      boardGapMm,
+      boardLengthM,
+      joistSpacingCm,
+      joistLengthM,
+      pedestalSpacingCm,
+      screwsPerSupport,
+      deckWastePercent,
+      drywallMode,
+      drywallLength,
+      drywallHeight,
+      drywallArea,
+      studSpacingCm,
+      boardWidthM,
+      boardHeightM,
+      boardLayers,
+      railLengthM,
+      studLengthM,
+      screwsPerBoard,
+      tileLength,
+      tileWidth,
+      tileAreaOpenings,
+      tileWastePercent,
+      poseType,
+      tileLenCm,
+      tileWidCm,
+      adhesiveRate,
+      groutRate,
+      skirtingHeightCm,
+      packPreset,
+      advBaseQty,
+      advBaseUnit,
+      advConsumptionRate,
+      advConsumptionUnit,
+      advPackSize,
+      advPackUnit,
+      advUnitPrice,
+      advCoats,
+      advWaste,
+      roofSpanM,
+      roofLengthM,
+      roofRiseM,
+      roofOverhangCm,
+      rafterSpacingCm,
+      battenGapCm,
+      battenLengthM,
+      underlayRollM2,
+      tileCoveragePerM2,
+      fenceLength,
+      fenceHeight,
+      panelWidth,
+      concretePerPostM3,
+      fenceWastePercent,
+      bulkLength,
+      bulkWidth,
+      bulkDepthCm,
+      bulkWastePercent,
+      bulkDensity,
+      bigBagSizeTons,
+      geoOverlapPercent,
+      insulationMode,
+      insulationArea,
+      insulationThicknessMm,
+      insulationLambda,
+      insulationCoverageRoll,
+      insulationWastePercent,
+    },
+  };
+
 
   useEffect(() => {
     const preset = packagingPresets[packPreset];
@@ -1515,7 +1724,7 @@ export const QuickToolsCalculator: React.FC<Props> = ({
   ]);
 
   useEffect(() => {
-    onCalculate(result);
+    onCalculate({ ...result, snapshot });
   }, [result, onCalculate]);
 
   return (

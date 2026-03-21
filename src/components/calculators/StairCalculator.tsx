@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { CalculatorType, CalculationResult, Unit } from "../../../types";
+import { CalculatorType, CalculationResult, Unit, CalculatorSnapshot } from "../../../types";
 import { DEFAULT_PRICES } from "../../constants";
 import { getUnitPrice } from "../../services/materialsService";
 import {
@@ -18,6 +18,7 @@ import {
 
 interface Props {
   onCalculate: (result: CalculationResult) => void;
+  initialSnapshot?: CalculatorSnapshot;
 }
 
 type StairType = "straight" | "quarter" | "half";
@@ -43,7 +44,9 @@ const priceOr = (catalogKey: string, defaultKey: string | null, fallback: number
   return fallback;
 };
 
-export const StairCalculator: React.FC<Props> = ({ onCalculate }) => {
+export const StairCalculator: React.FC<Props> = ({ onCalculate,
+  initialSnapshot
+}) => {
   const { t } = useTranslation();
 
   const [step, setStep] = useState(1);
@@ -109,6 +112,55 @@ export const StairCalculator: React.FC<Props> = ({ onCalculate }) => {
     coating: priceOr("COATING_M2", null, 35),
     pump: priceOr("PUMP_FEE", "PUMP_FEE", 250),
   }));
+
+  useEffect(() => {
+    const values = initialSnapshot?.values as Record<string, any> | undefined;
+    if (!values) return;
+    if (values.step !== undefined) setStep(values.step as any);
+    if (values.proMode !== undefined) setProMode(values.proMode as any);
+    if (values.stairType !== undefined) setStairType(values.stairType as any);
+    if (values.height !== undefined) setHeight(values.height as any);
+    if (values.width !== undefined) setWidth(values.width as any);
+    if (values.run !== undefined) setRun(values.run as any);
+    if (values.landingDepth !== undefined) setLandingDepth(values.landingDepth as any);
+    if (values.calcMode !== undefined) setCalcMode(values.calcMode as any);
+    if (values.numSteps !== undefined) setNumSteps(values.numSteps as any);
+    if (values.slabThickness !== undefined) setSlabThickness(values.slabThickness as any);
+    if (values.wasteConcrete !== undefined) setWasteConcrete(values.wasteConcrete as any);
+    if (values.wasteForm !== undefined) setWasteForm(values.wasteForm as any);
+    if (values.steelRatio !== undefined) setSteelRatio(values.steelRatio as any);
+    if (values.useProps !== undefined) setUseProps(values.useProps as any);
+    if (values.finishTiling !== undefined) setFinishTiling(values.finishTiling as any);
+    if (values.finishRailing !== undefined) setFinishRailing(values.finishRailing as any);
+    if (values.finishCoating !== undefined) setFinishCoating(values.finishCoating as any);
+    if (values.prices !== undefined) setPrices(values.prices as any);
+  }, [initialSnapshot]);
+
+  const snapshot: CalculatorSnapshot = {
+    version: 1,
+    calculatorType: CalculatorType.STAIRS,
+    values: {
+      step,
+      proMode,
+      stairType,
+      height,
+      width,
+      run,
+      landingDepth,
+      calcMode,
+      numSteps,
+      slabThickness,
+      wasteConcrete,
+      wasteForm,
+      steelRatio,
+      useProps,
+      finishTiling,
+      finishRailing,
+      finishCoating,
+      prices,
+    },
+  };
+
 
   const updatePrice = (key: keyof typeof prices, val: string) => {
     setPrices((prev) => ({ ...prev, [key]: toNum(val, 0) }));
@@ -391,6 +443,7 @@ export const StairCalculator: React.FC<Props> = ({ onCalculate }) => {
   // Push results
   useEffect(() => {
     onCalculate({
+      snapshot,
       summary: computed.summary,
       details: computed.details,
       materials: computed.materials,

@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { CalculatorType, CalculationResult, Unit } from "../../../types";
+import { CalculatorType, CalculationResult, Unit, CalculatorSnapshot } from "../../../types";
 import { DEFAULT_PRICES } from "../../constants";
 import { getUnitPrice } from "../../services/materialsService";
 import {
@@ -45,6 +45,7 @@ interface PlumbRoom {
 
 interface Props {
   onCalculate: (result: CalculationResult) => void;
+  initialSnapshot?: CalculatorSnapshot;
 }
 
 const uid = () =>
@@ -75,7 +76,9 @@ const inputBase = "w-full p-1.5 border border-white/80 rounded-2xl text-sm bg-wh
 const selectBase = "w-full p-2 text-sm border rounded bg-white text-slate-900";
 const inputPro = "w-full p-1.5 border border-blue-200 rounded-2xl text-sm bg-white/92 text-slate-900 shadow-[0_10px_24px_rgba(37,99,235,0.08)] backdrop-blur-xl";
 
-export const PlumbingCalculator: React.FC<Props> = ({ onCalculate }) => {
+export const PlumbingCalculator: React.FC<Props> = ({ onCalculate,
+  initialSnapshot
+}) => {
   const { t } = useTranslation();
 
   const [step, setStep] = useState(1);
@@ -127,6 +130,39 @@ export const PlumbingCalculator: React.FC<Props> = ({ onCalculate }) => {
     laborPoint: priceOr("LABOR_PLUMB_POINT", 80.0),
     laborNetwork: priceOr("LABOR_PLUMB_NETWORK_M", 15.0),
   }));
+
+  useEffect(() => {
+    const values = initialSnapshot?.values as Record<string, any> | undefined;
+    if (!values) return;
+    if (values.step !== undefined) setStep(values.step as any);
+    if (values.proMode !== undefined) setProMode(values.proMode as any);
+    if (values.rooms !== undefined) setRooms(values.rooms as any);
+    if (values.newRoomType !== undefined) setNewRoomType(values.newRoomType as any);
+    if (values.supplyMaterial !== undefined) setSupplyMaterial(values.supplyMaterial as any);
+    if (values.distributionMode !== undefined) setDistributionMode(values.distributionMode as any);
+    if (values.avgDistManifold !== undefined) setAvgDistManifold(values.avgDistManifold as any);
+    if (values.avgDistDrain !== undefined) setAvgDistDrain(values.avgDistDrain as any);
+    if (values.waterHeater !== undefined) setWaterHeater(values.waterHeater as any);
+    if (values.prices !== undefined) setPrices(values.prices as any);
+  }, [initialSnapshot]);
+
+  const snapshot: CalculatorSnapshot = {
+    version: 1,
+    calculatorType: CalculatorType.PLUMBING,
+    values: {
+      step,
+      proMode,
+      rooms,
+      newRoomType,
+      supplyMaterial,
+      distributionMode,
+      avgDistManifold,
+      avgDistDrain,
+      waterHeater,
+      prices,
+    },
+  };
+
 
   const updatePrice = (key: keyof typeof prices, val: string) => {
     setPrices((prev) => ({ ...prev, [key]: toNum(val, 0) }));
@@ -555,6 +591,7 @@ export const PlumbingCalculator: React.FC<Props> = ({ onCalculate }) => {
 
   useEffect(() => {
     onCalculate({
+      snapshot,
       summary: t("calc.plumbing.summary", { n: calculationData.summaryStats.totalApps }),
       details: [
         { label: t("calc.plumbing.detail.cold"), value: calculationData.summaryStats.totalColdLines, unit: "u" },

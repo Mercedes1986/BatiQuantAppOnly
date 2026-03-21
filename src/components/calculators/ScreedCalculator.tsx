@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { CalculatorType, CalculationResult, Unit } from "../../../types";
+import { CalculatorType, CalculationResult, Unit, CalculatorSnapshot } from "../../../types";
 import { DEFAULT_PRICES, MESH_TYPES } from "../../constants";
 import { getUnitPrice } from "../../services/materialsService";
 import {
@@ -29,6 +29,7 @@ interface ScreedZone {
 
 interface Props {
   onCalculate: (result: CalculationResult) => void;
+  initialSnapshot?: CalculatorSnapshot;
 }
 
 type ScreedType = "trad" | "fluid_anh" | "fluid_cem" | "light" | "ravoirage";
@@ -59,7 +60,9 @@ const priceOr = (catalogKey: string, defaultKey: string | null, fallback: number
   return fallback;
 };
 
-export const ScreedCalculator: React.FC<Props> = ({ onCalculate }) => {
+export const ScreedCalculator: React.FC<Props> = ({ onCalculate,
+  initialSnapshot
+}) => {
   const { t } = useTranslation();
 
   const [step, setStep] = useState(1);
@@ -114,6 +117,57 @@ export const ScreedCalculator: React.FC<Props> = ({ onCalculate }) => {
 
     meshPanel: priceOr("MESH_PANEL_UNIT", null, 5),
   }));
+
+  useEffect(() => {
+    const values = initialSnapshot?.values as Record<string, any> | undefined;
+    if (!values) return;
+    if (values.step !== undefined) setStep(values.step as any);
+    if (values.proMode !== undefined) setProMode(values.proMode as any);
+    if (values.zones !== undefined) setZones(values.zones as any);
+    if (values.newZoneLabel !== undefined) setNewZoneLabel(values.newZoneLabel as any);
+    if (values.newZoneArea !== undefined) setNewZoneArea(values.newZoneArea as any);
+    if (values.newZoneThick !== undefined) setNewZoneThick(values.newZoneThick as any);
+    if (values.screedType !== undefined) setScreedType(values.screedType as any);
+    if (values.usePolyane !== undefined) setUsePolyane(values.usePolyane as any);
+    if (values.useStrip !== undefined) setUseStrip(values.useStrip as any);
+    if (values.useInsulation !== undefined) setUseInsulation(values.useInsulation as any);
+    if (values.insulThick !== undefined) setInsulThick(values.insulThick as any);
+    if (values.reinforceType !== undefined) setReinforceType(values.reinforceType as any);
+    if (values.meshTypeId !== undefined) setMeshTypeId(values.meshTypeId as any);
+    if (values.fiberDosage !== undefined) setFiberDosage(values.fiberDosage as any);
+    if (values.useJoints !== undefined) setUseJoints(values.useJoints as any);
+    if (values.cementDosage !== undefined) setCementDosage(values.cementDosage as any);
+    if (values.sandRatio !== undefined) setSandRatio(values.sandRatio as any);
+    if (values.lightBagVol !== undefined) setLightBagVol(values.lightBagVol as any);
+    if (values.prices !== undefined) setPrices(values.prices as any);
+  }, [initialSnapshot]);
+
+  const snapshot: CalculatorSnapshot = {
+    version: 1,
+    calculatorType: CalculatorType.SCREED,
+    values: {
+      step,
+      proMode,
+      zones,
+      newZoneLabel,
+      newZoneArea,
+      newZoneThick,
+      screedType,
+      usePolyane,
+      useStrip,
+      useInsulation,
+      insulThick,
+      reinforceType,
+      meshTypeId,
+      fiberDosage,
+      useJoints,
+      cementDosage,
+      sandRatio,
+      lightBagVol,
+      prices,
+    },
+  };
+
 
   const updatePrice = (key: keyof typeof prices, val: string) => {
     setPrices((prev) => ({ ...prev, [key]: toNum(val, 0) }));
@@ -455,6 +509,7 @@ export const ScreedCalculator: React.FC<Props> = ({ onCalculate }) => {
 
   useEffect(() => {
     onCalculate({
+      snapshot,
       summary: t("calc.screed.summary", { vol: calculationData.totalVolume.toFixed(2), n: zones.length }),
       details: [
         { label: t("calc.screed.detail.area"), value: calculationData.totalArea.toFixed(1), unit: "m²" },

@@ -2,7 +2,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { CalculatorType, CalculationResult, Unit } from "../../../types";
+import { CalculatorType, CalculationResult, Unit, CalculatorSnapshot } from "../../../types";
 import { DEFAULT_PRICES, getOpeningPresets } from "../../constants";
 import { getUnitPrice } from "../../services/materialsService";
 
@@ -41,6 +41,7 @@ interface JoineryItem {
 
 interface Props {
   onCalculate: (result: CalculationResult) => void;
+  initialSnapshot?: CalculatorSnapshot;
 }
 
 const toNum = (v: unknown, fallback = 0) => {
@@ -70,7 +71,9 @@ const getTypeLabel = (t: TFn, type: JoineryType) => {
   }
 };
 
-export const JoineryCalculator: React.FC<Props> = ({ onCalculate }) => {
+export const JoineryCalculator: React.FC<Props> = ({ onCalculate,
+  initialSnapshot
+}) => {
   const { t, i18n } = useTranslation();
 
   const OPENING_PRESETS = useMemo(() => getOpeningPresets(), [i18n.language]);
@@ -146,6 +149,59 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate }) => {
     foamCart: priceOr("JOINERY_FOAM_CART", 12),
     fixingKit: priceOr("JOINERY_FIXING_KIT", 5),
   }));
+
+  useEffect(() => {
+    const values = initialSnapshot?.values as Record<string, any> | undefined;
+    if (!values) return;
+    if (values.step !== undefined) setStep(values.step as any);
+    if (values.proMode !== undefined) setProMode(values.proMode as any);
+    if (values.items !== undefined) setItems(values.items as any);
+    if (values.showForm !== undefined) setShowForm(values.showForm as any);
+    if (values.editingId !== undefined) setEditingId(values.editingId as any);
+    if (values.formType !== undefined) setFormType(values.formType as any);
+    if (values.formLabel !== undefined) setFormLabel(values.formLabel as any);
+    if (values.formW !== undefined) setFormW(values.formW as any);
+    if (values.formH !== undefined) setFormH(values.formH as any);
+    if (values.formQty !== undefined) setFormQty(values.formQty as any);
+    if (values.formMat !== undefined) setFormMat(values.formMat as any);
+    if (values.formShutter !== undefined) setFormShutter(values.formShutter as any);
+    if (values.formPriceOverride !== undefined) setFormPriceOverride(values.formPriceOverride as any);
+    if (values.installType !== undefined) setInstallType(values.installType as any);
+    if (values.useCompriband !== undefined) setUseCompriband(values.useCompriband as any);
+    if (values.useSilicone !== undefined) setUseSilicone(values.useSilicone as any);
+    if (values.useFoam !== undefined) setUseFoam(values.useFoam as any);
+    if (values.useFixings !== undefined) setUseFixings(values.useFixings as any);
+    if (values.wastePct !== undefined) setWastePct(values.wastePct as any);
+    if (values.prices !== undefined) setPrices(values.prices as any);
+  }, [initialSnapshot]);
+
+  const snapshot: CalculatorSnapshot = {
+    version: 1,
+    calculatorType: CalculatorType.JOINERY,
+    values: {
+      step,
+      proMode,
+      items,
+      showForm,
+      editingId,
+      formType,
+      formLabel,
+      formW,
+      formH,
+      formQty,
+      formMat,
+      formShutter,
+      formPriceOverride,
+      installType,
+      useCompriband,
+      useSilicone,
+      useFoam,
+      useFixings,
+      wastePct,
+      prices,
+    },
+  };
+
 
   type PriceKey = keyof typeof prices;
   const updatePrice = (key: PriceKey, val: string) =>
@@ -486,6 +542,7 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate }) => {
   // Push to parent
   useEffect(() => {
     onCalculate({
+      snapshot,
       summary: `${calc.totalUnits} ${t("joinery.summary.units", { defaultValue: "items" })}`,
       details: [
         {

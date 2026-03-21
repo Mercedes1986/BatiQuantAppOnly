@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { CalculatorType, CalculationResult, Unit } from "../../../types";
+import { CalculatorType, CalculationResult, Unit, CalculatorSnapshot } from "../../../types";
 import { DEFAULT_PRICES, LEVELING_PRODUCTS, LEVELING_SUBSTRATES } from "../../constants";
 import { getUnitPrice } from "../../services/materialsService";
 import {
@@ -32,6 +32,7 @@ interface LevelingZone {
 
 interface Props {
   onCalculate: (result: CalculationResult) => void;
+  initialSnapshot?: CalculatorSnapshot;
 }
 
 const toNum = (v: unknown, fallback = 0) => {
@@ -41,7 +42,9 @@ const toNum = (v: unknown, fallback = 0) => {
 const round2 = (n: number) => Math.round((n + Number.EPSILON) * 100) / 100;
 const clamp = (n: number, min: number, max: number) => Math.min(max, Math.max(min, n));
 
-export const LevelingCalculator: React.FC<Props> = ({ onCalculate }) => {
+export const LevelingCalculator: React.FC<Props> = ({ onCalculate,
+  initialSnapshot
+}) => {
   const { t } = useTranslation();
 
   // --- i18n (dynamic labels; avoids constants being stuck in EN after language switch) ---
@@ -166,6 +169,57 @@ export const LevelingCalculator: React.FC<Props> = ({ onCalculate }) => {
 
   // --- Auto recommendations ---
   const [autoProductLocked, setAutoProductLocked] = useState(true);
+
+  useEffect(() => {
+    const values = initialSnapshot?.values as Record<string, any> | undefined;
+    if (!values) return;
+    if (values.step !== undefined) setStep(values.step as any);
+    if (values.proMode !== undefined) setProMode(values.proMode as any);
+    if (values.zones !== undefined) setZones(values.zones as any);
+    if (values.newZoneLabel !== undefined) setNewZoneLabel(values.newZoneLabel as any);
+    if (values.newZoneArea !== undefined) setNewZoneArea(values.newZoneArea as any);
+    if (values.newZoneSubstrate !== undefined) setNewZoneSubstrate(values.newZoneSubstrate as any);
+    if (values.newZoneThicknessMode !== undefined) setNewZoneThicknessMode(values.newZoneThicknessMode as any);
+    if (values.newZoneThickAvg !== undefined) setNewZoneThickAvg(values.newZoneThickAvg as any);
+    if (values.newZoneThickMin !== undefined) setNewZoneThickMin(values.newZoneThickMin as any);
+    if (values.newZoneThickMax !== undefined) setNewZoneThickMax(values.newZoneThickMax as any);
+    if (values.productId !== undefined) setProductId(values.productId as any);
+    if (values.bagSize !== undefined) setBagSize(values.bagSize as any);
+    if (values.wastePct !== undefined) setWastePct(values.wastePct as any);
+    if (values.usePrimer !== undefined) setUsePrimer(values.usePrimer as any);
+    if (values.primerLayers !== undefined) setPrimerLayers(values.primerLayers as any);
+    if (values.usePeripheralBand !== undefined) setUsePeripheralBand(values.usePeripheralBand as any);
+    if (values.useMesh !== undefined) setUseMesh(values.useMesh as any);
+    if (values.prices !== undefined) setPrices(values.prices as any);
+    if (values.autoProductLocked !== undefined) setAutoProductLocked(values.autoProductLocked as any);
+  }, [initialSnapshot]);
+
+  const snapshot: CalculatorSnapshot = {
+    version: 1,
+    calculatorType: CalculatorType.RAGREAGE,
+    values: {
+      step,
+      proMode,
+      zones,
+      newZoneLabel,
+      newZoneArea,
+      newZoneSubstrate,
+      newZoneThicknessMode,
+      newZoneThickAvg,
+      newZoneThickMin,
+      newZoneThickMax,
+      productId,
+      bagSize,
+      wastePct,
+      usePrimer,
+      primerLayers,
+      usePeripheralBand,
+      useMesh,
+      prices,
+      autoProductLocked,
+    },
+  };
+
 
   useEffect(() => {
     if (!autoProductLocked) return;
@@ -372,6 +426,7 @@ export const LevelingCalculator: React.FC<Props> = ({ onCalculate }) => {
 
   useEffect(() => {
     onCalculate({
+      snapshot,
       summary: t("calc.leveling.summary", { area: calculationData.totalArea.toFixed(1) }),
       details: [
         { label: t("calc.leveling.detail_area"), value: calculationData.totalArea.toFixed(1), unit: "m²" },

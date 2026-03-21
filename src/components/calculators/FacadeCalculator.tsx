@@ -2,7 +2,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { CalculatorType, CalculationResult, Unit } from "../../../types";
+import { CalculatorType, CalculationResult, Unit, CalculatorSnapshot } from "../../../types";
 import { DEFAULT_PRICES, OPENING_PRESETS } from "../../constants";
 import { getUnitPrice } from "../../services/materialsService";
 
@@ -36,12 +36,15 @@ interface FacadeOpening {
 
 interface Props {
   onCalculate: (result: CalculationResult) => void;
+  initialSnapshot?: CalculatorSnapshot;
 }
 
 const n2 = (v: number) => (Number.isFinite(v) ? Number(v.toFixed(2)) : 0);
 const clamp = (v: number, min: number, max: number) => Math.min(max, Math.max(min, v));
 
-export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
+export const FacadeCalculator: React.FC<Props> = ({ onCalculate,
+  initialSnapshot
+}) => {
   const { t } = useTranslation();
 
   const [step, setStep] = useState(1);
@@ -123,6 +126,83 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
     laborM2: 45.0,
     laborScaffold: 15.0,
   }));
+
+  useEffect(() => {
+    const values = initialSnapshot?.values as Record<string, any> | undefined;
+    if (!values) return;
+    if (values.step !== undefined) setStep(values.step as any);
+    if (values.proMode !== undefined) setProMode(values.proMode as any);
+    if (values.geoMode !== undefined) setGeoMode(values.geoMode as any);
+    if (values.dimL !== undefined) setDimL(values.dimL as any);
+    if (values.dimW !== undefined) setDimW(values.dimW as any);
+    if (values.dimH !== undefined) setDimH(values.dimH as any);
+    if (values.perimeter !== undefined) setPerimeter(values.perimeter as any);
+    if (values.hasGables !== undefined) setHasGables(values.hasGables as any);
+    if (values.gableHeight !== undefined) setGableHeight(values.gableHeight as any);
+    if (values.numGables !== undefined) setNumGables(values.numGables as any);
+    if (values.openings !== undefined) setOpenings(values.openings as any);
+    if (values.newOpType !== undefined) setNewOpType(values.newOpType as any);
+    if (values.newOpW !== undefined) setNewOpW(values.newOpW as any);
+    if (values.newOpH !== undefined) setNewOpH(values.newOpH as any);
+    if (values.newOpReveal !== undefined) setNewOpReveal(values.newOpReveal as any);
+    if (values.doCleaning !== undefined) setDoCleaning(values.doCleaning as any);
+    if (values.doRepair !== undefined) setDoRepair(values.doRepair as any);
+    if (values.doCoating !== undefined) setDoCoating(values.doCoating as any);
+    if (values.doPaint !== undefined) setDoPaint(values.doPaint as any);
+    if (values.doITE !== undefined) setDoITE(values.doITE as any);
+    if (values.doCladding !== undefined) setDoCladding(values.doCladding as any);
+    if (values.cleanType !== undefined) setCleanType(values.cleanType as any);
+    if (values.crackLen !== undefined) setCrackLen(values.crackLen as any);
+    if (values.coatingType !== undefined) setCoatingType(values.coatingType as any);
+    if (values.coatingThick !== undefined) setCoatingThick(values.coatingThick as any);
+    if (values.paintType !== undefined) setPaintType(values.paintType as any);
+    if (values.paintLayers !== undefined) setPaintLayers(values.paintLayers as any);
+    if (values.iteThick !== undefined) setIteThick(values.iteThick as any);
+    if (values.iteType !== undefined) setIteType(values.iteType as any);
+    if (values.claddingType !== undefined) setCladdingType(values.claddingType as any);
+    if (values.scaffold !== undefined) setScaffold(values.scaffold as any);
+    if (values.prices !== undefined) setPrices(values.prices as any);
+  }, [initialSnapshot]);
+
+  const snapshot: CalculatorSnapshot = {
+    version: 1,
+    calculatorType: CalculatorType.FACADE,
+    values: {
+      step,
+      proMode,
+      geoMode,
+      dimL,
+      dimW,
+      dimH,
+      perimeter,
+      hasGables,
+      gableHeight,
+      numGables,
+      openings,
+      newOpType,
+      newOpW,
+      newOpH,
+      newOpReveal,
+      doCleaning,
+      doRepair,
+      doCoating,
+      doPaint,
+      doITE,
+      doCladding,
+      cleanType,
+      crackLen,
+      coatingType,
+      coatingThick,
+      paintType,
+      paintLayers,
+      iteThick,
+      iteType,
+      claddingType,
+      scaffold,
+      prices,
+    },
+  };
+
 
   const updatePrice = (key: keyof typeof prices, val: string) => {
     setPrices((prev) => ({ ...prev, [key]: parseFloat(val) || 0 }));
@@ -506,6 +586,7 @@ export const FacadeCalculator: React.FC<Props> = ({ onCalculate }) => {
 
   useEffect(() => {
     onCalculate({
+      snapshot,
       summary: `${calculationData.netArea.toFixed(1)} m²`,
       details: [
         { label: t("facade.details.gross", { defaultValue: "Gross area" }), value: calculationData.grossArea.toFixed(1), unit: "m²" },

@@ -2,7 +2,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { CalculatorType, CalculationResult, Unit } from "../../../types";
+import { CalculatorType, CalculationResult, Unit, CalculatorSnapshot } from "../../../types";
 import { DEFAULT_PRICES } from "../../constants";
 import { getUnitPrice } from "../../services/materialsService";
 
@@ -32,6 +32,7 @@ interface HvacZone {
 
 interface Props {
   onCalculate: (result: CalculationResult) => void;
+  initialSnapshot?: CalculatorSnapshot;
 }
 
 type InsulationLevel = "rt2012" | "renov_good" | "renov_avg" | "poor";
@@ -48,7 +49,9 @@ const toNum = (v: unknown, fallback = 0) => {
 const clamp = (v: number, min: number, max: number) => Math.min(max, Math.max(min, v));
 const round2 = (n: number) => Math.round((n + Number.EPSILON) * 100) / 100;
 
-export const HvacCalculator: React.FC<Props> = ({ onCalculate }) => {
+export const HvacCalculator: React.FC<Props> = ({ onCalculate,
+  initialSnapshot
+}) => {
   const { t } = useTranslation();
 
   const [step, setStep] = useState(1);
@@ -133,6 +136,53 @@ export const HvacCalculator: React.FC<Props> = ({ onCalculate }) => {
     installVmc: priceOr("HVAC_LABOR_VMC", 300),
     laborVent: priceOr("HVAC_LABOR_VENT_UNIT", 50),
   }));
+
+  useEffect(() => {
+    const values = initialSnapshot?.values as Record<string, any> | undefined;
+    if (!values) return;
+    if (values.step !== undefined) setStep(values.step as any);
+    if (values.proMode !== undefined) setProMode(values.proMode as any);
+    if (values.insulationLevel !== undefined) setInsulationLevel(values.insulationLevel as any);
+    if (values.ceilingHeight !== undefined) setCeilingHeight(values.ceilingHeight as any);
+    if (values.targetTemp !== undefined) setTargetTemp(values.targetTemp as any);
+    if (values.wattsPerM2 !== undefined) setWattsPerM2(values.wattsPerM2 as any);
+    if (values.zones !== undefined) setZones(values.zones as any);
+    if (values.newZoneType !== undefined) setNewZoneType(values.newZoneType as any);
+    if (values.newZoneArea !== undefined) setNewZoneArea(values.newZoneArea as any);
+    if (values.generatorType !== undefined) setGeneratorType(values.generatorType as any);
+    if (values.emitterType !== undefined) setEmitterType(values.emitterType as any);
+    if (values.floorPitch !== undefined) setFloorPitch(values.floorPitch as any);
+    if (values.floorPipeType !== undefined) setFloorPipeType(values.floorPipeType as any);
+    if (values.vmcType !== undefined) setVmcType(values.vmcType as any);
+    if (values.ductType !== undefined) setDuctType(values.ductType as any);
+    if (values.useInsulatedDucts !== undefined) setUseInsulatedDucts(values.useInsulatedDucts as any);
+    if (values.prices !== undefined) setPrices(values.prices as any);
+  }, [initialSnapshot]);
+
+  const snapshot: CalculatorSnapshot = {
+    version: 1,
+    calculatorType: CalculatorType.HVAC,
+    values: {
+      step,
+      proMode,
+      insulationLevel,
+      ceilingHeight,
+      targetTemp,
+      wattsPerM2,
+      zones,
+      newZoneType,
+      newZoneArea,
+      generatorType,
+      emitterType,
+      floorPitch,
+      floorPipeType,
+      vmcType,
+      ductType,
+      useInsulatedDucts,
+      prices,
+    },
+  };
+
 
   type PricesKey = keyof typeof prices;
   const updatePrice = (key: PricesKey, val: string) => {
@@ -582,6 +632,7 @@ export const HvacCalculator: React.FC<Props> = ({ onCalculate }) => {
   // Pass to parent
   useEffect(() => {
     onCalculate({
+      snapshot,
       summary: `${(calculationData.totalPower / 1000).toFixed(1)} kW`,
       details: [
         { label: t("struct.common.surface", { defaultValue: "Area" }), value: calculationData.totalArea, unit: "m²" },

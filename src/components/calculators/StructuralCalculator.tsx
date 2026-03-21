@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation } from "react-router-dom";
 
-import { CalculatorType, CalculationResult, Unit, ExcavationItem } from "@/types";
+import { CalculatorType, CalculationResult, Unit, ExcavationItem, CalculatorSnapshot } from "@/types";
 import { DEFAULT_PRICES, SOIL_PROPERTIES, getWallUnitPriceKey } from "@/constants";
 import { getUnitPrice } from "@/services/materialsService";
 
@@ -38,6 +38,7 @@ interface Props {
   initialArea?: number;
   initialMode?: "groundwork" | "foundations" | "walls";
   hideTabs?: boolean;
+  initialSnapshot?: CalculatorSnapshot;
 }
 
 // -------------------------
@@ -115,6 +116,7 @@ export const StructuralCalculator: React.FC<Props> = ({
   initialArea,
   initialMode = "groundwork",
   hideTabs = false,
+  initialSnapshot
 }) => {
   const { t, i18n } = useTranslation();
   const location = useLocation();
@@ -325,6 +327,163 @@ export const StructuralCalculator: React.FC<Props> = ({
 
   // Mortar mode (for non-stepoc walls): ready-mix bags vs. raw materials (cement + sand)
   const [wUseReadyMortar, setWUseReadyMortar] = useState<boolean>(true);
+
+  useEffect(() => {
+    const values = initialSnapshot?.values as Record<string, any> | undefined;
+    if (!values) return;
+    if (values.mode !== undefined) setMode(values.mode as any);
+    if (values.step !== undefined) setStep(values.step as any);
+    if (values.proMode !== undefined) setProMode(values.proMode as any);
+    if (values.dimL !== undefined) setDimL(values.dimL as any);
+    if (values.dimW !== undefined) setDimW(values.dimW as any);
+    if (values.perimeter !== undefined) setPerimeter(values.perimeter as any);
+    if (values.surface !== undefined) setSurface(values.surface as any);
+    if (values.gwMargin !== undefined) setGwMargin(values.gwMargin as any);
+    if (values.gwStripDepth !== undefined) setGwStripDepth(values.gwStripDepth as any);
+    if (values.gwKeepTopsoil !== undefined) setGwKeepTopsoil(values.gwKeepTopsoil as any);
+    if (values.gwDetailedExcavs !== undefined) setGwDetailedExcavs(values.gwDetailedExcavs as any);
+    if (values.newExType !== undefined) setNewExType(values.newExType as any);
+    if (values.newExL !== undefined) setNewExL(values.newExL as any);
+    if (values.newExW !== undefined) setNewExW(values.newExW as any);
+    if (values.newExD !== undefined) setNewExD(values.newExD as any);
+    if (values.newExSlope !== undefined) setNewExSlope(values.newExSlope as any);
+    if (values.gwSoilType !== undefined) setGwSoilType(values.gwSoilType as any);
+    if (values.gwReuseOnSite !== undefined) setGwReuseOnSite(values.gwReuseOnSite as any);
+    if (values.gwTruckCap !== undefined) setGwTruckCap(values.gwTruckCap as any);
+    if (values.gwDiggerDays !== undefined) setGwDiggerDays(values.gwDiggerDays as any);
+    if (values.gwFillType !== undefined) setGwFillType(values.gwFillType as any);
+    if (values.gwFillVolume !== undefined) setGwFillVolume(values.gwFillVolume as any);
+    if (values.gwCompactorDays !== undefined) setGwCompactorDays(values.gwCompactorDays as any);
+    if (values.gwDifficultAccess !== undefined) setGwDifficultAccess(values.gwDifficultAccess as any);
+    if (values.gwPrices !== undefined) setGwPrices(values.gwPrices as any);
+    if (values.fdHasStrip !== undefined) setFdHasStrip(values.fdHasStrip as any);
+    if (values.fdHasPads !== undefined) setFdHasPads(values.fdHasPads as any);
+    if (values.fdHasRaft !== undefined) setFdHasRaft(values.fdHasRaft as any);
+    if (values.fdCleanConcrete !== undefined) setFdCleanConcrete(values.fdCleanConcrete as any);
+    if (values.fdStripL !== undefined) setFdStripL(values.fdStripL as any);
+    if (values.fdStripW !== undefined) setFdStripW(values.fdStripW as any);
+    if (values.fdStripH !== undefined) setFdStripH(values.fdStripH as any);
+    if (values.fdRaftThick !== undefined) setFdRaftThick(values.fdRaftThick as any);
+    if (values.fdPads !== undefined) setFdPads(values.fdPads as any);
+    if (values.fdExcavEnabled !== undefined) setFdExcavEnabled(values.fdExcavEnabled as any);
+    if (values.fdDepth !== undefined) setFdDepth(values.fdDepth as any);
+    if (values.fdTrenchMargin !== undefined) setFdTrenchMargin(values.fdTrenchMargin as any);
+    if (values.fdSoilId !== undefined) setFdSoilId(values.fdSoilId as any);
+    if (values.fdEvac !== undefined) setFdEvac(values.fdEvac as any);
+    if (values.fdRebarStripType !== undefined) setFdRebarStripType(values.fdRebarStripType as any);
+    if (values.fdRebarRaftType !== undefined) setFdRebarRaftType(values.fdRebarRaftType as any);
+    if (values.fdFormwork !== undefined) setFdFormwork(values.fdFormwork as any);
+    if (values.fdPolyane !== undefined) setFdPolyane(values.fdPolyane as any);
+    if (values.fdDrain !== undefined) setFdDrain(values.fdDrain as any);
+    if (values.fdPrices !== undefined) setFdPrices(values.fdPrices as any);
+    if (values.wInputMode !== undefined) setWInputMode(values.wInputMode as any);
+    if (values.wPerimeter !== undefined) setWPerimeter(values.wPerimeter as any);
+    if (values.wHeight !== undefined) setWHeight(values.wHeight as any);
+    if (values.wGables !== undefined) setWGables(values.wGables as any);
+    if (values.wGableHeight !== undefined) setWGableHeight(values.wGableHeight as any);
+    if (values.wGableCount !== undefined) setWGableCount(values.wGableCount as any);
+    if (values.wSegments !== undefined) setWSegments(values.wSegments as any);
+    if (values.newSegL !== undefined) setNewSegL(values.newSegL as any);
+    if (values.newSegH !== undefined) setNewSegH(values.newSegH as any);
+    if (values.newSegLabel !== undefined) setNewSegLabel(values.newSegLabel as any);
+    if (values.wWallFamily !== undefined) setWWallFamily(values.wWallFamily as any);
+    if (values.wWallBlockId !== undefined) setWWallBlockId(values.wWallBlockId as any);
+    if (values.wWastePct !== undefined) setWWastePct(values.wWastePct as any);
+    if (values.wOpenings !== undefined) setWOpenings(values.wOpenings as any);
+    if (values.newWOpType !== undefined) setNewWOpType(values.newWOpType as any);
+    if (values.newWOpW !== undefined) setNewWOpW(values.newWOpW as any);
+    if (values.newWOpH !== undefined) setNewWOpH(values.newWOpH as any);
+    if (values.newWOpReveal !== undefined) setNewWOpReveal(values.newWOpReveal as any);
+    if (values.wLintelType !== undefined) setWLintelType(values.wLintelType as any);
+    if (values.wChainageHoriz !== undefined) setWChainageHoriz(values.wChainageHoriz as any);
+    if (values.wChainageInter !== undefined) setWChainageInter(values.wChainageInter as any);
+    if (values.wChainageVert !== undefined) setWChainageVert(values.wChainageVert as any);
+    if (values.wCoatingExt !== undefined) setWCoatingExt(values.wCoatingExt as any);
+    if (values.wCoatingInt !== undefined) setWCoatingInt(values.wCoatingInt as any);
+    if (values.wScaffold !== undefined) setWScaffold(values.wScaffold as any);
+    if (values.wPrices !== undefined) setWPrices(values.wPrices as any);
+    if (values.wUseReadyMortar !== undefined) setWUseReadyMortar(values.wUseReadyMortar as any);
+  }, [initialSnapshot]);
+
+  const snapshot: CalculatorSnapshot = {
+    version: 1,
+    calculatorType: mode === "groundwork" ? CalculatorType.GROUNDWORK : mode === "walls" ? CalculatorType.WALLS : CalculatorType.STRUCTURAL,
+    values: {
+      mode,
+      step,
+      proMode,
+      dimL,
+      dimW,
+      perimeter,
+      surface,
+      gwMargin,
+      gwStripDepth,
+      gwKeepTopsoil,
+      gwDetailedExcavs,
+      newExType,
+      newExL,
+      newExW,
+      newExD,
+      newExSlope,
+      gwSoilType,
+      gwReuseOnSite,
+      gwTruckCap,
+      gwDiggerDays,
+      gwFillType,
+      gwFillVolume,
+      gwCompactorDays,
+      gwDifficultAccess,
+      gwPrices,
+      fdHasStrip,
+      fdHasPads,
+      fdHasRaft,
+      fdCleanConcrete,
+      fdStripL,
+      fdStripW,
+      fdStripH,
+      fdRaftThick,
+      fdPads,
+      fdExcavEnabled,
+      fdDepth,
+      fdTrenchMargin,
+      fdSoilId,
+      fdEvac,
+      fdRebarStripType,
+      fdRebarRaftType,
+      fdFormwork,
+      fdPolyane,
+      fdDrain,
+      fdPrices,
+      wInputMode,
+      wPerimeter,
+      wHeight,
+      wGables,
+      wGableHeight,
+      wGableCount,
+      wSegments,
+      newSegL,
+      newSegH,
+      newSegLabel,
+      wWallFamily,
+      wWallBlockId,
+      wWastePct,
+      wOpenings,
+      newWOpType,
+      newWOpW,
+      newWOpH,
+      newWOpReveal,
+      wLintelType,
+      wChainageHoriz,
+      wChainageInter,
+      wChainageVert,
+      wCoatingExt,
+      wCoatingInt,
+      wScaffold,
+      wPrices,
+      wUseReadyMortar,
+    },
+  };
+
 
   // -------------------------
   // Pricing helpers (walls)
@@ -1458,6 +1617,7 @@ export const StructuralCalculator: React.FC<Props> = ({
   // Pass results to parent
   useEffect(() => {
     onCalculate({
+      snapshot,
       summary: calculationData.summary || tr("calculator.title_fallback"),
       details: calculationData.details || [],
       materials: calculationData.materials || [],

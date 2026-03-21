@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { CalculatorType, CalculationResult, Unit } from "../../../types";
+import { CalculatorType, CalculationResult, Unit, CalculatorSnapshot } from "../../../types";
 import { TILE_PATTERNS } from "../../constants";
 import { getUnitPrice } from "../../services/materialsService";
 import {
@@ -31,6 +31,7 @@ interface TileZone {
 
 interface Props {
   onCalculate: (result: CalculationResult) => void;
+  initialSnapshot?: CalculatorSnapshot;
 }
 
 const toNum = (v: unknown, fallback = 0) => {
@@ -40,7 +41,9 @@ const toNum = (v: unknown, fallback = 0) => {
 const round2 = (n: number) => Math.round((n + Number.EPSILON) * 100) / 100;
 const clamp = (n: number, min: number, max: number) => Math.min(max, Math.max(min, n));
 
-export const TileCalculator: React.FC<Props> = ({ onCalculate }) => {
+export const TileCalculator: React.FC<Props> = ({ onCalculate,
+  initialSnapshot
+}) => {
   const { t } = useTranslation();
 
   const [step, setStep] = useState(1);
@@ -141,6 +144,71 @@ export const TileCalculator: React.FC<Props> = ({ onCalculate }) => {
 
   // Auto double gluing suggestion (large format) — non destructive
   const [autoDoubleSuggested, setAutoDoubleSuggested] = useState(false);
+
+  useEffect(() => {
+    const values = initialSnapshot?.values as Record<string, any> | undefined;
+    if (!values) return;
+    if (values.step !== undefined) setStep(values.step as any);
+    if (values.proMode !== undefined) setProMode(values.proMode as any);
+    if (values.zones !== undefined) setZones(values.zones as any);
+    if (values.newZoneType !== undefined) setNewZoneType(values.newZoneType as any);
+    if (values.newZoneLabel !== undefined) setNewZoneLabel(values.newZoneLabel as any);
+    if (values.newZoneArea !== undefined) setNewZoneArea(values.newZoneArea as any);
+    if (values.newZonePerim !== undefined) setNewZonePerim(values.newZonePerim as any);
+    if (values.newZoneWet !== undefined) setNewZoneWet(values.newZoneWet as any);
+    if (values.newZoneSubstrate !== undefined) setNewZoneSubstrate(values.newZoneSubstrate as any);
+    if (values.tileLength !== undefined) setTileLength(values.tileLength as any);
+    if (values.tileWidth !== undefined) setTileWidth(values.tileWidth as any);
+    if (values.tileThickness !== undefined) setTileThickness(values.tileThickness as any);
+    if (values.patternId !== undefined) setPatternId(values.patternId as any);
+    if (values.boxSize !== undefined) setBoxSize(values.boxSize as any);
+    if (values.wastePct !== undefined) setWastePct(values.wastePct as any);
+    if (values.glueType !== undefined) setGlueType(values.glueType as any);
+    if (values.combSize !== undefined) setCombSize(values.combSize as any);
+    if (values.doubleGluing !== undefined) setDoubleGluing(values.doubleGluing as any);
+    if (values.jointWidth !== undefined) setJointWidth(values.jointWidth as any);
+    if (values.jointType !== undefined) setJointType(values.jointType as any);
+    if (values.useLevelingSystem !== undefined) setUseLevelingSystem(values.useLevelingSystem as any);
+    if (values.useSkirting !== undefined) setUseSkirting(values.useSkirting as any);
+    if (values.useWaterproofing !== undefined) setUseWaterproofing(values.useWaterproofing as any);
+    if (values.usePrimer !== undefined) setUsePrimer(values.usePrimer as any);
+    if (values.prices !== undefined) setPrices(values.prices as any);
+    if (values.autoDoubleSuggested !== undefined) setAutoDoubleSuggested(values.autoDoubleSuggested as any);
+  }, [initialSnapshot]);
+
+  const snapshot: CalculatorSnapshot = {
+    version: 1,
+    calculatorType: CalculatorType.TILES,
+    values: {
+      step,
+      proMode,
+      zones,
+      newZoneType,
+      newZoneLabel,
+      newZoneArea,
+      newZonePerim,
+      newZoneWet,
+      newZoneSubstrate,
+      tileLength,
+      tileWidth,
+      tileThickness,
+      patternId,
+      boxSize,
+      wastePct,
+      glueType,
+      combSize,
+      doubleGluing,
+      jointWidth,
+      jointType,
+      useLevelingSystem,
+      useSkirting,
+      useWaterproofing,
+      usePrimer,
+      prices,
+      autoDoubleSuggested,
+    },
+  };
+
   useEffect(() => {
     const isLarge = Math.max(tileLength, tileWidth) >= 45;
     if (isLarge && !doubleGluing) setAutoDoubleSuggested(true);
@@ -485,6 +553,7 @@ export const TileCalculator: React.FC<Props> = ({ onCalculate }) => {
   // Pass results
   useEffect(() => {
     onCalculate({
+      snapshot,
       summary: t("calc.tile.summary", {
         area: calculationData.totalArea.toFixed(1),
         defaultValue: `${calculationData.totalArea.toFixed(1)} m²`,

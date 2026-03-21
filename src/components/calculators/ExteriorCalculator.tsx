@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { CalculatorType, CalculationResult, Unit } from "../../../types";
+import { CalculatorType, CalculationResult, Unit, CalculatorSnapshot } from "../../../types";
 import { MATERIAL_METADATA, DEFAULT_PRICES } from "../../constants";
 import { getUnitPrice, incrementUsage } from "../../services/materialsService";
 import {
@@ -100,11 +100,14 @@ interface ExtGardenItem {
 
 interface Props {
   onCalculate: (result: CalculationResult) => void;
+  initialSnapshot?: CalculatorSnapshot;
 }
 
 const fmt2 = (n: number) => (Number.isFinite(n) ? Number(n.toFixed(2)) : 0);
 
-export const ExteriorCalculator: React.FC<Props> = ({ onCalculate }) => {
+export const ExteriorCalculator: React.FC<Props> = ({ onCalculate,
+  initialSnapshot
+}) => {
   const { t } = useTranslation();
 
   const [step, setStep] = useState(1);
@@ -690,6 +693,7 @@ export const ExteriorCalculator: React.FC<Props> = ({ onCalculate }) => {
 
   useEffect(() => {
     onCalculate({
+      snapshot,
       summary: t("calc.exterior.summary", { defaultValue: "Exterior estimate" }),
       details: [
         { label: t("calc.exterior.kpi.zones", { defaultValue: "Sols" }), value: zones.length, unit: t("calc.exterior.units.zones", { defaultValue: "zones" }) },
@@ -714,6 +718,65 @@ export const ExteriorCalculator: React.FC<Props> = ({ onCalculate }) => {
   const PriceEditor: React.FC = () => {
     const [editingKey, setEditingKey] = useState<string | null>(null);
     const [editValue, setEditValue] = useState("");
+
+  useEffect(() => {
+    const values = initialSnapshot?.values as Record<string, any> | undefined;
+    if (!values) return;
+    if (values.step !== undefined) setStep(values.step as any);
+    if (values.proMode !== undefined) setProMode(values.proMode as any);
+    if (values.zones !== undefined) setZones(values.zones as any);
+    if (values.walls !== undefined) setWalls(values.walls as any);
+    if (values.items !== undefined) setItems(values.items as any);
+    if (values.networks !== undefined) setNetworks(values.networks as any);
+    if (values.gardenItems !== undefined) setGardenItems(values.gardenItems as any);
+    if (values.overrides !== undefined) setOverrides(values.overrides as any);
+    if (values.newZoneLabel !== undefined) setNewZoneLabel(values.newZoneLabel as any);
+    if (values.newZoneArea !== undefined) setNewZoneArea(values.newZoneArea as any);
+    if (values.newZoneType !== undefined) setNewZoneType(values.newZoneType as any);
+    if (values.wallLen !== undefined) setWallLen(values.wallLen as any);
+    if (values.wallHeight !== undefined) setWallHeight(values.wallHeight as any);
+    if (values.wallWidth !== undefined) setWallWidth(values.wallWidth as any);
+    if (values.fenceLen !== undefined) setFenceLen(values.fenceLen as any);
+    if (values.fenceType !== undefined) setFenceType(values.fenceType as any);
+    if (values.netLen !== undefined) setNetLen(values.netLen as any);
+    if (values.netType !== undefined) setNetType(values.netType as any);
+    if (values.lawnArea !== undefined) setLawnArea(values.lawnArea as any);
+    if (values.plantCount !== undefined) setPlantCount(values.plantCount as any);
+    if (values.plantType !== undefined) setPlantType(values.plantType as any);
+    if (values.editingKey !== undefined) setEditingKey(values.editingKey as any);
+    if (values.editValue !== undefined) setEditValue(values.editValue as any);
+  }, [initialSnapshot]);
+
+  const snapshot: CalculatorSnapshot = {
+    version: 1,
+    calculatorType: CalculatorType.EXTERIOR,
+    values: {
+      step,
+      proMode,
+      zones,
+      walls,
+      items,
+      networks,
+      gardenItems,
+      overrides,
+      newZoneLabel,
+      newZoneArea,
+      newZoneType,
+      wallLen,
+      wallHeight,
+      wallWidth,
+      fenceLen,
+      fenceType,
+      netLen,
+      netType,
+      lawnArea,
+      plantCount,
+      plantType,
+      editingKey,
+      editValue,
+    },
+  };
+
 
     const startEdit = (key: string, current: number) => {
       setEditingKey(key);
