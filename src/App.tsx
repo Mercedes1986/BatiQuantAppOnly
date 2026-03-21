@@ -30,6 +30,7 @@ import { QuickToolsPage } from "@/pages/QuickToolsPage";
 
 // Documents
 import { QuoteEditorPage } from "@/pages/documents/QuoteEditorPage";
+import { QuotesListPage } from "@/pages/documents/QuotesListPage";
 import { InvoiceEditorPage } from "@/pages/documents/InvoiceEditorPage";
 import { PrintDocumentPage } from "@/pages/documents/PrintDocumentPage";
 
@@ -622,6 +623,7 @@ const App: React.FC = () => {
             <Route path="materials" element={<MaterialsPage />} />
             <Route path="settings" element={<SettingsPage />} />
             <Route path="calculator" element={<ProjectCalculatorWrapper />} />
+            <Route path="quotes" element={<QuotesListPage />} />
             <Route path="quotes/:id" element={<QuoteEditorPage />} />
             <Route path="invoices/:id" element={<InvoiceEditorPage />} />
           </Route>

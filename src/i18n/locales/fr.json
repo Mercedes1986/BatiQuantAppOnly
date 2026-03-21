@@ -114,12 +114,17 @@
         "title": "Calculs rapides chantier",
         "desc": "Accédez aux calculateurs rapides : conversions, pentes, conditionnements et contrôles express.",
         "badge": "RAPIDE"
+      },
+      "quotes": {
+        "title": "Mes devis",
+        "desc": "Consultez tous les devis créés depuis vos projets et vos chantiers au même endroit."
       }
     },
     "tools": {
       "title": "Tous les outils (accès direct)",
       "subtitle": "Cliquez sur un outil pour ouvrir le calculateur directement."
-    }
+    },
+    "quotes_shortcut": "Mes devis"
   },
   "struct": {
     "tabs": {
@@ -1938,7 +1943,8 @@
     "tabs": {
       "quote": "Devis",
       "steps": "Étapes"
-    }
+    },
+    "all_quotes": "Tous les devis"
   },
   "hvac": {
     "area_placeholder": "Surface (m²)",
@@ -2386,7 +2392,8 @@
     "subtitle": "Sauvegardes issues des calculateurs (calculs unitaires)",
     "total_estimated": "Total estimé",
     "create_new": "Créer un calcul",
-    "create_new_hint": "Choisissez un calculateur et sauvegardez le résultat ici"
+    "create_new_hint": "Choisissez un calculateur et sauvegardez le résultat ici",
+    "all_quotes": "Tous les devis"
   },
   "quote": {
     "addline": {
@@ -2902,5 +2909,22 @@
     },
     "title": "Calculs rapides chantier",
     "subtitle": "Micro-outils pour conversions, surfaces, quantités, terrasse bois, ossature placo, carrelage détaillé, toiture, clôture, gravier / remblai et isolation."
+  },
+  "quotes": {
+    "title": "Mes devis",
+    "subtitle": "Retrouvez au même endroit tous les devis créés depuis vos projets et vos chantiers.",
+    "back_to_menu": "Retour au menu",
+    "search": "Rechercher par numéro de devis, client ou projet...",
+    "empty": "Aucun devis n’a encore été créé.",
+    "empty_search": "Aucun devis ne correspond à votre recherche.",
+    "created_on": "Date",
+    "project": "Projet",
+    "no_project": "Non lié",
+    "no_client": "Client non renseigné",
+    "stats": {
+      "total": "Total devis",
+      "accepted": "Acceptés",
+      "total_amount": "Montant total"
+    }
   }
 }

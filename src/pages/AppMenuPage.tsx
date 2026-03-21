@@ -2,7 +2,6 @@ import React, { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   LayoutGrid,
-  ArrowLeft,
   ShieldCheck,
   HardHat,
   FolderOpen,
@@ -10,8 +9,10 @@ import {
   Settings as SettingsIcon,
   ChevronRight,
   Sparkles,
+  FileText,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { getQuotes } from "../services/documentsStorage";
 
 type SectionCard = {
   title: string;
@@ -21,7 +22,11 @@ type SectionCard = {
   tone: string;
 };
 
-const MainCard: React.FC<{ card: SectionCard; onClick: () => void }> = ({ card, onClick }) => (
+const MainCard: React.FC<{
+  card: SectionCard;
+  onClick: () => void;
+  ctaLabel: string;
+}> = ({ card, onClick, ctaLabel }) => (
   <button
     onClick={onClick}
     type="button"
@@ -31,9 +36,10 @@ const MainCard: React.FC<{ card: SectionCard; onClick: () => void }> = ({ card, 
       <div className={`flex h-12 w-12 items-center justify-center rounded-2xl ${card.tone}`}>{card.icon}</div>
       <ChevronRight size={18} className="text-slate-400 transition-transform group-hover:translate-x-0.5" />
     </div>
+
     <div className="text-[30px] font-extrabold leading-none text-slate-900 sm:text-[32px]">{card.title}</div>
     <p className="mt-3 text-sm leading-relaxed text-slate-500">{card.desc}</p>
-    <div className="mt-5 text-sm font-extrabold text-blue-700">Open</div>
+    <div className="mt-5 text-sm font-extrabold text-blue-700">{ctaLabel}</div>
   </button>
 );
 
@@ -45,8 +51,8 @@ const SecondaryCard: React.FC<{ card: SectionCard; onClick: () => void }> = ({ c
   >
     <div className={`flex h-10 w-10 items-center justify-center rounded-2xl ${card.tone}`}>{card.icon}</div>
     <div className="min-w-0 flex-1">
-      <div className="text-sm font-extrabold text-slate-900 truncate">{card.title}</div>
-      <div className="text-xs text-slate-500 line-clamp-1">{card.desc}</div>
+      <div className="truncate text-sm font-extrabold text-slate-900">{card.title}</div>
+      <div className="line-clamp-1 text-xs text-slate-500">{card.desc}</div>
     </div>
     <ChevronRight size={18} className="text-slate-400" />
   </button>
@@ -55,33 +61,51 @@ const SecondaryCard: React.FC<{ card: SectionCard; onClick: () => void }> = ({ c
 export const AppMenuPage: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const quotesCount = getQuotes().length;
 
   const mainCards: SectionCard[] = useMemo(
     () => [
       {
         title: t("menu.cards.quicktools.title", { defaultValue: "Quick tools" }),
-        desc: t("menu.cards.quicktools.desc", { defaultValue: "Dedicated quick calculators: conversions, slopes, packaging and other fast checks." }),
+        desc: t("menu.cards.quicktools.desc", {
+          defaultValue: "Dedicated quick calculators: conversions, slopes, packaging and other fast checks.",
+        }),
         path: "/app/quick-tools",
         icon: <Sparkles size={18} className="text-blue-700" />,
         tone: "bg-blue-50 text-blue-700 border border-blue-100",
       },
       {
         title: t("menu.cards.house.title", { defaultValue: "Site" }),
-        desc: t("menu.cards.house.desc", { defaultValue: "Create a site and save results step-by-step (full tracking)." }),
+        desc: t("menu.cards.house.desc", {
+          defaultValue: "Create a site and save results step-by-step (full tracking).",
+        }),
         path: "/app/house",
         icon: <HardHat size={18} className="text-amber-700" />,
         tone: "bg-amber-50 text-amber-700 border border-amber-100",
       },
       {
         title: t("menu.cards.projects.title", { defaultValue: "Projects" }),
-        desc: t("menu.cards.projects.desc", { defaultValue: "Find your saved calculations (estimates, materials, costs)." }),
+        desc: t("menu.cards.projects.desc", {
+          defaultValue: "Find your saved calculations (estimates, materials, costs).",
+        }),
         path: "/app/projects",
         icon: <FolderOpen size={18} className="text-indigo-700" />,
         tone: "bg-indigo-50 text-indigo-700 border border-indigo-100",
       },
       {
+        title: t("menu.cards.quotes.title", { defaultValue: "My quotes" }),
+        desc: t("menu.cards.quotes.desc", {
+          defaultValue: "Consult every quote you created from projects and sites in one place.",
+        }),
+        path: "/app/quotes",
+        icon: <FileText size={18} className="text-rose-700" />,
+        tone: "bg-rose-50 text-rose-700 border border-rose-100",
+      },
+      {
         title: t("menu.cards.materials.title", { defaultValue: "Materials & Pricing" }),
-        desc: t("menu.cards.materials.desc", { defaultValue: "Adjust prices, create custom materials, labor + data." }),
+        desc: t("menu.cards.materials.desc", {
+          defaultValue: "Adjust prices, create custom materials, labor + data.",
+        }),
         path: "/app/materials",
         icon: <Boxes size={18} className="text-emerald-700" />,
         tone: "bg-emerald-50 text-emerald-700 border border-emerald-100",
@@ -94,14 +118,18 @@ export const AppMenuPage: React.FC = () => {
     () => [
       {
         title: t("menu.cards.settings.title", { defaultValue: "Settings" }),
-        desc: t("menu.cards.settings.desc", { defaultValue: "Configure the app (options, preferences, display)." }),
+        desc: t("menu.cards.settings.desc", {
+          defaultValue: "Configure the app (options, preferences, display).",
+        }),
         path: "/app/settings",
         icon: <SettingsIcon size={18} className="text-violet-700" />,
         tone: "bg-violet-50 text-violet-700 border border-violet-100",
       },
       {
         title: t("menu.cards.backup.title", { defaultValue: "JSON backup" }),
-        desc: t("menu.cards.backup.desc", { defaultValue: "Export/import your data to avoid any loss (recommended)." }),
+        desc: t("menu.cards.backup.desc", {
+          defaultValue: "Export/import your data to avoid any loss (recommended).",
+        }),
         path: "/app/materials?tab=data",
         icon: <ShieldCheck size={18} className="text-slate-700" />,
         tone: "bg-slate-50 text-slate-700 border border-slate-100",
@@ -114,7 +142,7 @@ export const AppMenuPage: React.FC = () => {
     <div className="app-shell app-shell--menu min-h-screen bg-transparent pb-24">
       <div className="page-narrow">
         <section className="glass-panel rounded-[32px] p-4 sm:p-5">
-          <div className="flex items-center justify-between gap-3">
+          <div className="flex items-start justify-between gap-4">
             <div className="flex min-w-0 items-center gap-3">
               <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-blue-600 text-white shadow-[0_14px_30px_rgba(37,99,235,0.28)]">
                 <LayoutGrid size={20} />
@@ -123,26 +151,32 @@ export const AppMenuPage: React.FC = () => {
                 <h1 className="truncate text-[30px] font-extrabold tracking-tight text-slate-900 sm:text-[32px]">
                   {t("menu.title", { defaultValue: "App menu" })}
                 </h1>
-                <p className="truncate text-sm text-slate-500">
+                <p className="text-sm text-slate-500">
                   {t("menu.subtitle", { defaultValue: "Quick access to sections + tools" })}
                 </p>
               </div>
             </div>
 
             <button
-              onClick={() => navigate("/app/projects")}
+              onClick={() => navigate("/app/quotes")}
               className="inline-flex shrink-0 items-center rounded-[22px] border border-white/70 bg-white/70 px-4 py-3 text-sm font-extrabold text-slate-700 shadow-[0_12px_28px_rgba(15,23,42,0.06)] backdrop-blur-xl transition-colors hover:bg-white/85"
               type="button"
             >
-              <ArrowLeft size={16} className="mr-2" />
-              {t("menu.back_dashboard", { defaultValue: "Dashboard" })}
+              <FileText size={16} className="mr-2" />
+              {t("menu.quotes_shortcut", { defaultValue: "My quotes" })}
+              {quotesCount > 0 ? ` (${quotesCount})` : ""}
             </button>
           </div>
         </section>
 
         <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
           {mainCards.map((card) => (
-            <MainCard key={card.path} card={card} onClick={() => navigate(card.path)} />
+            <MainCard
+              key={card.path}
+              card={card}
+              onClick={() => navigate(card.path)}
+              ctaLabel={t("menu.open", { defaultValue: "Open" })}
+            />
           ))}
         </div>
 

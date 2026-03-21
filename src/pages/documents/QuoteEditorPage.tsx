@@ -43,7 +43,7 @@ export const QuoteEditorPage: React.FC = () => {
 
     const q = getQuote(id);
     if (q) setQuote(q);
-    else navigate("/app/house");
+    else navigate("/app/quotes");
 
     setCompany(getCompanyProfile());
   }, [id, navigate]);
@@ -78,7 +78,7 @@ export const QuoteEditorPage: React.FC = () => {
     if (!ok) return;
 
     deleteQuote(quote.id);
-    navigate(-1);
+    navigate("/app/quotes");
   }, [navigate, quote, t]);
 
   const handleConvertToInvoice = useCallback(() => {
@@ -127,7 +127,7 @@ export const QuoteEditorPage: React.FC = () => {
           <div className="flex items-center min-w-0">
             <button
               type="button"
-              onClick={() => navigate(-1)}
+              onClick={() => navigate("/app/quotes")}
               className="mr-3 text-slate-500 hover:text-blue-600 p-1 rounded hover:bg-slate-100 transition-colors"
               aria-label={t("common.back", { defaultValue: "Retour" })}
             >

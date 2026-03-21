@@ -98,6 +98,10 @@ export const HouseProjectPage: React.FC = () => {
     setSearchParams({}, { replace: true });
   };
 
+  const openAllQuotes = () => {
+    navigate("/app/quotes");
+  };
+
   const projectQuotes = useMemo(() => {
     if (!currentProject) return [];
     return getQuotes()
@@ -472,20 +476,31 @@ export const HouseProjectPage: React.FC = () => {
           {activeTab === "quote" && (
             <div className="space-y-8 animate-in slide-in-from-right-4">
               <section>
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="font-extrabold text-slate-800 text-lg flex items-center">
+                <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <h3 className="flex items-center text-lg font-extrabold text-slate-800">
                     <FileCheck className="mr-2 text-emerald-600" size={20} />{" "}
                     {t("house.official_docs", { defaultValue: "Official documents" })}
                   </h3>
 
-                  <button
-                    onClick={handleStartOfficialQuote}
-                    className="bg-emerald-600 text-white px-3 py-1.5 rounded-lg text-sm font-extrabold shadow-sm hover:bg-emerald-700 transition-colors flex items-center"
-                    type="button"
-                  >
-                    <Plus size={16} className="mr-1" />{" "}
-                    {t("house.generate_quote", { defaultValue: "Generate quote" })}
-                  </button>
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      onClick={openAllQuotes}
+                      className="flex items-center rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm font-extrabold text-slate-700 shadow-sm transition-colors hover:border-blue-200 hover:text-blue-700"
+                      type="button"
+                    >
+                      <FileText size={16} className="mr-1" />
+                      {t("house.all_quotes", { defaultValue: "All quotes" })}
+                    </button>
+
+                    <button
+                      onClick={handleStartOfficialQuote}
+                      className="flex items-center rounded-lg bg-emerald-600 px-3 py-1.5 text-sm font-extrabold text-white shadow-sm transition-colors hover:bg-emerald-700"
+                      type="button"
+                    >
+                      <Plus size={16} className="mr-1" />{" "}
+                      {t("house.generate_quote", { defaultValue: "Generate quote" })}
+                    </button>
+                  </div>
                 </div>
 
                 {projectQuotes.length > 0 ? (
@@ -564,15 +579,26 @@ export const HouseProjectPage: React.FC = () => {
     <div className="app-shell app-shell--house min-h-screen bg-transparent p-4 pb-20">
       <div className="max-w-6xl mx-auto space-y-4">
       <section className="rounded-[28px] border border-slate-200/80 bg-white/72 backdrop-blur-md shadow-sm p-5 md:p-6">
-      <div className="mb-3">
-        <h1 className="text-2xl font-extrabold text-slate-800">
-          {t("house.my_sites", { defaultValue: "My sites (full estimate)" })}
-        </h1>
-        <p className="text-sm text-slate-500 mt-1">
-          {t("house.my_sites_subtitle", {
-            defaultValue: "Create a site and save results step-by-step (full tracking).",
-          })}
-        </p>
+      <div className="mb-3 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+        <div>
+          <h1 className="text-2xl font-extrabold text-slate-800">
+            {t("house.my_sites", { defaultValue: "My sites (full estimate)" })}
+          </h1>
+          <p className="mt-1 text-sm text-slate-500">
+            {t("house.my_sites_subtitle", {
+              defaultValue: "Create a site and save results step-by-step (full tracking).",
+            })}
+          </p>
+        </div>
+
+        <button
+          onClick={openAllQuotes}
+          className="inline-flex items-center justify-center rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-extrabold text-slate-700 shadow-sm transition-all hover:border-blue-200 hover:text-blue-700"
+          type="button"
+        >
+          <FileText size={18} className="mr-2" />
+          {t("house.all_quotes", { defaultValue: "All quotes" })}
+        </button>
       </div>
 
       {/* HERO CTA (like Projects) */}

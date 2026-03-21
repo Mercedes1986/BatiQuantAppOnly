@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Trash2,
   Printer,
@@ -9,15 +9,17 @@ import {
   Plus,
   Calculator,
   Package,
+  FileStack,
 } from "lucide-react";
-import { getProjects, deleteProject } from "../services/storage";
-import { Project, ClientInfo } from "../types";
 import { PieChart as RePieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
+import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+
+import { getProjects, deleteProject } from "../services/storage";
 import { createQuoteFromSimpleProject } from "../services/documentLogic";
 import { getCompanyProfile } from "../services/documentsStorage";
-import { useNavigate } from "react-router-dom";
+import { Project, ClientInfo } from "../types";
 import { ClientModal } from "../components/documents/ClientModal";
-import { useTranslation } from "react-i18next";
 
 const CHART_COLORS = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6"] as const;
 
@@ -101,22 +103,31 @@ export const ProjectsPage: React.FC = () => {
     }));
 
     return (
-      <div className="pb-20 bg-transparent min-h-screen relative">
-        <div className="sticky top-0 z-30 border-b border-slate-200/80 bg-white/80 backdrop-blur-xl shadow-sm no-print">
-          <div className="mx-auto max-w-6xl px-4 py-3 flex items-center justify-between gap-3">
+      <div className="relative min-h-screen bg-transparent pb-20">
+        <div className="sticky top-0 z-30 border-b border-slate-200/80 bg-white/80 shadow-sm backdrop-blur-xl no-print">
+          <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3">
             <button
               onClick={() => setSelectedProject(null)}
-              className="text-slate-500 font-extrabold flex items-center hover:text-blue-600 transition-colors"
+              className="flex items-center font-extrabold text-slate-500 transition-colors hover:text-blue-600"
               type="button"
             >
-              <ChevronRight className="rotate-180 mr-1" size={20} />
+              <ChevronRight className="mr-1 rotate-180" size={20} />
               {t("common.back", { defaultValue: "Back" })}
             </button>
 
-            <div className="flex gap-2">
+            <div className="flex flex-wrap justify-end gap-2">
+              <button
+                onClick={() => navigate("/app/quotes")}
+                className="flex items-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-extrabold text-slate-700 shadow-sm transition-all hover:border-blue-200 hover:text-blue-700"
+                type="button"
+              >
+                <FileStack size={18} className="mr-2" />
+                {t("projects.all_quotes", { defaultValue: "All quotes" })}
+              </button>
+
               <button
                 onClick={handleGenerateQuote}
-                className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-xl text-sm font-extrabold shadow-md hover:bg-blue-700 active:scale-95 transition-all"
+                className="flex items-center rounded-xl bg-blue-600 px-4 py-2 text-sm font-extrabold text-white shadow-md transition-all hover:bg-blue-700 active:scale-95"
                 type="button"
               >
                 <FileText size={18} className="mr-2" />
@@ -125,7 +136,7 @@ export const ProjectsPage: React.FC = () => {
 
               <button
                 onClick={handlePrint}
-                className="p-2.5 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-colors"
+                className="rounded-xl p-2.5 text-slate-500 transition-colors hover:bg-blue-50 hover:text-blue-600"
                 title={t("projects.print", { defaultValue: "Print" })}
                 type="button"
               >
@@ -134,7 +145,7 @@ export const ProjectsPage: React.FC = () => {
 
               <button
                 onClick={(e) => handleDelete(selectedProject.id, e)}
-                className="p-2.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-colors"
+                className="rounded-xl p-2.5 text-slate-400 transition-colors hover:bg-red-50 hover:text-red-600"
                 title={t("common.delete", { defaultValue: "Delete" })}
                 type="button"
               >
@@ -144,23 +155,23 @@ export const ProjectsPage: React.FC = () => {
           </div>
         </div>
 
-        <div className="max-w-6xl mx-auto p-4 md:p-6 printable-content space-y-4">
-          <section className="rounded-[28px] border border-slate-200/80 bg-white/72 backdrop-blur-md shadow-sm overflow-hidden print:bg-white">
-            <div className="p-5 md:p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div className="printable-content mx-auto max-w-6xl space-y-4 p-4 md:p-6">
+          <section className="overflow-hidden rounded-[28px] border border-slate-200/80 bg-white/72 shadow-sm backdrop-blur-md print:bg-white">
+            <div className="flex flex-col gap-4 p-5 md:flex-row md:items-center md:justify-between md:p-6">
               <div>
-                <div className="inline-flex items-center gap-2 rounded-full bg-blue-50 px-3 py-1 text-xs font-extrabold text-blue-700 border border-blue-100 mb-3">
+                <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-blue-100 bg-blue-50 px-3 py-1 text-xs font-extrabold text-blue-700">
                   <Calculator size={14} />
                   {t("projects.title", { defaultValue: "My projects (calculations)" })}
                 </div>
-                <h1 className="text-3xl font-extrabold text-slate-900 mb-1">{selectedProject.name}</h1>
-                <p className="text-sm text-slate-500 font-medium">
+                <h1 className="mb-1 text-3xl font-extrabold text-slate-900">{selectedProject.name}</h1>
+                <p className="text-sm font-medium text-slate-500">
                   {t("projects.created_on", { defaultValue: "Created on" })}{" "}
                   {new Date(selectedProject.date).toLocaleDateString(i18n.language || undefined)}
                 </p>
               </div>
 
-              <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50/80 px-4 py-3 self-start md:self-auto">
-                <div className="w-11 h-11 rounded-2xl bg-white border border-slate-200 flex items-center justify-center text-blue-600 shadow-sm">
+              <div className="flex items-center gap-3 self-start rounded-2xl border border-slate-200 bg-slate-50/80 px-4 py-3 md:self-auto">
+                <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-200 bg-white text-blue-600 shadow-sm">
                   <Package size={20} />
                 </div>
                 <div>
@@ -173,9 +184,9 @@ export const ProjectsPage: React.FC = () => {
             </div>
           </section>
 
-          <div className="grid xl:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.8fr)] gap-4 md:gap-5">
-            <section className="rounded-[28px] border border-slate-200/80 bg-white/72 backdrop-blur-md shadow-sm p-5 md:p-6 print:bg-white">
-              <h2 className="text-lg font-extrabold mb-4 flex items-center text-slate-800">
+          <div className="grid gap-4 md:gap-5 xl:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.8fr)]">
+            <section className="rounded-[28px] border border-slate-200/80 bg-white/72 p-5 shadow-sm backdrop-blur-md print:bg-white md:p-6">
+              <h2 className="mb-4 flex items-center text-lg font-extrabold text-slate-800">
                 {t("projects.materials_list", { defaultValue: "Materials list" })}
               </h2>
 
@@ -183,24 +194,24 @@ export const ProjectsPage: React.FC = () => {
                 {selectedProject.items.map((item) => (
                   <li
                     key={item.id}
-                    className="flex justify-between items-center gap-3 p-3.5 bg-white/85 rounded-2xl border border-slate-200/80 print:border-slate-300"
+                    className="flex items-center justify-between gap-3 rounded-2xl border border-slate-200/80 bg-white/85 p-3.5 print:border-slate-300"
                   >
                     <div className="min-w-0">
-                      <span className="font-extrabold text-slate-700 block text-sm truncate">{item.name}</span>
-                      <span className="text-xs text-slate-500 font-medium">
+                      <span className="block truncate text-sm font-extrabold text-slate-700">{item.name}</span>
+                      <span className="text-xs font-medium text-slate-500">
                         {item.quantity} {item.unit} × {euro.format(item.unitPrice)}
                       </span>
                     </div>
 
-                    <span className="font-extrabold text-slate-800 whitespace-nowrap">{euro.format(item.totalPrice)}</span>
+                    <span className="whitespace-nowrap font-extrabold text-slate-800">{euro.format(item.totalPrice)}</span>
                   </li>
                 ))}
               </ul>
             </section>
 
             <div className="space-y-4 print:hidden">
-              <section className="rounded-[28px] border border-slate-200/80 bg-white/72 backdrop-blur-md shadow-sm p-5 md:p-6">
-                <h2 className="text-lg font-extrabold mb-4 flex items-center text-slate-800">
+              <section className="rounded-[28px] border border-slate-200/80 bg-white/72 p-5 shadow-sm backdrop-blur-md md:p-6">
+                <h2 className="mb-4 flex items-center text-lg font-extrabold text-slate-800">
                   <PieChart className="mr-2 text-slate-400" size={20} />
                   {t("projects.cost_breakdown", { defaultValue: "Cost breakdown" })}
                 </h2>
@@ -226,29 +237,29 @@ export const ProjectsPage: React.FC = () => {
                 </div>
               </section>
 
-              <section className="rounded-[28px] border border-blue-100 bg-blue-50/90 shadow-sm p-5 md:p-6 print:bg-transparent print:border-slate-900">
+              <section className="rounded-[28px] border border-blue-100 bg-blue-50/90 p-5 shadow-sm print:border-slate-900 print:bg-transparent md:p-6">
                 <div className="flex items-center justify-between gap-3">
-                  <span className="font-extrabold text-blue-900 text-lg">
+                  <span className="text-lg font-extrabold text-blue-900">
                     {t("projects.total_estimated", { defaultValue: "Estimated total" })}
                   </span>
-                  <span className="font-extrabold text-2xl text-blue-600 print:text-black">{euro.format(totalCost)}</span>
+                  <span className="text-2xl font-extrabold text-blue-600 print:text-black">{euro.format(totalCost)}</span>
                 </div>
               </section>
             </div>
           </div>
 
           {selectedProject.notes && (
-            <div className="rounded-[28px] border border-amber-100 bg-amber-50/90 shadow-sm p-5 md:p-6 print:border-slate-300">
-              <h3 className="font-extrabold text-amber-800 mb-2 print:text-black">
+            <div className="rounded-[28px] border border-amber-100 bg-amber-50/90 p-5 shadow-sm print:border-slate-300 md:p-6">
+              <h3 className="mb-2 font-extrabold text-amber-800 print:text-black">
                 {t("projects.notes", { defaultValue: "Notes & tips" })}
               </h3>
-              <p className="text-sm text-amber-900/80 whitespace-pre-line print:text-black leading-relaxed">
+              <p className="whitespace-pre-line text-sm leading-relaxed text-amber-900/80 print:text-black">
                 {selectedProject.notes}
               </p>
             </div>
           )}
 
-          <div className="mt-12 text-center text-xs text-slate-400 print:block hidden">
+          <div className="mt-12 hidden text-center text-xs text-slate-400 print:block">
             {t("projects.print_footer", {
               defaultValue: "Document generated by BatiQuant - Non-contractual estimates.",
             })}
@@ -261,32 +272,41 @@ export const ProjectsPage: React.FC = () => {
   }
 
   return (
-    <div className="p-4 pb-24 bg-transparent min-h-screen">
-      <div className="max-w-6xl mx-auto space-y-4">
-        <section className="rounded-[28px] border border-slate-200/80 bg-white/72 backdrop-blur-md shadow-sm p-5 md:p-6">
-          <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 mb-4">
+    <div className="min-h-screen bg-transparent p-4 pb-24">
+      <div className="mx-auto max-w-6xl space-y-4">
+        <section className="rounded-[28px] border border-slate-200/80 bg-white/72 p-5 shadow-sm backdrop-blur-md md:p-6">
+          <div className="mb-4 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <div>
               <h1 className="text-2xl font-extrabold text-slate-800">
                 {t("projects.title", { defaultValue: "My projects (calculations)" })}
               </h1>
-              <p className="mt-1 text-sm text-slate-500 font-medium">
+              <p className="mt-1 text-sm font-medium text-slate-500">
                 {t("projects.subtitle", {
                   defaultValue: "Saved from individual calculators (single calculations).",
                 })}
               </p>
             </div>
+
+            <button
+              onClick={() => navigate("/app/quotes")}
+              className="inline-flex items-center justify-center rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-extrabold text-slate-700 shadow-sm transition-all hover:border-blue-200 hover:text-blue-700"
+              type="button"
+            >
+              <FileStack size={18} className="mr-2" />
+              {t("projects.all_quotes", { defaultValue: "All quotes" })}
+            </button>
           </div>
 
           <button
             onClick={() => navigate("/app/calculators")}
-            className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-transform active:scale-[0.98] hover:shadow-md w-full"
+            className="group relative w-full overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-transform hover:shadow-md active:scale-[0.98]"
             type="button"
           >
             <div className="absolute inset-0">
               <img
                 src="/images/menu/calcul.jpg"
                 alt=""
-                className="w-full h-full object-cover"
+                className="h-full w-full object-cover"
                 draggable={false}
                 onError={(e) => {
                   (e.currentTarget as HTMLImageElement).src = "/images/menu/fallback.jpg";
@@ -296,22 +316,24 @@ export const ProjectsPage: React.FC = () => {
               <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/35 to-black/10" />
             </div>
 
-            <div className="relative z-10 w-full p-5 flex items-center justify-between">
+            <div className="relative z-10 flex w-full items-center justify-between p-5">
               <div className="flex items-center gap-3">
-                <div className="w-11 h-11 rounded-full bg-white/90 border border-white/60 flex items-center justify-center shadow-sm">
+                <div className="flex h-11 w-11 items-center justify-center rounded-full border border-white/60 bg-white/90 shadow-sm">
                   <Plus className="text-blue-600" size={22} />
                 </div>
                 <div className="text-left">
-                  <div className="text-white font-extrabold text-base leading-tight">
+                  <div className="text-base font-extrabold leading-tight text-white">
                     {t("projects.create_new", { defaultValue: "Create a calculation" })}
                   </div>
-                  <div className="text-white/80 text-xs font-semibold mt-0.5">
-                    {t("projects.create_new_hint", { defaultValue: "Choose a calculator and save the result here" })}
+                  <div className="mt-0.5 text-xs font-semibold text-white/80">
+                    {t("projects.create_new_hint", {
+                      defaultValue: "Choose a calculator and save the result here",
+                    })}
                   </div>
                 </div>
               </div>
 
-              <div className="w-9 h-9 rounded-full bg-white/20 border border-white/30 flex items-center justify-center">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full border border-white/30 bg-white/20">
                 <ChevronRight className="text-white" size={18} />
               </div>
             </div>
@@ -319,32 +341,32 @@ export const ProjectsPage: React.FC = () => {
         </section>
 
         {projects.length === 0 ? (
-          <div className="rounded-[28px] border border-dashed border-slate-200 bg-white/65 backdrop-blur-sm py-16 text-center text-slate-400">
+          <div className="rounded-[28px] border border-dashed border-slate-200 bg-white/65 py-16 text-center text-slate-400 backdrop-blur-sm">
             <FolderOpen size={64} className="mx-auto text-slate-300" />
-            <p className="mt-4 text-slate-500 font-medium">
+            <p className="mt-4 font-medium text-slate-500">
               {t("projects.empty", { defaultValue: "No saved calculations." })}
             </p>
           </div>
         ) : (
           <div className="grid gap-3">
             {projects.map((project) => {
-              const total = project.items.reduce((s, i) => s + i.totalPrice, 0);
+              const total = project.items.reduce((sum, item) => sum + item.totalPrice, 0);
               return (
                 <div
                   key={project.id}
                   onClick={() => setSelectedProject(project)}
-                  className="bg-white/72 backdrop-blur-sm p-5 rounded-[24px] shadow-sm border border-slate-200/80 flex justify-between items-center active:scale-[0.98] transition-all cursor-pointer hover:border-blue-200"
+                  className="flex cursor-pointer items-center justify-between rounded-[24px] border border-slate-200/80 bg-white/72 p-5 shadow-sm transition-all hover:border-blue-200 active:scale-[0.98]"
                 >
                   <div>
-                    <h3 className="font-extrabold text-slate-800 text-lg">{project.name}</h3>
-                    <p className="text-xs text-slate-500 mt-1 font-medium">
+                    <h3 className="text-lg font-extrabold text-slate-800">{project.name}</h3>
+                    <p className="mt-1 text-xs font-medium text-slate-500">
                       {new Date(project.date).toLocaleDateString(i18n.language || undefined)} • {project.items.length}{" "}
                       {t("projects.items", { defaultValue: "items" })}
                     </p>
                   </div>
 
                   <div className="flex items-center space-x-3">
-                    <span className="font-extrabold text-slate-700 bg-slate-100/90 px-3 py-1.5 rounded-xl text-sm border border-slate-200">
+                    <span className="rounded-xl border border-slate-200 bg-slate-100/90 px-3 py-1.5 text-sm font-extrabold text-slate-700">
                       {euro.format(total)}
                     </span>
                     <ChevronRight className="text-slate-300" size={20} />

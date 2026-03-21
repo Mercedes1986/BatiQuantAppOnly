@@ -430,12 +430,17 @@
         "title": "Quick tools",
         "desc": "Dedicated quick calculators: conversions, slopes, packaging and other fast checks.",
         "badge": "FAST"
+      },
+      "quotes": {
+        "title": "My quotes",
+        "desc": "Consult every quote you created from projects and sites in one place."
       }
     },
     "tools": {
       "title": "All tools (quick access)",
       "subtitle": "Click a tool to open the calculator directly."
-    }
+    },
+    "quotes_shortcut": "My quotes"
   },
   "ads": {
     "dev": {
@@ -1860,7 +1865,8 @@
     "tabs": {
       "quote": "Quote",
       "steps": "Steps"
-    }
+    },
+    "all_quotes": "All quotes"
   },
   "hvac": {
     "area_placeholder": "Area (m²)",
@@ -2183,7 +2189,8 @@
     "subtitle": "Saved from individual calculators (single calculations).",
     "total_estimated": "Total estimated",
     "create_new": "Create a calculation",
-    "create_new_hint": "Choose a calculator and save the result here"
+    "create_new_hint": "Choose a calculator and save the result here",
+    "all_quotes": "All quotes"
   },
   "quote": {
     "addline": {
@@ -2699,5 +2706,22 @@
     },
     "title": "Quick site tools",
     "subtitle": "Micro-tools for conversions, areas, quantities, timber decking, drywall framing, detailed tiling, roofing, fencing, gravel / backfill and insulation."
+  },
+  "quotes": {
+    "title": "My quotes",
+    "subtitle": "Find every quote created from your projects and sites in one place.",
+    "back_to_menu": "Back to menu",
+    "search": "Search by quote number, client or project...",
+    "empty": "No quote has been created yet.",
+    "empty_search": "No quote matches your search.",
+    "created_on": "Date",
+    "project": "Project",
+    "no_project": "Not linked",
+    "no_client": "Unnamed client",
+    "stats": {
+      "total": "Total quotes",
+      "accepted": "Accepted",
+      "total_amount": "Total amount"
+    }
   }
 }
