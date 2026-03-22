@@ -431,6 +431,10 @@
         "title": "Quick tools",
         "desc": "Dedicated quick calculators: conversions, slopes, packaging and other fast checks.",
         "badge": "FAST"
+      },
+      "quotes": {
+        "title": "My quotes",
+        "subtitle": "Find all quotes created from your projects and job sites."
       }
     },
     "tools": {
@@ -1890,7 +1894,8 @@
     "tabs": {
       "quote": "Quote",
       "steps": "Steps"
-    }
+    },
+    "all_quotes": "All quotes"
   },
   "hvac": {
     "area_placeholder": "Area (m²)",
@@ -2213,7 +2218,8 @@
     "subtitle": "Saved from individual calculators (single calculations).",
     "total_estimated": "Total estimated",
     "create_new": "Create a calculation",
-    "create_new_hint": "Choose a calculator and save the result here"
+    "create_new_hint": "Choose a calculator and save the result here",
+    "all_quotes": "All quotes"
   },
   "quote": {
     "addline": {
@@ -2489,6 +2495,24 @@
       "2": "For a driveable slab, aim for 12–15cm thickness + ST25C mesh.",
       "3": "Lift the mesh with spacers so it sits in the concrete, not on the ground.",
       "4": "Plan expansion joints every 15–20m² to prevent cracking."
+    },
+    "foundations": {
+      "1": "Double-check frost depth and soil conditions before sizing footings.",
+      "2": "Keep reinforcement properly covered to avoid corrosion.",
+      "3": "Plan access for the mixer truck or pump early (turning radius, hose route)."
+    },
+    "substructure": {
+      "1": "Apply waterproofing on a clean, dry surface and protect it with a drainage membrane.",
+      "2": "Always include inspection points or manholes for perimeter drains.",
+      "3": "With shuttering blocks, calculate fill concrete separately because it depends on the block type."
+    },
+    "walls": {
+      "1": "Check bond pattern and keep joints consistent to reduce waste and improve alignment.",
+      "2": "Do not forget lintel bearings and horizontal ring beams where required."
+    },
+    "exterior": {
+      "1": "Compact in layers: most outdoor failures come from insufficient base preparation.",
+      "2": "Add drainage considerations (slope away from buildings, permeable layers)."
     }
   },
   "packaging": {
@@ -2739,5 +2763,22 @@
     "cellular_60x25x20": "AAC block 60×25×20",
     "stepoc20": "Shuttering block (Stepoc) 20",
     "stepoc25": "Shuttering block (Stepoc) 25"
+  },
+  "quotes": {
+    "title": "My quotes",
+    "subtitle": "Find all quotes created from your projects and job sites.",
+    "back_to_menu": "Back to menu",
+    "stats": {
+      "total": "Total quotes",
+      "accepted": "Accepted",
+      "total_amount": "Total amount"
+    },
+    "search": "Search by quote, client or project",
+    "empty": "No quote has been created yet.",
+    "empty_search": "No quote matches your search.",
+    "no_client": "Unnamed client",
+    "created_on": "Date",
+    "project": "Project",
+    "no_project": "Not linked"
   }
 }

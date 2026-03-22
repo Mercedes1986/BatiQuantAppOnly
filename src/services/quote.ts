@@ -1,5 +1,5 @@
 import { HouseProject, QuoteManualLine, Unit } from "../types";
-import { getConstructionSteps, type ConstructionStepDef, type ConstructionStepGroup } from "../constants";
+import { getConstructionSteps, localizeLegacyText, type ConstructionStepDef, type ConstructionStepGroup } from "../constants";
 
 export interface QuoteSection {
   id: string;
@@ -70,7 +70,7 @@ export const calculateQuote = (project: HouseProject): ComputedQuote => {
 
           items.push({
             id: mat.id,
-            label: mat.name,
+            label: localizeLegacyText(String(mat.name || "")),
             quantity: qty,
             unit: mat.unit,
             unitPrice: up,
@@ -91,7 +91,7 @@ export const calculateQuote = (project: HouseProject): ComputedQuote => {
 
         items.push({
           id: line.id,
-          label: line.label,
+          label: localizeLegacyText(String(line.label || "")),
           quantity: qty,
           unit: line.unit,
           unitPrice: up,
@@ -129,7 +129,7 @@ export const calculateQuote = (project: HouseProject): ComputedQuote => {
 
       items.push({
         id: line.id,
-        label: line.label,
+        label: localizeLegacyText(String(line.label || "")),
         quantity: qty,
         unit: line.unit,
         unitPrice: up,
@@ -146,7 +146,7 @@ export const calculateQuote = (project: HouseProject): ComputedQuote => {
 
     sections.push({
       id: "global",
-      label: "Frais Généraux / Divers",
+      label: localizeLegacyText("Frais Généraux / Divers"),
       items,
       totalHT: sectionTotal,
     });

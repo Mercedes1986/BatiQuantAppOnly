@@ -10,6 +10,7 @@ import {
 } from "../../services/documentsStorage";
 import { convertQuoteToInvoice, recalculateTotals } from "../../services/documentLogic";
 import { QuoteDocument, DocumentLine, CompanyProfile } from "../../types";
+import { localizeLegacyText } from "../../constants";
 import {
   ArrowLeft,
   Save,
@@ -29,41 +30,7 @@ const toNum = (v: unknown, fallback = 0) => {
 
 
 
-const localizeLegacyLineDescription = (description: string, t: (key: string, options?: any) => string) => {
-  const source = String(description || "").trim();
-  if (!source) return source;
-
-  const exact: Record<string, string> = {
-    "Foundation concrete (C25/30)": t("calc.foundations.mat.foundation_concrete", { defaultValue: "Foundation concrete (C25/30)" }),
-    "Steel (average ratio)": t("calc.foundations.mat.steel", { defaultValue: "Steel (average ratio)" }),
-    "Excavation": t("calc.foundations.mat.excavation", { defaultValue: "Excavation" }),
-    "Blinding concrete": t("calc.foundations.mat.clean_concrete", { defaultValue: "Blinding concrete" }),
-    "Formwork": t("calc.foundations.mat.formwork", { defaultValue: "Formwork" }),
-    "Soil disposal": t("calc.foundations.mat.evac", { defaultValue: "Soil disposal" }),
-    "Drain pipe": t("calc.foundations.mat.drain", { defaultValue: "Drain pipe" }),
-    "Drain gravel": t("calc.foundations.mat.drain_gravel", { defaultValue: "Drain gravel" }),
-    "Geotextile (drain)": t("calc.foundations.mat.geotextile", { defaultValue: "Geotextile (drain)" }),
-    "Masonry block": t("calc.substructure.mat.block_generic", { defaultValue: "Masonry block" }),
-  };
-
-  let out = exact[source] ?? source;
-
-  out = out.replace(/^undefined(?:\s*\(.*\))?$/i, t("calc.substructure.mat.block_generic", { defaultValue: "Masonry block" }));
-  out = out.replace(/^null(?:\s*\(.*\))?$/i, t("calc.substructure.mat.block_generic", { defaultValue: "Masonry block" }));
-
-  out = out.replace(/\bundefined\s*\(\s*\{\{units\}\}\s*(?:unités|units)\s*\)/gi, t("calc.substructure.mat.block_generic", { defaultValue: "Masonry block" }));
-  out = out.replace(/\(\s*\{\{units\}\}\s*(?:unités|units)\s*\)/gi, "");
-
-  out = out.replace(/Standard structural mix/gi, t("calc.foundations.mat.foundation_concrete_detail", { defaultValue: "Standard structural mix" }));
-  out = out.replace(/Ratio:\s*([0-9]+(?:[.,][0-9]+)?)\s*kg\/m³/gi, (_m, ratio) =>
-    t("calc.foundations.mat.steel_ratio", { ratio, defaultValue: "Ratio: {{ratio}} kg/m³" })
-  );
-  out = out.replace(/Bulking factor\s*x\s*([0-9]+(?:[.,][0-9]+)?)/gi, (_m, factor) =>
-    t("calc.foundations.mat.evac_detail", { factor, defaultValue: "Bulking factor × {{factor}}" })
-  );
-
-  return out.replace(/\s{2,}/g, " ").trim();
-};
+const localizeLegacyLineDescription = (description: string) => localizeLegacyText(String(description || ""));
 
 
 const localizeLegacyNotes = (notes: string | undefined, t: (key: string, options?: any) => string) => {
@@ -87,7 +54,7 @@ const localizeLegacyNotes = (notes: string | undefined, t: (key: string, options
 };
 
 const localizeLegacyLines = (lines: DocumentLine[], t: (key: string, options?: any) => string) =>
-  lines.map((line) => ({ ...line, description: localizeLegacyLineDescription(line.description, t) }));
+  lines.map((line) => ({ ...line, description: localizeLegacyLineDescription(line.description) }));
 
 
 export const QuoteEditorPage: React.FC = () => {

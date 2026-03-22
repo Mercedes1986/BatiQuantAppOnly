@@ -115,6 +115,10 @@
         "title": "Calculs rapides chantier",
         "desc": "Accédez aux calculateurs rapides : conversions, pentes, conditionnements et contrôles express.",
         "badge": "RAPIDE"
+      },
+      "quotes": {
+        "title": "Mes devis",
+        "subtitle": "Retrouvez tous les devis créés depuis vos projets et chantiers."
       }
     },
     "tools": {
@@ -1968,7 +1972,8 @@
     "tabs": {
       "quote": "Devis",
       "steps": "Étapes"
-    }
+    },
+    "all_quotes": "Tous les devis"
   },
   "hvac": {
     "area_placeholder": "Surface (m²)",
@@ -2416,7 +2421,8 @@
     "subtitle": "Sauvegardes issues des calculateurs (calculs unitaires)",
     "total_estimated": "Total estimé",
     "create_new": "Créer un calcul",
-    "create_new_hint": "Choisissez un calculateur et sauvegardez le résultat ici"
+    "create_new_hint": "Choisissez un calculateur et sauvegardez le résultat ici",
+    "all_quotes": "Tous les devis"
   },
   "quote": {
     "addline": {
@@ -2692,6 +2698,24 @@
       "2": "Pour une dalle carrossable, viser 12–15 cm + treillis ST25C.",
       "3": "Rehausser le treillis avec des cales : il doit être dans le béton, pas au sol.",
       "4": "Prévoir des joints de dilatation tous les 15–20 m² pour limiter les fissures."
+    },
+    "foundations": {
+      "1": "Vérifiez la profondeur hors gel et la nature du sol avant de dimensionner les fondations.",
+      "2": "Respectez l’enrobage des aciers pour éviter les risques de corrosion.",
+      "3": "Anticipez l’accès du camion toupie ou de la pompe (rayon de braquage, cheminement du tuyau)."
+    },
+    "substructure": {
+      "1": "L’étanchéité doit être posée sur un support propre et sec, puis protégée par une nappe drainante.",
+      "2": "Prévoyez toujours des regards ou points d’inspection pour le drainage périphérique.",
+      "3": "Avec les blocs à bancher, calculez séparément le béton de remplissage selon le modèle choisi."
+    },
+    "walls": {
+      "1": "Contrôlez l’appareillage et gardez des joints réguliers pour limiter les pertes et améliorer l’alignement.",
+      "2": "N’oubliez pas les appuis de linteaux et les chaînages horizontaux quand ils sont nécessaires."
+    },
+    "exterior": {
+      "1": "Compactez par couches : la majorité des désordres extérieurs vient d’une préparation de support insuffisante.",
+      "2": "Intégrez le drainage dès la conception (pentes, évacuation loin du bâtiment, couches perméables)."
     }
   },
   "packaging": {
@@ -2942,5 +2966,22 @@
     "cellular_60x25x20": "Bloc béton cellulaire 60×25×20",
     "stepoc20": "Bloc à bancher (Stepoc) 20",
     "stepoc25": "Bloc à bancher (Stepoc) 25"
+  },
+  "quotes": {
+    "title": "Mes devis",
+    "subtitle": "Retrouvez tous les devis créés depuis vos projets et chantiers.",
+    "back_to_menu": "Retour au menu",
+    "stats": {
+      "total": "Nombre de devis",
+      "accepted": "Acceptés",
+      "total_amount": "Montant total"
+    },
+    "search": "Rechercher un devis, un client ou un projet",
+    "empty": "Aucun devis n’a encore été créé.",
+    "empty_search": "Aucun devis ne correspond à votre recherche.",
+    "no_client": "Client non renseigné",
+    "created_on": "Date",
+    "project": "Projet",
+    "no_project": "Non lié"
   }
 }
