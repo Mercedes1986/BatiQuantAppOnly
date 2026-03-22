@@ -1409,25 +1409,26 @@
       "mat": {
         "bitumen": "Bitumen coating",
         "bitumen_detail": "{{l}} L",
-        "blocks_details": "{{units}} units",
+        "blocks_details": "{{units}} units/m² — th. {{th}} cm",
         "delta_ms": "Delta MS membrane",
         "delta_ms_overlap": "Overlap",
         "delta_profile": "Delta profile",
         "dpc": "DPC (damp proof course)",
-        "dpc_ratio": "Ratio",
+        "dpc_ratio": "≈ 1 roll / 20 m",
         "drain_pipe": "Drain pipe",
         "geotextile": "Geotextile",
         "glue": "Adhesive",
-        "glue_ratio": "Ratio",
+        "glue_ratio": "~1 bag / 5 m²",
         "gravel": "Gravel",
         "gravel_detail": "{{m3}} m³",
         "manholes": "Manholes",
         "mortar": "Mortar",
-        "mortar_ratio": "Ratio",
+        "mortar_ratio": "~1 bag / 3 m²",
         "poured_wall": "Poured wall",
         "stepoc_fill": "Concrete infill",
         "stepoc_fill_detail_fallback": "Infill volume",
-        "stepoc_fill_detail_spec": "{{m3}} m³"
+        "stepoc_fill_detail_spec": "{{m3}} m³",
+        "block_generic": "Masonry block"
       },
       "summary": "Substructure estimate",
       "title": "Substructure calculator",
@@ -1613,7 +1614,9 @@
         "drain": "Perimeter drain",
         "drain_gravel": "Drain gravel",
         "geotextile": "Geotextile (drain)",
-        "geotextile_note": "Drain trench wrap"
+        "geotextile_note": "Drain trench wrap",
+        "foundation_concrete_detail": "Standard structural mix",
+        "evac_detail": "Bulking factor × {{factor}}"
       },
       "warn_pad_drain_manual": "Drainage enabled for pad footings: drain length is not calculated automatically (check your setup).",
       "warn_drain_zero": "Drainage enabled but drain length = 0 (check the length).",
@@ -2726,5 +2729,15 @@
     },
     "title": "Quick site tools",
     "subtitle": "Micro-tools for conversions, areas, quantities, timber decking, drywall framing, detailed tiling, roofing, fencing, gravel / backfill and insulation."
+  },
+  "wallspecs": {
+    "parpaing20": "Hollow concrete block 20×20×50 (standard)",
+    "parpaing15": "Hollow concrete block 15×20×50",
+    "parpaing10": "Hollow concrete block 10×20×50",
+    "parpaing25": "Hollow concrete block 25×20×50",
+    "brick_g7": "Rolled brick (G7 / Optibric) — example",
+    "cellular_60x25x20": "AAC block 60×25×20",
+    "stepoc20": "Shuttering block (Stepoc) 20",
+    "stepoc25": "Shuttering block (Stepoc) 25"
   }
 }

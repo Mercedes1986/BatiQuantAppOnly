@@ -1468,25 +1468,26 @@
       "mat": {
         "bitumen": "Enduit bitumineux",
         "bitumen_detail": "{{l}} L",
-        "blocks_details": "{{units}} unités",
+        "blocks_details": "{{units}} unités/m² — ép. {{th}} cm",
         "delta_ms": "Membrane Delta MS",
         "delta_ms_overlap": "Recouvrement",
         "delta_profile": "Profil Delta",
         "dpc": "Arase étanche",
-        "dpc_ratio": "Ratio",
+        "dpc_ratio": "≈ 1 rouleau / 20 m",
         "drain_pipe": "Drain",
         "geotextile": "Géotextile",
         "glue": "Colle",
-        "glue_ratio": "Ratio",
+        "glue_ratio": "~1 sac / 5 m²",
         "gravel": "Gravier",
         "gravel_detail": "{{m3}} m³",
         "manholes": "Regards",
         "mortar": "Mortier",
-        "mortar_ratio": "Ratio",
+        "mortar_ratio": "~1 sac / 3 m²",
         "poured_wall": "Mur banché",
         "stepoc_fill": "Béton de remplissage",
         "stepoc_fill_detail_fallback": "Volume de remplissage",
-        "stepoc_fill_detail_spec": "{{m3}} m³"
+        "stepoc_fill_detail_spec": "{{m3}} m³",
+        "block_generic": "Bloc de maçonnerie"
       },
       "summary": "Estimation soubassement",
       "title": "Calculateur soubassement",
@@ -1691,7 +1692,9 @@
         "drain": "Drain périphérique",
         "drain_gravel": "Gravier drainant",
         "geotextile": "Géotextile (drain)",
-        "geotextile_note": "Enrobage du drain"
+        "geotextile_note": "Enrobage du drain",
+        "foundation_concrete_detail": "Béton structurel standard",
+        "evac_detail": "Coefficient de foisonnement × {{factor}}"
       },
       "warn_pad_drain_manual": "Drainage activé avec des plots isolés : la longueur de drain n’est pas calculée automatiquement (vérifiez votre configuration).",
       "warn_drain_zero": "Drainage activé mais longueur de drain = 0 (vérifiez la longueur).",
@@ -2929,5 +2932,15 @@
     },
     "title": "Calculs rapides chantier",
     "subtitle": "Micro-outils pour conversions, surfaces, quantités, terrasse bois, ossature placo, carrelage détaillé, toiture, clôture, gravier / remblai et isolation."
+  },
+  "wallspecs": {
+    "parpaing20": "Parpaing creux 20×20×50 (standard)",
+    "parpaing15": "Parpaing creux 15×20×50",
+    "parpaing10": "Parpaing creux 10×20×50",
+    "parpaing25": "Parpaing creux 25×20×50",
+    "brick_g7": "Brique roulée (G7 / Optibric) — exemple",
+    "cellular_60x25x20": "Bloc béton cellulaire 60×25×20",
+    "stepoc20": "Bloc à bancher (Stepoc) 20",
+    "stepoc25": "Bloc à bancher (Stepoc) 25"
   }
 }

@@ -324,7 +324,7 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate,
 
       materials.push({
         id: "blocks_sub",
-        name: selectedSpec.label, // comes from data/specs (not UI hardcoded)
+        name: selectedSpec.label || t("calc.substructure.mat.block_generic", { defaultValue: "Masonry block" }),
         quantity: totalBlocks,
         quantityRaw: totalBlocks,
         unit: Unit.PIECE,
@@ -332,9 +332,9 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate,
         totalPrice: round2(costBlocks),
         category: CalculatorType.SUBSTRUCTURE,
         details: t("calc.substructure.mat.blocks_details", {
-          u: selectedSpec.unitsPerM2.toFixed(2),
+          units: selectedSpec.unitsPerM2.toFixed(2),
           th: selectedSpec.thicknessCm,
-          defaultValue: `${selectedSpec.unitsPerM2.toFixed(2)} units/m² — th. ${selectedSpec.thicknessCm}cm`,
+          defaultValue: `${selectedSpec.unitsPerM2.toFixed(2)} units/m² — th. ${selectedSpec.thicknessCm} cm`,
         }),
         refKey: blockKey,
       });

@@ -13,6 +13,19 @@ import { generateDocumentNumber, saveQuote, saveInvoice, getQuote } from "./docu
 
 const todayISO = () => new Date().toISOString().split("T")[0];
 
+const buildSafeLineDescription = (name: unknown, details?: unknown, category?: unknown) => {
+  const rawName = String(name ?? "").trim();
+  const rawDetails = String(details ?? "").trim();
+
+  const safeName = rawName && rawName.toLowerCase() !== "undefined"
+    ? rawName
+    : (String(category ?? "") === "SUBSTRUCTURE" ? "Masonry block" : "Item");
+
+  const safeDetails = rawDetails.includes("{{") ? "" : rawDetails;
+
+  return safeDetails ? `${safeName} (${safeDetails})` : safeName;
+};
+
 export const createQuoteFromProject = (
   project: HouseProject,
   computed: ComputedQuote,
@@ -90,7 +103,7 @@ export const createQuoteFromSimpleProject = (
 
     lines.push({
       id: generateId(),
-      description: item.name + (item.details ? ` (${item.details})` : ""),
+      description: buildSafeLineDescription(item.name, item.details, item.category),
       quantity: qty,
       unit: item.unit,
       unitPrice: up,
