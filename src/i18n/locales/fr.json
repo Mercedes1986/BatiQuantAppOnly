@@ -1679,48 +1679,22 @@
         "staggered": "Pose décalée (1/2, 1/3)",
         "diagonal": "Pose diagonale"
       }
-    },
-    "foundations": {
-      "mat": {
-        "foundation_concrete": "Béton de fondation (C25/30)",
-        "foundation_concrete_note": "Béton structure standard",
-        "steel": "Acier (ratio moyen)",
-        "steel_ratio": "Ratio : {{ratio}} kg/m³",
-        "excavation": "Terrassement / fouilles",
-        "clean_concrete": "Béton de propreté",
-        "clean_concrete_thickness": "Épaisseur {{cm}} cm",
-        "evac": "Évacuation des terres",
-        "evac_swell": "Foisonnement ×{{factor}}",
-        "formwork": "Coffrage",
-        "drain": "Drain",
-        "drain_gravel": "Gravier drainant",
-        "geotextile": "Géotextile (drain)",
-        "geotextile_note": "Enrobage de la tranchée drainante"
-      },
-      "warn_depth_lt_frost": "La profondeur de fouille ({{depth}} cm) est inférieure au hors-gel ({{frost}} cm).",
-      "warn_clay_risk": "Sol argileux : risque de retrait-gonflement. Une étude de sol est recommandée.",
-      "warn_pad_drain_manual": "Drainage activé sur plots/semelles isolées : la longueur de drain n’est pas calculée automatiquement (vérifiez la configuration).",
-      "warn_drain_zero": "Drainage activé mais longueur de drain = 0 (vérifiez la longueur).",
-      "warn_groundwater_drain": "Présence possible d’eau : drainage fortement recommandé.",
-      "warn_spoil_management": "Aucune gestion des déblais sélectionnée (ni évacuation ni réutilisation)."
     }
   },
   "client": {
     "address": {
-      "placeholder": "N° et rue"
+      "placeholder": "Adresse"
     },
     "address_full": "Adresse complète",
     "city": "Ville",
     "contact": "Contact",
     "email": "E-mail",
-    "info": "Informations client",
+    "info": "Infos",
     "name": {
-      "placeholder": "Nom / raison sociale"
+      "placeholder": "Nom du client"
     },
     "phone": "Téléphone",
-    "zip": "Code postal",
-    "name_label": "Nom / raison sociale",
-    "address_label": "Adresse"
+    "zip": "Code postal"
   },
   "client_modal": {
     "address": "Adresse",
@@ -2697,9 +2671,59 @@
       "4": "Prévoir des joints de dilatation tous les 15–20 m² pour limiter les fissures."
     },
     "foundations": {
-      "1": "Vérifiez le hors-gel et la nature du sol avant de dimensionner les fondations.",
-      "2": "Respectez un bon enrobage des armatures pour limiter les risques de corrosion.",
-      "3": "Anticipez l’accès du camion-toupie ou de la pompe (rayon de braquage, cheminement)."
+      "1": "Vérifiez la profondeur hors gel et la nature du sol avant de dimensionner les semelles.",
+      "2": "Respectez un enrobage suffisant des armatures pour éviter la corrosion.",
+      "3": "Anticipez l’accès du camion-malaxeur ou de la pompe (rayon de braquage, cheminement du tuyau)."
+    },
+    "substructure": {
+      "1": "L’étanchéité doit être appliquée sur un support propre et sec, puis protégée par une membrane drainante.",
+      "2": "Prévoyez toujours des points de visite ou regards pour les drains périphériques afin de faciliter l’inspection.",
+      "3": "Avec les blocs à bancher, calculez séparément le béton de remplissage : il dépend du type de bloc."
+    },
+    "walls": {
+      "1": "Vérifiez l’appareillage et gardez des joints réguliers pour limiter les pertes et améliorer l’alignement.",
+      "2": "N’oubliez pas les appuis de linteaux et les chaînages horizontaux lorsqu’ils sont nécessaires."
+    },
+    "placo": {
+      "1": "Décalez les joints des plaques et gardez un entraxe de vis d’environ 30 cm pour une pose standard.",
+      "2": "Ajoutez une bande résiliente sous les rails pour réduire les ponts phoniques dans les cloisons."
+    },
+    "elec": {
+      "1": "Regroupez les circuits par usage et prévoyez des lignes dédiées pour les gros appareils.",
+      "2": "Tracez les cheminements avant de saigner : des parcours plus courts réduisent câble, gaine et main-d’œuvre."
+    },
+    "plumbing": {
+      "1": "Privilégiez une distribution par nourrice quand l’accès maintenance est simple : l’équilibrage est plus facile.",
+      "2": "Respectez les bonnes pentes sur les évacuations et évitez les coudes trop serrés."
+    },
+    "roof": {
+      "1": "Vérifiez les pentes minimales imposées par votre couverture (tuiles, zinc, membranes).",
+      "2": "Ajoutez une marge pour les découpes autour des noues, arêtiers et pénétrations."
+    },
+    "screed": {
+      "1": "Respectez les temps de cure et de séchage avant la pose du revêtement final.",
+      "2": "Utilisez une bande périphérique pour limiter les fissures et améliorer l’acoustique."
+    },
+    "leveling": {
+      "1": "Le primaire est essentiel : il améliore l’adhérence et limite les bulles sur les supports poreux.",
+      "2": "Pour les fortes épaisseurs, prévoyez des fibres ou une trame selon le support."
+    },
+    "tiles": {
+      "1": "Faites un calepinage à blanc sur quelques carreaux pour valider la pose et limiter les petites coupes en rive.",
+      "2": "Utilisez la bonne taille de peigne : les grands formats demandent plus de colle et souvent un double encollage."
+    },
+    "facade": {
+      "1": "Vérifiez la compatibilité du support entre enduit et peinture, notamment côté perméabilité à la vapeur.",
+      "2": "Anticipez l’échafaudage : il représente souvent une part importante du coût."
+    },
+    "exterior": {
+      "1": "Compactez par couches : la plupart des désordres extérieurs viennent d’une base insuffisamment préparée.",
+      "2": "Intégrez le drainage dès la conception (pente à l’opposé du bâtiment, couches perméables)."
+    },
+    "quick": {
+      "1": "Utilisez ces outils pour des estimations rapides sur chantier, puis validez le dimensionnement final avant achat ou exécution.",
+      "2": "Gardez une marge de pertes réaliste : découpes, recouvrements et contraintes de chantier ajoutent souvent 5 à 15 %.",
+      "3": "Pour les dimensionnements électriques, vérifiez toujours les normes applicables et les conditions de pose."
     }
   },
   "packaging": {
