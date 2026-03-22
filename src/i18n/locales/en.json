@@ -35,7 +35,8 @@
     "type": "Type",
     "unknown": "Unknown",
     "validate": "Validate",
-    "waste_plus": "Waste +"
+    "waste_plus": "Waste +",
+    "back_to_quote": "Back to quote"
   },
   "calculator": {
     "open": "Open calculator",
@@ -430,17 +431,12 @@
         "title": "Quick tools",
         "desc": "Dedicated quick calculators: conversions, slopes, packaging and other fast checks.",
         "badge": "FAST"
-      },
-      "quotes": {
-        "title": "My quotes",
-        "desc": "Consult every quote you created from projects and sites in one place."
       }
     },
     "tools": {
       "title": "All tools (quick access)",
       "subtitle": "Click a tool to open the calculator directly."
-    },
-    "quotes_shortcut": "My quotes"
+    }
   },
   "ads": {
     "dev": {
@@ -1601,6 +1597,30 @@
       "warn_old_tile": "Tiling over old tiles requires specific prep.",
       "warn_wet_no_spec": "Wet room without waterproofing selected.",
       "warn_wood": "Wood substrates require specific systems."
+    },
+    "foundations": {
+      "mat": {
+        "foundation_concrete": "Foundation concrete (C25/30)",
+        "foundation_concrete_note": "Standard structural mix",
+        "steel": "Steel (average ratio)",
+        "steel_ratio": "Ratio: {{ratio}} kg/m³",
+        "excavation": "Excavation",
+        "clean_concrete": "Blinding concrete",
+        "clean_concrete_thickness": "Thickness {{cm}} cm",
+        "formwork": "Formwork",
+        "evac": "Soil disposal",
+        "evac_swell": "Bulking factor ×{{factor}}",
+        "drain": "Perimeter drain",
+        "drain_gravel": "Drain gravel",
+        "geotextile": "Geotextile (drain)",
+        "geotextile_note": "Drain trench wrap"
+      },
+      "warn_pad_drain_manual": "Drainage enabled for pad footings: drain length is not calculated automatically (check your setup).",
+      "warn_drain_zero": "Drainage enabled but drain length = 0 (check the length).",
+      "warn_depth_lt_frost": "Excavation depth ({{depth}} cm) is below frost depth ({{frost}} cm).",
+      "warn_clay_risk": "Clay soil: shrink–swell risk. A soil study is recommended.",
+      "warn_groundwater_drain": "Possible groundwater: drainage is strongly recommended.",
+      "warn_spoil_management": "No spoil management selected (neither disposal nor reuse)."
     }
   },
   "client": {
@@ -1616,7 +1636,9 @@
       "placeholder": "Client name"
     },
     "phone": "Phone",
-    "zip": "ZIP code"
+    "zip": "ZIP code",
+    "name_label": "Name / company name",
+    "address_label": "Address"
   },
   "client_modal": {
     "address": "Address",
@@ -1865,8 +1887,7 @@
     "tabs": {
       "quote": "Quote",
       "steps": "Steps"
-    },
-    "all_quotes": "All quotes"
+    }
   },
   "hvac": {
     "area_placeholder": "Area (m²)",
@@ -2180,7 +2201,7 @@
     "items": "Items",
     "materials_list": "Materials list",
     "need_company_profile": "Complete your company profile to generate documents.",
-    "notes": "Notes",
+    "notes": "Notes & tips",
     "print": "Print",
     "print_footer": "Generated with BatiQuant",
     "quote": "Quote",
@@ -2189,8 +2210,7 @@
     "subtitle": "Saved from individual calculators (single calculations).",
     "total_estimated": "Total estimated",
     "create_new": "Create a calculation",
-    "create_new_hint": "Choose a calculator and save the result here",
-    "all_quotes": "All quotes"
+    "create_new_hint": "Choose a calculator and save the result here"
   },
   "quote": {
     "addline": {
@@ -2466,61 +2486,6 @@
       "2": "For a driveable slab, aim for 12–15cm thickness + ST25C mesh.",
       "3": "Lift the mesh with spacers so it sits in the concrete, not on the ground.",
       "4": "Plan expansion joints every 15–20m² to prevent cracking."
-    },
-    "foundations": {
-      "1": "Double-check frost depth and soil conditions before sizing footings.",
-      "2": "Keep reinforcement properly covered (concrete cover) to avoid corrosion.",
-      "3": "Plan access for the mixer truck or pump early (turning radius, hose route)."
-    },
-    "substructure": {
-      "1": "Waterproofing should be applied on a clean, dry surface and protected with a drainage membrane.",
-      "2": "Always include inspection points or manholes for perimeter drains.",
-      "3": "With shuttering blocks, calculate fill concrete separately because it depends on the block type."
-    },
-    "walls": {
-      "1": "Check the bond pattern and keep joints consistent to reduce waste and improve alignment.",
-      "2": "Do not forget lintel bearings and horizontal ring beams where required."
-    },
-    "placo": {
-      "1": "Stagger board joints and keep screw spacing around 30 cm for standard drywall installation.",
-      "2": "Add acoustic tape under tracks to reduce sound bridges in partitions."
-    },
-    "elec": {
-      "1": "Group circuits by use and keep dedicated lines for major appliances.",
-      "2": "Plan routes before cutting chases: shorter runs reduce cable, conduit, and labor."
-    },
-    "plumbing": {
-      "1": "Prefer a manifold layout when maintenance access is easy because balancing is simpler.",
-      "2": "Keep proper slopes on drains and avoid too many tight bends."
-    },
-    "roof": {
-      "1": "Verify the minimum slopes required for your roofing material (tiles, zinc, membranes).",
-      "2": "Add waste for cuts around valleys, hips, and penetrations."
-    },
-    "screed": {
-      "1": "Respect curing and drying times before laying the final floor finish.",
-      "2": "Use edge strip to reduce cracking and improve acoustics."
-    },
-    "leveling": {
-      "1": "Primer is essential: it improves adhesion and reduces bubbles on porous substrates.",
-      "2": "For thick applications, consider fibers or mesh depending on the substrate."
-    },
-    "tiles": {
-      "1": "Dry-lay a few tiles first to validate the layout and minimize small edge cuts.",
-      "2": "Use the right trowel size: large-format tiles require more adhesive and often back-buttering."
-    },
-    "facade": {
-      "1": "Check substrate compatibility between render and paint systems, especially vapor permeability.",
-      "2": "Plan scaffolding early because it often drives a significant part of the cost."
-    },
-    "exterior": {
-      "1": "Compact in layers: most outdoor failures come from insufficient base preparation.",
-      "2": "Include drainage in the design (slope away from buildings, permeable layers)."
-    },
-    "quick": {
-      "1": "Use these tools for fast field estimates, then validate final sizing before purchasing or execution.",
-      "2": "Keep a realistic waste allowance: cuts, overlaps, and site constraints often add 5 to 15%.",
-      "3": "For electrical sizing, always verify applicable standards and installation conditions."
     }
   },
   "packaging": {
@@ -2761,22 +2726,5 @@
     },
     "title": "Quick site tools",
     "subtitle": "Micro-tools for conversions, areas, quantities, timber decking, drywall framing, detailed tiling, roofing, fencing, gravel / backfill and insulation."
-  },
-  "quotes": {
-    "title": "My quotes",
-    "subtitle": "Find every quote created from your projects and sites in one place.",
-    "back_to_menu": "Back to menu",
-    "search": "Search by quote number, client or project...",
-    "empty": "No quote has been created yet.",
-    "empty_search": "No quote matches your search.",
-    "created_on": "Date",
-    "project": "Project",
-    "no_project": "Not linked",
-    "no_client": "Unnamed client",
-    "stats": {
-      "total": "Total quotes",
-      "accepted": "Accepted",
-      "total_amount": "Total amount"
-    }
   }
 }

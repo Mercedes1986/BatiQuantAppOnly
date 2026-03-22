@@ -1172,6 +1172,81 @@ export const getStaticTips = (): Record<string, string[]> => ({
 // Backward-compatible alias (same limitation as CALCULATORS).
 export const STATIC_TIPS: Record<string, string[]> = getStaticTips();
 
+
+type LegacyTextEntry = {
+  source: string;
+  key: string;
+  fallbackEn: string;
+};
+
+export const getLegacyTextEntries = (): LegacyTextEntry[] => [
+  { source: "Foundation concrete (C25/30)", key: "calc.foundations.mat.foundation_concrete", fallbackEn: "Foundation concrete (C25/30)" },
+  { source: "Steel (average ratio)", key: "calc.foundations.mat.steel", fallbackEn: "Steel (average ratio)" },
+  { source: "Excavation", key: "calc.foundations.mat.excavation", fallbackEn: "Excavation" },
+  { source: "Blinding concrete", key: "calc.foundations.mat.clean_concrete", fallbackEn: "Blinding concrete" },
+  { source: "Formwork", key: "calc.foundations.mat.formwork", fallbackEn: "Formwork" },
+  { source: "Soil disposal", key: "calc.foundations.mat.evac", fallbackEn: "Soil disposal" },
+  { source: "Drain pipe", key: "calc.foundations.mat.drain", fallbackEn: "Drain pipe" },
+  { source: "Drain gravel", key: "calc.foundations.mat.drain_gravel", fallbackEn: "Drain gravel" },
+  { source: "Geotextile (drain)", key: "calc.foundations.mat.geotextile", fallbackEn: "Geotextile (drain)" },
+  { source: "Standard structural mix", key: "calc.foundations.mat.foundation_concrete_note", fallbackEn: "Standard structural mix" },
+  { source: "Drain trench wrap", key: "calc.foundations.mat.geotextile_note", fallbackEn: "Drain trench wrap" },
+
+  { source: "Double-check frost depth and soil conditions before sizing footings.", key: "tips.foundations.1", fallbackEn: "Double-check frost depth and soil conditions before sizing footings." },
+  { source: "Keep reinforcement properly covered (concrete cover) to avoid corrosion.", key: "tips.foundations.2", fallbackEn: "Keep reinforcement properly covered (concrete cover) to avoid corrosion." },
+  { source: "Plan access for the mixer truck/pump early (turning radius, hose path).", key: "tips.foundations.3", fallbackEn: "Plan access for the mixer truck/pump early (turning radius, hose path)." },
+  { source: "Plan access for the mixer truck or pump early (turning radius, hose route).", key: "tips.foundations.3", fallbackEn: "Plan access for the mixer truck or pump early (turning radius, hose route)." },
+
+  { source: "Waterproofing should go on a clean, dry surface — and protect it with a drainage membrane.", key: "tips.substructure.1", fallbackEn: "Waterproofing should go on a clean, dry surface — and protect it with a drainage membrane." },
+  { source: "Waterproofing should be applied on a clean, dry surface and protected with a drainage membrane.", key: "tips.substructure.1", fallbackEn: "Waterproofing should be applied on a clean, dry surface and protected with a drainage membrane." },
+  { source: "Always include weep points/manholes for perimeter drains to allow inspection.", key: "tips.substructure.2", fallbackEn: "Always include weep points/manholes for perimeter drains to allow inspection." },
+  { source: "Always include inspection points or manholes for perimeter drains.", key: "tips.substructure.2", fallbackEn: "Always include inspection points or manholes for perimeter drains." },
+  { source: "On shuttering blocks, calculate fill concrete separately — it depends on the block type.", key: "tips.substructure.3", fallbackEn: "On shuttering blocks, calculate fill concrete separately — it depends on the block type." },
+  { source: "With shuttering blocks, calculate fill concrete separately because it depends on the block type.", key: "tips.substructure.3", fallbackEn: "With shuttering blocks, calculate fill concrete separately because it depends on the block type." },
+
+  { source: "Check bond pattern and keep joints consistent to reduce waste and improve alignment.", key: "tips.walls.1", fallbackEn: "Check bond pattern and keep joints consistent to reduce waste and improve alignment." },
+  { source: "Don’t forget lintel bearings and horizontal ring beams where required.", key: "tips.walls.2", fallbackEn: "Don’t forget lintel bearings and horizontal ring beams where required." },
+  { source: "Don't forget lintel bearings and horizontal ring beams where required.", key: "tips.walls.2", fallbackEn: "Don't forget lintel bearings and horizontal ring beams where required." },
+
+  { source: "Compact in layers: most outdoor failures come from insufficient base preparation.", key: "tips.exterior.1", fallbackEn: "Compact in layers: most outdoor failures come from insufficient base preparation." },
+  { source: "Add drainage considerations (slope away from buildings, permeable layers).", key: "tips.exterior.2", fallbackEn: "Add drainage considerations (slope away from buildings, permeable layers)." },
+
+  { source: "Use these tools for fast field estimates, then validate the final sizing for procurement or compliance.", key: "tips.quick.1", fallbackEn: "Use these tools for fast field estimates, then validate the final sizing for procurement or compliance." },
+  { source: "Use these tools for fast field estimates, then validate final sizing before purchasing or execution.", key: "tips.quick.1", fallbackEn: "Use these tools for fast field estimates, then validate final sizing before purchasing or execution." },
+  { source: "Keep a practical waste allowance: cuts, overlaps and site constraints often add 5 to 15%.", key: "tips.quick.2", fallbackEn: "Keep a practical waste allowance: cuts, overlaps and site constraints often add 5 to 15%." },
+  { source: "For electrical sizing, always cross-check applicable standards and installation conditions.", key: "tips.quick.3", fallbackEn: "For electrical sizing, always cross-check applicable standards and installation conditions." },
+];
+
+export const localizeLegacyText = (input?: string | null): string => {
+  if (!input) return input || "";
+  let output = input;
+
+  for (const entry of getLegacyTextEntries()) {
+    const localized = tr(entry.key, entry.fallbackEn);
+    if (localized && localized !== entry.source) {
+      output = output.split(entry.source).join(localized);
+    }
+  }
+
+  output = output.replace(
+    /Ratio:\s*([0-9]+(?:[.,][0-9]+)?)\s*kg\/m³/gi,
+    (_m, ratio) => tr("calc.foundations.mat.steel_ratio", "Ratio: {{ratio}} kg/m³").replace("{{ratio}}", String(ratio))
+  );
+
+  output = output.replace(
+    /Thickness\s*([0-9]+(?:[.,][0-9]+)?)\s*cm/gi,
+    (_m, cm) => tr("calc.foundations.mat.clean_concrete_thickness", "Thickness {{cm}} cm").replace("{{cm}}", String(cm))
+  );
+
+  output = output.replace(
+    /Bulking factor\s*[×x]\s*([0-9]+(?:[.,][0-9]+)?)/gi,
+    (_m, factor) => tr("calc.foundations.mat.evac_swell", "Bulking factor ×{{factor}}").replace("{{factor}}", String(factor))
+  );
+
+  return output;
+};
+
+
 /* -------------------------------------------------------
    OTHER CONSTANTS (i18n-ready)
 ------------------------------------------------------- */
@@ -1292,7 +1367,7 @@ export const OPENING_PRESETS = getOpeningPresets();
  * - coverM2 = covered area by 1 panel
  * - priceRef = DEFAULT_PRICES key (price per panel)
  */
-export const getMeshTypes = (): (MeshType & { coverM2: number; priceRef: string })[] => [
+export const getMeshTypes = (): (MeshType & { width: number; height: number; coverM2: number; priceRef: string })[] => [
   {
     id: "ST10",
     label: tr("mesh.ST10", "ST10 (light - terrace)"),

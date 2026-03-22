@@ -16,6 +16,46 @@ const toNum = (v: unknown, fallback = 0) => {
   return Number.isFinite(n) ? n : fallback;
 };
 
+
+const localizeLegacyLineDescription = (description: string, t: (key: string, options?: any) => string) => {
+  const translated: Record<string, string> = {
+    "Foundation concrete (C25/30)": t("calc.foundations.mat.foundation_concrete", { defaultValue: "Foundation concrete (C25/30)" }),
+    "Steel (average ratio)": t("calc.foundations.mat.steel", { defaultValue: "Steel (average ratio)" }),
+    "Excavation": t("calc.foundations.mat.excavation", { defaultValue: "Excavation" }),
+    "Blinding concrete": t("calc.foundations.mat.clean_concrete", { defaultValue: "Blinding concrete" }),
+    "Formwork": t("calc.foundations.mat.formwork", { defaultValue: "Formwork" }),
+    "Soil disposal": t("calc.foundations.mat.evac", { defaultValue: "Soil disposal" }),
+    "Drain pipe": t("calc.foundations.mat.drain", { defaultValue: "Drain pipe" }),
+    "Drain gravel": t("calc.foundations.mat.drain_gravel", { defaultValue: "Drain gravel" }),
+    "Geotextile (drain)": t("calc.foundations.mat.geotextile", { defaultValue: "Geotextile (drain)" }),
+  };
+  return translated[description] ?? description;
+};
+
+const localizeLegacyNotes = (notes: string | undefined, t: (key: string, options?: any) => string) => {
+  if (!notes) return notes || "";
+  const pairs: Array<[string, string]> = [
+    ["Double-check frost depth and soil conditions before sizing footings.", t("tips.foundations.1", { defaultValue: "Double-check frost depth and soil conditions before sizing footings." })],
+    ["Keep reinforcement properly covered (concrete cover) to avoid corrosion.", t("tips.foundations.2", { defaultValue: "Keep reinforcement properly covered (concrete cover) to avoid corrosion." })],
+    ["Plan access for the mixer truck/pump early (turning radius, hose path).", t("tips.foundations.3", { defaultValue: "Plan access for the mixer truck/pump early (turning radius, hose path)." })],
+    ["Waterproofing should go on a clean, dry surface — and protect it with a drainage membrane.", t("tips.substructure.1", { defaultValue: "Waterproofing should go on a clean, dry surface — and protect it with a drainage membrane." })],
+    ["Always include weep points/manholes for perimeter drains to allow inspection.", t("tips.substructure.2", { defaultValue: "Always include weep points/manholes for perimeter drains to allow inspection." })],
+    ["On shuttering blocks, calculate fill concrete separately — it depends on the block type.", t("tips.substructure.3", { defaultValue: "On shuttering blocks, calculate fill concrete separately — it depends on the block type." })],
+    ["Check bond pattern and keep joints consistent to reduce waste and improve alignment.", t("tips.walls.1", { defaultValue: "Check bond pattern and keep joints consistent to reduce waste and improve alignment." })],
+    ["Don’t forget lintel bearings and horizontal ring beams where required.", t("tips.walls.2", { defaultValue: "Don’t forget lintel bearings and horizontal ring beams where required." })],
+    ["Don't forget lintel bearings and horizontal ring beams where required.", t("tips.walls.2", { defaultValue: "Don't forget lintel bearings and horizontal ring beams where required." })],
+    ["Compact in layers: most outdoor failures come from insufficient base preparation.", t("tips.exterior.1", { defaultValue: "Compact in layers: most outdoor failures come from insufficient base preparation." })],
+    ["Add drainage considerations (slope away from buildings, permeable layers).", t("tips.exterior.2", { defaultValue: "Add drainage considerations (slope away from buildings, permeable layers)." })],
+  ];
+  let value = notes;
+  for (const [src, localized] of pairs) value = value.split(src).join(localized);
+  return value;
+};
+
+const localizeLegacyLines = (lines: DocumentLine[], t: (key: string, options?: any) => string) =>
+  lines.map((line) => ({ ...line, description: localizeLegacyLineDescription(line.description, t) }));
+
+
 export const InvoiceEditorPage: React.FC = () => {
   const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
@@ -27,38 +67,15 @@ export const InvoiceEditorPage: React.FC = () => {
   const [saveFlash, setSaveFlash] = useState(false);
   const saveTimer = useRef<number | null>(null);
 
-  const localizeLegacyLineDescription = useCallback(
-    (description: string) => {
-      const translated: Record<string, string> = {
-        "Foundation concrete (C25/30)": t("calc.foundations.mat.foundation_concrete", { defaultValue: "Foundation concrete (C25/30)" }),
-        "Steel (average ratio)": t("calc.foundations.mat.steel", { defaultValue: "Steel (average ratio)" }),
-        "Excavation": t("calc.foundations.mat.excavation", { defaultValue: "Excavation" }),
-        "Blinding concrete": t("calc.foundations.mat.clean_concrete", { defaultValue: "Blinding concrete" }),
-        "Soil disposal": t("calc.foundations.mat.evac", { defaultValue: "Soil disposal" }),
-        "Formwork": t("calc.foundations.mat.formwork", { defaultValue: "Formwork" }),
-        "Drain pipe": t("calc.foundations.mat.drain", { defaultValue: "Drain pipe" }),
-        "Geotextile (drain)": t("calc.foundations.mat.geotextile", { defaultValue: "Geotextile (drain)" }),
-        "Drain gravel": t("calc.foundations.mat.drain_gravel", { defaultValue: "Drain gravel" }),
-      };
-      return translated[description] ?? description;
-    },
-    [t]
-  );
-
-  const localizeLegacyLines = useCallback(
-    (lines: DocumentLine[]) => lines.map((line) => ({ ...line, description: localizeLegacyLineDescription(line.description) })),
-    [localizeLegacyLineDescription]
-  );
-
   useEffect(() => {
     if (!id) return;
 
     const doc = getInvoice(id);
-    if (doc) setInvoice({ ...doc, lines: localizeLegacyLines(doc.lines) });
+    if (doc) setInvoice(doc);
     else navigate("/app/house");
 
     setCompany(getCompanyProfile());
-  }, [id, navigate, localizeLegacyLines]);
+  }, [id, navigate]);
 
   useEffect(() => {
     return () => {
@@ -209,7 +226,7 @@ export const InvoiceEditorPage: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">
-                  {t("client.name_label", { defaultValue: "Nom / raison sociale" })}
+                  {t("client.name", { defaultValue: "Nom / Raison Sociale" })}
                 </label>
                 <input
                   value={invoice.client.name}
@@ -248,7 +265,7 @@ export const InvoiceEditorPage: React.FC = () => {
 
             <div>
               <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">
-                {t("client.address_full", { defaultValue: "Adresse complète" })}
+                {t("client.address_full", { defaultValue: "Adresse Complète" })}
               </label>
               <div className="flex gap-2">
                 <div className="relative flex-1">

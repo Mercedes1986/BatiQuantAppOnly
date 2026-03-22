@@ -26,8 +26,7 @@ function MobileAdPlaceholder({
   );
 }
 
-import React, { useEffect, useMemo, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import React, { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   ArrowLeft,
@@ -43,28 +42,28 @@ import {
   CalculatorConfig,
   CalculationResult,
   Project,
-} from "@/types";
-import { getCalculators, getStaticTips } from "@/constants";
+} from "../types";
+import { getCalculators, getStaticTips, localizeLegacyText } from "../constants";
 
-import { PaintCalculator } from "@/components/calculators/PaintCalculator";
-import { ConcreteCalculator } from "@/components/calculators/ConcreteCalculator";
-import { TileCalculator } from "@/components/calculators/TileCalculator";
-import { LevelingCalculator } from "@/components/calculators/LevelingCalculator";
-import { PlacoCalculator } from "@/components/calculators/PlacoCalculator";
-import { StructuralCalculator } from "@/components/calculators/StructuralCalculator";
-import { SubstructureCalculator } from "@/components/calculators/SubstructureCalculator";
-import { RoofCalculator } from "@/components/calculators/RoofCalculator";
-import { JoineryCalculator } from "@/components/calculators/JoineryCalculator";
-import { ElectricityCalculator } from "@/components/calculators/ElectricityCalculator";
-import { PlumbingCalculator } from "@/components/calculators/PlumbingCalculator";
-import { HvacCalculator } from "@/components/calculators/HvacCalculator";
-import { ScreedCalculator } from "@/components/calculators/ScreedCalculator";
-import { FacadeCalculator } from "@/components/calculators/FacadeCalculator";
-import { ExteriorCalculator } from "@/components/calculators/ExteriorCalculator";
-import { StairCalculator } from "@/components/calculators/StairCalculator";
-import { FoundationsCalculator } from "@/components/calculators/FoundationsCalculator";
-import { QuickToolsCalculator } from "@/components/calculators/QuickToolsCalc";
-import { getProjects, saveProject, generateId } from "@/services/storage";
+import { PaintCalculator } from "../components/calculators/PaintCalculator";
+import { ConcreteCalculator } from "../components/calculators/ConcreteCalculator";
+import { TileCalculator } from "../components/calculators/TileCalculator";
+import { LevelingCalculator } from "../components/calculators/LevelingCalculator";
+import { PlacoCalculator } from "../components/calculators/PlacoCalculator";
+import { StructuralCalculator } from "../components/calculators/StructuralCalculator";
+import { SubstructureCalculator } from "../components/calculators/SubstructureCalculator";
+import { RoofCalculator } from "../components/calculators/RoofCalculator";
+import { JoineryCalculator } from "../components/calculators/JoineryCalculator";
+import { ElectricityCalculator } from "../components/calculators/ElectricityCalculator";
+import { PlumbingCalculator } from "../components/calculators/PlumbingCalculator";
+import { HvacCalculator } from "../components/calculators/HvacCalculator";
+import { ScreedCalculator } from "../components/calculators/ScreedCalculator";
+import { FacadeCalculator } from "../components/calculators/FacadeCalculator";
+import { ExteriorCalculator } from "../components/calculators/ExteriorCalculator";
+import { StairCalculator } from "../components/calculators/StairCalculator";
+import { FoundationsCalculator } from "../components/calculators/FoundationsCalculator";
+import { QuickToolsCalculator } from "../components/calculators/QuickToolsCalc";
+import { saveProject, generateId } from "../services/storage";
 
 interface Props {
   type: CalculatorType;
@@ -74,13 +73,9 @@ interface Props {
 
 export const CalculatorPage: React.FC<Props> = ({ type, onBack, onNavigateProjects }) => {
   const { t, i18n } = useTranslation();
-  const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const projectId = searchParams.get("projectId");
-  const returnQuoteId = searchParams.get("returnQuoteId");
 
   const config = useMemo(() => {
-    const c = getCalculators().find((x: CalculatorConfig) => x.id === type) as CalculatorConfig | undefined;
+    const c = getCalculators().find((x) => x.id === type) as CalculatorConfig | undefined;
     return c;
   }, [type, i18n.language]);
 
@@ -92,29 +87,24 @@ export const CalculatorPage: React.FC<Props> = ({ type, onBack, onNavigateProjec
   const tips = (getStaticTips()[type] || []) as string[];
   const hasTips = tips.length > 0;
 
-
-  const existingProject = useMemo(() => {
-    if (!projectId) return null;
-    return getProjects().find((project) => project.id === projectId) || null;
-  }, [projectId]);
-
-  const initialSnapshot = existingProject?.calculatorSnapshot;
-
-  useEffect(() => {
-    if (existingProject?.name) setNewProjectName(existingProject.name);
-  }, [existingProject?.name]);
-
-  const handleBack = () => {
-    if (returnQuoteId) {
-      navigate(`/app/quotes/${returnQuoteId}`);
-      return;
-    }
-    if (projectId) {
-      navigate(`/app/projects?projectId=${projectId}`);
-      return;
-    }
-    onBack();
-  };
+  const displayResult = useMemo(() => {
+    if (!result) return null;
+    return {
+      ...result,
+      summary: localizeLegacyText(result.summary),
+      details: result.details.map((d) => ({
+        ...d,
+        label: localizeLegacyText(d.label),
+        value: typeof d.value === "string" ? localizeLegacyText(d.value) : d.value,
+      })),
+      materials: result.materials.map((m) => ({
+        ...m,
+        name: localizeLegacyText(m.name),
+        details: m.details ? localizeLegacyText(m.details) : m.details,
+      })),
+      warnings: result.warnings?.map((w) => localizeLegacyText(w)),
+    };
+  }, [result, i18n.language]);
 
   const euro = useMemo(
     () =>
@@ -136,66 +126,66 @@ export const CalculatorPage: React.FC<Props> = ({ type, onBack, onNavigateProjec
   const renderCalculator = () => {
     switch (type) {
       case CalculatorType.PAINT:
-        return <PaintCalculator onCalculate={setResult} initialSnapshot={initialSnapshot} />;
+        return <PaintCalculator onCalculate={setResult} />;
 
       case CalculatorType.CONCRETE:
-        return <ConcreteCalculator onCalculate={setResult} initialSnapshot={initialSnapshot} />;
+        return <ConcreteCalculator onCalculate={setResult} />;
 
       case CalculatorType.TILES:
-        return <TileCalculator onCalculate={setResult} initialSnapshot={initialSnapshot} />;
+        return <TileCalculator onCalculate={setResult} />;
 
       case CalculatorType.RAGREAGE:
-        return <LevelingCalculator onCalculate={setResult} initialSnapshot={initialSnapshot} />;
+        return <LevelingCalculator onCalculate={setResult} />;
 
       case CalculatorType.PLACO:
-        return <PlacoCalculator onCalculate={setResult} initialSnapshot={initialSnapshot} />;
+        return <PlacoCalculator onCalculate={setResult} />;
 
       // Legacy fallback
       case CalculatorType.STRUCTURAL:
-        return <StructuralCalculator onCalculate={setResult} initialSnapshot={initialSnapshot} />;
+        return <StructuralCalculator onCalculate={setResult} />;
 
       // Specific structural modes
       case CalculatorType.GROUNDWORK:
-        return <StructuralCalculator onCalculate={setResult} initialMode="groundwork" hideTabs initialSnapshot={initialSnapshot} />;
+        return <StructuralCalculator onCalculate={setResult} initialMode="groundwork" hideTabs />;
 
       case CalculatorType.FOUNDATIONS:
-        return <FoundationsCalculator onCalculate={setResult} initialSnapshot={initialSnapshot} />;
+        return <FoundationsCalculator onCalculate={setResult} />;
 
       case CalculatorType.WALLS:
-        return <StructuralCalculator onCalculate={setResult} initialMode="walls" hideTabs initialSnapshot={initialSnapshot} />;
+        return <StructuralCalculator onCalculate={setResult} initialMode="walls" hideTabs />;
 
       case CalculatorType.SUBSTRUCTURE:
-        return <SubstructureCalculator onCalculate={setResult} initialSnapshot={initialSnapshot} />;
+        return <SubstructureCalculator onCalculate={setResult} />;
 
       case CalculatorType.STAIRS:
-        return <StairCalculator onCalculate={setResult} initialSnapshot={initialSnapshot} />;
+        return <StairCalculator onCalculate={setResult} />;
 
       case CalculatorType.ROOF:
-        return <RoofCalculator onCalculate={setResult} initialSnapshot={initialSnapshot} />;
+        return <RoofCalculator onCalculate={setResult} />;
 
       case CalculatorType.JOINERY:
-        return <JoineryCalculator onCalculate={setResult} initialSnapshot={initialSnapshot} />;
+        return <JoineryCalculator onCalculate={setResult} />;
 
       case CalculatorType.ELECTRICITY:
-        return <ElectricityCalculator onCalculate={setResult} initialSnapshot={initialSnapshot} />;
+        return <ElectricityCalculator onCalculate={setResult} />;
 
       case CalculatorType.PLUMBING:
-        return <PlumbingCalculator onCalculate={setResult} initialSnapshot={initialSnapshot} />;
+        return <PlumbingCalculator onCalculate={setResult} />;
 
       case CalculatorType.HVAC:
-        return <HvacCalculator onCalculate={setResult} initialSnapshot={initialSnapshot} />;
+        return <HvacCalculator onCalculate={setResult} />;
 
       case CalculatorType.SCREED:
-        return <ScreedCalculator onCalculate={setResult} initialSnapshot={initialSnapshot} />;
+        return <ScreedCalculator onCalculate={setResult} />;
 
       case CalculatorType.FACADE:
-        return <FacadeCalculator onCalculate={setResult} initialSnapshot={initialSnapshot} />;
+        return <FacadeCalculator onCalculate={setResult} />;
 
       case CalculatorType.EXTERIOR:
-        return <ExteriorCalculator onCalculate={setResult} initialSnapshot={initialSnapshot} />;
+        return <ExteriorCalculator onCalculate={setResult} />;
 
       case CalculatorType.QUICK_TOOLS:
-        return <QuickToolsCalculator onCalculate={setResult} initialSnapshot={initialSnapshot} />;
+        return <QuickToolsCalculator onCalculate={setResult} />;
 
       default:
         return (
@@ -207,7 +197,7 @@ export const CalculatorPage: React.FC<Props> = ({ type, onBack, onNavigateProjec
   };
 
   const handleAddToProject = () => {
-    if (!result) return;
+    if (!displayResult) return;
 
     const dateLabel = new Date().toLocaleDateString(i18n.language || "en-GB");
     const projectNotes =
@@ -219,40 +209,26 @@ ${tips
         : "";
 
     const project: Project = {
-      id: existingProject?.id || generateId(),
-      name: newProjectName || existingProject?.name || `${config.name} - ${dateLabel}`,
-      date: existingProject?.date || new Date().toISOString(),
-      items: result.materials,
-      notes: projectNotes || existingProject?.notes || "",
-      calculatorType: type,
-      calculatorLabel: config.name,
-      calculatorSnapshot: result.snapshot,
+      id: generateId(),
+      name: newProjectName || `${config.name} - ${dateLabel}`,
+      date: new Date().toISOString(),
+      items: displayResult.materials,
+      notes: projectNotes,
     };
 
     saveProject(project);
     setShowSaveModal(false);
-
-    if (returnQuoteId) {
-      navigate(`/app/quotes/${returnQuoteId}`);
-      return;
-    }
-
-    if (existingProject) {
-      navigate(`/app/projects?projectId=${project.id}`);
-      return;
-    }
-
     onNavigateProjects();
   };
 
   const handleShare = async () => {
-    if (!result) return;
+    if (!displayResult) return;
 
-    const detailsText = result.details
+    const detailsText = displayResult.details
       .map((d) => `• ${d.label}: ${d.value} ${d.unit || ""}`.trim())
       .join("\n");
 
-    const materialsText = result.materials
+    const materialsText = displayResult.materials
       .map((m) => {
         const line = `- ${m.name}: ${m.quantity} ${m.unit}`;
         return m.details ? `${line}
@@ -261,17 +237,17 @@ ${tips
       .join("\n");
 
     const warningsText =
-      result.warnings && result.warnings.length > 0
+      displayResult.warnings && displayResult.warnings.length > 0
         ? `
 ${t("common.attention", { defaultValue: "ATTENTION" })}:
-${result.warnings.join("\n")}`
+${displayResult.warnings.join("\n")}`
         : "";
 
     const text = [
       `${t("app.name", { defaultValue: "BatiQuant" })} - ${config.name}`,
       "-------------------------",
-      result.summary,
-      `${t("calculator.estimated_cost", { defaultValue: "Estimated cost" })}: ~ ${euro.format(result.totalCost)}`,
+      displayResult.summary,
+      `${t("calculator.estimated_cost", { defaultValue: "Estimated cost" })}: ~ ${euro.format(displayResult.totalCost)}`,
       "-------------------------",
       "",
       `${t("calculator.tech_details", { defaultValue: "TECHNICAL DETAILS" })}:`,
@@ -302,7 +278,7 @@ ${result.warnings.join("\n")}`
     <div className="flex flex-col h-full bg-slate-50 pb-20 overflow-y-auto no-scrollbar">
       <div className={`sticky top-0 z-10 flex items-center p-4 ${config.color} text-white shadow-md`}>
         <button
-          onClick={handleBack}
+          onClick={onBack}
           className="mr-4 p-2 hover:bg-white/20 rounded-full transition-colors"
           type="button"
           aria-label={t("common.back", { defaultValue: "Back" })}
@@ -315,15 +291,6 @@ ${result.warnings.join("\n")}`
           <p className="text-xs opacity-90">
             {t("calculator.precision", { defaultValue: "Precision calculator" })}
           </p>
-          {returnQuoteId ? (
-            <button
-              type="button"
-              onClick={() => navigate(`/app/quotes/${returnQuoteId}`)}
-              className="mt-1 text-[11px] font-semibold text-white/90 underline underline-offset-2"
-            >
-              {t("common.back_to_quote", { defaultValue: "Back to quote" })}
-            </button>
-          ) : null}
         </div>
       </div>
 
@@ -332,16 +299,16 @@ ${result.warnings.join("\n")}`
           {renderCalculator()}
         </div>
 
-        {result && (
+        {displayResult && (
           <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div className="bg-white p-6 rounded-2xl shadow-lg border-2 border-blue-600 relative overflow-hidden">
               <h2 className="text-sm uppercase tracking-wider text-slate-500 mb-1">
                 {t("calculator.result_estimated", { defaultValue: "Estimated result" })}
               </h2>
-              <p className="text-4xl font-extrabold text-blue-600 mb-4">{result.summary}</p>
+              <p className="text-4xl font-extrabold text-blue-600 mb-4">{displayResult.summary}</p>
 
               <div className="grid grid-cols-2 gap-4 text-sm border-t border-slate-100 pt-4">
-                {result.details.map((d, i) => (
+                {displayResult.details.map((d, i) => (
                   <div key={i}>
                     <span className="block text-slate-500">{d.label}</span>
                     <span className="font-semibold text-slate-800">
@@ -351,14 +318,14 @@ ${result.warnings.join("\n")}`
                 ))}
               </div>
 
-              {result.warnings && result.warnings.length > 0 && (
+              {displayResult.warnings && displayResult.warnings.length > 0 && (
                 <div className="mt-4 bg-red-50 border border-red-200 p-3 rounded-lg text-sm text-red-700">
                   <div className="flex items-center mb-1 font-extrabold">
                     <AlertTriangle size={16} className="mr-2" />{" "}
                     {t("common.attention", { defaultValue: "Warning" })}
                   </div>
                   <ul className="list-disc pl-4 space-y-1">
-                    {result.warnings.map((w, i) => (
+                    {displayResult.warnings.map((w, i) => (
                       <li key={i}>{w}</li>
                     ))}
                   </ul>
@@ -372,12 +339,12 @@ ${result.warnings.join("\n")}`
                   {t("calculator.materials_estimated", { defaultValue: "Estimated materials" })}
                 </h3>
                 <span className="text-emerald-600 font-extrabold text-lg">
-                  ~ {euro.format(result.totalCost)}
+                  ~ {euro.format(displayResult.totalCost)}
                 </span>
               </div>
 
               <ul className="space-y-4 text-sm">
-                {result.materials.map((m) => {
+                {displayResult.materials.map((m) => {
                   return (
                     <li key={m.id} className="border-b border-slate-50 last:border-0 pb-2">
                       <div className="flex justify-between items-start gap-3">
@@ -440,11 +407,11 @@ ${result.warnings.join("\n")}`
 
               <button
                 type="button"
-                onClick={() => (existingProject ? handleAddToProject() : setShowSaveModal(true))}
+                onClick={() => setShowSaveModal(true)}
                 className="flex items-center justify-center space-x-2 bg-blue-600 text-white p-3 rounded-xl font-extrabold shadow-md active:scale-95 transition-transform"
               >
                 <Plus size={20} />
-                <span>{existingProject ? t("common.update", { defaultValue: "Update" }) : t("common.save", { defaultValue: "Save" })}</span>
+                <span>{t("common.save", { defaultValue: "Save" })}</span>
               </button>
 
               <button
@@ -459,8 +426,8 @@ ${result.warnings.join("\n")}`
 
             <div className="pt-4">
               <MobileAdPlaceholder
-            title={t("ads.placeholderTitle", { defaultValue: "Reserved ad placement" })}
-            description={t("ads.placeholderDescription", {
+            title={t("ads.placeholder_title", { defaultValue: "Reserved mobile ad slot" })}
+            description={t("ads.placeholder_text", {
               defaultValue: "This area is kept for future mobile ad integration.",
             })}
             minHeight={180}

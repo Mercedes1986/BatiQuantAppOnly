@@ -16,30 +16,29 @@ import { useTranslation } from "react-i18next";
 import i18next from "i18next";
 
 // Layout / UI
-import { BottomNav } from "@/components/BottomNav";
+import { BottomNav } from "./components/BottomNav";
 
 // App pages
-import { DashboardPage } from "@/pages/DashboardPage";
-import { CalculatorPage } from "@/pages/CalculatorPage";
-import { ProjectsPage } from "@/pages/ProjectsPage";
-import { SettingsPage } from "@/pages/SettingsPage";
-import { HouseProjectPage } from "@/pages/HouseProjectPage";
-import { MaterialsPage } from "@/pages/MaterialsPage";
-import { AppMenuPage } from "@/pages/AppMenuPage";
-import { QuickToolsPage } from "@/pages/QuickToolsPage";
+import { DashboardPage } from "./pages/DashboardPage";
+import { CalculatorPage } from "./pages/CalculatorPage";
+import { ProjectsPage } from "./pages/ProjectsPage";
+import { SettingsPage } from "./pages/SettingsPage";
+import { HouseProjectPage } from "./pages/HouseProjectPage";
+import { MaterialsPage } from "./pages/MaterialsPage";
+import { AppMenuPage } from "./pages/AppMenuPage";
+import { QuickToolsPage } from "./pages/QuickToolsPage";
 
 // Documents
-import { QuoteEditorPage } from "@/pages/documents/QuoteEditorPage";
-import { QuotesListPage } from "@/pages/documents/QuotesListPage";
-import { InvoiceEditorPage } from "@/pages/documents/InvoiceEditorPage";
-import { PrintDocumentPage } from "@/pages/documents/PrintDocumentPage";
+import { QuoteEditorPage } from "./pages/documents/QuoteEditorPage";
+import { InvoiceEditorPage } from "./pages/documents/InvoiceEditorPage";
+import { PrintDocumentPage } from "./pages/documents/PrintDocumentPage";
 
 // Storage
-import { getHouseProjects, saveHouseProject } from "@/services/storage";
+import { getHouseProjects, saveHouseProject } from "./services/storage";
 
 // Types
-import { CalculatorType, ConstructionStepId } from "@/types";
-import type { HouseProject } from "@/types";
+import { CalculatorType, ConstructionStepId } from "./types";
+import type { HouseProject } from "./types";
 
 import { ArrowLeft, Save, Loader2, AlertTriangle } from "lucide-react";
 
@@ -232,8 +231,6 @@ const ProjectCalculatorWrapper: React.FC = () => {
         materials: result.materials,
         cost: result.totalCost,
         notes: result.summary,
-        calculatorType: calcType,
-        calculatorSnapshot: result.snapshot,
       },
     };
 
@@ -296,13 +293,10 @@ const ProjectCalculatorWrapper: React.FC = () => {
   };
 
   const renderCalculator = () => {
-    const stepSnapshot = stepId ? project?.steps?.[stepId]?.calculatorSnapshot : undefined;
-
     const props = {
       onCalculate: setResult,
       initialArea: project?.params.surfaceArea,
       initialPerimeter: project?.params.perimeter,
-      initialSnapshot: stepSnapshot,
     };
 
     switch (calcType) {
@@ -628,7 +622,6 @@ const App: React.FC = () => {
             <Route path="materials" element={<MaterialsPage />} />
             <Route path="settings" element={<SettingsPage />} />
             <Route path="calculator" element={<ProjectCalculatorWrapper />} />
-            <Route path="quotes" element={<QuotesListPage />} />
             <Route path="quotes/:id" element={<QuoteEditorPage />} />
             <Route path="invoices/:id" element={<InvoiceEditorPage />} />
           </Route>

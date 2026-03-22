@@ -14,6 +14,43 @@ const hasFontReady = (doc: Document): doc is Document & { fonts: FontFaceSetLike
   return typeof (doc as any).fonts?.ready?.then === "function";
 };
 
+
+const localizeLegacyLineDescription = (description: string, t: (key: string, options?: any) => string) => {
+  const translated: Record<string, string> = {
+    "Foundation concrete (C25/30)": t("calc.foundations.mat.foundation_concrete", { defaultValue: "Foundation concrete (C25/30)" }),
+    "Steel (average ratio)": t("calc.foundations.mat.steel", { defaultValue: "Steel (average ratio)" }),
+    "Excavation": t("calc.foundations.mat.excavation", { defaultValue: "Excavation" }),
+    "Blinding concrete": t("calc.foundations.mat.clean_concrete", { defaultValue: "Blinding concrete" }),
+    "Formwork": t("calc.foundations.mat.formwork", { defaultValue: "Formwork" }),
+    "Soil disposal": t("calc.foundations.mat.evac", { defaultValue: "Soil disposal" }),
+    "Drain pipe": t("calc.foundations.mat.drain", { defaultValue: "Drain pipe" }),
+    "Drain gravel": t("calc.foundations.mat.drain_gravel", { defaultValue: "Drain gravel" }),
+    "Geotextile (drain)": t("calc.foundations.mat.geotextile", { defaultValue: "Geotextile (drain)" }),
+  };
+  return translated[description] ?? description;
+};
+
+const localizeLegacyNotes = (notes: string | undefined, t: (key: string, options?: any) => string) => {
+  if (!notes) return notes || "";
+  const pairs: Array<[string, string]> = [
+    ["Double-check frost depth and soil conditions before sizing footings.", t("tips.foundations.1", { defaultValue: "Double-check frost depth and soil conditions before sizing footings." })],
+    ["Keep reinforcement properly covered (concrete cover) to avoid corrosion.", t("tips.foundations.2", { defaultValue: "Keep reinforcement properly covered (concrete cover) to avoid corrosion." })],
+    ["Plan access for the mixer truck/pump early (turning radius, hose path).", t("tips.foundations.3", { defaultValue: "Plan access for the mixer truck/pump early (turning radius, hose path)." })],
+    ["Waterproofing should go on a clean, dry surface — and protect it with a drainage membrane.", t("tips.substructure.1", { defaultValue: "Waterproofing should go on a clean, dry surface — and protect it with a drainage membrane." })],
+    ["Always include weep points/manholes for perimeter drains to allow inspection.", t("tips.substructure.2", { defaultValue: "Always include weep points/manholes for perimeter drains to allow inspection." })],
+    ["On shuttering blocks, calculate fill concrete separately — it depends on the block type.", t("tips.substructure.3", { defaultValue: "On shuttering blocks, calculate fill concrete separately — it depends on the block type." })],
+    ["Check bond pattern and keep joints consistent to reduce waste and improve alignment.", t("tips.walls.1", { defaultValue: "Check bond pattern and keep joints consistent to reduce waste and improve alignment." })],
+    ["Don’t forget lintel bearings and horizontal ring beams where required.", t("tips.walls.2", { defaultValue: "Don’t forget lintel bearings and horizontal ring beams where required." })],
+    ["Don't forget lintel bearings and horizontal ring beams where required.", t("tips.walls.2", { defaultValue: "Don't forget lintel bearings and horizontal ring beams where required." })],
+    ["Compact in layers: most outdoor failures come from insufficient base preparation.", t("tips.exterior.1", { defaultValue: "Compact in layers: most outdoor failures come from insufficient base preparation." })],
+    ["Add drainage considerations (slope away from buildings, permeable layers).", t("tips.exterior.2", { defaultValue: "Add drainage considerations (slope away from buildings, permeable layers)." })],
+  ];
+  let value = notes;
+  for (const [src, localized] of pairs) value = value.split(src).join(localized);
+  return value;
+};
+
+
 export const PrintDocumentPage: React.FC = () => {
   const { t } = useTranslation();
   const { type, id } = useParams<{ type: string; id: string }>();
@@ -29,6 +66,15 @@ export const PrintDocumentPage: React.FC = () => {
   }, [id, type]);
 
   const isQuote = useMemo(() => type === "quote", [type]);
+
+  const localizedDoc = useMemo(() => {
+    if (!doc) return null;
+    return {
+      ...doc,
+      lines: doc.lines.map((line) => ({ ...line, description: localizeLegacyLineDescription(line.description, t) })),
+      notes: localizeLegacyNotes(doc.notes, t),
+    };
+  }, [doc, t]);
 
   useEffect(() => {
     if (!doc || !company) return;
@@ -59,7 +105,7 @@ export const PrintDocumentPage: React.FC = () => {
     };
   }, [doc, company]);
 
-  if (!doc || !company) {
+  if (!localizedDoc || !company) {
     return (
       <div className="p-8 text-center text-slate-500">
         {t("common.loading_document", { defaultValue: "Chargement du document..." })}
@@ -67,7 +113,7 @@ export const PrintDocumentPage: React.FC = () => {
     );
   }
 
-  const vatPct = doc.totalHT > 0 ? (doc.totalVAT / doc.totalHT) * 100 : 0;
+  const vatPct = localizedDoc.totalHT > 0 ? (localizedDoc.totalVAT / localizedDoc.totalHT) * 100 : 0;
 
   return (
     <div className="min-h-screen bg-white text-slate-900 font-sans print:p-0 p-8 max-w-[210mm] mx-auto box-border">
@@ -108,13 +154,13 @@ export const PrintDocumentPage: React.FC = () => {
               {t("doc.recipient", { defaultValue: "Destinataire" })}
             </h3>
             <div className="text-base text-slate-800 leading-relaxed">
-              <p className="font-bold text-lg">{doc.client.name}</p>
-              <p>{doc.client.address}</p>
+              <p className="font-bold text-lg">{localizedDoc.client.name}</p>
+              <p>{localizedDoc.client.address}</p>
               <p>
-                {doc.client.zip} {doc.client.city}
+                {localizedDoc.client.zip} {localizedDoc.client.city}
               </p>
-              {doc.client.phone ? <p className="text-sm text-slate-500 mt-2">{doc.client.phone}</p> : null}
-              {doc.client.email ? <p className="text-sm text-slate-500">{doc.client.email}</p> : null}
+              {localizedDoc.client.phone ? <p className="text-sm text-slate-500 mt-2">{localizedDoc.client.phone}</p> : null}
+              {localizedDoc.client.email ? <p className="text-sm text-slate-500">{localizedDoc.client.email}</p> : null}
             </div>
           </div>
         </div>
@@ -129,7 +175,7 @@ export const PrintDocumentPage: React.FC = () => {
               : t("doc.invoice_title", { defaultValue: "Facture Client" })}
           </span>
           <h2 className="text-4xl font-bold text-slate-900">
-            {t("doc.number_prefix", { defaultValue: "N°" })} {doc.number}
+            {t("doc.number_prefix", { defaultValue: "N°" })} {localizedDoc.number}
           </h2>
         </div>
 
@@ -138,24 +184,24 @@ export const PrintDocumentPage: React.FC = () => {
             <span className="font-medium text-slate-400">
               {t("doc.issue_date", { defaultValue: "Date d'émission" })} :
             </span>{" "}
-            {new Date(doc.date).toLocaleDateString()}
+            {new Date(localizedDoc.date).toLocaleDateString()}
           </p>
 
-          {"validUntil" in doc && (doc as any).validUntil ? (
+          {"validUntil" in localizedDoc && (localizedDoc as any).validUntil ? (
             <p>
               <span className="font-medium text-slate-400">
                 {t("doc.valid_until", { defaultValue: "Valable jusqu'au" })} :
               </span>{" "}
-              {new Date((doc as any).validUntil).toLocaleDateString()}
+              {new Date((localizedDoc as any).validUntil).toLocaleDateString()}
             </p>
           ) : null}
 
-          {!isQuote && (doc as any).paymentDate ? (
+          {!isQuote && (localizedDoc as any).paymentDate ? (
             <p>
               <span className="font-medium text-slate-400">
                 {t("invoice.payment_date", { defaultValue: "Date paiement" })} :
               </span>{" "}
-              {new Date((doc as any).paymentDate).toLocaleDateString()}
+              {new Date((localizedDoc as any).paymentDate).toLocaleDateString()}
             </p>
           ) : null}
         </div>
@@ -181,7 +227,7 @@ export const PrintDocumentPage: React.FC = () => {
         </thead>
 
         <tbody className="divide-y divide-slate-100">
-          {doc.lines.map((line, idx) => (
+          {localizedDoc.lines.map((line, idx) => (
             <tr
               key={idx}
               className={line.unitPrice === 0 ? "bg-slate-50 break-inside-avoid" : "break-inside-avoid"}
@@ -214,29 +260,29 @@ export const PrintDocumentPage: React.FC = () => {
         <div className="w-[300px] bg-slate-50 p-6 rounded-xl border border-slate-200">
           <div className="flex justify-between mb-3 text-sm text-slate-600">
             <span>{t("doc.total_ht", { defaultValue: "Total HT" })}</span>
-            <span className="font-bold">{doc.totalHT.toFixed(2)} €</span>
+            <span className="font-bold">{localizedDoc.totalHT.toFixed(2)} €</span>
           </div>
           <div className="flex justify-between mb-4 text-sm text-slate-600 border-b border-slate-200 pb-4">
             <span>{t("doc.vat", { defaultValue: "TVA" })} ({vatPct.toFixed(1)}%)</span>
-            <span>{doc.totalVAT.toFixed(2)} €</span>
+            <span>{localizedDoc.totalVAT.toFixed(2)} €</span>
           </div>
           <div className="flex justify-between items-center">
             <span className="text-base font-bold text-slate-800">
               {t("doc.net_to_pay", { defaultValue: "NET À PAYER" })}
             </span>
-            <span className="text-2xl font-bold text-blue-600">{doc.totalTTC.toFixed(2)} €</span>
+            <span className="text-2xl font-bold text-blue-600">{localizedDoc.totalTTC.toFixed(2)} €</span>
           </div>
         </div>
       </div>
 
       {/* FOOTER */}
       <div className="text-xs text-slate-500 mt-auto pt-8 border-t border-slate-200 break-inside-avoid">
-        {doc.notes ? (
+        {localizedDoc.notes ? (
           <div className="mb-6 p-4 bg-slate-50 rounded-lg border border-slate-100">
             <p className="font-bold text-slate-700 mb-1">
               {t("doc.notes", { defaultValue: "Notes / Conditions :" })}
             </p>
-            <p className="whitespace-pre-line leading-relaxed">{doc.notes}</p>
+            <p className="whitespace-pre-line leading-relaxed">{localizedDoc.notes}</p>
           </div>
         ) : null}
 
