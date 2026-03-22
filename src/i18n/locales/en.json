@@ -67,7 +67,8 @@
     "site": "Site",
     "projects": "Projects",
     "materials": "Materials",
-    "settings": "Settings"
+    "settings": "Settings",
+    "quick_tools": "Quick"
   },
   "struct": {
     "tabs": {
@@ -386,8 +387,8 @@
     }
   },
   "menu": {
-    "title": "App menu",
-    "subtitle": "Quick access to sections + tools",
+    "title": "Main menu",
+    "subtitle": "Open the tools you use most often without wasting time in extra navigation.",
     "back_dashboard": "Dashboard",
     "back_dashboard_title": "Back to dashboard",
     "how": {
@@ -434,12 +435,28 @@
       },
       "quotes": {
         "title": "My quotes",
-        "subtitle": "Find all quotes created from your projects and job sites."
+        "subtitle": "Find all quotes created from your projects and job sites.",
+        "desc": "See every quote created from projects and sites in one place."
       }
     },
     "tools": {
       "title": "All tools (quick access)",
       "subtitle": "Click a tool to open the calculator directly."
+    },
+    "dashboard_badge": "Worksite dashboard",
+    "primary": {
+      "title": "Priority actions",
+      "subtitle": "The most useful entries for day-to-day work."
+    },
+    "secondary": {
+      "title": "Continue",
+      "subtitle": "Quotes, projects, materials and app options."
+    },
+    "quotes_shortcut": "My quotes",
+    "stats": {
+      "quotes": "Quotes",
+      "projects": "Projects",
+      "sites": "Sites"
     }
   },
   "ads": {
@@ -451,7 +468,10 @@
     },
     "label": "Advertisement",
     "placeholder_title": "Reserved mobile ad slot",
-    "placeholder_text": "Web ads are disabled in this codebase. AdMob must be wired in the native Android/iOS layer."
+    "placeholder_text": "Web ads are disabled in this codebase. AdMob must be wired in the native Android/iOS layer.",
+    "placeholderTitle": "Reserved ad placement",
+    "placeholderDescription": "This area is kept for future mobile ad integration.",
+    "placeholderLabel": "Advertising placeholder"
   },
   "app": {
     "name": "BatiQuant",
@@ -2034,7 +2054,8 @@
       "late": "Late",
       "paid": "Paid",
       "sent": "Sent"
-    }
+    },
+    "status_label": "Status"
   },
   "joinery": {
     "add": "Add",
@@ -2123,7 +2144,9 @@
       "low_override": "Override price is low.",
       "no_items": "Add at least one item."
     },
-    "supplies_title": "Installation supplies"
+    "supplies_title": "Installation supplies",
+    "material_label": "Material",
+    "shutter_label": "Shutter"
   },
   "materials": {
     "all": "All",
@@ -2358,7 +2381,8 @@
     "pool": "Pool",
     "networks": "Networks",
     "garden": "Garden",
-    "finishes": "Finishes"
+    "finishes": "Finishes",
+    "other": "Other"
   },
   "calculators": {
     "groundwork": {

@@ -618,7 +618,7 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate,
                         {item.width}×{item.height}m • {item.material.toUpperCase()}
                         {item.shutter !== "none" && (
                           <span className="ml-2 text-blue-600 font-medium">
-                            + {t("joinery.shutter", { defaultValue: "Shutter" })}{" "}
+                            + {t("joinery.shutter_label", { defaultValue: "Shutter" })}{" "}
                             {item.shutter === "rolling"
                               ? t("joinery.shutter.rolling", { defaultValue: "Rolling" })
                               : t("joinery.shutter.swing", { defaultValue: "Swing" })}
@@ -776,7 +776,7 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate,
                     </div>
                     <div>
                       <label className="block text-xs font-bold text-slate-500 mb-1">
-                        {t("joinery.material", { defaultValue: "Material" })}
+                        {t("joinery.material_label", { defaultValue: "Material" })}
                       </label>
                       <select
                         value={formMat}
@@ -793,7 +793,7 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate,
                   {(formType === "window" || formType === "bay") && (
                     <div>
                       <label className="block text-xs font-bold text-slate-500 mb-1">
-                        {t("joinery.shutter", { defaultValue: "Shutter" })}
+                        {t("joinery.shutter_label", { defaultValue: "Shutter" })}
                       </label>
                       <div className="flex bg-slate-100 p-1 rounded">
                         <button

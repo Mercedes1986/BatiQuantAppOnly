@@ -555,7 +555,7 @@ export const HouseProjectPage: React.FC = () => {
 
               <hr className="border-slate-200" />
 
-              <section style={{ paddingBottom: "calc(var(--bottom-nav-space) + 0.75rem)" }}>
+              <section style={{ paddingBottom: "calc(var(--bottom-nav-height) + var(--app-safe-bottom) + 0.75rem)" }}>
                 <h3 className="font-extrabold text-slate-800 text-lg mb-4 flex items-center">
                   <AlertTriangle className="mr-2 text-amber-500" size={20} />{" "}
                   {t("house.quick_estimator", { defaultValue: "Quick estimator" })}

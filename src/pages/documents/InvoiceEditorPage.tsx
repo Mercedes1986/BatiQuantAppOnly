@@ -177,7 +177,7 @@ export const InvoiceEditorPage: React.FC = () => {
         <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-wrap gap-4 items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="text-sm font-bold text-slate-600 uppercase tracking-wide text-[10px]">
-              {t("invoice.status", { defaultValue: "Statut" })}
+              {t("invoice.status_label", { defaultValue: "Status" })}
             </span>
             <select
               value={invoice.status}

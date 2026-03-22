@@ -67,11 +67,12 @@
     "site": "Chantier",
     "projects": "Projets",
     "materials": "Matériaux",
-    "settings": "Réglages"
+    "settings": "Réglages",
+    "quick_tools": "Rapide"
   },
   "menu": {
-    "title": "Menu de l’application",
-    "subtitle": "Accès direct aux sections + aux outils",
+    "title": "Menu principal",
+    "subtitle": "Ouvrez les outils les plus utiles sans perdre de temps dans une navigation inutile.",
     "back_dashboard": "Tableau de bord",
     "back_dashboard_title": "Retour au tableau de bord",
     "how": {
@@ -118,12 +119,28 @@
       },
       "quotes": {
         "title": "Mes devis",
-        "subtitle": "Retrouvez tous les devis créés depuis vos projets et chantiers."
+        "subtitle": "Retrouvez tous les devis créés depuis vos projets et chantiers.",
+        "desc": "Consultez tous les devis créés depuis vos projets et chantiers au même endroit."
       }
     },
     "tools": {
       "title": "Tous les outils (accès direct)",
       "subtitle": "Cliquez sur un outil pour ouvrir le calculateur directement."
+    },
+    "dashboard_badge": "Tableau de bord chantier",
+    "primary": {
+      "title": "Actions prioritaires",
+      "subtitle": "Les entrées les plus utiles pour le travail au quotidien."
+    },
+    "secondary": {
+      "title": "Continuer",
+      "subtitle": "Devis, projets, matériaux et options de l’application."
+    },
+    "quotes_shortcut": "Mes devis",
+    "stats": {
+      "quotes": "Devis",
+      "projects": "Projets",
+      "sites": "Chantiers"
     }
   },
   "struct": {
@@ -451,7 +468,10 @@
     },
     "label": "Publicité",
     "placeholder_title": "Emplacement publicitaire mobile réservé",
-    "placeholder_text": "La publicité web est désactivée dans cette base. Branche AdMob à intégrer dans la couche Android/iOS native."
+    "placeholder_text": "La publicité web est désactivée dans cette base. Branche AdMob à intégrer dans la couche Android/iOS native.",
+    "placeholderTitle": "Emplacement publicitaire réservé",
+    "placeholderDescription": "Cette zone est conservée pour une future intégration publicitaire mobile.",
+    "placeholderLabel": "Espace publicitaire"
   },
   "app": {
     "name": "BatiQuant",
@@ -2112,7 +2132,8 @@
       "late": "En retard",
       "paid": "Payée",
       "sent": "Envoyée"
-    }
+    },
+    "status_label": "Statut"
   },
   "joinery": {
     "add": "Ajouter",
@@ -2201,7 +2222,9 @@
       "low_override": "Surcharge de prix faible.",
       "no_items": "Ajoutez au moins un élément."
     },
-    "supplies_title": "Fournitures de pose"
+    "supplies_title": "Fournitures de pose",
+    "material_label": "Matériau",
+    "shutter_label": "Volet"
   },
   "materials": {
     "all": "Tout",
@@ -2561,7 +2584,8 @@
     "pool": "Piscine",
     "networks": "Réseaux",
     "garden": "Jardin",
-    "finishes": "Finitions"
+    "finishes": "Finitions",
+    "other": "Autres"
   },
   "calculators": {
     "groundwork": {

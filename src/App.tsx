@@ -613,7 +613,7 @@ const App: React.FC = () => {
 
           {/* App zone */}
           <Route path="/app" element={<AppLayout />}>
-            <Route index element={<Navigate to="projects" replace />} />
+            <Route index element={<Navigate to="menu" replace />} />
             <Route path="calculators" element={<DashboardOutlet />} />
             <Route path="menu" element={<AppMenuPage />} />
             <Route path="quick-tools" element={<QuickToolsPage />} />
