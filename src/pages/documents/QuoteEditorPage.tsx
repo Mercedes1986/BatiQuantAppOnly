@@ -38,15 +38,38 @@ export const QuoteEditorPage: React.FC = () => {
   const [saveFlash, setSaveFlash] = useState(false);
   const saveTimer = useRef<number | null>(null);
 
+  const localizeLegacyLineDescription = useCallback(
+    (description: string) => {
+      const translated: Record<string, string> = {
+        "Foundation concrete (C25/30)": t("calc.foundations.mat.foundation_concrete", { defaultValue: "Foundation concrete (C25/30)" }),
+        "Steel (average ratio)": t("calc.foundations.mat.steel", { defaultValue: "Steel (average ratio)" }),
+        "Excavation": t("calc.foundations.mat.excavation", { defaultValue: "Excavation" }),
+        "Blinding concrete": t("calc.foundations.mat.clean_concrete", { defaultValue: "Blinding concrete" }),
+        "Soil disposal": t("calc.foundations.mat.evac", { defaultValue: "Soil disposal" }),
+        "Formwork": t("calc.foundations.mat.formwork", { defaultValue: "Formwork" }),
+        "Drain pipe": t("calc.foundations.mat.drain", { defaultValue: "Drain pipe" }),
+        "Geotextile (drain)": t("calc.foundations.mat.geotextile", { defaultValue: "Geotextile (drain)" }),
+        "Drain gravel": t("calc.foundations.mat.drain_gravel", { defaultValue: "Drain gravel" }),
+      };
+      return translated[description] ?? description;
+    },
+    [t]
+  );
+
+  const localizeLegacyLines = useCallback(
+    (lines: DocumentLine[]) => lines.map((line) => ({ ...line, description: localizeLegacyLineDescription(line.description) })),
+    [localizeLegacyLineDescription]
+  );
+
   useEffect(() => {
     if (!id) return;
 
     const q = getQuote(id);
-    if (q) setQuote(q);
+    if (q) setQuote({ ...q, lines: localizeLegacyLines(q.lines) });
     else navigate("/app/quotes");
 
     setCompany(getCompanyProfile());
-  }, [id, navigate]);
+  }, [id, navigate, localizeLegacyLines]);
 
   useEffect(() => {
     return () => {
@@ -232,7 +255,7 @@ export const QuoteEditorPage: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">
-                  {t("client.name", { defaultValue: "Nom / Raison Sociale" })}
+                  {t("client.name_label", { defaultValue: "Nom / raison sociale" })}
                 </label>
                 <input
                   value={quote.client.name}
@@ -271,7 +294,7 @@ export const QuoteEditorPage: React.FC = () => {
 
             <div>
               <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">
-                {t("client.address_full", { defaultValue: "Adresse Complète" })}
+                {t("client.address_full", { defaultValue: "Adresse complète" })}
               </label>
               <div className="flex gap-2">
                 <div className="relative flex-1">

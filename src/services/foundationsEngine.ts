@@ -107,7 +107,7 @@ export const calculateFoundations = (
     // Drainage : pas automatique sur plots (à toi de décider en V2)
     if (inputs.drainage) {
       warnings.push(
-        "Drainage activé sur semelles isolées : la longueur de drain n'est pas calculée automatiquement (vérifie la configuration)."
+        tr("calc.foundations.warn_pad_drain_manual", "Drainage enabled for pad footings: drain length is not calculated automatically (check your setup).")
       );
     }
   }
@@ -188,7 +188,7 @@ export const calculateFoundations = (
       unitPrice: p("STEEL_KG"),
       totalPrice: r2(cost),
       category: CalculatorType.FOUNDATIONS,
-      details: `Ratio: ${n0(inputs.steelRatio)} kg/m³`,
+      details: tr("calc.foundations.mat.steel_ratio", "Ratio: {{ratio}} kg/m³").replace("{{ratio}}", String(n0(inputs.steelRatio))),
     });
   }
 
@@ -219,7 +219,7 @@ export const calculateFoundations = (
       unitPrice: p("LEANCONC_M3"),
       totalPrice: r2(cost),
       category: CalculatorType.FOUNDATIONS,
-      details: `Épaisseur ${n0(inputs.cleanConcreteThickCm)} cm`,
+      details: tr("calc.foundations.mat.clean_concrete_thickness", "Thickness {{cm}} cm").replace("{{cm}}", String(n0(inputs.cleanConcreteThickCm))),
     });
   }
 
@@ -228,7 +228,7 @@ export const calculateFoundations = (
     const cost = areaFormwork * p("FORMWORK_M2");
     materials.push({
       id: "formwork",
-      name: "Coffrage",
+      name: tr("calc.foundations.mat.formwork", "Formwork"),
       quantity: r2(areaFormwork),
       quantityRaw: areaFormwork,
       unit: Unit.M2,
@@ -260,7 +260,7 @@ export const calculateFoundations = (
     const cost = lenDrain * p("DRAIN_ML");
     materials.push({
       id: "drain",
-      name: "Drain routier / agricole",
+      name: tr("calc.foundations.mat.drain", "Drain pipe"),
       quantity: Math.ceil(lenDrain),
       quantityRaw: lenDrain,
       unit: Unit.METER,
@@ -269,7 +269,7 @@ export const calculateFoundations = (
       category: CalculatorType.FOUNDATIONS,
     });
   } else if (inputs.drainage && inputs.type !== "pad") {
-    warnings.push("Drainage activé mais longueur de drain = 0 (vérifie la longueur).");
+    warnings.push(tr("calc.foundations.warn_drain_zero", "Drainage enabled but drain length = 0 (check the length)."));
   }
 
   // Gravier drainant
@@ -277,7 +277,7 @@ export const calculateFoundations = (
     const cost = volGravel * p("GRAVEL_M3");
     materials.push({
       id: "gravel",
-      name: "Gravier drainant",
+      name: tr("calc.foundations.mat.drain_gravel", "Drain gravel"),
       quantity: r2(volGravel),
       quantityRaw: volGravel,
       unit: Unit.M3,
@@ -294,31 +294,33 @@ export const calculateFoundations = (
     const cost = areaGeo * geoUnit;
     materials.push({
       id: "geotextile",
-      name: "Géotextile (Drain)",
+      name: tr("calc.foundations.mat.geotextile", "Geotextile (drain)"),
       quantity: Math.ceil(areaGeo),
       quantityRaw: areaGeo,
       unit: Unit.M2,
       unitPrice: geoUnit,
       totalPrice: r2(cost),
       category: CalculatorType.FOUNDATIONS,
-      details: "Enrobage tranchée drainante",
+      details: tr("calc.foundations.mat.geotextile_note", "Drain trench wrap"),
     });
   }
 
   // --- 5. Warnings ---
   if (n0(inputs.frostDepthCm) > 0 && n0(inputs.excavationDepthCm) < n0(inputs.frostDepthCm)) {
     warnings.push(
-      tr("calc.foundations.warn_depth_lt_frost", `Excavation depth (${n0(inputs.excavationDepthCm)} cm) is below frost depth (${n0(inputs.frostDepthCm)} cm).`)
+      tr("calc.foundations.warn_depth_lt_frost", "Excavation depth ({{depth}} cm) is below frost depth ({{frost}} cm).")
+        .replace("{{depth}}", String(n0(inputs.excavationDepthCm)))
+        .replace("{{frost}}", String(n0(inputs.frostDepthCm)))
     );
   }
   if (inputs.soilType === "clay") {
     warnings.push(tr("calc.foundations.warn_clay_risk", "Clay soil: shrink–swell risk. A soil study is recommended."));
   }
   if (inputs.groundwater && !inputs.drainage) {
-    warnings.push("Nappe possible : drainage fortement recommandé.");
+    warnings.push(tr("calc.foundations.warn_groundwater_drain", "Possible groundwater: drainage is strongly recommended."));
   }
   if (!inputs.evacuateSpoil && !inputs.reuseSpoil) {
-    warnings.push("Aucune gestion des déblais (ni évacuation, ni réutilisation).");
+    warnings.push(tr("calc.foundations.warn_spoil_management", "No spoil management selected (neither disposal nor reuse)."));
   }
 
   return {

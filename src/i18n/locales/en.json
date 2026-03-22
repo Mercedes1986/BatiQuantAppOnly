@@ -1601,22 +1601,48 @@
       "warn_old_tile": "Tiling over old tiles requires specific prep.",
       "warn_wet_no_spec": "Wet room without waterproofing selected.",
       "warn_wood": "Wood substrates require specific systems."
+    },
+    "foundations": {
+      "mat": {
+        "foundation_concrete": "Foundation concrete (C25/30)",
+        "foundation_concrete_note": "Standard structural mix",
+        "steel": "Steel (average ratio)",
+        "steel_ratio": "Ratio: {{ratio}} kg/m³",
+        "excavation": "Excavation",
+        "clean_concrete": "Blinding concrete",
+        "clean_concrete_thickness": "Thickness {{cm}} cm",
+        "evac": "Soil disposal",
+        "evac_swell": "Bulking factor ×{{factor}}",
+        "formwork": "Formwork",
+        "drain": "Drain pipe",
+        "drain_gravel": "Drain gravel",
+        "geotextile": "Geotextile (drain)",
+        "geotextile_note": "Drain trench wrap"
+      },
+      "warn_depth_lt_frost": "Excavation depth ({{depth}} cm) is below frost depth ({{frost}} cm).",
+      "warn_clay_risk": "Clay soil: shrink–swell risk. A soil study is recommended.",
+      "warn_pad_drain_manual": "Drainage enabled for pad footings: drain length is not calculated automatically (check your setup).",
+      "warn_drain_zero": "Drainage enabled but drain length = 0 (check the length).",
+      "warn_groundwater_drain": "Possible groundwater: drainage is strongly recommended.",
+      "warn_spoil_management": "No spoil management selected (neither disposal nor reuse)."
     }
   },
   "client": {
     "address": {
-      "placeholder": "Street address"
+      "placeholder": "Street and number"
     },
     "address_full": "Full address",
     "city": "City",
     "contact": "Contact",
     "email": "Email",
-    "info": "Info",
+    "info": "Client info",
     "name": {
       "placeholder": "Client name"
     },
     "phone": "Phone",
-    "zip": "ZIP code"
+    "zip": "ZIP code",
+    "name_label": "Name / company",
+    "address_label": "Address"
   },
   "client_modal": {
     "address": "Address",
@@ -2466,6 +2492,11 @@
       "2": "For a driveable slab, aim for 12–15cm thickness + ST25C mesh.",
       "3": "Lift the mesh with spacers so it sits in the concrete, not on the ground.",
       "4": "Plan expansion joints every 15–20m² to prevent cracking."
+    },
+    "foundations": {
+      "1": "Double-check frost depth and soil conditions before sizing footings.",
+      "2": "Keep reinforcement properly covered (concrete cover) to avoid corrosion.",
+      "3": "Plan access for the mixer truck/pump early (turning radius, hose path)."
     }
   },
   "packaging": {

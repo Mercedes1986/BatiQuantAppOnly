@@ -1679,22 +1679,48 @@
         "staggered": "Pose décalée (1/2, 1/3)",
         "diagonal": "Pose diagonale"
       }
+    },
+    "foundations": {
+      "mat": {
+        "foundation_concrete": "Béton de fondation (C25/30)",
+        "foundation_concrete_note": "Béton structure standard",
+        "steel": "Acier (ratio moyen)",
+        "steel_ratio": "Ratio : {{ratio}} kg/m³",
+        "excavation": "Terrassement / fouilles",
+        "clean_concrete": "Béton de propreté",
+        "clean_concrete_thickness": "Épaisseur {{cm}} cm",
+        "evac": "Évacuation des terres",
+        "evac_swell": "Foisonnement ×{{factor}}",
+        "formwork": "Coffrage",
+        "drain": "Drain",
+        "drain_gravel": "Gravier drainant",
+        "geotextile": "Géotextile (drain)",
+        "geotextile_note": "Enrobage de la tranchée drainante"
+      },
+      "warn_depth_lt_frost": "La profondeur de fouille ({{depth}} cm) est inférieure au hors-gel ({{frost}} cm).",
+      "warn_clay_risk": "Sol argileux : risque de retrait-gonflement. Une étude de sol est recommandée.",
+      "warn_pad_drain_manual": "Drainage activé sur plots/semelles isolées : la longueur de drain n’est pas calculée automatiquement (vérifiez la configuration).",
+      "warn_drain_zero": "Drainage activé mais longueur de drain = 0 (vérifiez la longueur).",
+      "warn_groundwater_drain": "Présence possible d’eau : drainage fortement recommandé.",
+      "warn_spoil_management": "Aucune gestion des déblais sélectionnée (ni évacuation ni réutilisation)."
     }
   },
   "client": {
     "address": {
-      "placeholder": "Adresse"
+      "placeholder": "N° et rue"
     },
     "address_full": "Adresse complète",
     "city": "Ville",
     "contact": "Contact",
     "email": "E-mail",
-    "info": "Infos",
+    "info": "Informations client",
     "name": {
-      "placeholder": "Nom du client"
+      "placeholder": "Nom / raison sociale"
     },
     "phone": "Téléphone",
-    "zip": "Code postal"
+    "zip": "Code postal",
+    "name_label": "Nom / raison sociale",
+    "address_label": "Adresse"
   },
   "client_modal": {
     "address": "Adresse",
@@ -2669,6 +2695,11 @@
       "2": "Pour une dalle carrossable, viser 12–15 cm + treillis ST25C.",
       "3": "Rehausser le treillis avec des cales : il doit être dans le béton, pas au sol.",
       "4": "Prévoir des joints de dilatation tous les 15–20 m² pour limiter les fissures."
+    },
+    "foundations": {
+      "1": "Vérifiez le hors-gel et la nature du sol avant de dimensionner les fondations.",
+      "2": "Respectez un bon enrobage des armatures pour limiter les risques de corrosion.",
+      "3": "Anticipez l’accès du camion-toupie ou de la pompe (rayon de braquage, cheminement)."
     }
   },
   "packaging": {

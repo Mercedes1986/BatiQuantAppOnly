@@ -31,7 +31,7 @@ export const ClientModal: React.FC<Props> = ({ isOpen, onClose, onConfirm }) => 
       <div className="bg-white rounded-2xl w-full max-w-sm shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
         <div className="bg-slate-50 px-6 py-4 border-b border-slate-100 flex justify-between items-center">
           <h3 className="font-extrabold text-lg text-slate-800">
-            {t("client_modal.title", { defaultValue: "Nouveau devis" })}
+            {t("client_modal.title", { defaultValue: "Coordonnées client" })}
           </h3>
           <button
             onClick={onClose}
