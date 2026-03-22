@@ -2,11 +2,11 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { CalculationResult, Unit, FoundationProjectInputs, PadConfig, FoundationType, CalculatorType, CalculatorSnapshot } from "@/types";
+import { CalculationResult, Unit, FoundationProjectInputs, PadConfig, FoundationType, CalculatorType, CalculatorSnapshot, SoilDef } from "@/types";
 
-import { SOIL_PROPERTIES, DEFAULT_PRICES } from "../../constants";
-import { calculateFoundations } from "../../services/foundationsEngine";
-import { getUnitPrice } from "../../services/materialsService";
+import { SOIL_PROPERTIES, DEFAULT_PRICES } from "@/constants";
+import { calculateFoundations } from "@/services/foundationsEngine";
+import { getUnitPrice } from "@/services/materialsService";
 
 import {
   Warehouse,
@@ -290,7 +290,7 @@ export const FoundationsCalculator: React.FC<Props> = ({ onCalculate, initialMod
   }, [results, type, onCalculate, t]);
 
   const soilObj = useMemo(
-    () => SOIL_PROPERTIES.find((s) => s.id === soilType) || SOIL_PROPERTIES[0],
+    () => SOIL_PROPERTIES.find((s: SoilDef) => s.id === soilType) || SOIL_PROPERTIES[0],
     [soilType]
   );
 
@@ -519,7 +519,7 @@ export const FoundationsCalculator: React.FC<Props> = ({ onCalculate, initialMod
 
             <label className={labelClass}>{t("struct.gw.soil_type", { defaultValue: "Type de sol" })}</label>
             <select value={soilType} onChange={(e) => setSoilType(e.target.value)} className={inputClass}>
-              {SOIL_PROPERTIES.map((s) => (
+              {SOIL_PROPERTIES.map((s: SoilDef) => (
                 <option key={s.id} value={s.id}>
                   {s.label} (x{s.bulkingFactor})
                 </option>

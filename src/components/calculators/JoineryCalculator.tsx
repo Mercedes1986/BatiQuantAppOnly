@@ -3,8 +3,8 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { CalculatorType, CalculationResult, Unit, CalculatorSnapshot } from "@/types";
-import { DEFAULT_PRICES, getOpeningPresets } from "../../constants";
-import { getUnitPrice } from "../../services/materialsService";
+import { DEFAULT_PRICES, getOpeningPresets } from "@/constants";
+import { getUnitPrice } from "@/services/materialsService";
 
 import {
   BoxSelect,

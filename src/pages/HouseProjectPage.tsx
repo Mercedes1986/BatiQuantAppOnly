@@ -20,15 +20,15 @@ import {
   saveHouseProject,
   deleteHouseProject,
   generateId,
-} from "../services/storage";
-import { HouseProject, ConstructionStepId, ClientInfo } from "../types";
-import { getConstructionSteps, type ConstructionStepDef, type ConstructionStepGroup } from "../constants";
+} from "@/services/storage";
+import { HouseProject, ConstructionStepId, ClientInfo, CalculatorType } from "@/types";
+import { getConstructionSteps, type ConstructionStepDef, type ConstructionStepGroup } from "@/constants";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { QuotePanel } from "../components/quote/QuotePanel";
-import { calculateQuote } from "../services/quote";
-import { createQuoteFromProject } from "../services/documentLogic";
-import { getCompanyProfile, getQuotes } from "../services/documentsStorage";
-import { ClientModal } from "../components/documents/ClientModal";
+import { QuotePanel } from "@/components/quote/QuotePanel";
+import { calculateQuote } from "@/services/quote";
+import { createQuoteFromProject } from "@/services/documentLogic";
+import { getCompanyProfile, getQuotes } from "@/services/documentsStorage";
+import { ClientModal } from "@/components/documents/ClientModal";
 import { useTranslation } from "react-i18next";
 
 /**
@@ -171,7 +171,7 @@ export const HouseProjectPage: React.FC = () => {
     setIsEditingParams(false);
   };
 
-  const openStepCalculator = (stepId: ConstructionStepId, calcType: any) => {
+  const openStepCalculator = (stepId: ConstructionStepId, calcType?: CalculatorType) => {
     if (!currentProject || !calcType) return;
     navigate(`/app/calculator?calc=${calcType}&projectId=${currentProject.id}&stepId=${stepId}`);
   };
@@ -406,14 +406,15 @@ export const HouseProjectPage: React.FC = () => {
                     </h3>
                     <div className="space-y-2">
                       {group.steps.map((step: ConstructionStepDef) => {
-                        const stepData = currentProject.steps[step.id];
+                        const stepId = step.id as ConstructionStepId;
+                        const stepData = currentProject.steps[stepId];
                         const isDone = stepData?.status === "done";
                         const Icon = step.icon;
 
                         return (
                           <button
                             key={step.id}
-                            onClick={() => openStepCalculator(step.id, step.calc)}
+                            onClick={() => openStepCalculator(stepId, step.calc)}
                             disabled={!step.calc}
                             type="button"
                             className={`w-full flex items-center justify-between p-3 rounded-xl border transition-all ${

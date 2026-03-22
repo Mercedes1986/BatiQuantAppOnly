@@ -1,9 +1,9 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { CalculatorType, CalculationResult, Unit, CalculatorSnapshot } from "@/types";
-import { DEFAULT_PRICES, MESH_TYPES, CONCRETE_MIX_RATIOS } from "../../constants";
-import { getUnitPrice } from "../../services/materialsService";
+import { CalculatorType, CalculationResult, Unit, CalculatorSnapshot, MeshType } from "@/types";
+import { DEFAULT_PRICES, MESH_TYPES, CONCRETE_MIX_RATIOS } from "@/constants";
+import { getUnitPrice } from "@/services/materialsService";
 
 import { ArrowRight, Check, CircleDollarSign, Info, Layers, Settings, Truck } from "lucide-react";
 
@@ -390,7 +390,7 @@ export const ConcreteCalculator: React.FC<Props> = ({ onCalculate, initialArea, 
 
     // 4) Reinforcement
     if (useMesh) {
-      const meshDef = MESH_TYPES.find((m) => m.id === meshTypeId) || MESH_TYPES[0];
+      const meshDef = MESH_TYPES.find((m: MeshType & { coverM2: number; priceRef: string }) => m.id === meshTypeId) || MESH_TYPES[0];
       const panelArea = (meshDef as any).width * (meshDef as any).height;
       const usefulArea = panelArea * 0.85;
       const panels = Math.ceil(area / (usefulArea || 1));
@@ -819,7 +819,7 @@ export const ConcreteCalculator: React.FC<Props> = ({ onCalculate, initialArea, 
               </div>
               {useMesh && (
                 <select value={meshTypeId} onChange={(e) => setMeshTypeId(e.target.value)} className="text-xs p-1 border rounded max-w-[140px] bg-white text-slate-900">
-                  {MESH_TYPES.map((m) => (
+                  {MESH_TYPES.map((m: MeshType & { coverM2: number; priceRef: string }) => (
                     <option key={m.id} value={m.id}>
                       {m.label}
                     </option>

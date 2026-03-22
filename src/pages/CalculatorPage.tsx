@@ -43,28 +43,28 @@ import {
   CalculatorConfig,
   CalculationResult,
   Project,
-} from "../types";
-import { getCalculators, getStaticTips } from "../constants";
+} from "@/types";
+import { getCalculators, getStaticTips } from "@/constants";
 
-import { PaintCalculator } from "../components/calculators/PaintCalculator";
-import { ConcreteCalculator } from "../components/calculators/ConcreteCalculator";
-import { TileCalculator } from "../components/calculators/TileCalculator";
-import { LevelingCalculator } from "../components/calculators/LevelingCalculator";
-import { PlacoCalculator } from "../components/calculators/PlacoCalculator";
-import { StructuralCalculator } from "../components/calculators/StructuralCalculator";
-import { SubstructureCalculator } from "../components/calculators/SubstructureCalculator";
-import { RoofCalculator } from "../components/calculators/RoofCalculator";
-import { JoineryCalculator } from "../components/calculators/JoineryCalculator";
-import { ElectricityCalculator } from "../components/calculators/ElectricityCalculator";
-import { PlumbingCalculator } from "../components/calculators/PlumbingCalculator";
-import { HvacCalculator } from "../components/calculators/HvacCalculator";
-import { ScreedCalculator } from "../components/calculators/ScreedCalculator";
-import { FacadeCalculator } from "../components/calculators/FacadeCalculator";
-import { ExteriorCalculator } from "../components/calculators/ExteriorCalculator";
-import { StairCalculator } from "../components/calculators/StairCalculator";
-import { FoundationsCalculator } from "../components/calculators/FoundationsCalculator";
-import { QuickToolsCalculator } from "../components/calculators/QuickToolsCalc";
-import { getProjects, saveProject, generateId } from "../services/storage";
+import { PaintCalculator } from "@/components/calculators/PaintCalculator";
+import { ConcreteCalculator } from "@/components/calculators/ConcreteCalculator";
+import { TileCalculator } from "@/components/calculators/TileCalculator";
+import { LevelingCalculator } from "@/components/calculators/LevelingCalculator";
+import { PlacoCalculator } from "@/components/calculators/PlacoCalculator";
+import { StructuralCalculator } from "@/components/calculators/StructuralCalculator";
+import { SubstructureCalculator } from "@/components/calculators/SubstructureCalculator";
+import { RoofCalculator } from "@/components/calculators/RoofCalculator";
+import { JoineryCalculator } from "@/components/calculators/JoineryCalculator";
+import { ElectricityCalculator } from "@/components/calculators/ElectricityCalculator";
+import { PlumbingCalculator } from "@/components/calculators/PlumbingCalculator";
+import { HvacCalculator } from "@/components/calculators/HvacCalculator";
+import { ScreedCalculator } from "@/components/calculators/ScreedCalculator";
+import { FacadeCalculator } from "@/components/calculators/FacadeCalculator";
+import { ExteriorCalculator } from "@/components/calculators/ExteriorCalculator";
+import { StairCalculator } from "@/components/calculators/StairCalculator";
+import { FoundationsCalculator } from "@/components/calculators/FoundationsCalculator";
+import { QuickToolsCalculator } from "@/components/calculators/QuickToolsCalc";
+import { getProjects, saveProject, generateId } from "@/services/storage";
 
 interface Props {
   type: CalculatorType;
@@ -80,7 +80,7 @@ export const CalculatorPage: React.FC<Props> = ({ type, onBack, onNavigateProjec
   const returnQuoteId = searchParams.get("returnQuoteId");
 
   const config = useMemo(() => {
-    const c = getCalculators().find((x) => x.id === type) as CalculatorConfig | undefined;
+    const c = getCalculators().find((x: CalculatorConfig) => x.id === type) as CalculatorConfig | undefined;
     return c;
   }, [type, i18n.language]);
 

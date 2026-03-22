@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation } from "react-router-dom";
 
-import { CalculatorType, CalculationResult, Unit, ExcavationItem, CalculatorSnapshot } from "@/types";
+import { CalculatorType, CalculationResult, Unit, ExcavationItem, CalculatorSnapshot, SoilDef } from "@/types";
 import { DEFAULT_PRICES, SOIL_PROPERTIES, getWallUnitPriceKey } from "@/constants";
 import { getUnitPrice } from "@/services/materialsService";
 
@@ -671,7 +671,7 @@ export const StructuralCalculator: React.FC<Props> = ({
       const stripArea = L > 0 && W > 0 ? (L + 2 * margin) * (W + 2 * margin) : parseFloat(surface) || 0;
       const stripVolPlace = stripArea * stripDepth;
 
-      const soilProps = SOIL_PROPERTIES.find((s) => s.id === gwSoilType) || SOIL_PROPERTIES[0];
+      const soilProps = SOIL_PROPERTIES.find((s: SoilDef) => s.id === gwSoilType) || SOIL_PROPERTIES[0];
       const swellCoef = soilProps.bulkingFactor;
       const stripVolFoison = stripVolPlace * swellCoef;
 
@@ -856,7 +856,7 @@ export const StructuralCalculator: React.FC<Props> = ({
       const details: any[] = [];
       const warnings: string[] = [];
 
-      const soilProps = SOIL_PROPERTIES.find((s) => s.id === fdSoilId) || SOIL_PROPERTIES[0];
+      const soilProps = SOIL_PROPERTIES.find((s: SoilDef) => s.id === fdSoilId) || SOIL_PROPERTIES[0];
       const swellCoef = soilProps.bulkingFactor;
 
       const houseL = parseFloat(dimL) || 0;
@@ -1872,7 +1872,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                   onChange={(e) => setGwSoilType(e.target.value)}
                   className="w-full p-3 border border-slate-300 rounded bg-white text-slate-900"
                 >
-                  {SOIL_PROPERTIES.map((s) => (
+                  {SOIL_PROPERTIES.map((s: SoilDef) => (
                     <option key={s.id} value={s.id}>
                       {s.label} (x{s.bulkingFactor})
                     </option>
@@ -2268,7 +2268,7 @@ export const StructuralCalculator: React.FC<Props> = ({
                         onChange={(e) => setFdSoilId(e.target.value)}
                         className="w-full p-2 border border-slate-300 rounded bg-white text-slate-900 text-sm"
                       >
-                        {SOIL_PROPERTIES.map((s) => (
+                        {SOIL_PROPERTIES.map((s: SoilDef) => (
                           <option key={s.id} value={s.id}>
                             {s.label}
                           </option>

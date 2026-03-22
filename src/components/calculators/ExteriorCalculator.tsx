@@ -2,8 +2,8 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { CalculatorType, CalculationResult, Unit, CalculatorSnapshot } from "@/types";
-import { MATERIAL_METADATA, DEFAULT_PRICES } from "../../constants";
-import { getUnitPrice, incrementUsage } from "../../services/materialsService";
+import { MATERIAL_METADATA, DEFAULT_PRICES } from "@/constants";
+import { getUnitPrice, incrementUsage } from "@/services/materialsService";
 import {
   Fence,
   Pickaxe,

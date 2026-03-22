@@ -4,8 +4,9 @@ import {
   MaterialItem,
   Unit,
   CalculatorType,
-} from "../types";
-import { SOIL_PROPERTIES } from "../constants";
+  SoilDef,
+} from "@/types";
+import { SOIL_PROPERTIES } from "@/constants";
 import i18next from "i18next";
 
 const tr = (key: string, fallbackEn: string) => i18next.t(key, { defaultValue: fallbackEn });
@@ -129,7 +130,7 @@ export const calculateFoundations = (
 
   // --- 2. Sol / déblais ---
   const soilProp =
-    SOIL_PROPERTIES.find((s) => s.id === inputs.soilType) || SOIL_PROPERTIES[0];
+    SOIL_PROPERTIES.find((s: SoilDef) => s.id === inputs.soilType) || SOIL_PROPERTIES[0];
 
   const volSpoil = volExcavation * n0(soilProp.bulkingFactor);
 
