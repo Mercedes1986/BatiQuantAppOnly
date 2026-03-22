@@ -1112,7 +1112,6 @@ export const getStaticTips = (): Record<string, string[]> => ({
     tr("tips.concrete.3", "Lift the mesh with spacers so it sits in the concrete, not on the ground."),
     tr("tips.concrete.4", "Plan expansion joints every 15–20m² to prevent cracking."),
   ],
-  // Foundation tips are localized through tips.foundations.* keys.
   [CalculatorType.FOUNDATIONS]: [
     tr("tips.foundations.1", "Double-check frost depth and soil conditions before sizing footings."),
     tr("tips.foundations.2", "Keep reinforcement properly covered (concrete cover) to avoid corrosion."),
@@ -1293,7 +1292,7 @@ export const OPENING_PRESETS = getOpeningPresets();
  * - coverM2 = covered area by 1 panel
  * - priceRef = DEFAULT_PRICES key (price per panel)
  */
-export const getMeshTypes = (): (MeshType & { width: number; height: number })[] => [
+export const getMeshTypes = (): (MeshType & { coverM2: number; priceRef: string })[] => [
   {
     id: "ST10",
     label: tr("mesh.ST10", "ST10 (light - terrace)"),
