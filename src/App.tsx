@@ -492,6 +492,66 @@ const AppLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [currentCalc, setCurrentCalc] = useState<CalculatorType | null>(null);
+  const [keyboardOpen, setKeyboardOpen] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || typeof document === "undefined") return;
+
+    const root = document.documentElement;
+    const viewport = window.visualViewport;
+
+    if (!viewport) {
+      root.style.setProperty("--keyboard-offset", "0px");
+      root.setAttribute("data-keyboard-open", "false");
+      return;
+    }
+
+    let raf = 0;
+
+    const updateKeyboardState = () => {
+      window.cancelAnimationFrame(raf);
+      raf = window.requestAnimationFrame(() => {
+        const viewportOffsetTop = Math.max(0, viewport.offsetTop || 0);
+        const keyboardHeight = Math.max(0, window.innerHeight - viewport.height - viewportOffsetTop);
+        const isOpen = keyboardHeight > 140;
+
+        root.style.setProperty("--keyboard-offset", `${Math.round(isOpen ? keyboardHeight : 0)}px`);
+        root.setAttribute("data-keyboard-open", isOpen ? "true" : "false");
+        setKeyboardOpen(isOpen);
+      });
+    };
+
+    const handleFocusIn = (event: FocusEvent) => {
+      const target = event.target as HTMLElement | null;
+      if (!target) return;
+      if (!target.matches('input, textarea, select, [contenteditable="true"]')) return;
+
+      window.setTimeout(() => {
+        try {
+          target.scrollIntoView({ block: "center", behavior: "smooth" });
+        } catch {
+          // ignore scroll issues on older Android WebViews
+        }
+      }, 220);
+    };
+
+    updateKeyboardState();
+    viewport.addEventListener("resize", updateKeyboardState);
+    viewport.addEventListener("scroll", updateKeyboardState);
+    window.addEventListener("orientationchange", updateKeyboardState);
+    document.addEventListener("focusin", handleFocusIn as EventListener);
+
+    return () => {
+      window.cancelAnimationFrame(raf);
+      viewport.removeEventListener("resize", updateKeyboardState);
+      viewport.removeEventListener("scroll", updateKeyboardState);
+      window.removeEventListener("orientationchange", updateKeyboardState);
+      document.removeEventListener("focusin", handleFocusIn as EventListener);
+      root.style.setProperty("--keyboard-offset", "0px");
+      root.setAttribute("data-keyboard-open", "false");
+      setKeyboardOpen(false);
+    };
+  }, []);
 
   // Background image per section (served from /public/backgrounds)
   const bgUrl = useMemo(() => {
@@ -519,14 +579,16 @@ const AppLayout = () => {
     : location.pathname.includes("quick-tools")
       ? "quick-tools"
       : location.pathname.includes("settings")
-      ? "settings"
-      : location.pathname.includes("house") || location.pathname.includes("quotes") || location.pathname.includes("invoices")
-        ? "house"
-        : location.pathname.includes("projects") || location.pathname.includes("calculators")
-          ? "projects"
-          : location.pathname.includes("materials")
-            ? "materials"
-            : "projects";
+        ? "settings"
+        : location.pathname.includes("quotes") || location.pathname.includes("invoices")
+          ? "menu"
+          : location.pathname.includes("house")
+            ? "house"
+            : location.pathname.includes("projects") || location.pathname.includes("calculators")
+              ? "projects"
+              : location.pathname.includes("materials")
+                ? "materials"
+                : "projects";
 
   const handleNavChange = (tab: string) => {
     setCurrentCalc(null);
@@ -546,6 +608,7 @@ const AppLayout = () => {
     const resolved = resolveCalcFromParam(sp.get("calc"));
     if (resolved) setCurrentCalc(resolved);
   }, [location.pathname, location.search]);
+
   const layoutContent = currentCalc ? (
     <Suspense
       fallback={
@@ -568,7 +631,7 @@ const AppLayout = () => {
   );
 
   return (
-    <div className="app-bg app-shell-grid relative">
+    <div className="app-bg app-shell-grid relative" data-keyboard-open={keyboardOpen ? "true" : "false"}>
       <div className="app-bg__image" style={{ backgroundImage: `url('${bgUrl}')` }} aria-hidden="true" />
       <div className="app-bg__veil" aria-hidden="true" />
 

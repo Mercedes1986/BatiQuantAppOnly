@@ -141,6 +141,36 @@
       "quotes": "Devis",
       "projects": "Projets",
       "sites": "Chantiers"
+    },
+    "actions": {
+      "quotes": "Tous les devis",
+      "projects": "Tous les projets",
+      "sites": "Tous les chantiers"
+    },
+    "recent": {
+      "title": "Reprendre l’activité",
+      "subtitle": "Accès direct au dernier devis, projet ou chantier utilisé dans l’application.",
+      "continue": "Continuer",
+      "empty_title": "Aucune activité récente",
+      "empty_text": "Créez un projet ou un chantier pour retrouver ici vos dernières actions.",
+      "quote_label": "Dernier devis",
+      "project_label": "Dernier projet",
+      "site_label": "Dernier chantier",
+      "client_label": "Client",
+      "total_label": "Montant",
+      "progress_label": "Avancement",
+      "surface_label": "Surface",
+      "surface_value": "{{value}} m²",
+      "site_meta": "{{count}} étapes enregistrées",
+      "updated_on": "Mis à jour le {{date}}",
+      "quote_desc": "Rouvrez le dernier devis généré pour continuer la modification ou lancer un export.",
+      "quote_desc_project": "Lié à {{project}}.",
+      "project_desc": "Rouvrez le calcul sauvegardé pour vérifier matériaux, totaux et impression.",
+      "site_desc": "Continuez le chiffrage chantier par étape et retrouvez les devis générés."
+    },
+    "support": {
+      "title": "Outils et données",
+      "subtitle": "Matériaux, sauvegarde et réglages de l’application."
     }
   },
   "struct": {

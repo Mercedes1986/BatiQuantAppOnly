@@ -457,6 +457,36 @@
       "quotes": "Quotes",
       "projects": "Projects",
       "sites": "Sites"
+    },
+    "actions": {
+      "quotes": "All quotes",
+      "projects": "All projects",
+      "sites": "All sites"
+    },
+    "recent": {
+      "title": "Resume activity",
+      "subtitle": "Direct access to the latest quote, project or site used in the app.",
+      "continue": "Continue",
+      "empty_title": "No recent activity",
+      "empty_text": "Create a project or a site to find your latest actions here.",
+      "quote_label": "Last quote",
+      "project_label": "Last project",
+      "site_label": "Last site",
+      "client_label": "Client",
+      "total_label": "Amount",
+      "progress_label": "Progress",
+      "surface_label": "Area",
+      "surface_value": "{{value}} m²",
+      "site_meta": "{{count}} saved steps",
+      "updated_on": "Updated {{date}}",
+      "quote_desc": "Open the last generated quote and continue editing or export.",
+      "quote_desc_project": "Linked to {{project}}.",
+      "project_desc": "Reopen the saved calculation and inspect materials, totals and print view.",
+      "site_desc": "Continue the step-by-step worksite estimate and access generated quotes."
+    },
+    "support": {
+      "title": "Tools and data",
+      "subtitle": "Materials, backup and app settings."
     }
   },
   "ads": {

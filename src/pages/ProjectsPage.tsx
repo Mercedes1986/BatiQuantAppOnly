@@ -12,7 +12,7 @@ import {
   FileStack,
 } from "lucide-react";
 import { PieChart as RePieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import { getProjects, deleteProject } from "../services/storage";
@@ -26,10 +26,13 @@ const CHART_COLORS = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6"] as 
 export const ProjectsPage: React.FC = () => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const [projects, setProjects] = useState<Project[]>([]);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [showClientModal, setShowClientModal] = useState(false);
+
+  const selectedProjectId = searchParams.get("id");
 
   const euro = useMemo(
     () =>
@@ -42,8 +45,34 @@ export const ProjectsPage: React.FC = () => {
   );
 
   useEffect(() => {
-    setProjects(getProjects());
-  }, [selectedProject]);
+    const allProjects = getProjects();
+    setProjects(allProjects);
+
+    if (!selectedProjectId) {
+      setSelectedProject((current) => {
+        if (!current) return null;
+        return allProjects.find((project) => project.id === current.id) || null;
+      });
+      return;
+    }
+
+    const foundProject = allProjects.find((project) => project.id === selectedProjectId) || null;
+    setSelectedProject(foundProject);
+
+    if (!foundProject) {
+      setSearchParams({}, { replace: true });
+    }
+  }, [selectedProjectId, setSearchParams]);
+
+  const openProject = (project: Project) => {
+    setSelectedProject(project);
+    setSearchParams({ id: project.id }, { replace: true });
+  };
+
+  const closeProject = () => {
+    setSelectedProject(null);
+    setSearchParams({}, { replace: true });
+  };
 
   const handleDelete = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -56,7 +85,7 @@ export const ProjectsPage: React.FC = () => {
 
     deleteProject(id);
     setProjects(getProjects());
-    if (selectedProject?.id === id) setSelectedProject(null);
+    if (selectedProject?.id === id) closeProject();
   };
 
   const handlePrint = () => window.print();
@@ -107,7 +136,7 @@ export const ProjectsPage: React.FC = () => {
         <div className="sticky top-0 z-30 border-b border-slate-200/80 bg-white/80 shadow-sm backdrop-blur-xl no-print">
           <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3">
             <button
-              onClick={() => setSelectedProject(null)}
+              onClick={closeProject}
               className="flex items-center font-extrabold text-slate-500 transition-colors hover:text-blue-600"
               type="button"
             >
@@ -354,7 +383,7 @@ export const ProjectsPage: React.FC = () => {
               return (
                 <div
                   key={project.id}
-                  onClick={() => setSelectedProject(project)}
+                  onClick={() => openProject(project)}
                   className="flex cursor-pointer items-center justify-between rounded-[24px] border border-slate-200/80 bg-white/72 p-5 shadow-sm transition-all hover:border-blue-200 active:scale-[0.98]"
                 >
                   <div>
