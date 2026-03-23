@@ -219,21 +219,17 @@ input:-webkit-autofill:active {
   --app-safe-bottom: var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px));
   --app-safe-left: var(--safe-area-inset-left, env(safe-area-inset-left, 0px));
   --app-top-gap: max(12px, var(--app-safe-top));
-  --bottom-nav-height: 84px;
+  --bottom-nav-height: 80px;
   --bottom-nav-space: calc(var(--bottom-nav-height) + var(--app-safe-bottom));
-  --keyboard-offset: 0px;
 }
 
 body {
   overflow: hidden;
-  overscroll-behavior-y: none;
 }
 
 .app-shell-grid {
   min-height: 100svh;
-  min-height: 100dvh;
   height: 100svh;
-  height: 100dvh;
   display: grid;
   grid-template-rows: minmax(0, 1fr) auto;
 }
@@ -246,29 +242,20 @@ body {
   padding-top: var(--app-top-gap);
   padding-left: max(0px, var(--app-safe-left));
   padding-right: max(0px, var(--app-safe-right));
-  padding-bottom: calc(12px + var(--keyboard-offset));
   scroll-padding-top: calc(var(--app-top-gap) + 12px);
-  scroll-padding-bottom: calc(24px + var(--keyboard-offset));
 }
 
 .app-bottom-nav-host {
   padding-left: max(12px, var(--app-safe-left));
   padding-right: max(12px, var(--app-safe-right));
-  padding-top: 6px;
+  padding-top: 4px;
   padding-bottom: calc(var(--app-safe-bottom) + 6px);
-  transition: transform 180ms ease, opacity 180ms ease;
-}
-
-[data-keyboard-open="true"] .app-bottom-nav-host {
-  opacity: 0;
-  pointer-events: none;
-  transform: translateY(calc(100% + var(--app-safe-bottom) + 12px));
 }
 
 .page-frame,
 .page-narrow {
-  padding-top: 0.75rem;
-  padding-bottom: 1rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.85rem;
 }
 
 .safe-top-offset {

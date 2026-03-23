@@ -492,66 +492,7 @@ const AppLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [currentCalc, setCurrentCalc] = useState<CalculatorType | null>(null);
-  const [keyboardOpen, setKeyboardOpen] = useState(false);
-
-  useEffect(() => {
-    if (typeof window === "undefined" || typeof document === "undefined") return;
-
-    const root = document.documentElement;
-    const viewport = window.visualViewport;
-
-    if (!viewport) {
-      root.style.setProperty("--keyboard-offset", "0px");
-      root.setAttribute("data-keyboard-open", "false");
-      return;
-    }
-
-    let raf = 0;
-
-    const updateKeyboardState = () => {
-      window.cancelAnimationFrame(raf);
-      raf = window.requestAnimationFrame(() => {
-        const viewportOffsetTop = Math.max(0, viewport.offsetTop || 0);
-        const keyboardHeight = Math.max(0, window.innerHeight - viewport.height - viewportOffsetTop);
-        const isOpen = keyboardHeight > 140;
-
-        root.style.setProperty("--keyboard-offset", `${Math.round(isOpen ? keyboardHeight : 0)}px`);
-        root.setAttribute("data-keyboard-open", isOpen ? "true" : "false");
-        setKeyboardOpen(isOpen);
-      });
-    };
-
-    const handleFocusIn = (event: FocusEvent) => {
-      const target = event.target as HTMLElement | null;
-      if (!target) return;
-      if (!target.matches('input, textarea, select, [contenteditable="true"]')) return;
-
-      window.setTimeout(() => {
-        try {
-          target.scrollIntoView({ block: "center", behavior: "smooth" });
-        } catch {
-          // ignore scroll issues on older Android WebViews
-        }
-      }, 220);
-    };
-
-    updateKeyboardState();
-    viewport.addEventListener("resize", updateKeyboardState);
-    viewport.addEventListener("scroll", updateKeyboardState);
-    window.addEventListener("orientationchange", updateKeyboardState);
-    document.addEventListener("focusin", handleFocusIn as EventListener);
-
-    return () => {
-      window.cancelAnimationFrame(raf);
-      viewport.removeEventListener("resize", updateKeyboardState);
-      viewport.removeEventListener("scroll", updateKeyboardState);
-      window.removeEventListener("orientationchange", updateKeyboardState);
-      document.removeEventListener("focusin", handleFocusIn as EventListener);
-      root.style.setProperty("--keyboard-offset", "0px");
-      root.setAttribute("data-keyboard-open", "false");
-      setKeyboardOpen(false);
-    };
-  }, []);
+  const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
 
   // Background image per section (served from /public/backgrounds)
   const bgUrl = useMemo(() => {
@@ -578,17 +519,15 @@ const AppLayout = () => {
     ? "menu"
     : location.pathname.includes("quick-tools")
       ? "quick-tools"
-      : location.pathname.includes("settings")
-        ? "settings"
-        : location.pathname.includes("quotes") || location.pathname.includes("invoices")
-          ? "menu"
-          : location.pathname.includes("house")
-            ? "house"
-            : location.pathname.includes("projects") || location.pathname.includes("calculators")
-              ? "projects"
-              : location.pathname.includes("materials")
-                ? "materials"
-                : "projects";
+      : location.pathname.includes("house")
+        ? "house"
+        : location.pathname.includes("projects") || location.pathname.includes("calculators") || location.pathname.includes("calculator")
+          ? "projects"
+          : location.pathname.includes("materials")
+            ? "materials"
+            : location.pathname.includes("settings") || location.pathname.includes("quotes") || location.pathname.includes("invoices") || location.pathname.includes("print")
+              ? "menu"
+              : "menu";
 
   const handleNavChange = (tab: string) => {
     setCurrentCalc(null);
@@ -598,8 +537,43 @@ const AppLayout = () => {
     if (tab === "projects") navigate("/app/projects");
     if (tab === "house") navigate("/app/house");
     if (tab === "materials") navigate("/app/materials");
-    if (tab === "settings") navigate("/app/settings");
   };
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const viewport = window.visualViewport;
+    if (!viewport) return;
+
+    const updateKeyboardState = () => {
+      const keyboardHeight = window.innerHeight - viewport.height - viewport.offsetTop;
+      setIsKeyboardOpen(keyboardHeight > 140);
+    };
+
+    updateKeyboardState();
+    viewport.addEventListener("resize", updateKeyboardState);
+    viewport.addEventListener("scroll", updateKeyboardState);
+
+    return () => {
+      viewport.removeEventListener("resize", updateKeyboardState);
+      viewport.removeEventListener("scroll", updateKeyboardState);
+    };
+  }, []);
+
+  useEffect(() => {
+    const onFocusIn = (event: FocusEvent) => {
+      const target = event.target;
+      if (!(target instanceof HTMLElement)) return;
+      if (!["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName)) return;
+
+      requestAnimationFrame(() => {
+        target.scrollIntoView({ block: "center", behavior: "smooth" });
+      });
+    };
+
+    document.addEventListener("focusin", onFocusIn);
+    return () => document.removeEventListener("focusin", onFocusIn);
+  }, []);
 
   // ✅ /app/calculators?calc=... -> opens calculator (safe)
   useEffect(() => {
@@ -608,7 +582,6 @@ const AppLayout = () => {
     const resolved = resolveCalcFromParam(sp.get("calc"));
     if (resolved) setCurrentCalc(resolved);
   }, [location.pathname, location.search]);
-
   const layoutContent = currentCalc ? (
     <Suspense
       fallback={
@@ -631,7 +604,7 @@ const AppLayout = () => {
   );
 
   return (
-    <div className="app-bg app-shell-grid relative" data-keyboard-open={keyboardOpen ? "true" : "false"}>
+    <div className="app-bg app-shell-grid relative">
       <div className="app-bg__image" style={{ backgroundImage: `url('${bgUrl}')` }} aria-hidden="true" />
       <div className="app-bg__veil" aria-hidden="true" />
 
@@ -639,9 +612,11 @@ const AppLayout = () => {
         {layoutContent}
       </main>
 
-      <div className="app-bottom-nav-host relative z-20">
-        <BottomNav currentTab={currentTab} onChange={handleNavChange} />
-      </div>
+      {!isKeyboardOpen ? (
+        <div className="app-bottom-nav-host relative z-20">
+          <BottomNav currentTab={currentTab} onChange={handleNavChange} />
+        </div>
+      ) : null}
     </div>
   );
 };

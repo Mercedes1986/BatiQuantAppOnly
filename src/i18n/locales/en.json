@@ -62,7 +62,7 @@
     "title_fallback": "Calculator"
   },
   "nav": {
-    "menu": "Menu",
+    "menu": "Home",
     "calc": "Calculator",
     "site": "Site",
     "projects": "Projects",
@@ -387,8 +387,8 @@
     }
   },
   "menu": {
-    "title": "Main menu",
-    "subtitle": "Open the tools you use most often without wasting time in extra navigation.",
+    "title": "Worksite dashboard",
+    "subtitle": "Resume your recent items and open the most useful actions without extra navigation.",
     "back_dashboard": "Dashboard",
     "back_dashboard_title": "Back to dashboard",
     "how": {
@@ -404,7 +404,7 @@
       },
       "house": {
         "title": "Site",
-        "desc": "Create a site and save results step-by-step (full tracking)."
+        "desc": "Create or continue a site with its steps, costs and document links."
       },
       "projects": {
         "title": "Projects",
@@ -425,12 +425,12 @@
       },
       "quicktools": {
         "title": "Quick tools",
-        "desc": "Dedicated quick calculators: conversions, slopes, packaging and other fast checks.",
+        "desc": "Fast calculators for conversions, slopes, packaging and instant checks.",
         "badge": "FAST"
       },
       "quick_tools": {
         "title": "Quick tools",
-        "desc": "Dedicated quick calculators: conversions, slopes, packaging and other fast checks.",
+        "desc": "Fast calculators for conversions, slopes, packaging and instant checks.",
         "badge": "FAST"
       },
       "quotes": {
@@ -443,10 +443,10 @@
       "title": "All tools (quick access)",
       "subtitle": "Click a tool to open the calculator directly."
     },
-    "dashboard_badge": "Worksite dashboard",
+    "dashboard_badge": "Quick resume",
     "primary": {
       "title": "Priority actions",
-      "subtitle": "The most useful entries for day-to-day work."
+      "subtitle": "Open the useful tools immediately."
     },
     "secondary": {
       "title": "Continue",
@@ -458,35 +458,28 @@
       "projects": "Projects",
       "sites": "Sites"
     },
-    "actions": {
-      "quotes": "All quotes",
-      "projects": "All projects",
-      "sites": "All sites"
+    "shortcuts": {
+      "title": "Useful shortcuts",
+      "subtitle": "Quotes, projects, materials, settings and backup in one compact block.",
+      "all_quotes": "All quotes",
+      "all_projects": "All projects",
+      "materials": "Materials & pricing",
+      "settings": "Settings",
+      "backup": "JSON backup"
     },
-    "recent": {
-      "title": "Resume activity",
-      "subtitle": "Direct access to the latest quote, project or site used in the app.",
-      "continue": "Continue",
-      "empty_title": "No recent activity",
-      "empty_text": "Create a project or a site to find your latest actions here.",
+    "resume": {
       "quote_label": "Last quote",
       "project_label": "Last project",
       "site_label": "Last site",
-      "client_label": "Client",
-      "total_label": "Amount",
-      "progress_label": "Progress",
-      "surface_label": "Area",
-      "surface_value": "{{value}} m²",
-      "site_meta": "{{count}} saved steps",
-      "updated_on": "Updated {{date}}",
-      "quote_desc": "Open the last generated quote and continue editing or export.",
-      "quote_desc_project": "Linked to {{project}}.",
-      "project_desc": "Reopen the saved calculation and inspect materials, totals and print view.",
-      "site_desc": "Continue the step-by-step worksite estimate and access generated quotes."
-    },
-    "support": {
-      "title": "Tools and data",
-      "subtitle": "Materials, backup and app settings."
+      "open_last": "Continue",
+      "empty_cta": "Ready",
+      "no_quote_title": "No quote yet",
+      "no_quote_meta": "Create a quote from a project or a site to find it here.",
+      "no_project_title": "No saved project",
+      "no_project_meta": "Save a calculator result to continue it later from here.",
+      "no_site_title": "No site yet",
+      "no_site_meta": "Create a site to track steps, costs and documents in one place.",
+      "site_steps": "{{count}} saved steps"
     }
   },
   "ads": {
@@ -2821,7 +2814,7 @@
   "quotes": {
     "title": "My quotes",
     "subtitle": "Find all quotes created from your projects and job sites.",
-    "back_to_menu": "Back to menu",
+    "back_to_menu": "Back to dashboard",
     "stats": {
       "total": "Total quotes",
       "accepted": "Accepted",

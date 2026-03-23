@@ -62,7 +62,7 @@
     "title_fallback": "Calculateur"
   },
   "nav": {
-    "menu": "Menu",
+    "menu": "Accueil",
     "calc": "Calcul",
     "site": "Chantier",
     "projects": "Projets",
@@ -71,8 +71,8 @@
     "quick_tools": "Rapide"
   },
   "menu": {
-    "title": "Menu principal",
-    "subtitle": "Ouvrez les outils les plus utiles sans perdre de temps dans une navigation inutile.",
+    "title": "Tableau de bord chantier",
+    "subtitle": "Reprenez vos derniers éléments et ouvrez les actions utiles sans passer par des menus inutiles.",
     "back_dashboard": "Tableau de bord",
     "back_dashboard_title": "Retour au tableau de bord",
     "how": {
@@ -88,7 +88,7 @@
       },
       "house": {
         "title": "Chantier",
-        "desc": "Créez un chantier et enregistrez les résultats par étape (suivi complet)."
+        "desc": "Créez ou reprenez un chantier avec ses étapes, coûts et documents liés."
       },
       "projects": {
         "title": "Projets",
@@ -109,12 +109,12 @@
       },
       "quicktools": {
         "title": "Calculs rapides chantier",
-        "desc": "Accédez aux calculateurs rapides : conversions, pentes, conditionnements et contrôles express.",
+        "desc": "Calculs rapides pour conversions, pentes, conditionnements et contrôles express.",
         "badge": "RAPIDE"
       },
       "quick_tools": {
         "title": "Calculs rapides chantier",
-        "desc": "Accédez aux calculateurs rapides : conversions, pentes, conditionnements et contrôles express.",
+        "desc": "Calculs rapides pour conversions, pentes, conditionnements et contrôles express.",
         "badge": "RAPIDE"
       },
       "quotes": {
@@ -127,10 +127,10 @@
       "title": "Tous les outils (accès direct)",
       "subtitle": "Cliquez sur un outil pour ouvrir le calculateur directement."
     },
-    "dashboard_badge": "Tableau de bord chantier",
+    "dashboard_badge": "Reprise rapide",
     "primary": {
       "title": "Actions prioritaires",
-      "subtitle": "Les entrées les plus utiles pour le travail au quotidien."
+      "subtitle": "Ouvrez tout de suite les outils utiles."
     },
     "secondary": {
       "title": "Continuer",
@@ -142,35 +142,28 @@
       "projects": "Projets",
       "sites": "Chantiers"
     },
-    "actions": {
-      "quotes": "Tous les devis",
-      "projects": "Tous les projets",
-      "sites": "Tous les chantiers"
+    "shortcuts": {
+      "title": "Raccourcis utiles",
+      "subtitle": "Devis, projets, matériaux, réglages et sauvegarde dans un bloc compact.",
+      "all_quotes": "Tous les devis",
+      "all_projects": "Tous les projets",
+      "materials": "Matériaux & prix",
+      "settings": "Réglages",
+      "backup": "Sauvegarde JSON"
     },
-    "recent": {
-      "title": "Reprendre l’activité",
-      "subtitle": "Accès direct au dernier devis, projet ou chantier utilisé dans l’application.",
-      "continue": "Continuer",
-      "empty_title": "Aucune activité récente",
-      "empty_text": "Créez un projet ou un chantier pour retrouver ici vos dernières actions.",
+    "resume": {
       "quote_label": "Dernier devis",
       "project_label": "Dernier projet",
       "site_label": "Dernier chantier",
-      "client_label": "Client",
-      "total_label": "Montant",
-      "progress_label": "Avancement",
-      "surface_label": "Surface",
-      "surface_value": "{{value}} m²",
-      "site_meta": "{{count}} étapes enregistrées",
-      "updated_on": "Mis à jour le {{date}}",
-      "quote_desc": "Rouvrez le dernier devis généré pour continuer la modification ou lancer un export.",
-      "quote_desc_project": "Lié à {{project}}.",
-      "project_desc": "Rouvrez le calcul sauvegardé pour vérifier matériaux, totaux et impression.",
-      "site_desc": "Continuez le chiffrage chantier par étape et retrouvez les devis générés."
-    },
-    "support": {
-      "title": "Outils et données",
-      "subtitle": "Matériaux, sauvegarde et réglages de l’application."
+      "open_last": "Continuer",
+      "empty_cta": "Prêt",
+      "no_quote_title": "Aucun devis pour le moment",
+      "no_quote_meta": "Créez un devis depuis un projet ou un chantier pour le retrouver ici.",
+      "no_project_title": "Aucun projet sauvegardé",
+      "no_project_meta": "Enregistrez un résultat de calcul pour le reprendre ensuite ici.",
+      "no_site_title": "Aucun chantier pour le moment",
+      "no_site_meta": "Créez un chantier pour suivre les étapes, les coûts et les documents au même endroit.",
+      "site_steps": "{{count}} étapes enregistrées"
     }
   },
   "struct": {
@@ -3024,7 +3017,7 @@
   "quotes": {
     "title": "Mes devis",
     "subtitle": "Retrouvez tous les devis créés depuis vos projets et chantiers.",
-    "back_to_menu": "Retour au menu",
+    "back_to_menu": "Retour à l’accueil",
     "stats": {
       "total": "Nombre de devis",
       "accepted": "Acceptés",

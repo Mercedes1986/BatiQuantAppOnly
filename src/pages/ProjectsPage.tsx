@@ -23,6 +23,9 @@ import { ClientModal } from "../components/documents/ClientModal";
 
 const CHART_COLORS = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6"] as const;
 
+const sortProjects = (items: Project[]) =>
+  [...items].sort((a, b) => new Date(b.date || 0).getTime() - new Date(a.date || 0).getTime());
+
 export const ProjectsPage: React.FC = () => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
@@ -45,24 +48,14 @@ export const ProjectsPage: React.FC = () => {
   );
 
   useEffect(() => {
-    const allProjects = getProjects();
-    setProjects(allProjects);
+    setProjects(sortProjects(getProjects()));
+  }, [selectedProject]);
 
-    if (!selectedProjectId) {
-      setSelectedProject((current) => {
-        if (!current) return null;
-        return allProjects.find((project) => project.id === current.id) || null;
-      });
-      return;
-    }
-
-    const foundProject = allProjects.find((project) => project.id === selectedProjectId) || null;
-    setSelectedProject(foundProject);
-
-    if (!foundProject) {
-      setSearchParams({}, { replace: true });
-    }
-  }, [selectedProjectId, setSearchParams]);
+  useEffect(() => {
+    if (!selectedProjectId) return;
+    const match = getProjects().find((project) => project.id === selectedProjectId);
+    if (match) setSelectedProject(match);
+  }, [selectedProjectId]);
 
   const openProject = (project: Project) => {
     setSelectedProject(project);
@@ -84,7 +77,7 @@ export const ProjectsPage: React.FC = () => {
     if (!ok) return;
 
     deleteProject(id);
-    setProjects(getProjects());
+    setProjects(sortProjects(getProjects()));
     if (selectedProject?.id === id) closeProject();
   };
 
