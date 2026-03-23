@@ -85,7 +85,7 @@ export const QuotesListPage: React.FC = () => {
   );
 
   return (
-    <div className="app-shell app-shell--projects min-h-screen bg-transparent p-4 pb-24">
+    <div className="app-shell app-shell--projects min-h-full bg-transparent p-4 safe-bottom-offset">
       <div className="mx-auto max-w-6xl space-y-4">
         <section className="rounded-[28px] border border-slate-200/80 bg-white/72 p-5 shadow-sm backdrop-blur-md md:p-6">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">

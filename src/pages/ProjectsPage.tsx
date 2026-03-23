@@ -125,7 +125,7 @@ export const ProjectsPage: React.FC = () => {
     }));
 
     return (
-      <div className="relative min-h-screen bg-transparent pb-20">
+      <div className="relative min-h-full bg-transparent safe-bottom-offset">
         <div className="sticky top-0 z-30 border-b border-slate-200/80 bg-white/80 shadow-sm backdrop-blur-xl no-print">
           <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3">
             <button
@@ -294,7 +294,7 @@ export const ProjectsPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-transparent p-4 pb-24">
+    <div className="min-h-full bg-transparent p-4 safe-bottom-offset">
       <div className="mx-auto max-w-6xl space-y-4">
         <section className="rounded-[28px] border border-slate-200/80 bg-white/72 p-5 shadow-sm backdrop-blur-md md:p-6">
           <div className="mb-4 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">

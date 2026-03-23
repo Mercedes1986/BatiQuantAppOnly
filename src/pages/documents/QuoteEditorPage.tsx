@@ -150,7 +150,7 @@ export const QuoteEditorPage: React.FC = () => {
   if (!quote) return <div className="p-10 text-center text-slate-500">{t("common.loading", { defaultValue: "Chargement..." })}</div>;
 
   return (
-    <div className="app-shell app-shell--projects min-h-screen bg-transparent safe-bottom-pad">
+    <div className="app-shell app-shell--projects min-h-full bg-transparent safe-bottom-pad">
       {/* Sticky Header */}
       <div className="safe-top-header sticky top-safe-offset z-20 border-b border-slate-200/80 bg-white/84 px-4 py-3 shadow-sm backdrop-blur-xl">
         <div className="mx-auto flex max-w-5xl items-center justify-between gap-3">

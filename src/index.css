@@ -219,8 +219,8 @@ input:-webkit-autofill:active {
   --app-safe-bottom: var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px));
   --app-safe-left: var(--safe-area-inset-left, env(safe-area-inset-left, 0px));
   --app-top-gap: max(12px, var(--app-safe-top));
-  --bottom-nav-height: 80px;
-  --bottom-nav-space: calc(var(--bottom-nav-height) + var(--app-safe-bottom));
+  --bottom-nav-height: 84px;
+  --bottom-nav-space: calc(var(--bottom-nav-height) + var(--app-safe-bottom) + 8px);
 }
 
 body {
@@ -240,6 +240,7 @@ body {
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
   padding-top: var(--app-top-gap);
+  padding-bottom: 18px;
   padding-left: max(0px, var(--app-safe-left));
   padding-right: max(0px, var(--app-safe-right));
   scroll-padding-top: calc(var(--app-top-gap) + 12px);
@@ -248,14 +249,14 @@ body {
 .app-bottom-nav-host {
   padding-left: max(12px, var(--app-safe-left));
   padding-right: max(12px, var(--app-safe-right));
-  padding-top: 4px;
-  padding-bottom: calc(var(--app-safe-bottom) + 6px);
+  padding-top: 8px;
+  padding-bottom: calc(var(--app-safe-bottom) + 10px);
 }
 
 .page-frame,
 .page-narrow {
   padding-top: 0.5rem;
-  padding-bottom: 0.85rem;
+  padding-bottom: max(0.95rem, calc(var(--app-safe-bottom) + 0.95rem));
 }
 
 .safe-top-offset {
@@ -263,5 +264,28 @@ body {
 }
 
 .safe-bottom-offset {
-  padding-bottom: calc(var(--bottom-nav-space) + 8px);
+  padding-bottom: calc(var(--bottom-nav-space) + 18px);
+}
+
+
+.safe-bottom-pad {
+  padding-bottom: calc(var(--bottom-nav-space) + 18px);
+}
+
+.top-safe-offset {
+  top: 0;
+}
+
+.safe-top-header {
+  padding-top: 0.75rem;
+}
+
+@media (max-width: 640px) {
+  .app-main {
+    padding-bottom: 14px;
+  }
+
+  .app-bottom-nav-host {
+    padding-top: 6px;
+  }
 }

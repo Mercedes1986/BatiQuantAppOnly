@@ -68,7 +68,7 @@
     "projects": "Projets",
     "materials": "Matériaux",
     "settings": "Réglages",
-    "quick_tools": "Rapide"
+    "quick_tools": "Express"
   },
   "menu": {
     "title": "Tableau de bord chantier",
@@ -127,10 +127,10 @@
       "title": "Tous les outils (accès direct)",
       "subtitle": "Cliquez sur un outil pour ouvrir le calculateur directement."
     },
-    "dashboard_badge": "Reprise rapide",
+    "dashboard_badge": "Vue d'ensemble",
     "primary": {
-      "title": "Actions prioritaires",
-      "subtitle": "Ouvrez tout de suite les outils utiles."
+      "title": "Outils essentiels",
+      "subtitle": "Lancez les outils les plus utiles sans détour."
     },
     "secondary": {
       "title": "Continuer",
@@ -155,8 +155,8 @@
       "quote_label": "Dernier devis",
       "project_label": "Dernier projet",
       "site_label": "Dernier chantier",
-      "open_last": "Continuer",
-      "empty_cta": "Prêt",
+      "open_last": "Ouvrir",
+      "empty_cta": "Créer",
       "no_quote_title": "Aucun devis pour le moment",
       "no_quote_meta": "Créez un devis depuis un projet ou un chantier pour le retrouver ici.",
       "no_project_title": "Aucun projet sauvegardé",
@@ -164,6 +164,17 @@
       "no_site_title": "Aucun chantier pour le moment",
       "no_site_meta": "Créez un chantier pour suivre les étapes, les coûts et les documents au même endroit.",
       "site_steps": "{{count}} étapes enregistrées"
+    },
+    "followup": {
+      "title": "À suivre",
+      "subtitle": "Gardez un œil sur les éléments qui demandent encore une action.",
+      "up_to_date": "Tout est à jour",
+      "up_to_date_hint": "Aucun devis ou facture ne demande une action immédiate.",
+      "draft_quotes": "Devis brouillons",
+      "accepted_quotes": "Devis acceptés",
+      "late_invoices": "Factures en retard",
+      "active_sites": "Chantiers actifs",
+      "saved_steps": "Étapes enregistrées"
     }
   },
   "struct": {

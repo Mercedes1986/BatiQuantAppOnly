@@ -68,7 +68,7 @@
     "projects": "Projects",
     "materials": "Materials",
     "settings": "Settings",
-    "quick_tools": "Quick"
+    "quick_tools": "Express"
   },
   "struct": {
     "tabs": {
@@ -443,10 +443,10 @@
       "title": "All tools (quick access)",
       "subtitle": "Click a tool to open the calculator directly."
     },
-    "dashboard_badge": "Quick resume",
+    "dashboard_badge": "Overview",
     "primary": {
-      "title": "Priority actions",
-      "subtitle": "Open the useful tools immediately."
+      "title": "Essential tools",
+      "subtitle": "Launch the most useful tools without any extra steps."
     },
     "secondary": {
       "title": "Continue",
@@ -471,8 +471,8 @@
       "quote_label": "Last quote",
       "project_label": "Last project",
       "site_label": "Last site",
-      "open_last": "Continue",
-      "empty_cta": "Ready",
+      "open_last": "Open",
+      "empty_cta": "Create",
       "no_quote_title": "No quote yet",
       "no_quote_meta": "Create a quote from a project or a site to find it here.",
       "no_project_title": "No saved project",
@@ -480,6 +480,17 @@
       "no_site_title": "No site yet",
       "no_site_meta": "Create a site to track steps, costs and documents in one place.",
       "site_steps": "{{count}} saved steps"
+    },
+    "followup": {
+      "title": "Follow-up",
+      "subtitle": "Keep an eye on the items that still need action.",
+      "up_to_date": "Everything is up to date",
+      "up_to_date_hint": "No quote or invoice needs immediate action.",
+      "draft_quotes": "Draft quotes",
+      "accepted_quotes": "Accepted quotes",
+      "late_invoices": "Late invoices",
+      "active_sites": "Active sites",
+      "saved_steps": "Saved steps"
     }
   },
   "ads": {

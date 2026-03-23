@@ -223,7 +223,7 @@ export const HouseProjectPage: React.FC = () => {
     const totalBudget = getProjectTotal(currentProject);
 
     return (
-      <div className="app-shell app-shell--house min-h-screen bg-transparent pb-20">
+      <div className="app-shell app-shell--house min-h-full bg-transparent safe-bottom-offset">
         <div className="sticky top-0 z-20 border-b border-slate-200/80 bg-white/80 backdrop-blur-xl shadow-sm">
           <div className="p-4 flex items-center justify-between">
             <button
@@ -577,7 +577,7 @@ export const HouseProjectPage: React.FC = () => {
 
   // ===== LIST PAGE (same aesthetic as Projects) =====
   return (
-    <div className="app-shell app-shell--house min-h-screen bg-transparent p-4 pb-20">
+    <div className="app-shell app-shell--house min-h-full bg-transparent p-4 safe-bottom-offset">
       <div className="max-w-6xl mx-auto space-y-4">
       <section className="rounded-[28px] border border-slate-200/80 bg-white/72 backdrop-blur-md shadow-sm p-5 md:p-6">
       <div className="mb-3 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">

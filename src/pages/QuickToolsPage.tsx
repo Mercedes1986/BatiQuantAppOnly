@@ -165,7 +165,7 @@ export const QuickToolsPage: React.FC = () => {
     const ActiveToolIcon = activeTool.icon;
 
     return (
-      <div className="app-shell app-shell--quick min-h-screen pb-24">
+      <div className="app-shell app-shell--quick min-h-full safe-bottom-offset">
         <div className="page-narrow space-y-4">
           <section className="glass-panel rounded-[32px] p-4 sm:p-5">
             <div className="flex items-center gap-3">
@@ -249,7 +249,7 @@ export const QuickToolsPage: React.FC = () => {
   }
 
   return (
-    <div className="app-shell app-shell--quick min-h-screen pb-24">
+    <div className="app-shell app-shell--quick min-h-full safe-bottom-offset">
       <div className="page-narrow space-y-4">
         <section className="glass-panel rounded-[32px] p-5">
           <div className="flex items-start gap-3">

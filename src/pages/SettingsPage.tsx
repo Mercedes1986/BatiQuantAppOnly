@@ -178,7 +178,7 @@ export const SettingsPage: React.FC = () => {
     "w-full p-4 flex items-center justify-between gap-3 text-left hover:bg-white/70 transition-colors";
 
   return (
-    <div className="app-shell app-shell--settings p-4 pb-20 bg-transparent min-h-screen">
+    <div className="app-shell app-shell--settings p-4 safe-bottom-offset bg-transparent min-h-full">
       <div className="max-w-6xl mx-auto space-y-4">
         <section className="rounded-[28px] border border-slate-200/80 bg-white/72 backdrop-blur-md shadow-sm p-5 md:p-6">
           <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
