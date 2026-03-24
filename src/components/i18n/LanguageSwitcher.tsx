@@ -2,6 +2,7 @@ import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import i18n, { SUPPORTED_LANGUAGES, SupportedLanguage } from "@/i18n";
 import { I18N_KEYS } from "@/i18n/keys";
+import { setPreferredLanguage } from "../../services/persistentStorage";
 
 type Props = {
   className?: string;
@@ -30,21 +31,12 @@ export function LanguageSwitcher({ className, label = true }: Props) {
   const onChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
     const lng = e.target.value as SupportedLanguage;
     await i18n.changeLanguage(lng);
-    try {
-      // cohérent avec i18next-browser-languagedetector
-      localStorage.setItem("i18nextLng", lng);
-    } catch {
-      // ignore
-    }
+    setPreferredLanguage(lng);
   };
 
   return (
     <div className={className} style={{ display: "grid", gap: 8 }}>
-      {label && (
-        <div style={{ fontSize: 14, opacity: 0.9 }}>
-          {t(I18N_KEYS.settings.languageTitle)}
-        </div>
-      )}
+      {label && <div style={{ fontSize: 14, opacity: 0.9 }}>{t(I18N_KEYS.settings.languageTitle)}</div>}
 
       <select
         value={current}
@@ -64,9 +56,7 @@ export function LanguageSwitcher({ className, label = true }: Props) {
         ))}
       </select>
 
-      <div style={{ fontSize: 12, opacity: 0.7 }}>
-        {t(I18N_KEYS.settings.languageHelp)}
-      </div>
+      <div style={{ fontSize: 12, opacity: 0.7 }}>{t(I18N_KEYS.settings.languageHelp)}</div>
     </div>
   );
 }

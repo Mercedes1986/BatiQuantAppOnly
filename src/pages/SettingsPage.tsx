@@ -17,6 +17,7 @@ import { useTranslation } from "react-i18next";
 import { exportAppData, importAppData } from "../services/materialsService";
 import { CompanyProfileForm } from "../components/documents/CompanyProfileForm";
 import { getSettings, saveSettings } from "../services/storage";
+import { setPreferredLanguage } from "../services/persistentStorage";
 
 type SettingsTab = "app" | "company";
 type Currency = "EUR" | "USD" | "CAD" | "CHF";
@@ -140,11 +141,7 @@ export const SettingsPage: React.FC = () => {
   const changeLanguage = async (lng: string) => {
     try {
       await i18n.changeLanguage(lng);
-      try {
-        localStorage.setItem("i18nextLng", lng);
-      } catch {
-        // ignore
-      }
+      setPreferredLanguage(lng);
     } catch (e) {
       console.error(e);
     }

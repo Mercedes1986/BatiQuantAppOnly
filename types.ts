@@ -69,12 +69,19 @@ export interface MaterialItem {
   imageUrl?: string;
 }
 
+export interface CalculatorSnapshot {
+  version: number;
+  calculatorType: CalculatorType;
+  values: Record<string, unknown>;
+}
+
 export interface CalculationResult {
   summary: string;
   details: { label: string; value: string | number; unit?: string }[];
   materials: MaterialItem[];
   totalCost: number;
   warnings?: string[]; // e.g. "Attention: Support poreux"
+  snapshot?: CalculatorSnapshot;
 }
 
 // Legacy Project (Simple List)
@@ -84,6 +91,14 @@ export interface Project {
   date: string;
   items: MaterialItem[];
   notes: string;
+
+  /**
+   * Optional calculator metadata used to reopen the originating calculator
+   * from a saved project or from a quote created from that project.
+   */
+  calculatorType?: CalculatorType;
+  calculatorLabel?: string;
+  calculatorSnapshot?: CalculatorSnapshot;
 }
 
 // --- NEW: Full House Project ---
@@ -139,6 +154,16 @@ export interface QuoteData {
   updatedAt: string;
 }
 
+export type QuoteSourceKind = "simple_project" | "house_project" | "house_step";
+
+export interface QuoteSource {
+  kind: QuoteSourceKind;
+  projectId?: string;
+  calculatorType?: CalculatorType;
+  stepId?: ConstructionStepId;
+  stepIds?: ConstructionStepId[];
+}
+
 export interface HouseProject {
   id: string;
   name: string;
@@ -162,6 +187,13 @@ export interface HouseProject {
         materials: MaterialItem[];
         cost: number;
         notes?: string;
+
+        /**
+         * Optional metadata used to reopen the exact calculator/step state
+         * that produced this construction step.
+         */
+        calculatorType?: CalculatorType;
+        calculatorSnapshot?: CalculatorSnapshot;
       }
     >
   >;
@@ -236,11 +268,17 @@ export interface AppDataBackup {
   mappings: Record<string, string>; // systemKey -> customId
   taxSettings: TaxSettings;
   laborSettings: LaborSettings;
-  // Added for Documents
-  companyProfile?: CompanyProfile;
+  projects?: Project[];
+  houseProjects?: HouseProject[];
+  userSettings?: UserSettings;
+  companyProfile?: CompanyProfile | null;
   quotes?: QuoteDocument[];
   invoices?: InvoiceDocument[];
-  docCounters?: any;
+  docCounters?: {
+    quote: number;
+    invoice: number;
+    year: number;
+  };
 }
 
 // --- DOCUMENTS MODULE TYPES ---
@@ -308,6 +346,7 @@ export interface BaseDocument {
 export interface QuoteDocument extends BaseDocument {
   type: 'quote';
   status: 'draft' | 'sent' | 'accepted' | 'rejected' | 'invoiced';
+  source?: QuoteSource;
 }
 
 export interface InvoiceDocument extends BaseDocument {

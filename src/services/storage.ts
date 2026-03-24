@@ -1,66 +1,79 @@
-// src/services/projectStorage.ts (ou ton chemin actuel)
 import type { Project, UserSettings, HouseProject } from "../types";
-
-/**
- * Brand rename: BatiCalc -> BatiQuant
- * Strategy:
- * - New keys (batiquant_*)
- * - Backward compatible: reads old keys if new ones are empty
- * - One-time migration: if old exists and new missing => copy old -> new
- * - Safe for SSR / private mode (localStorage may throw)
- */
+import {
+  canUsePersistentStorage,
+  markNamespaceMigrated,
+  migrateLegacyKey,
+  readJson,
+  writeJson,
+} from "./persistentStorage";
 
 const BRAND_PREFIX_NEW = "batiquant";
 const BRAND_PREFIX_OLD = "baticalc";
 
-// New keys
 const PROJECTS_KEY = `${BRAND_PREFIX_NEW}_projects`;
 const HOUSE_PROJECTS_KEY = `${BRAND_PREFIX_NEW}_house_projects`;
 const SETTINGS_KEY = `${BRAND_PREFIX_NEW}_settings`;
 
-// Old keys (legacy)
 const PROJECTS_KEY_OLD = `${BRAND_PREFIX_OLD}_projects`;
 const HOUSE_PROJECTS_KEY_OLD = `${BRAND_PREFIX_OLD}_house_projects`;
 const SETTINGS_KEY_OLD = `${BRAND_PREFIX_OLD}_settings`;
 
-// Optional event to refresh UI if needed
 const PROJECTS_EVENT = "batiquant:projects_changed";
-type ProjectsEventDetail = { reason: "save" | "delete" | "settings" | "import"; key: "projects" | "house_projects" | "settings" };
+const STORAGE_NAMESPACE = "projects";
 
-const canUseStorage = () => {
-  try {
-    return typeof window !== "undefined" && !!window.localStorage;
-  } catch {
-    return false;
-  }
+type ProjectsEventDetail = {
+  reason: "save" | "delete" | "settings" | "import";
+  key: "projects" | "house_projects" | "settings";
 };
 
-function safeJsonParse<T>(raw: string | null, fallback: T): T {
-  if (!raw) return fallback;
-  try {
-    return JSON.parse(raw) as T;
-  } catch {
-    return fallback;
-  }
-}
+const DEFAULT_SETTINGS: UserSettings = {
+  currency: "€",
+  taxRate: 20,
+  isPro: false,
+};
 
-function safeGet(key: string): string | null {
-  if (!canUseStorage()) return null;
-  try {
-    return window.localStorage.getItem(key);
-  } catch {
-    return null;
-  }
-}
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  !!value && typeof value === "object" && !Array.isArray(value);
 
-function safeSet(key: string, value: string): void {
-  if (!canUseStorage()) return;
-  try {
-    window.localStorage.setItem(key, value);
-  } catch {
-    // ignore
-  }
-}
+const sanitizeProjectList = (value: unknown): Project[] => {
+  if (!Array.isArray(value)) return [];
+  return value.filter(
+    (project): project is Project =>
+      isRecord(project) &&
+      typeof project.id === "string" &&
+      typeof project.name === "string" &&
+      typeof project.date === "string" &&
+      Array.isArray(project.items)
+  );
+};
+
+const sanitizeHouseProjectList = (value: unknown): HouseProject[] => {
+  if (!Array.isArray(value)) return [];
+  return value.filter(
+    (project): project is HouseProject =>
+      isRecord(project) &&
+      typeof project.id === "string" &&
+      typeof project.name === "string" &&
+      typeof project.date === "string" &&
+      isRecord(project.params) &&
+      isRecord(project.steps)
+  );
+};
+
+const sanitizeSettings = (value: unknown): UserSettings => {
+  if (!isRecord(value)) return { ...DEFAULT_SETTINGS };
+
+  const currency = typeof value.currency === "string" && value.currency.trim() ? value.currency : "€";
+  const taxRate =
+    typeof value.taxRate === "number" && Number.isFinite(value.taxRate) ? value.taxRate : DEFAULT_SETTINGS.taxRate;
+  const isPro = typeof value.isPro === "boolean" ? value.isPro : DEFAULT_SETTINGS.isPro;
+
+  return {
+    currency,
+    taxRate,
+    isPro,
+  };
+};
 
 function emitChanged(detail: ProjectsEventDetail) {
   if (typeof window === "undefined") return;
@@ -78,33 +91,26 @@ export const onProjectsChanged = (handler: (detail: ProjectsEventDetail) => void
   return () => window.removeEventListener(PROJECTS_EVENT, fn);
 };
 
-/** Copy old key -> new key only if new is empty and old exists */
-function migrateKey(oldKey: string, newKey: string) {
-  const newVal = safeGet(newKey);
-  if (newVal && newVal.trim().length > 0) return;
-
-  const oldVal = safeGet(oldKey);
-  if (!oldVal || oldVal.trim().length === 0) return;
-
-  safeSet(newKey, oldVal);
-  // Optionnel: supprimer l'ancienne clé après migration
-  // try { window.localStorage.removeItem(oldKey); } catch {}
-}
-
 let didMigrate = false;
 function ensureMigratedOnce() {
   if (didMigrate) return;
   didMigrate = true;
 
-  migrateKey(PROJECTS_KEY_OLD, PROJECTS_KEY);
-  migrateKey(HOUSE_PROJECTS_KEY_OLD, HOUSE_PROJECTS_KEY);
-  migrateKey(SETTINGS_KEY_OLD, SETTINGS_KEY);
+  if (!canUsePersistentStorage()) return;
+
+  migrateLegacyKey(PROJECTS_KEY, [PROJECTS_KEY_OLD]);
+  migrateLegacyKey(HOUSE_PROJECTS_KEY, [HOUSE_PROJECTS_KEY_OLD]);
+  migrateLegacyKey(SETTINGS_KEY, [SETTINGS_KEY_OLD]);
+  markNamespaceMigrated(STORAGE_NAMESPACE);
 }
 
-// --- Projects ---
+const readProjects = (): Project[] => sanitizeProjectList(readJson<unknown>(PROJECTS_KEY, []));
+const readHouseProjects = (): HouseProject[] => sanitizeHouseProjectList(readJson<unknown>(HOUSE_PROJECTS_KEY, []));
+const readSettings = (): UserSettings => sanitizeSettings(readJson<unknown>(SETTINGS_KEY, DEFAULT_SETTINGS));
+
 export const getProjects = (): Project[] => {
   ensureMigratedOnce();
-  return safeJsonParse<Project[]>(safeGet(PROJECTS_KEY), []);
+  return readProjects();
 };
 
 export const saveProject = (project: Project): void => {
@@ -115,21 +121,26 @@ export const saveProject = (project: Project): void => {
   if (idx >= 0) projects[idx] = project;
   else projects.push(project);
 
-  safeSet(PROJECTS_KEY, JSON.stringify(projects));
+  writeJson(PROJECTS_KEY, projects);
   emitChanged({ reason: "save", key: "projects" });
+};
+
+export const replaceProjects = (projects: Project[]): void => {
+  ensureMigratedOnce();
+  writeJson(PROJECTS_KEY, sanitizeProjectList(projects));
+  emitChanged({ reason: "import", key: "projects" });
 };
 
 export const deleteProject = (id: string): void => {
   ensureMigratedOnce();
   const projects = getProjects().filter((p) => p.id !== id);
-  safeSet(PROJECTS_KEY, JSON.stringify(projects));
+  writeJson(PROJECTS_KEY, projects);
   emitChanged({ reason: "delete", key: "projects" });
 };
 
-// --- HOUSE PROJECTS ---
 export const getHouseProjects = (): HouseProject[] => {
   ensureMigratedOnce();
-  return safeJsonParse<HouseProject[]>(safeGet(HOUSE_PROJECTS_KEY), []);
+  return readHouseProjects();
 };
 
 export const saveHouseProject = (project: HouseProject): void => {
@@ -140,33 +151,38 @@ export const saveHouseProject = (project: HouseProject): void => {
   if (idx >= 0) projects[idx] = project;
   else projects.push(project);
 
-  safeSet(HOUSE_PROJECTS_KEY, JSON.stringify(projects));
+  writeJson(HOUSE_PROJECTS_KEY, projects);
   emitChanged({ reason: "save", key: "house_projects" });
+};
+
+export const replaceHouseProjects = (projects: HouseProject[]): void => {
+  ensureMigratedOnce();
+  writeJson(HOUSE_PROJECTS_KEY, sanitizeHouseProjectList(projects));
+  emitChanged({ reason: "import", key: "house_projects" });
 };
 
 export const deleteHouseProject = (id: string): void => {
   ensureMigratedOnce();
   const projects = getHouseProjects().filter((p) => p.id !== id);
-  safeSet(HOUSE_PROJECTS_KEY, JSON.stringify(projects));
+  writeJson(HOUSE_PROJECTS_KEY, projects);
   emitChanged({ reason: "delete", key: "house_projects" });
-};
-
-// --- SETTINGS ---
-const DEFAULT_SETTINGS: UserSettings = {
-  currency: "€",
-  taxRate: 20,
-  isPro: false,
 };
 
 export const getSettings = (): UserSettings => {
   ensureMigratedOnce();
-  return safeJsonParse<UserSettings>(safeGet(SETTINGS_KEY), DEFAULT_SETTINGS);
+  return readSettings();
 };
 
 export const saveSettings = (settings: UserSettings): void => {
   ensureMigratedOnce();
-  safeSet(SETTINGS_KEY, JSON.stringify(settings));
+  writeJson(SETTINGS_KEY, sanitizeSettings(settings));
   emitChanged({ reason: "settings", key: "settings" });
+};
+
+export const replaceSettings = (settings: UserSettings): void => {
+  ensureMigratedOnce();
+  writeJson(SETTINGS_KEY, sanitizeSettings(settings));
+  emitChanged({ reason: "import", key: "settings" });
 };
 
 export const generateId = (): string => {

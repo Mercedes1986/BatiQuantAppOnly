@@ -268,11 +268,17 @@ export interface AppDataBackup {
   mappings: Record<string, string>; // systemKey -> customId
   taxSettings: TaxSettings;
   laborSettings: LaborSettings;
-  // Added for Documents
-  companyProfile?: CompanyProfile;
+  projects?: Project[];
+  houseProjects?: HouseProject[];
+  userSettings?: UserSettings;
+  companyProfile?: CompanyProfile | null;
   quotes?: QuoteDocument[];
   invoices?: InvoiceDocument[];
-  docCounters?: any;
+  docCounters?: {
+    quote: number;
+    invoice: number;
+    year: number;
+  };
 }
 
 // --- DOCUMENTS MODULE TYPES ---

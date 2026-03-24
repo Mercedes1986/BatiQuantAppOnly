@@ -1,6 +1,7 @@
 import React, { useMemo, useState, useEffect } from "react";
 import { Lock, ArrowRight, ShieldCheck, AlertTriangle } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { canUsePersistentStorage, safeStorageGet, safeStorageSet } from "../../services/persistentStorage";
 
 interface Props {
   onUnlock: () => void;
@@ -10,22 +11,16 @@ const ACCESS_KEY = "batiquant_tutorial_access";
 const ACCESS_TS_KEY = "batiquant_tutorial_access_ts";
 const ACCESS_TTL_DAYS = 7;
 
-const canUseStorage = () => {
-  try {
-    return typeof window !== "undefined" && !!window.localStorage;
-  } catch {
-    return false;
-  }
-};
+const canUseStorage = () => canUsePersistentStorage();
 
 const hasValidAccessFlag = (): boolean => {
   if (!canUseStorage()) return false;
 
   try {
-    const ok = localStorage.getItem(ACCESS_KEY) === "true";
+    const ok = safeStorageGet(ACCESS_KEY) === "true";
     if (!ok) return false;
 
-    const ts = Number(localStorage.getItem(ACCESS_TS_KEY) || "0");
+    const ts = Number(safeStorageGet(ACCESS_TS_KEY) || "0");
     if (!ts) return true; // compat ancienne version sans TTL
 
     const maxAge = ACCESS_TTL_DAYS * 24 * 60 * 60 * 1000;
@@ -81,8 +76,8 @@ export const TutorialAuth: React.FC<Props> = ({ onUnlock }) => {
     if (normalized === VALID_CODE) {
       try {
         if (canUseStorage()) {
-          localStorage.setItem(ACCESS_KEY, "true");
-          localStorage.setItem(ACCESS_TS_KEY, String(Date.now()));
+          safeStorageSet(ACCESS_KEY, "true");
+          safeStorageSet(ACCESS_TS_KEY, String(Date.now()));
         }
       } catch {
         // ignore

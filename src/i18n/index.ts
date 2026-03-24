@@ -1,48 +1,45 @@
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
-import LanguageDetector from "i18next-browser-languagedetector";
 
 import fr from "./locales/fr.json";
 import en from "./locales/en.json";
+import { getPreferredLanguage } from "../services/persistentStorage";
 
 const SUPPORTED = ["fr", "en"] as const;
 
 export type SupportedLanguage = (typeof SUPPORTED)[number];
 export const SUPPORTED_LANGUAGES: readonly SupportedLanguage[] = SUPPORTED;
 
-i18n
-  .use(LanguageDetector)
-  .use(initReactI18next)
-  .init({
-    resources: {
-      fr: { translation: fr },
-      en: { translation: en },
-    },
-    // Important: when the user selects English, do NOT fall back to French.
-    // Missing keys should fall back to English defaults in code (defaultValue) instead.
-    fallbackLng: "en",
-    supportedLngs: [...SUPPORTED],
-    nonExplicitSupportedLngs: true,
-    load: "languageOnly",
-    interpolation: { escapeValue: false },
+const normalizeLanguage = (raw: string | null | undefined): SupportedLanguage | null => {
+  const value = String(raw || "").toLowerCase();
+  if (value.startsWith("fr")) return "fr";
+  if (value.startsWith("en")) return "en";
+  return null;
+};
 
-    returnNull: false,
-    returnEmptyString: false,
+const stored = normalizeLanguage(getPreferredLanguage());
+const browser =
+  normalizeLanguage(typeof navigator !== "undefined" ? navigator.language : null) ||
+  (typeof navigator !== "undefined" && Array.isArray(navigator.languages)
+    ? normalizeLanguage(navigator.languages[0])
+    : null);
 
-    detection: {
-      order: ["localStorage", "navigator", "htmlTag"],
-      caches: ["localStorage"],
-      lookupLocalStorage: "i18nextLng",
-    },
+i18n.use(initReactI18next).init({
+  resources: {
+    fr: { translation: fr },
+    en: { translation: en },
+  },
+  fallbackLng: "en",
+  supportedLngs: [...SUPPORTED],
+  nonExplicitSupportedLngs: true,
+  load: "languageOnly",
+  lng: stored || browser || "en",
+  interpolation: { escapeValue: false },
+  returnNull: false,
+  returnEmptyString: false,
+  react: { useSuspense: false },
+});
 
-    react: { useSuspense: false },
-
-    // (Optionnel) utile pour détecter les clés manquantes pendant dev
-    // saveMissing: true,
-    // missingKeyHandler: (_, __, key) => console.warn("[i18n missing]", key),
-  });
-
-// ✅ synchronise <html lang="...">
 const syncHtmlLang = (lng: string) => {
   try {
     const short = String(lng || "en").split("-")[0];

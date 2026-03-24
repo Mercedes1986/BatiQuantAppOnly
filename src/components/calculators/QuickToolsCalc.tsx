@@ -16,6 +16,7 @@ import {
 import { CalculatorType, CalculationResult, MaterialItem, Unit, CalculatorSnapshot } from "../../types";
 import { Input } from "../ui/Input";
 import { Select } from "../ui/Select";
+import { getPreferredLanguage } from "../../services/persistentStorage";
 
 export type ToolKey =
   | "convert"
@@ -74,13 +75,15 @@ const makeMaterial = (
 
 
 const getLang = () => {
-  try {
-    const stored = typeof window !== "undefined" ? window.localStorage?.getItem("i18nextLng") : "";
-    if (stored) return stored;
-  } catch {}
+  const stored = getPreferredLanguage();
+  if (stored) return stored;
+
   try {
     if (typeof navigator !== "undefined" && navigator.language) return navigator.language;
-  } catch {}
+  } catch {
+    // ignore
+  }
+
   return "fr";
 };
 

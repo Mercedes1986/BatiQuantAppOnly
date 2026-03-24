@@ -1,4 +1,3 @@
-// src/services/materialsService.ts
 import { DEFAULT_PRICES, getMaterialMetadata } from "../constants";
 import type {
   CustomMaterial,
@@ -6,18 +5,42 @@ import type {
   LaborSettings,
   AppDataBackup,
   UsageStats,
+  Project,
+  HouseProject,
+  UserSettings,
+  CompanyProfile,
+  QuoteDocument,
+  InvoiceDocument,
 } from "../types";
-
-/**
- * ✅ MAJ BatiCalc -> BatiQuant
- * - Nouvelles clés localStorage : batiquant_*
- * - Compat lecture anciennes clés : baticalc_*
- * - Migration automatique (copie) si nouvelles vides
- * - Event global "batiquant:materials_changed"
- */
+import {
+  canUsePersistentStorage,
+  markNamespaceMigrated,
+  migrateLegacyKey,
+  readJson,
+  writeJson,
+} from "./persistentStorage";
+import {
+  getProjects,
+  getHouseProjects,
+  getSettings,
+  replaceHouseProjects,
+  replaceProjects,
+  replaceSettings,
+} from "./storage";
+import {
+  getCompanyProfile,
+  getDocumentCounters,
+  getInvoices,
+  getQuotes,
+  replaceCompanyProfile,
+  replaceDocumentCounters,
+  replaceInvoices,
+  replaceQuotes,
+} from "./documentsStorage";
 
 const BRAND_NEW = "batiquant";
 const BRAND_OLD = "baticalc";
+const STORAGE_NAMESPACE = "materials";
 
 const STORAGE_KEYS_NEW = {
   PRICES: `${BRAND_NEW}_prices`,
@@ -51,10 +74,14 @@ type MaterialsEventDetail = {
     | "tax"
     | "labor"
     | "import";
-  key?: string; // systemKey
+  key?: string;
 };
 
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  !!value && typeof value === "object" && !Array.isArray(value);
+
 const emitMaterialsChanged = (detail: MaterialsEventDetail) => {
+  if (typeof window === "undefined") return;
   try {
     window.dispatchEvent(new CustomEvent(MATERIALS_EVENT, { detail }));
   } catch {
@@ -62,140 +89,199 @@ const emitMaterialsChanged = (detail: MaterialsEventDetail) => {
   }
 };
 
-export const onMaterialsChanged = (
-  handler: (detail: MaterialsEventDetail) => void
-) => {
+export const onMaterialsChanged = (handler: (detail: MaterialsEventDetail) => void) => {
+  if (typeof window === "undefined") return () => {};
+
   const fn = (e: Event) => {
     const ce = e as CustomEvent<MaterialsEventDetail>;
     handler(ce.detail);
   };
+
   window.addEventListener(MATERIALS_EVENT, fn);
   return () => window.removeEventListener(MATERIALS_EVENT, fn);
 };
 
-// --- JSON helpers ---
-const safeParse = <T>(raw: string | null, fallback: T): T => {
-  if (!raw) return fallback;
-  try {
-    return JSON.parse(raw) as T;
-  } catch {
-    return fallback;
+const sanitizePriceMap = (value: unknown): Record<string, number> => {
+  if (!isRecord(value)) return {};
+  return Object.fromEntries(
+    Object.entries(value).filter(
+      ([key, amount]) => typeof key === "string" && typeof amount === "number" && Number.isFinite(amount)
+    )
+  ) as Record<string, number>;
+};
+
+const sanitizeStringArray = (value: unknown): string[] => {
+  if (!Array.isArray(value)) return [];
+  return Array.from(new Set(value.filter((item): item is string => typeof item === "string" && item.trim().length > 0)));
+};
+
+const sanitizeMappings = (value: unknown): Record<string, string> => {
+  if (!isRecord(value)) return {};
+  return Object.fromEntries(
+    Object.entries(value).filter(
+      ([key, customId]) => typeof key === "string" && typeof customId === "string" && customId.trim().length > 0
+    )
+  ) as Record<string, string>;
+};
+
+const sanitizeUsage = (value: unknown): Record<string, UsageStats> => {
+  if (!isRecord(value)) return {};
+  return Object.fromEntries(
+    Object.entries(value)
+      .map(([key, stats]) => {
+        if (!isRecord(stats)) return null;
+        const count = typeof stats.count === "number" && Number.isFinite(stats.count) ? Math.max(0, stats.count) : 0;
+        const lastUsedAt =
+          typeof stats.lastUsedAt === "number" && Number.isFinite(stats.lastUsedAt) ? stats.lastUsedAt : 0;
+        return [key, { count, lastUsedAt }] as const;
+      })
+      .filter((entry): entry is readonly [string, UsageStats] => !!entry)
+  );
+};
+
+const sanitizeCustomMaterials = (value: unknown): CustomMaterial[] => {
+  if (!Array.isArray(value)) return [];
+
+  return value.filter(
+    (material): material is CustomMaterial =>
+      isRecord(material) &&
+      typeof material.id === "string" &&
+      typeof material.label === "string" &&
+      typeof material.category === "string" &&
+      typeof material.unit === "string" &&
+      typeof material.price === "number" &&
+      Number.isFinite(material.price) &&
+      typeof material.createdAt === "number" &&
+      Number.isFinite(material.createdAt)
+  );
+};
+
+const sanitizeTaxSettings = (value: unknown): TaxSettings => {
+  if (!isRecord(value)) {
+    return { mode: "HT", vatRate: 20 };
   }
+
+  const mode = value.mode === "HT" || value.mode === "TTC" ? value.mode : "HT";
+  const vatRate = typeof value.vatRate === "number" && Number.isFinite(value.vatRate) ? value.vatRate : 20;
+  return { mode, vatRate };
 };
 
-const getJSON = <T>(keyNew: string, keyOld: string, defaultVal: T): T => {
-  const newRaw = localStorage.getItem(keyNew);
-  if (newRaw != null) return safeParse<T>(newRaw, defaultVal);
+const sanitizeLaborSettings = (value: unknown): LaborSettings => {
+  if (!isRecord(value)) {
+    return { enabled: false, globalHourlyRate: 45 };
+  }
 
-  const oldRaw = localStorage.getItem(keyOld);
-  if (oldRaw != null) return safeParse<T>(oldRaw, defaultVal);
-
-  return defaultVal;
-};
-
-const setJSON = (keyNew: string, data: any) => {
-  localStorage.setItem(keyNew, JSON.stringify(data));
-};
-
-// --- One-time migration ---
-const migrateOnce = (() => {
-  let done = false;
-  return () => {
-    if (done) return;
-    done = true;
-
-    const pairs: Array<[string, string]> = [
-      [STORAGE_KEYS_NEW.PRICES, STORAGE_KEYS_OLD.PRICES],
-      [STORAGE_KEYS_NEW.CUSTOM_MATS, STORAGE_KEYS_OLD.CUSTOM_MATS],
-      [STORAGE_KEYS_NEW.MAPPINGS, STORAGE_KEYS_OLD.MAPPINGS],
-      [STORAGE_KEYS_NEW.FAVORITES, STORAGE_KEYS_OLD.FAVORITES],
-      [STORAGE_KEYS_NEW.USAGE, STORAGE_KEYS_OLD.USAGE],
-      [STORAGE_KEYS_NEW.TAX, STORAGE_KEYS_OLD.TAX],
-      [STORAGE_KEYS_NEW.LABOR, STORAGE_KEYS_OLD.LABOR],
-    ];
-
-    pairs.forEach(([kNew, kOld]) => {
-      const hasNew = localStorage.getItem(kNew) != null;
-      const oldVal = localStorage.getItem(kOld);
-      if (!hasNew && oldVal != null) {
-        localStorage.setItem(kNew, oldVal);
-      }
-    });
+  return {
+    enabled: typeof value.enabled === "boolean" ? value.enabled : false,
+    globalHourlyRate:
+      typeof value.globalHourlyRate === "number" && Number.isFinite(value.globalHourlyRate)
+        ? value.globalHourlyRate
+        : 45,
   };
-})();
+};
 
-// --- SETTINGS ---
+let didMigrate = false;
+const migrateOnce = () => {
+  if (didMigrate) return;
+  didMigrate = true;
+
+  if (!canUsePersistentStorage()) return;
+
+  const pairs: Array<[string, string]> = [
+    [STORAGE_KEYS_NEW.PRICES, STORAGE_KEYS_OLD.PRICES],
+    [STORAGE_KEYS_NEW.CUSTOM_MATS, STORAGE_KEYS_OLD.CUSTOM_MATS],
+    [STORAGE_KEYS_NEW.MAPPINGS, STORAGE_KEYS_OLD.MAPPINGS],
+    [STORAGE_KEYS_NEW.FAVORITES, STORAGE_KEYS_OLD.FAVORITES],
+    [STORAGE_KEYS_NEW.USAGE, STORAGE_KEYS_OLD.USAGE],
+    [STORAGE_KEYS_NEW.TAX, STORAGE_KEYS_OLD.TAX],
+    [STORAGE_KEYS_NEW.LABOR, STORAGE_KEYS_OLD.LABOR],
+  ];
+
+  pairs.forEach(([newKey, oldKey]) => {
+    migrateLegacyKey(newKey, [oldKey]);
+  });
+
+  markNamespaceMigrated(STORAGE_NAMESPACE);
+};
+
+const readPriceMap = (): Record<string, number> => sanitizePriceMap(readJson<unknown>(STORAGE_KEYS_NEW.PRICES, {}));
+const readCustomMaterials = (): CustomMaterial[] => sanitizeCustomMaterials(readJson<unknown>(STORAGE_KEYS_NEW.CUSTOM_MATS, []));
+const readMappings = (): Record<string, string> => sanitizeMappings(readJson<unknown>(STORAGE_KEYS_NEW.MAPPINGS, {}));
+const readFavorites = (): string[] => sanitizeStringArray(readJson<unknown>(STORAGE_KEYS_NEW.FAVORITES, []));
+const readUsage = (): Record<string, UsageStats> => sanitizeUsage(readJson<unknown>(STORAGE_KEYS_NEW.USAGE, {}));
+const readTaxSettings = (): TaxSettings => sanitizeTaxSettings(readJson<unknown>(STORAGE_KEYS_NEW.TAX, { mode: "HT", vatRate: 20 }));
+const readLaborSettings = (): LaborSettings =>
+  sanitizeLaborSettings(readJson<unknown>(STORAGE_KEYS_NEW.LABOR, { enabled: false, globalHourlyRate: 45 }));
+
+const setPriceMap = (value: Record<string, number>) => {
+  writeJson(STORAGE_KEYS_NEW.PRICES, sanitizePriceMap(value));
+};
+
+const setCustomMaterials = (value: CustomMaterial[]) => {
+  writeJson(STORAGE_KEYS_NEW.CUSTOM_MATS, sanitizeCustomMaterials(value));
+};
+
+const setMappings = (value: Record<string, string>) => {
+  writeJson(STORAGE_KEYS_NEW.MAPPINGS, sanitizeMappings(value));
+};
+
+const setFavorites = (value: string[]) => {
+  writeJson(STORAGE_KEYS_NEW.FAVORITES, sanitizeStringArray(value));
+};
+
+const setUsage = (value: Record<string, UsageStats>) => {
+  writeJson(STORAGE_KEYS_NEW.USAGE, sanitizeUsage(value));
+};
+
+const setTaxSettingsSafe = (value: TaxSettings) => {
+  writeJson(STORAGE_KEYS_NEW.TAX, sanitizeTaxSettings(value));
+};
+
+const setLaborSettingsSafe = (value: LaborSettings) => {
+  writeJson(STORAGE_KEYS_NEW.LABOR, sanitizeLaborSettings(value));
+};
+
 export const getTaxSettings = (): TaxSettings => {
   migrateOnce();
-  return getJSON<TaxSettings>(STORAGE_KEYS_NEW.TAX, STORAGE_KEYS_OLD.TAX, {
-    mode: "HT",
-    vatRate: 20,
-  });
+  return readTaxSettings();
 };
 
-export const setTaxSettings = (s: TaxSettings) => {
+export const setTaxSettings = (settings: TaxSettings) => {
   migrateOnce();
-  setJSON(STORAGE_KEYS_NEW.TAX, s);
+  setTaxSettingsSafe(settings);
   emitMaterialsChanged({ reason: "tax" });
 };
 
 export const getLaborSettings = (): LaborSettings => {
   migrateOnce();
-  return getJSON<LaborSettings>(
-    STORAGE_KEYS_NEW.LABOR,
-    STORAGE_KEYS_OLD.LABOR,
-    { enabled: false, globalHourlyRate: 45 }
-  );
+  return readLaborSettings();
 };
 
-export const setLaborSettings = (s: LaborSettings) => {
+export const setLaborSettings = (settings: LaborSettings) => {
   migrateOnce();
-  setJSON(STORAGE_KEYS_NEW.LABOR, s);
+  setLaborSettingsSafe(settings);
   emitMaterialsChanged({ reason: "labor" });
 };
 
-// --- CORE PRICING ENGINE ---
 const getUnitPriceHT = (systemKey: string): number => {
   if (!systemKey) return 0;
 
-  // mapping
-  const mappings = getJSON<Record<string, string>>(
-    STORAGE_KEYS_NEW.MAPPINGS,
-    STORAGE_KEYS_OLD.MAPPINGS,
-    {}
-  );
+  const mappings = readMappings();
   const customId = mappings[systemKey];
 
   if (customId) {
-    const customs = getJSON<CustomMaterial[]>(
-      STORAGE_KEYS_NEW.CUSTOM_MATS,
-      STORAGE_KEYS_OLD.CUSTOM_MATS,
-      []
-    );
-    const customMat = customs.find((m) => m.id === customId);
-
+    const customMat = readCustomMaterials().find((material) => material.id === customId);
     if (customMat) return customMat.price;
 
-    // mapping cassé -> fallback override puis default
-    const overrides = getJSON<Record<string, number>>(
-      STORAGE_KEYS_NEW.PRICES,
-      STORAGE_KEYS_OLD.PRICES,
-      {}
-    );
+    const overrides = readPriceMap();
     if (overrides[systemKey] !== undefined) return overrides[systemKey];
-    return (DEFAULT_PRICES as any)[systemKey] || 0;
+    return (DEFAULT_PRICES as Record<string, number>)[systemKey] || 0;
   }
 
-  // override
-  const overrides = getJSON<Record<string, number>>(
-    STORAGE_KEYS_NEW.PRICES,
-    STORAGE_KEYS_OLD.PRICES,
-    {}
-  );
+  const overrides = readPriceMap();
   if (overrides[systemKey] !== undefined) return overrides[systemKey];
 
-  // default
-  return (DEFAULT_PRICES as any)[systemKey] || 0;
+  return (DEFAULT_PRICES as Record<string, number>)[systemKey] || 0;
 };
 
 export const getUnitPrice = (systemKey: string): number => {
@@ -206,99 +292,77 @@ export const getUnitPrice = (systemKey: string): number => {
   return tax.mode === "TTC" ? baseHT * (1 + tax.vatRate / 100) : baseHT;
 };
 
-// --- USAGE ---
 export const incrementUsage = (systemKey: string) => {
   migrateOnce();
-  const usage = getJSON<Record<string, UsageStats>>(
-    STORAGE_KEYS_NEW.USAGE,
-    STORAGE_KEYS_OLD.USAGE,
-    {}
-  );
+  if (!systemKey) return;
+
+  const usage = readUsage();
   const current = usage[systemKey] || { count: 0, lastUsedAt: 0 };
   usage[systemKey] = { count: current.count + 1, lastUsedAt: Date.now() };
-  setJSON(STORAGE_KEYS_NEW.USAGE, usage);
+  setUsage(usage);
   emitMaterialsChanged({ reason: "usage", key: systemKey });
 };
 
 export const getMostUsedMaterials = (limit = 10): string[] => {
   migrateOnce();
-  const usage = getJSON<Record<string, UsageStats>>(
-    STORAGE_KEYS_NEW.USAGE,
-    STORAGE_KEYS_OLD.USAGE,
-    {}
-  );
+  const usage = readUsage();
   return Object.entries(usage)
     .sort(([, a], [, b]) => b.count - a.count)
     .slice(0, limit)
     .map(([key]) => key);
 };
 
-// --- FAVORITES ---
 export const getFavorites = (): string[] => {
   migrateOnce();
-  return getJSON<string[]>(
-    STORAGE_KEYS_NEW.FAVORITES,
-    STORAGE_KEYS_OLD.FAVORITES,
-    []
-  );
+  return readFavorites();
 };
 
 export const toggleFavorite = (systemKey: string) => {
   migrateOnce();
-  const favs = getFavorites();
-  const next = favs.includes(systemKey)
-    ? favs.filter((k) => k !== systemKey)
-    : [...favs, systemKey];
-  setJSON(STORAGE_KEYS_NEW.FAVORITES, next);
+  if (!systemKey) return;
+
+  const favorites = getFavorites();
+  const next = favorites.includes(systemKey)
+    ? favorites.filter((key) => key !== systemKey)
+    : [...favorites, systemKey];
+
+  setFavorites(next);
   emitMaterialsChanged({ reason: "favorite", key: systemKey });
 };
 
-// --- CUSTOM MATERIALS / MAPPINGS ---
 export const getCustomMaterials = (): CustomMaterial[] => {
   migrateOnce();
-  return getJSON<CustomMaterial[]>(
-    STORAGE_KEYS_NEW.CUSTOM_MATS,
-    STORAGE_KEYS_OLD.CUSTOM_MATS,
-    []
-  );
+  return readCustomMaterials();
 };
 
-export const saveCustomMaterial = (mat: CustomMaterial) => {
+export const saveCustomMaterial = (material: CustomMaterial) => {
   migrateOnce();
-  const list = getCustomMaterials();
-  const idx = list.findIndex((m) => m.id === mat.id);
-  if (idx >= 0) list[idx] = mat;
-  else list.push(mat);
-  setJSON(STORAGE_KEYS_NEW.CUSTOM_MATS, list);
+  const materials = getCustomMaterials();
+  const idx = materials.findIndex((item) => item.id === material.id);
+  if (idx >= 0) materials[idx] = material;
+  else materials.push(material);
+  setCustomMaterials(materials);
   emitMaterialsChanged({ reason: "custom_material" });
 };
 
 export const deleteCustomMaterial = (id: string) => {
   migrateOnce();
-  const list = getCustomMaterials().filter((m) => m.id !== id);
-  setJSON(STORAGE_KEYS_NEW.CUSTOM_MATS, list);
+  const materials = getCustomMaterials().filter((material) => material.id !== id);
+  setCustomMaterials(materials);
 
-  const mappings = getJSON<Record<string, string>>(
-    STORAGE_KEYS_NEW.MAPPINGS,
-    STORAGE_KEYS_OLD.MAPPINGS,
-    {}
-  );
-  const newMappings: Record<string, string> = {};
-  Object.entries(mappings).forEach(([k, v]) => {
-    if (v !== id) newMappings[k] = v;
+  const mappings = readMappings();
+  const nextMappings: Record<string, string> = {};
+  Object.entries(mappings).forEach(([systemKey, customId]) => {
+    if (customId !== id) nextMappings[systemKey] = customId;
   });
-  setJSON(STORAGE_KEYS_NEW.MAPPINGS, newMappings);
+  setMappings(nextMappings);
 
   emitMaterialsChanged({ reason: "custom_material" });
 };
 
-export const getMappings = () => {
+export const getMappings = (): Record<string, string> => {
   migrateOnce();
-  return getJSON<Record<string, string>>(
-    STORAGE_KEYS_NEW.MAPPINGS,
-    STORAGE_KEYS_OLD.MAPPINGS,
-    {}
-  );
+  return readMappings();
 };
 
 export const setMapping = (systemKey: string, customId: string | null) => {
@@ -306,127 +370,209 @@ export const setMapping = (systemKey: string, customId: string | null) => {
   const mappings = getMappings();
   if (customId) mappings[systemKey] = customId;
   else delete mappings[systemKey];
-  setJSON(STORAGE_KEYS_NEW.MAPPINGS, mappings);
+  setMappings(mappings);
   emitMaterialsChanged({ reason: "mapping", key: systemKey });
 };
 
-// --- PRICE OVERRIDES ---
 export const saveCustomPrice = (key: string, price: number) => {
   migrateOnce();
-  const overrides = getJSON<Record<string, number>>(
-    STORAGE_KEYS_NEW.PRICES,
-    STORAGE_KEYS_OLD.PRICES,
-    {}
-  );
+  if (!key || !Number.isFinite(price)) return;
+  const overrides = readPriceMap();
   overrides[key] = price;
-  setJSON(STORAGE_KEYS_NEW.PRICES, overrides);
+  setPriceMap(overrides);
   emitMaterialsChanged({ reason: "price_override", key });
 };
 
 export const resetCustomPrice = (key: string) => {
   migrateOnce();
-  const overrides = getJSON<Record<string, number>>(
-    STORAGE_KEYS_NEW.PRICES,
-    STORAGE_KEYS_OLD.PRICES,
-    {}
-  );
+  const overrides = readPriceMap();
   delete overrides[key];
-  setJSON(STORAGE_KEYS_NEW.PRICES, overrides);
+  setPriceMap(overrides);
   emitMaterialsChanged({ reason: "price_override", key });
 };
 
-// --- IMPORT / EXPORT ---
+const mergeById = <T extends { id: string }>(current: T[], incoming: T[]): T[] => {
+  const map = new Map<string, T>();
+  current.forEach((item) => map.set(item.id, item));
+  incoming.forEach((item) => map.set(item.id, item));
+  return Array.from(map.values());
+};
+
+const sanitizeBackupProjects = (value: unknown): Project[] =>
+  Array.isArray(value) ? (value.filter((item): item is Project => isRecord(item) && typeof item.id === "string") as Project[]) : [];
+
+const sanitizeBackupHouseProjects = (value: unknown): HouseProject[] =>
+  Array.isArray(value)
+    ? (value.filter((item): item is HouseProject => isRecord(item) && typeof item.id === "string") as HouseProject[])
+    : [];
+
+const sanitizeBackupSettings = (value: unknown): UserSettings | undefined =>
+  isRecord(value)
+    ? {
+        currency: typeof value.currency === "string" && value.currency.trim() ? value.currency : "€",
+        taxRate: typeof value.taxRate === "number" && Number.isFinite(value.taxRate) ? value.taxRate : 20,
+        isPro: typeof value.isPro === "boolean" ? value.isPro : false,
+      }
+    : undefined;
+
+const sanitizeBackupCompanyProfile = (value: unknown): CompanyProfile | null | undefined => {
+  if (value === null) return null;
+  if (!isRecord(value)) return undefined;
+  if (typeof value.name !== "string") return undefined;
+
+  return {
+    name: typeof value.name === "string" ? value.name : "",
+    address: typeof value.address === "string" ? value.address : "",
+    city: typeof value.city === "string" ? value.city : "",
+    zip: typeof value.zip === "string" ? value.zip : "",
+    phone: typeof value.phone === "string" ? value.phone : "",
+    email: typeof value.email === "string" ? value.email : "",
+    siret: typeof value.siret === "string" ? value.siret : "",
+    tvaNumber: typeof value.tvaNumber === "string" ? value.tvaNumber : undefined,
+    logoUrl: typeof value.logoUrl === "string" ? value.logoUrl : undefined,
+    footerNote: typeof value.footerNote === "string" ? value.footerNote : undefined,
+    terms: typeof value.terms === "string" ? value.terms : undefined,
+  };
+};
+
+const sanitizeBackupQuotes = (value: unknown): QuoteDocument[] =>
+  Array.isArray(value)
+    ? (value.filter(
+        (item): item is QuoteDocument =>
+          isRecord(item) && typeof item.id === "string" && typeof item.number === "string" && item.type === "quote"
+      ) as QuoteDocument[])
+    : [];
+
+const sanitizeBackupInvoices = (value: unknown): InvoiceDocument[] =>
+  Array.isArray(value)
+    ? (value.filter(
+        (item): item is InvoiceDocument =>
+          isRecord(item) && typeof item.id === "string" && typeof item.number === "string" && item.type === "invoice"
+      ) as InvoiceDocument[])
+    : [];
+
+const sanitizeBackupCounters = (
+  value: unknown
+): { quote: number; invoice: number; year: number } | undefined => {
+  if (!isRecord(value)) return undefined;
+  const currentYear = new Date().getFullYear();
+  return {
+    quote: typeof value.quote === "number" && Number.isFinite(value.quote) ? Math.max(0, value.quote) : 0,
+    invoice: typeof value.invoice === "number" && Number.isFinite(value.invoice) ? Math.max(0, value.invoice) : 0,
+    year: typeof value.year === "number" && Number.isFinite(value.year) ? value.year : currentYear,
+  };
+};
+
 export const exportAppData = (): string => {
   migrateOnce();
+
   const data: AppDataBackup = {
-    version: 1,
+    version: 2,
     exportedAt: Date.now(),
-    customPrices: getJSON(STORAGE_KEYS_NEW.PRICES, STORAGE_KEYS_OLD.PRICES, {}),
+    customPrices: readPriceMap(),
     customMaterials: getCustomMaterials(),
     favorites: getFavorites(),
-    usage: getJSON(STORAGE_KEYS_NEW.USAGE, STORAGE_KEYS_OLD.USAGE, {}),
+    usage: readUsage(),
     mappings: getMappings(),
     taxSettings: getTaxSettings(),
     laborSettings: getLaborSettings(),
+    projects: getProjects(),
+    houseProjects: getHouseProjects(),
+    userSettings: getSettings(),
+    companyProfile: getCompanyProfile(),
+    quotes: getQuotes(),
+    invoices: getInvoices(),
+    docCounters: getDocumentCounters(),
   };
+
   return JSON.stringify(data, null, 2);
 };
 
-export const importAppData = (
-  jsonString: string,
-  mode: "merge" | "replace"
-): boolean => {
+export const importAppData = (jsonString: string, mode: "merge" | "replace"): boolean => {
   migrateOnce();
+
   try {
-    const data: AppDataBackup = JSON.parse(jsonString);
-    if (!data.version) return false;
+    const parsed = JSON.parse(jsonString) as Partial<AppDataBackup>;
+    if (!parsed || typeof parsed !== "object") return false;
+    if (typeof parsed.version !== "number" || parsed.version < 1) return false;
+
+    const customPrices = sanitizePriceMap(parsed.customPrices);
+    const customMaterials = sanitizeCustomMaterials(parsed.customMaterials);
+    const favorites = sanitizeStringArray(parsed.favorites);
+    const usage = sanitizeUsage(parsed.usage);
+    const mappings = sanitizeMappings(parsed.mappings);
+    const taxSettings = sanitizeTaxSettings(parsed.taxSettings);
+    const laborSettings = sanitizeLaborSettings(parsed.laborSettings);
+    const projects = sanitizeBackupProjects(parsed.projects);
+    const houseProjects = sanitizeBackupHouseProjects(parsed.houseProjects);
+    const userSettings = sanitizeBackupSettings(parsed.userSettings);
+    const companyProfile = sanitizeBackupCompanyProfile(parsed.companyProfile);
+    const quotes = sanitizeBackupQuotes(parsed.quotes);
+    const invoices = sanitizeBackupInvoices(parsed.invoices);
+    const docCounters = sanitizeBackupCounters(parsed.docCounters);
 
     if (mode === "replace") {
-      setJSON(STORAGE_KEYS_NEW.PRICES, data.customPrices || {});
-      setJSON(STORAGE_KEYS_NEW.CUSTOM_MATS, data.customMaterials || []);
-      setJSON(STORAGE_KEYS_NEW.FAVORITES, data.favorites || []);
-      setJSON(STORAGE_KEYS_NEW.USAGE, data.usage || {});
-      setJSON(STORAGE_KEYS_NEW.MAPPINGS, data.mappings || {});
-      setJSON(STORAGE_KEYS_NEW.TAX, data.taxSettings || getTaxSettings());
-      setJSON(STORAGE_KEYS_NEW.LABOR, data.laborSettings || getLaborSettings());
+      setPriceMap(customPrices);
+      setCustomMaterials(customMaterials);
+      setFavorites(favorites);
+      setUsage(usage);
+      setMappings(mappings);
+      setTaxSettingsSafe(taxSettings);
+      setLaborSettingsSafe(laborSettings);
+      replaceProjects(projects);
+      replaceHouseProjects(houseProjects);
+      if (userSettings) replaceSettings(userSettings);
+      if (companyProfile !== undefined) replaceCompanyProfile(companyProfile);
+      replaceQuotes(quotes);
+      replaceInvoices(invoices);
+      if (docCounters) replaceDocumentCounters(docCounters);
     } else {
-      const currentCustoms = getCustomMaterials();
-      const mergedCustoms = [
-        ...currentCustoms,
-        ...(data.customMaterials || []).filter(
-          (m) => !currentCustoms.find((c) => c.id === m.id)
-        ),
-      ];
-      setJSON(STORAGE_KEYS_NEW.CUSTOM_MATS, mergedCustoms);
-
-      setJSON(STORAGE_KEYS_NEW.PRICES, {
-        ...getJSON(STORAGE_KEYS_NEW.PRICES, STORAGE_KEYS_OLD.PRICES, {}),
-        ...(data.customPrices || {}),
-      });
-
-      setJSON(STORAGE_KEYS_NEW.MAPPINGS, {
-        ...getJSON(STORAGE_KEYS_NEW.MAPPINGS, STORAGE_KEYS_OLD.MAPPINGS, {}),
-        ...(data.mappings || {}),
-      });
-
-      const currentFavs = getFavorites();
-      const newFavs = Array.from(new Set([...currentFavs, ...(data.favorites || [])]));
-      setJSON(STORAGE_KEYS_NEW.FAVORITES, newFavs);
+      setCustomMaterials(mergeById(getCustomMaterials(), customMaterials));
+      setPriceMap({ ...readPriceMap(), ...customPrices });
+      setMappings({ ...getMappings(), ...mappings });
+      setFavorites([...getFavorites(), ...favorites]);
+      setUsage({ ...readUsage(), ...usage });
+      setTaxSettingsSafe(taxSettings);
+      setLaborSettingsSafe(laborSettings);
+      replaceProjects(mergeById(getProjects(), projects));
+      replaceHouseProjects(mergeById(getHouseProjects(), houseProjects));
+      if (userSettings) replaceSettings({ ...getSettings(), ...userSettings });
+      if (companyProfile) replaceCompanyProfile(companyProfile);
+      replaceQuotes(mergeById(getQuotes(), quotes));
+      replaceInvoices(mergeById(getInvoices(), invoices));
+      if (docCounters) replaceDocumentCounters(docCounters);
     }
 
     emitMaterialsChanged({ reason: "import" });
     return true;
-  } catch (e) {
-    console.error("Import failed", e);
+  } catch (error) {
+    console.error("Import failed", error);
     return false;
   }
 };
 
-// --- LIST FOR UI ---
 export const getSystemMaterialsList = () => {
   migrateOnce();
-  const overrides = getJSON<Record<string, number>>(
-    STORAGE_KEYS_NEW.PRICES,
-    STORAGE_KEYS_OLD.PRICES,
-    {}
-  );
+  const overrides = readPriceMap();
   const mappings = getMappings();
   const tax = getTaxSettings();
   const customs = getCustomMaterials();
 
-  const keys = Object.keys(DEFAULT_PRICES).map((k) => String(k).toUpperCase().trim()).sort();
+  const keys = Object.keys(DEFAULT_PRICES)
+    .map((key) => String(key).toUpperCase().trim())
+    .sort();
 
   return keys.map((key) => {
-    const meta = getMaterialMetadata(String(key || '').toUpperCase().trim());
+    const meta = getMaterialMetadata(String(key || "").toUpperCase().trim());
     const safeLabel = meta.label;
     const safeCategory = meta.category;
     const safeUnit = meta.unit;
-    const imageUrl = (meta as any).imageUrl;
-    const defaultPrice = (DEFAULT_PRICES as any)[key] as number;
+    const imageUrl = (meta as { imageUrl?: string }).imageUrl;
+    const defaultPrice = (DEFAULT_PRICES as Record<string, number>)[key] as number;
 
     const userOverride = overrides[key];
     const mappedId = mappings[key];
-    const mappedMaterial = mappedId ? customs.find((c) => c.id === mappedId) : null;
+    const mappedMaterial = mappedId ? customs.find((custom) => custom.id === mappedId) : null;
 
     let priceHT = defaultPrice;
     if (mappedMaterial) priceHT = mappedMaterial.price;
