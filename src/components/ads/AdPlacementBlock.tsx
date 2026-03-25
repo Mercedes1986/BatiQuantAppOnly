@@ -1,10 +1,10 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useLocation } from "react-router-dom";
 
-import AdSlot, { type AdSlotVariant } from "@/components/ads/AdSlot";
-import { AD_CONFIG, getAdUnitId } from "@/config/adsConfig";
-import { getAdRenderState, hideBanner, showBanner } from "@/services/adsService";
-import type { AdPlacement, AdSlotRenderState } from "@/types/ads";
+import AdSlot, { type AdSlotVariant } from "./AdSlot";
+import { AD_CONFIG, getAdUnitId } from "../../config/adsConfig";
+import { getAdRenderState, hideBanner, showBanner } from "../../services/adsService";
+import type { AdPlacement, AdSlotRenderState } from "../../types/ads";
 
 interface AdPlacementBlockProps {
   placement: Extract<AdPlacement, "dashboard_banner" | "calculator_result_banner">;

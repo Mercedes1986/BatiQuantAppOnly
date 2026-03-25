@@ -42,9 +42,9 @@ import { CalculatorType, ConstructionStepId } from "./types";
 import type { HouseProject } from "./types";
 
 import { ArrowLeft, Save, Loader2, AlertTriangle } from "lucide-react";
-import ConsentModal from "@/components/privacy/ConsentModal";
-import { initializeAds } from "@/services/adsService";
-import { initConsent } from "@/services/consentService";
+import ConsentModal from "./components/privacy/ConsentModal";
+import { initializeAds } from "./services/adsService";
+import { initConsent } from "./services/consentService";
 
 // --- helper: keep prop typing for React.lazy ---
 const lazyNamed = <T extends React.ComponentType<any>>(factory: () => Promise<{ default: T }>) =>

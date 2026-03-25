@@ -8,9 +8,9 @@ import {
   openConsent,
   setConsentChoice,
   type ConsentChoice,
-} from "@/services/consentService";
-import { isNativeAdsBridgeAvailable } from "@/services/platformService";
-import { getPrivacyPolicyUrl } from "@/services/privacyService";
+} from "../../services/consentService";
+import { isNativeAdsBridgeAvailable } from "../../services/platformService";
+import { getPrivacyPolicyUrl } from "../../services/privacyService";
 
 const shouldUseWebConsent = () => !isNativeAdsBridgeAvailable();
 

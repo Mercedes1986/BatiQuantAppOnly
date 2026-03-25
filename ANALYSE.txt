@@ -1,0 +1,19 @@
+Diagnostic racine :
+1. Les fichiers ConsentModal.tsx et AdPlacementBlock.tsx existent bien.
+2. L'erreur VS Code "Cannot find module" ne venait pas d'un fichier absent dans l'archive analysée.
+3. Le projet avait aussi une vraie erreur TypeScript dans CalculatorPage.tsx : CalculatorType était importé en import type alors qu'il est utilisé comme valeur runtime.
+4. Pour neutraliser les faux positifs de résolution d'alias sur les nouveaux fichiers, les imports sensibles ont été repassés en chemins relatifs.
+
+Fichiers corrigés :
+- src/App.tsx
+- src/pages/CalculatorPage.tsx
+- src/pages/DashboardPage.tsx
+- src/components/ads/AdPlacementBlock.tsx
+- src/components/privacy/ConsentModal.tsx
+
+Vérification faite :
+- npm run typecheck : OK
+- npm run build : OK
+
+Point restant :
+- Le build passe, mais il reste un problème structurel de faux lazy loading : les calculateurs sont importés à la fois dynamiquement dans App.tsx et statiquement dans CalculatorPage.tsx. Ce n'est pas bloquant pour compiler, mais c'est mauvais pour la taille du bundle.

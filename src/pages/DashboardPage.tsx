@@ -1,10 +1,10 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 
-import AdPlacementBlock from "@/components/ads/AdPlacementBlock";
-import { CalculatorCard } from "@/components/ui/CalculatorCard";
-import { getCalculators } from "@/constants";
-import { CalculatorType } from "@/types";
+import AdPlacementBlock from "../components/ads/AdPlacementBlock";
+import { CalculatorCard } from "../components/ui/CalculatorCard";
+import { getCalculators } from "../constants";
+import { CalculatorType } from "../types";
 
 interface DashboardPageProps {
   onSelectCalc: (id: CalculatorType) => void;

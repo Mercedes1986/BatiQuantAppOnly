@@ -9,34 +9,34 @@ import {
   Share2,
 } from "lucide-react";
 
-import AdPlacementBlock from "@/components/ads/AdPlacementBlock";
-import { ConcreteCalculator } from "@/components/calculators/ConcreteCalculator";
-import { ElectricityCalculator } from "@/components/calculators/ElectricityCalculator";
-import { ExteriorCalculator } from "@/components/calculators/ExteriorCalculator";
-import { FacadeCalculator } from "@/components/calculators/FacadeCalculator";
-import { FoundationsCalculator } from "@/components/calculators/FoundationsCalculator";
-import { HvacCalculator } from "@/components/calculators/HvacCalculator";
-import { JoineryCalculator } from "@/components/calculators/JoineryCalculator";
-import { LevelingCalculator } from "@/components/calculators/LevelingCalculator";
-import { PaintCalculator } from "@/components/calculators/PaintCalculator";
-import { PlacoCalculator } from "@/components/calculators/PlacoCalculator";
-import { PlumbingCalculator } from "@/components/calculators/PlumbingCalculator";
-import { QuickToolsCalculator } from "@/components/calculators/QuickToolsCalc";
-import { RoofCalculator } from "@/components/calculators/RoofCalculator";
-import { ScreedCalculator } from "@/components/calculators/ScreedCalculator";
-import { StairCalculator } from "@/components/calculators/StairCalculator";
-import { StructuralCalculator } from "@/components/calculators/StructuralCalculator";
-import { SubstructureCalculator } from "@/components/calculators/SubstructureCalculator";
-import { TileCalculator } from "@/components/calculators/TileCalculator";
-import { getCalculators, getStaticTips, localizeLegacyText } from "@/constants";
-import { showInterstitialIfReady } from "@/services/adsService";
-import { generateId, saveProject } from "@/services/storage";
+import AdPlacementBlock from "../components/ads/AdPlacementBlock";
+import { ConcreteCalculator } from "../components/calculators/ConcreteCalculator";
+import { ElectricityCalculator } from "../components/calculators/ElectricityCalculator";
+import { ExteriorCalculator } from "../components/calculators/ExteriorCalculator";
+import { FacadeCalculator } from "../components/calculators/FacadeCalculator";
+import { FoundationsCalculator } from "../components/calculators/FoundationsCalculator";
+import { HvacCalculator } from "../components/calculators/HvacCalculator";
+import { JoineryCalculator } from "../components/calculators/JoineryCalculator";
+import { LevelingCalculator } from "../components/calculators/LevelingCalculator";
+import { PaintCalculator } from "../components/calculators/PaintCalculator";
+import { PlacoCalculator } from "../components/calculators/PlacoCalculator";
+import { PlumbingCalculator } from "../components/calculators/PlumbingCalculator";
+import { QuickToolsCalculator } from "../components/calculators/QuickToolsCalc";
+import { RoofCalculator } from "../components/calculators/RoofCalculator";
+import { ScreedCalculator } from "../components/calculators/ScreedCalculator";
+import { StairCalculator } from "../components/calculators/StairCalculator";
+import { StructuralCalculator } from "../components/calculators/StructuralCalculator";
+import { SubstructureCalculator } from "../components/calculators/SubstructureCalculator";
+import { TileCalculator } from "../components/calculators/TileCalculator";
+import { getCalculators, getStaticTips, localizeLegacyText } from "../constants";
+import { showInterstitialIfReady } from "../services/adsService";
+import { generateId, saveProject } from "../services/storage";
+import { CalculatorType } from "../types";
 import type {
   CalculationResult,
   CalculatorConfig,
-  CalculatorType,
   Project,
-} from "@/types";
+} from "../types";
 
 interface Props {
   type: CalculatorType;
