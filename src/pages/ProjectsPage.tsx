@@ -293,81 +293,107 @@ export const ProjectsPage: React.FC = () => {
     );
   }
 
+  const projectsTotalEstimate = projects.reduce(
+    (sum, project) => sum + project.items.reduce((projectSum, item) => projectSum + item.totalPrice, 0),
+    0
+  );
+
   return (
-    <div className="min-h-full bg-transparent p-4 safe-bottom-offset">
-      <div className="mx-auto max-w-6xl space-y-4">
+    <div className="min-h-full bg-transparent px-4 pb-4 safe-bottom-offset">
+      <div className="mx-auto max-w-6xl space-y-3">
         <section className="rounded-[28px] border border-slate-200/80 bg-white/72 p-5 shadow-sm backdrop-blur-md md:p-6">
-          <div className="mb-4 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-            <div>
-              <h1 className="text-2xl font-extrabold text-slate-800">
-                {t("projects.title", { defaultValue: "My projects (calculations)" })}
-              </h1>
-              <p className="mt-1 text-sm font-medium text-slate-500">
-                {t("projects.subtitle", {
-                  defaultValue: "Saved from individual calculators (single calculations).",
-                })}
-              </p>
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <div className="min-w-0">
+                <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-blue-100 bg-blue-50 px-3 py-1 text-xs font-extrabold text-blue-700">
+                  <Calculator size={14} />
+                  {t("projects.title", { defaultValue: "My projects (calculations)" })}
+                </div>
+                <h1 className="text-2xl font-extrabold tracking-tight text-slate-900">
+                  {t("projects.page_heading", { defaultValue: "Projects & saved calculations" })}
+                </h1>
+                <p className="mt-1 text-sm font-medium text-slate-500">
+                  {t("projects.subtitle", {
+                    defaultValue: "Saved from individual calculators (single calculations).",
+                  })}
+                </p>
+              </div>
+
+              <div className="flex flex-wrap gap-2 sm:justify-end">
+                <button
+                  onClick={() => navigate("/app/calculators")}
+                  className="inline-flex items-center justify-center rounded-2xl bg-blue-600 px-4 py-2.5 text-sm font-extrabold text-white shadow-sm transition-all hover:bg-blue-700 active:scale-[0.98]"
+                  type="button"
+                >
+                  <Plus size={18} className="mr-2" />
+                  {t("projects.create_new", { defaultValue: "Create a calculation" })}
+                </button>
+
+                <button
+                  onClick={() => navigate("/app/quotes")}
+                  className="inline-flex items-center justify-center rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-extrabold text-slate-700 shadow-sm transition-all hover:border-blue-200 hover:text-blue-700"
+                  type="button"
+                >
+                  <FileStack size={18} className="mr-2" />
+                  {t("projects.all_quotes", { defaultValue: "All quotes" })}
+                </button>
+              </div>
             </div>
 
-            <button
-              onClick={() => navigate("/app/quotes")}
-              className="inline-flex items-center justify-center rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-extrabold text-slate-700 shadow-sm transition-all hover:border-blue-200 hover:text-blue-700"
-              type="button"
-            >
-              <FileStack size={18} className="mr-2" />
-              {t("projects.all_quotes", { defaultValue: "All quotes" })}
-            </button>
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+              <div className="rounded-2xl border border-slate-200/80 bg-white/85 p-4 shadow-sm">
+                <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 text-blue-600">
+                  <FolderOpen size={18} />
+                </div>
+                <div className="text-xs font-bold uppercase tracking-wide text-slate-400">
+                  {t("projects.saved_count", { defaultValue: "Saved projects" })}
+                </div>
+                <div className="mt-1 text-2xl font-extrabold text-slate-900">{projects.length}</div>
+              </div>
+
+              <div className="rounded-2xl border border-slate-200/80 bg-white/85 p-4 shadow-sm">
+                <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 text-blue-600">
+                  <Package size={18} />
+                </div>
+                <div className="text-xs font-bold uppercase tracking-wide text-slate-400">
+                  {t("projects.total_estimated", { defaultValue: "Estimated total" })}
+                </div>
+                <div className="mt-1 text-2xl font-extrabold text-slate-900">{euro.format(projectsTotalEstimate)}</div>
+              </div>
+
+              <div className="hidden rounded-2xl border border-blue-100 bg-blue-50/90 p-4 shadow-sm xl:block">
+                <div className="text-sm font-extrabold text-blue-900">
+                  {t("projects.create_new_hint", {
+                    defaultValue: "Choose a calculator and save the result here",
+                  })}
+                </div>
+                <button
+                  onClick={() => navigate("/app/calculators")}
+                  className="mt-3 inline-flex items-center rounded-xl bg-white px-3 py-2 text-sm font-extrabold text-blue-700 shadow-sm"
+                  type="button"
+                >
+                  <ChevronRight size={16} className="mr-1" />
+                  {t("projects.create_new", { defaultValue: "Create a calculation" })}
+                </button>
+              </div>
+            </div>
           </div>
-
-          <button
-            onClick={() => navigate("/app/calculators")}
-            className="group relative w-full overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-transform hover:shadow-md active:scale-[0.98]"
-            type="button"
-          >
-            <div className="absolute inset-0">
-              <img
-                src="/images/menu/calcul.jpg"
-                alt=""
-                className="h-full w-full object-cover"
-                draggable={false}
-                onError={(e) => {
-                  (e.currentTarget as HTMLImageElement).src = "/images/menu/fallback.jpg";
-                }}
-              />
-              <div className="absolute inset-0 bg-black/25" />
-              <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/35 to-black/10" />
-            </div>
-
-            <div className="relative z-10 flex w-full items-center justify-between p-5">
-              <div className="flex items-center gap-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-full border border-white/60 bg-white/90 shadow-sm">
-                  <Plus className="text-blue-600" size={22} />
-                </div>
-                <div className="text-left">
-                  <div className="text-base font-extrabold leading-tight text-white">
-                    {t("projects.create_new", { defaultValue: "Create a calculation" })}
-                  </div>
-                  <div className="mt-0.5 text-xs font-semibold text-white/80">
-                    {t("projects.create_new_hint", {
-                      defaultValue: "Choose a calculator and save the result here",
-                    })}
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex h-9 w-9 items-center justify-center rounded-full border border-white/30 bg-white/20">
-                <ChevronRight className="text-white" size={18} />
-              </div>
-            </div>
-          </button>
         </section>
 
         {projects.length === 0 ? (
-          <div className="rounded-[28px] border border-dashed border-slate-200 bg-white/65 py-16 text-center text-slate-400 backdrop-blur-sm">
-            <FolderOpen size={64} className="mx-auto text-slate-300" />
+          <div className="rounded-[28px] border border-dashed border-slate-200 bg-white/65 py-14 text-center text-slate-400 backdrop-blur-sm">
+            <FolderOpen size={60} className="mx-auto text-slate-300" />
             <p className="mt-4 font-medium text-slate-500">
               {t("projects.empty", { defaultValue: "No saved calculations." })}
             </p>
+            <button
+              onClick={() => navigate("/app/calculators")}
+              className="mt-5 inline-flex items-center rounded-2xl bg-blue-600 px-4 py-3 text-sm font-extrabold text-white shadow-sm transition-all hover:bg-blue-700 active:scale-[0.98]"
+              type="button"
+            >
+              <Plus size={18} className="mr-2" />
+              {t("projects.create_new", { defaultValue: "Create a calculation" })}
+            </button>
           </div>
         ) : (
           <div className="grid gap-3">
