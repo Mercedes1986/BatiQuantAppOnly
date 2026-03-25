@@ -1,43 +1,91 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
-  User,
-  Shield,
-  HelpCircle,
-  HardDrive,
-  Download,
-  Upload,
   AlertTriangle,
-  Languages,
+  BadgeInfo,
   Building2,
   ChevronRight,
-  Globe,
   Coins,
+  Download,
+  Globe,
+  HardDrive,
+  HelpCircle,
+  Languages,
+  RotateCcw,
+  Shield,
+  ShieldCheck,
+  User,
+  Upload,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { exportAppData, importAppData } from "../services/materialsService";
-import { CompanyProfileForm } from "../components/documents/CompanyProfileForm";
-import { getSettings, saveSettings } from "../services/storage";
-import { setPreferredLanguage } from "../services/persistentStorage";
+
+import { CompanyProfileForm } from "@/components/documents/CompanyProfileForm";
+import { setPreferredLanguage } from "@/services/persistentStorage";
+import {
+  getPrivacyPolicyUrl,
+  getPrivacyState,
+  openPrivacyOptions,
+  resetPrivacyChoices,
+} from "@/services/privacyService";
+import { exportAppData, importAppData } from "@/services/materialsService";
+import { getSettings, saveSettings } from "@/services/storage";
 
 type SettingsTab = "app" | "company";
 type Currency = "EUR" | "USD" | "CAD" | "CHF";
 
 const getAppVersion = () => {
   try {
-    const v = String((import.meta as any)?.env?.VITE_APP_VERSION || "").trim();
-    if (v) return `BatiQuant v${v}`;
+    const version = String((import.meta as any)?.env?.VITE_APP_VERSION || "").trim();
+    if (version) return `BatiQuant v${version}`;
     return (import.meta as any)?.env?.DEV ? "BatiQuant (dev)" : "BatiQuant";
   } catch {
     return "BatiQuant";
   }
 };
 
-const currencyToSymbol = (c: Currency): string => {
-  if (c === "EUR") return "€";
-  if (c === "USD") return "$";
-  if (c === "CAD") return "$";
-  if (c === "CHF") return "CHF";
-  return "€";
+const currencyCodeToStoredValue = (currency: Currency): string => {
+  switch (currency) {
+    case "USD":
+      return "USD";
+    case "CAD":
+      return "CAD";
+    case "CHF":
+      return "CHF";
+    case "EUR":
+    default:
+      return "EUR";
+  }
+};
+
+const storedValueToCurrencyCode = (stored: string): Currency => {
+  const normalized = String(stored || "").trim().toUpperCase();
+  if (normalized === "USD" || normalized === "$USD") return "USD";
+  if (normalized === "CAD" || normalized === "$CAD") return "CAD";
+  if (normalized === "CHF") return "CHF";
+  if (normalized === "€" || normalized === "EUR") return "EUR";
+  if (normalized === "$") return "USD";
+  return "EUR";
+};
+
+const currencySelectLabel = (currency: Currency): string => {
+  switch (currency) {
+    case "USD":
+      return "USD ($)";
+    case "CAD":
+      return "CAD ($)";
+    case "CHF":
+      return "CHF";
+    case "EUR":
+    default:
+      return "EUR (€)";
+  }
+};
+
+const openExternalPage = (url: string) => {
+  try {
+    window.open(url, "_blank", "noopener,noreferrer");
+  } catch {
+    window.location.href = url;
+  }
 };
 
 export const SettingsPage: React.FC = () => {
@@ -47,18 +95,32 @@ export const SettingsPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<SettingsTab>("app");
   const [currency, setCurrency] = useState<Currency>("EUR");
   const [isImporting, setIsImporting] = useState(false);
+  const [privacyVersion, setPrivacyVersion] = useState(0);
 
   const versionLabel = useMemo(() => getAppVersion(), []);
+  const privacyPolicyUrl = useMemo(() => getPrivacyPolicyUrl(), []);
+  const helpUrl = useMemo(() => "/help.html", []);
+  const privacyState = useMemo(() => getPrivacyState(), [privacyVersion]);
 
   useEffect(() => {
     try {
-      const s = getSettings();
-      const sym = s.currency || "€";
-      const code: Currency = sym === "€" ? "EUR" : sym === "CHF" ? "CHF" : sym === "$" ? "EUR" : "EUR";
-      setCurrency(code);
+      const settings = getSettings();
+      setCurrency(storedValueToCurrencyCode(settings.currency || "EUR"));
     } catch {
       // ignore
     }
+  }, []);
+
+  useEffect(() => {
+    const refresh = () => setPrivacyVersion((current) => current + 1);
+
+    window.addEventListener("consent-updated", refresh);
+    window.addEventListener("batiquant-native-privacy", refresh as EventListener);
+
+    return () => {
+      window.removeEventListener("consent-updated", refresh);
+      window.removeEventListener("batiquant-native-privacy", refresh as EventListener);
+    };
   }, []);
 
   const resetFileInput = () => {
@@ -76,25 +138,34 @@ export const SettingsPage: React.FC = () => {
       link.download = `BatiQuant_Backup_${new Date().toISOString().split("T")[0]}.json`;
       link.click();
       URL.revokeObjectURL(url);
-    } catch (e) {
-      console.error(e);
-      alert(t("settings.export_error", { defaultValue: "Erreur lors de l’export. Réessayez." }));
+    } catch (error) {
+      console.error(error);
+      alert(
+        t("settings.export_error", {
+          defaultValue: "Erreur lors de l’export. Réessayez.",
+        })
+      );
     }
   };
 
-  const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+  const handleImport = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
     if (!file) return;
 
     if (file.size > 5 * 1024 * 1024) {
-      alert(t("settings.file_too_big", { defaultValue: "Fichier trop volumineux (max 5 Mo)." }));
+      alert(
+        t("settings.file_too_big", {
+          defaultValue: "Fichier trop volumineux (max 5 Mo).",
+        })
+      );
       resetFileInput();
       return;
     }
 
     const ok = confirm(
       t("settings.import_confirm", {
-        defaultValue: "Attention : L'importation remplacera vos données actuelles. Voulez-vous continuer ?",
+        defaultValue:
+          "Attention : L'importation remplacera vos données actuelles. Voulez-vous continuer ?",
       })
     );
     if (!ok) {
@@ -108,27 +179,47 @@ export const SettingsPage: React.FC = () => {
     reader.onerror = () => {
       setIsImporting(false);
       resetFileInput();
-      alert(t("settings.file_read_error", { defaultValue: "Erreur de lecture du fichier." }));
+      alert(
+        t("settings.file_read_error", {
+          defaultValue: "Erreur de lecture du fichier.",
+        })
+      );
     };
 
-    reader.onload = (evt) => {
+    reader.onload = (loadEvent) => {
       try {
-        const content = evt.target?.result;
+        const content = loadEvent.target?.result;
         if (!content || typeof content !== "string") {
-          alert(t("settings.invalid_backup", { defaultValue: "Erreur: Fichier de sauvegarde invalide." }));
+          alert(
+            t("settings.invalid_backup", {
+              defaultValue: "Erreur: Fichier de sauvegarde invalide.",
+            })
+          );
           return;
         }
 
         const success = importAppData(content, "replace");
         if (success) {
-          alert(t("settings.restore_ok", { defaultValue: "Données restaurées avec succès !" }));
+          alert(
+            t("settings.restore_ok", {
+              defaultValue: "Données restaurées avec succès !",
+            })
+          );
           window.location.reload();
         } else {
-          alert(t("settings.invalid_backup", { defaultValue: "Erreur: Fichier de sauvegarde invalide." }));
+          alert(
+            t("settings.invalid_backup", {
+              defaultValue: "Erreur: Fichier de sauvegarde invalide.",
+            })
+          );
         }
-      } catch (err) {
-        console.error(err);
-        alert(t("settings.invalid_backup", { defaultValue: "Erreur: Fichier de sauvegarde invalide." }));
+      } catch (error) {
+        console.error(error);
+        alert(
+          t("settings.invalid_backup", {
+            defaultValue: "Erreur: Fichier de sauvegarde invalide.",
+          })
+        );
       } finally {
         setIsImporting(false);
         resetFileInput();
@@ -142,19 +233,44 @@ export const SettingsPage: React.FC = () => {
     try {
       await i18n.changeLanguage(lng);
       setPreferredLanguage(lng);
-    } catch (e) {
-      console.error(e);
+    } catch (error) {
+      console.error(error);
     }
   };
 
-  const onCurrencyChange = (c: Currency) => {
-    setCurrency(c);
+  const onCurrencyChange = (nextCurrency: Currency) => {
+    setCurrency(nextCurrency);
     try {
       const current = getSettings();
-      saveSettings({ ...current, currency: currencyToSymbol(c) });
+      saveSettings({
+        ...current,
+        currency: currencyCodeToStoredValue(nextCurrency),
+      });
     } catch {
       // ignore
     }
+  };
+
+  const handleOpenPrivacyOptions = async () => {
+    try {
+      await openPrivacyOptions();
+      setPrivacyVersion((current) => current + 1);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleResetPrivacy = () => {
+    const confirmed = confirm(
+      t("settings.ads.reset_confirm", {
+        defaultValue:
+          "Réinitialiser vos choix publicitaires et de confidentialité ?",
+      })
+    );
+    if (!confirmed) return;
+
+    resetPrivacyChoices();
+    setPrivacyVersion((current) => current + 1);
   };
 
   const tabButton = (tab: SettingsTab, label: string, icon: React.ReactNode) => (
@@ -162,8 +278,10 @@ export const SettingsPage: React.FC = () => {
       type="button"
       onClick={() => setActiveTab(tab)}
       className={[
-        "px-4 py-2 text-sm font-extrabold rounded-xl whitespace-nowrap transition-colors flex items-center gap-2",
-        activeTab === tab ? "bg-white text-slate-900 shadow" : "text-slate-700 hover:bg-white/70",
+        "flex items-center gap-2 whitespace-nowrap rounded-xl px-4 py-2 text-sm font-extrabold transition-colors",
+        activeTab === tab
+          ? "bg-white text-slate-900 shadow"
+          : "text-slate-700 hover:bg-white/70",
       ].join(" ")}
     >
       {icon}
@@ -172,13 +290,13 @@ export const SettingsPage: React.FC = () => {
   );
 
   const rowClass =
-    "w-full p-4 flex items-center justify-between gap-3 text-left hover:bg-white/70 transition-colors";
+    "flex w-full items-center justify-between gap-3 p-4 text-left transition-colors hover:bg-white/70";
 
   return (
-    <div className="app-shell app-shell--settings p-4 safe-bottom-offset bg-transparent min-h-full">
-      <div className="max-w-6xl mx-auto space-y-4">
-        <section className="rounded-[28px] border border-slate-200/80 bg-white/72 backdrop-blur-md shadow-sm p-5 md:p-6">
-          <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
+    <div className="app-shell app-shell--settings min-h-full bg-transparent p-4 safe-bottom-offset">
+      <div className="mx-auto max-w-6xl space-y-4">
+        <section className="rounded-[28px] border border-slate-200/80 bg-white/72 p-5 shadow-sm backdrop-blur-md md:p-6">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <div>
               <h1 className="text-2xl font-extrabold text-slate-800">
                 {t("settings.title", { defaultValue: "Settings" })}
@@ -186,8 +304,8 @@ export const SettingsPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="mx-auto w-fit max-w-full mt-4">
-            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar rounded-xl bg-slate-200/80 p-1.5 shadow-sm border border-slate-200">
+          <div className="mx-auto mt-4 w-fit max-w-full">
+            <div className="no-scrollbar flex items-center gap-1.5 overflow-x-auto rounded-xl border border-slate-200 bg-slate-200/80 p-1.5 shadow-sm">
               {tabButton(
                 "app",
                 t("settings.tabs.app", { defaultValue: "Application" }),
@@ -195,7 +313,9 @@ export const SettingsPage: React.FC = () => {
               )}
               {tabButton(
                 "company",
-                t("settings.tabs.company", { defaultValue: "Entreprise & Facturation" }),
+                t("settings.tabs.company", {
+                  defaultValue: "Entreprise & Facturation",
+                }),
                 <Building2 size={16} />
               )}
             </div>
@@ -203,101 +323,146 @@ export const SettingsPage: React.FC = () => {
         </section>
 
         {activeTab === "company" ? (
-          <div className="rounded-[28px] border border-slate-200/80 bg-white/72 backdrop-blur-md shadow-sm p-1 md:p-2">
+          <div className="rounded-[28px] border border-slate-200/80 bg-white/72 p-1 shadow-sm backdrop-blur-md md:p-2">
             <CompanyProfileForm />
           </div>
         ) : (
           <div className="space-y-4">
-            <section className="bg-white/72 backdrop-blur-md rounded-[28px] shadow-sm border border-slate-200/80 overflow-hidden">
-              <div className="p-5 flex items-center">
-                <div className="bg-emerald-100 p-3 rounded-2xl mr-3 text-emerald-600">
+            <section className="overflow-hidden rounded-[28px] border border-slate-200/80 bg-white/72 shadow-sm backdrop-blur-md">
+              <div className="flex items-center p-5">
+                <div className="mr-3 rounded-2xl bg-emerald-100 p-3 text-emerald-600">
                   <User size={20} />
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-extrabold text-slate-800">{t("settings.pro.title", { defaultValue: "Version Pro" })}</h3>
-                  <p className="text-xs text-slate-500">{t("settings.pro.subtitle", { defaultValue: "Licence active • Mode Hors-ligne" })}</p>
+                  <h3 className="font-extrabold text-slate-800">
+                    {t("settings.pro.title", { defaultValue: "Version Pro" })}
+                  </h3>
+                  <p className="text-xs text-slate-500">
+                    {t("settings.pro.subtitle", {
+                      defaultValue: "Licence active • Mode Hors-ligne",
+                    })}
+                  </p>
                 </div>
               </div>
             </section>
 
-            <section className="bg-white/72 backdrop-blur-md rounded-[28px] shadow-sm border border-slate-200/80 overflow-hidden">
-              <h3 className="px-5 pt-5 text-xs font-extrabold text-slate-400 uppercase tracking-wider flex items-center">
-                <HardDrive size={12} className="mr-2" /> {t("settings.data.title", { defaultValue: "Données & Sauvegarde" })}
+            <section className="overflow-hidden rounded-[28px] border border-slate-200/80 bg-white/72 shadow-sm backdrop-blur-md">
+              <h3 className="flex items-center px-5 pt-5 text-xs font-extrabold uppercase tracking-wider text-slate-400">
+                <HardDrive size={12} className="mr-2" />
+                {t("settings.data.title", {
+                  defaultValue: "Données & Sauvegarde",
+                })}
               </h3>
 
-              <div className="p-5 grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 gap-3 p-5 sm:grid-cols-2">
                 <button
                   type="button"
                   onClick={handleExport}
-                  className="flex flex-col items-center justify-center p-5 border border-slate-200 rounded-2xl hover:bg-blue-50/70 hover:border-blue-200 transition-colors group bg-white/70"
+                  className="group flex flex-col items-center justify-center rounded-2xl border border-slate-200 bg-white/70 p-5 transition-colors hover:border-blue-200 hover:bg-blue-50/70"
                 >
-                  <Download size={24} className="text-blue-600 mb-2 group-hover:scale-110 transition-transform" />
-                  <span className="text-sm font-extrabold text-slate-700">{t("settings.data.backup", { defaultValue: "Sauvegarder" })}</span>
-                  <span className="text-[10px] text-slate-400">{t("settings.data.export_json", { defaultValue: "Exporter JSON" })}</span>
+                  <Download
+                    size={24}
+                    className="mb-2 text-blue-600 transition-transform group-hover:scale-110"
+                  />
+                  <span className="text-sm font-extrabold text-slate-700">
+                    {t("settings.data.backup", { defaultValue: "Sauvegarder" })}
+                  </span>
+                  <span className="text-[10px] text-slate-400">
+                    {t("settings.data.export_json", {
+                      defaultValue: "Exporter JSON",
+                    })}
+                  </span>
                 </button>
 
                 <label
-                  className={`flex flex-col items-center justify-center p-5 border border-slate-200 rounded-2xl transition-colors cursor-pointer group bg-white/70 ${
-                    isImporting ? "opacity-60 pointer-events-none" : "hover:bg-emerald-50/70 hover:border-emerald-200"
+                  className={`group flex cursor-pointer flex-col items-center justify-center rounded-2xl border border-slate-200 bg-white/70 p-5 transition-colors ${
+                    isImporting
+                      ? "pointer-events-none opacity-60"
+                      : "hover:border-emerald-200 hover:bg-emerald-50/70"
                   }`}
                   title={
                     isImporting
-                      ? t("settings.data.importing", { defaultValue: "Import en cours…" })
-                      : t("settings.data.import_title", { defaultValue: "Importer une sauvegarde" })
+                      ? t("settings.data.importing", {
+                          defaultValue: "Import en cours…",
+                        })
+                      : t("settings.data.import_title", {
+                          defaultValue: "Importer une sauvegarde",
+                        })
                   }
                 >
-                  <Upload size={24} className="text-emerald-600 mb-2 group-hover:scale-110 transition-transform" />
+                  <Upload
+                    size={24}
+                    className="mb-2 text-emerald-600 transition-transform group-hover:scale-110"
+                  />
                   <span className="text-sm font-extrabold text-slate-700">
                     {isImporting
-                      ? t("settings.data.importing_short", { defaultValue: "Import..." })
+                      ? t("settings.data.importing_short", {
+                          defaultValue: "Import...",
+                        })
                       : t("settings.data.restore", { defaultValue: "Restaurer" })}
                   </span>
-                  <span className="text-[10px] text-slate-400">{t("settings.data.import_json", { defaultValue: "Importer JSON" })}</span>
-                  <input type="file" ref={fileInputRef} className="hidden" accept="application/json,.json" onChange={handleImport} />
+                  <span className="text-[10px] text-slate-400">
+                    {t("settings.data.import_json", {
+                      defaultValue: "Importer JSON",
+                    })}
+                  </span>
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    className="hidden"
+                    accept="application/json,.json"
+                    onChange={handleImport}
+                  />
                 </label>
               </div>
 
               <div className="px-5 pb-5">
-                <div className="bg-amber-50 text-amber-700 text-xs p-3 rounded-xl flex items-start border border-amber-100">
+                <div className="flex items-start rounded-xl border border-amber-100 bg-amber-50 p-3 text-xs text-amber-700">
                   <AlertTriangle size={14} className="mr-2 mt-0.5 shrink-0" />
-                  <p>{t("settings.data.warning", { defaultValue: "Important : Vos données sont stockées dans le navigateur. Pensez à faire une sauvegarde régulière." })}</p>
+                  <p>
+                    {t("settings.data.warning", {
+                      defaultValue:
+                        "Important : Vos données sont stockées dans le navigateur. Pensez à faire une sauvegarde régulière.",
+                    })}
+                  </p>
                 </div>
               </div>
             </section>
 
-            <section className="bg-white/72 backdrop-blur-md rounded-[28px] shadow-sm border border-slate-200/80 overflow-hidden">
-              <h3 className="px-5 pt-5 text-xs font-extrabold text-slate-400 uppercase tracking-wider">
+            <section className="overflow-hidden rounded-[28px] border border-slate-200/80 bg-white/72 shadow-sm backdrop-blur-md">
+              <h3 className="px-5 pt-5 text-xs font-extrabold uppercase tracking-wider text-slate-400">
                 {t("settings.app.title", { defaultValue: "Application" })}
               </h3>
 
               <div className="divide-y divide-slate-100">
                 <div className={rowClass}>
-                  <span className="text-sm font-medium flex items-center gap-2 text-slate-700">
+                  <span className="flex items-center gap-2 text-sm font-medium text-slate-700">
                     <Coins size={16} className="text-slate-400" />
                     {t("settings.app.currency", { defaultValue: "Currency" })}
                   </span>
                   <select
                     value={currency}
-                    onChange={(e) => onCurrencyChange(e.target.value as Currency)}
-                    className="bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-600 px-3 py-2 focus:ring-0"
+                    onChange={(event) => onCurrencyChange(event.target.value as Currency)}
+                    className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-600 focus:ring-0"
                   >
-                    <option value="EUR">EUR (€)</option>
-                    <option value="USD">USD ($)</option>
-                    <option value="CAD">CAD ($)</option>
-                    <option value="CHF">CHF</option>
+                    {(["EUR", "USD", "CAD", "CHF"] as Currency[]).map((entry) => (
+                      <option key={entry} value={entry}>
+                        {currencySelectLabel(entry)}
+                      </option>
+                    ))}
                   </select>
                 </div>
 
                 <div className={rowClass}>
-                  <span className="text-sm font-medium flex items-center gap-2 text-slate-700">
+                  <span className="flex items-center gap-2 text-sm font-medium text-slate-700">
                     <Languages size={16} className="text-slate-400" />
                     {t("settings.app.language", { defaultValue: "Language" })}
                   </span>
 
                   <select
                     value={(i18n.language || "fr").split("-")[0]}
-                    onChange={(e) => changeLanguage(e.target.value)}
-                    className="bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-600 px-3 py-2 focus:ring-0"
+                    onChange={(event) => changeLanguage(event.target.value)}
+                    className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-600 focus:ring-0"
                   >
                     <option value="fr">Français</option>
                     <option value="en">English</option>
@@ -306,28 +471,132 @@ export const SettingsPage: React.FC = () => {
               </div>
             </section>
 
-            <section className="bg-white/72 backdrop-blur-md rounded-[28px] shadow-sm border border-slate-200/80 overflow-hidden">
+            <section className="overflow-hidden rounded-[28px] border border-slate-200/80 bg-white/72 shadow-sm backdrop-blur-md">
+              <div className="border-b border-slate-100 px-5 py-4">
+                <div className="flex items-center gap-3">
+                  <div className="rounded-2xl bg-blue-100 p-3 text-blue-700">
+                    <ShieldCheck size={20} />
+                  </div>
+                  <div>
+                    <h3 className="font-extrabold text-slate-800">
+                      {t("settings.ads.title", {
+                        defaultValue: "Publicité & confidentialité",
+                      })}
+                    </h3>
+                    <p className="text-xs text-slate-500">
+                      {privacyState.canRequestAds
+                        ? t("settings.ads.enabled_status", {
+                            defaultValue: "Les demandes publicitaires sont autorisées.",
+                          })
+                        : t("settings.ads.disabled_status", {
+                            defaultValue:
+                              "Les demandes publicitaires sont actuellement bloquées.",
+                          })}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid gap-3 p-5 md:grid-cols-2">
+                <div className="rounded-2xl border border-slate-200 bg-white/80 p-4">
+                  <div className="flex items-center gap-2 text-sm font-extrabold text-slate-700">
+                    <BadgeInfo size={16} className="text-slate-400" />
+                    {t("settings.ads.mode", { defaultValue: "Mode actuel" })}
+                  </div>
+                  <p className="mt-2 text-sm text-slate-600">
+                    {privacyState.adsMode === "personalized"
+                      ? t("settings.ads.personalized_status", {
+                          defaultValue: "Annonces personnalisées autorisées.",
+                        })
+                      : t("settings.ads.limited_status", {
+                          defaultValue:
+                            "Annonces limitées ou non personnalisées.",
+                        })}
+                  </p>
+                  <p className="mt-2 text-xs text-slate-400">
+                    {privacyState.privacyOptionsRequired
+                      ? t("settings.ads.privacy_required", {
+                          defaultValue:
+                            "Une entrée de gestion des choix doit rester accessible.",
+                        })
+                      : t("settings.ads.privacy_optional", {
+                          defaultValue:
+                            "Aucun formulaire complémentaire n’est exigé dans cette session.",
+                        })}
+                  </p>
+                </div>
+
+                <div className="rounded-2xl border border-slate-200 bg-white/80 p-4">
+                  <div className="flex items-center gap-2 text-sm font-extrabold text-slate-700">
+                    <Shield size={16} className="text-slate-400" />
+                    {t("settings.ads.actions", { defaultValue: "Actions" })}
+                  </div>
+                  <div className="mt-3 grid gap-2">
+                    <button
+                      type="button"
+                      onClick={handleOpenPrivacyOptions}
+                      className="rounded-xl bg-blue-600 px-4 py-3 text-sm font-extrabold text-white shadow-md transition-colors hover:bg-blue-700"
+                    >
+                      {t("settings.ads.manage_choices", {
+                        defaultValue: "Gérer mes choix publicitaires",
+                      })}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleResetPrivacy}
+                      className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-extrabold text-slate-700 transition-colors hover:bg-slate-50"
+                    >
+                      <RotateCcw size={16} />
+                      {t("settings.ads.reset_choices", {
+                        defaultValue: "Réinitialiser mes choix",
+                      })}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section className="overflow-hidden rounded-[28px] border border-slate-200/80 bg-white/72 shadow-sm backdrop-blur-md">
               <div className="divide-y divide-slate-100">
-                <button type="button" className={rowClass}>
+                <button
+                  type="button"
+                  className={rowClass}
+                  onClick={() => openExternalPage(helpUrl)}
+                >
                   <div className="flex items-center gap-3">
                     <HelpCircle size={18} className="text-slate-400" />
-                    <span className="text-sm font-medium text-slate-700">{t("settings.support.help", { defaultValue: "Aide & FAQ" })}</span>
+                    <span className="text-sm font-medium text-slate-700">
+                      {t("settings.support.help", { defaultValue: "Aide & FAQ" })}
+                    </span>
                   </div>
                   <ChevronRight size={18} className="text-slate-300" />
                 </button>
-                <button type="button" className={rowClass}>
+                <button
+                  type="button"
+                  className={rowClass}
+                  onClick={() => openExternalPage(privacyPolicyUrl)}
+                >
                   <div className="flex items-center gap-3">
                     <Shield size={18} className="text-slate-400" />
-                    <span className="text-sm font-medium text-slate-700">{t("settings.support.privacy", { defaultValue: "Politique de confidentialité" })}</span>
+                    <span className="text-sm font-medium text-slate-700">
+                      {t("settings.support.privacy", {
+                        defaultValue: "Politique de confidentialité",
+                      })}
+                    </span>
                   </div>
                   <ChevronRight size={18} className="text-slate-300" />
                 </button>
               </div>
             </section>
 
-            <div className="text-center pt-4">
+            <div className="pt-4 text-center">
               <p className="text-xs text-slate-400">{versionLabel}</p>
-              <p className="text-[10px] text-slate-300 mt-2">{t("settings.footer", { defaultValue: "Aucune donnée n'est collectée." })}</p>
+              <p className="mt-2 text-[10px] text-slate-300">
+                {t("settings.footer", {
+                  defaultValue:
+                    "Vos préférences et projets restent stockés sur votre appareil.",
+                })}
+              </p>
             </div>
           </div>
         )}

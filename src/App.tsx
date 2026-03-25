@@ -42,6 +42,9 @@ import { CalculatorType, ConstructionStepId } from "./types";
 import type { HouseProject } from "./types";
 
 import { ArrowLeft, Save, Loader2, AlertTriangle } from "lucide-react";
+import ConsentModal from "@/components/privacy/ConsentModal";
+import { initializeAds } from "@/services/adsService";
+import { initConsent } from "@/services/consentService";
 
 // --- helper: keep prop typing for React.lazy ---
 const lazyNamed = <T extends React.ComponentType<any>>(factory: () => Promise<{ default: T }>) =>
@@ -640,45 +643,53 @@ const NotFoundPage: React.FC = () => {
 };
 
 // --- 3. Main Router ---
+const AppRouter: React.FC = () => (
+  <BrowserRouter basename={import.meta.env.BASE_URL}>
+    <ScrollToTop />
+    <ErrorBoundary>
+      <Routes>
+        {/* Root -> Application */}
+        <Route path="/" element={<Navigate to="/app" replace />} />
+
+        {/* App zone */}
+        <Route path="/app" element={<AppLayout />}>
+          <Route index element={<Navigate to="menu" replace />} />
+          <Route path="calculators" element={<DashboardOutlet />} />
+          <Route path="menu" element={<AppMenuPage />} />
+          <Route path="quick-tools" element={<QuickToolsPage />} />
+          <Route path="quick-tools/:tool" element={<QuickToolsPage />} />
+          <Route path="house" element={<HouseProjectPage />} />
+          <Route path="projects" element={<ProjectsPage />} />
+          <Route path="materials" element={<MaterialsPage />} />
+          <Route path="settings" element={<SettingsPage />} />
+          <Route path="calculator" element={<ProjectCalculatorWrapper />} />
+          <Route path="quotes" element={<QuotesListPage />} />
+          <Route path="quotes/:id" element={<QuoteEditorPage />} />
+          <Route path="invoices/:id" element={<InvoiceEditorPage />} />
+        </Route>
+
+        {/* Print */}
+        <Route path="/app/print/:type/:id" element={<PrintDocumentPage />} />
+
+        {/* Redirects */}
+        <Route path="/projects" element={<Navigate to="/app/projects" replace />} />
+        <Route path="/settings" element={<Navigate to="/app/settings" replace />} />
+
+        {/* 404 */}
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
+      <ConsentModal />
+    </ErrorBoundary>
+  </BrowserRouter>
+);
+
 const App: React.FC = () => {
-  return (
-    <BrowserRouter basename={import.meta.env.BASE_URL}>
-      <ScrollToTop />
-      <ErrorBoundary>
-        <Routes>
-          {/* Root -> Application */}
-          <Route path="/" element={<Navigate to="/app" replace />} />
+  useEffect(() => {
+    initConsent();
+    void initializeAds();
+  }, []);
 
-          {/* App zone */}
-          <Route path="/app" element={<AppLayout />}>
-            <Route index element={<Navigate to="menu" replace />} />
-            <Route path="calculators" element={<DashboardOutlet />} />
-            <Route path="menu" element={<AppMenuPage />} />
-            <Route path="quick-tools" element={<QuickToolsPage />} />
-            <Route path="quick-tools/:tool" element={<QuickToolsPage />} />
-            <Route path="house" element={<HouseProjectPage />} />
-            <Route path="projects" element={<ProjectsPage />} />
-            <Route path="materials" element={<MaterialsPage />} />
-            <Route path="settings" element={<SettingsPage />} />
-            <Route path="calculator" element={<ProjectCalculatorWrapper />} />
-            <Route path="quotes" element={<QuotesListPage />} />
-            <Route path="quotes/:id" element={<QuoteEditorPage />} />
-            <Route path="invoices/:id" element={<InvoiceEditorPage />} />
-          </Route>
-
-          {/* Print */}
-          <Route path="/app/print/:type/:id" element={<PrintDocumentPage />} />
-
-          {/* Redirects */}
-          <Route path="/projects" element={<Navigate to="/app/projects" replace />} />
-          <Route path="/settings" element={<Navigate to="/app/settings" replace />} />
-
-          {/* 404 */}
-          <Route path="*" element={<NotFoundPage />} />
-        </Routes>
-      </ErrorBoundary>
-    </BrowserRouter>
-  );
+  return <AppRouter />;
 };
 
 // ✅ DashboardOutlet: reads ?calc= and opens calculator via context

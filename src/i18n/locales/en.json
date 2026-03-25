@@ -36,7 +36,9 @@
     "unknown": "Unknown",
     "validate": "Validate",
     "waste_plus": "Waste +",
-    "back_to_quote": "Back to quote"
+    "back_to_quote": "Back to quote",
+    "open": "Open",
+    "total": "Total"
   },
   "calculator": {
     "open": "Open calculator",
@@ -2352,7 +2354,7 @@
     "export_error": "Export error",
     "file_read_error": "File read error",
     "file_too_big": "File too big",
-    "footer": "Settings",
+    "footer": "Your preferences and projects remain stored on your device.",
     "import_confirm": "Import this backup?",
     "invalid_backup": "Invalid backup",
     "pro": {
@@ -2361,14 +2363,28 @@
     },
     "restore_ok": "Restore successful",
     "support": {
-      "help": "Help",
-      "privacy": "Privacy"
+      "help": "Help & FAQ",
+      "privacy": "Privacy policy"
     },
     "tabs": {
       "app": "App",
       "company": "Company"
     },
-    "title": "Settings"
+    "title": "Settings",
+    "ads": {
+      "title": "Ads & privacy",
+      "enabled_status": "Ad requests are allowed.",
+      "disabled_status": "Ad requests are currently blocked.",
+      "mode": "Current mode",
+      "personalized_status": "Personalized ads are allowed.",
+      "limited_status": "Limited or non-personalized ads only.",
+      "privacy_required": "A privacy choices entry point must remain accessible.",
+      "privacy_optional": "No extra privacy form is required in this session.",
+      "actions": "Actions",
+      "manage_choices": "Manage my ad choices",
+      "reset_choices": "Reset my choices",
+      "reset_confirm": "Reset your advertising and privacy choices?"
+    }
   },
   "tutorial_auth": {
     "access_code": "Access code",

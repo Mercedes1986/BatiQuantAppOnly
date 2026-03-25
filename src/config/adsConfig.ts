@@ -30,6 +30,7 @@ export const AD_CONFIG = {
   SAFE_ROUTES: [
     "/app",
     "/app/dashboard",
+    "/app/calculators",
     "/app/calculator",
     "/app/house",
     "/app/projects",

@@ -1,12 +1,17 @@
 import { AD_CONFIG } from "@/config/adsConfig";
 import {
+  canServeLimitedAds,
   canServePersonalizedAds,
   getAdsMode,
   getConsent,
   openConsent,
   resetConsent,
 } from "@/services/consentService";
-import { getNativeAdsBridge, isNativeAdsBridgeAvailable } from "@/services/platformService";
+import {
+  getNativeAdsBridge,
+  getNativeBoolean,
+  isNativeAdsBridgeAvailable,
+} from "@/services/platformService";
 import type { PrivacyState } from "@/types/privacy";
 
 export const getPrivacyPolicyUrl = (): string =>
@@ -14,13 +19,15 @@ export const getPrivacyPolicyUrl = (): string =>
 
 export const getPrivacyState = (): PrivacyState => {
   const consent = getConsent();
+  const nativeCanRequestAds = getNativeBoolean("canRequestAds");
+  const nativePrivacyOptionsRequired = getNativeBoolean("privacyOptionsRequired");
 
   return {
     consentChoice: consent.choice,
-    canRequestAds: true,
+    canRequestAds: nativeCanRequestAds ?? canServeLimitedAds(),
     canServePersonalizedAds: canServePersonalizedAds(),
     adsMode: getAdsMode(),
-    privacyOptionsRequired: true,
+    privacyOptionsRequired: nativePrivacyOptionsRequired ?? true,
     privacyEntryPoint: isNativeAdsBridgeAvailable() ? "native" : "settings",
   };
 };

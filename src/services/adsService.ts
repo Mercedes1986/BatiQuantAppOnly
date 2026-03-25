@@ -1,15 +1,30 @@
-import { AD_CONFIG, getAdPermission, getAdUnitId, hasMobileAppId } from "@/config/adsConfig";
+import { AD_CONFIG, getAdPermission } from "@/config/adsConfig";
 import { canServeLimitedAds } from "@/services/consentService";
-import { getNativeAdsBridge, getPlatform, isNativeAdsBridgeAvailable } from "@/services/platformService";
-import type { AdInterstitialResult, AdPlacement, AdRuntimeState, AdSlotRenderState } from "@/types/ads";
+import {
+  getNativeAdsBridge,
+  getNativeBoolean,
+  getPlatform,
+  isNativeAdsBridgeAvailable,
+} from "@/services/platformService";
+import type {
+  AdInterstitialResult,
+  AdPlacement,
+  AdRuntimeState,
+  AdSlotRenderState,
+} from "@/types/ads";
 
 let initialized = false;
+
+const getCanRequestAds = (): boolean => {
+  const nativeCanRequestAds = getNativeBoolean("canRequestAds");
+  return nativeCanRequestAds ?? canServeLimitedAds();
+};
 
 export const getAdsRuntimeState = (): AdRuntimeState => ({
   platform: getPlatform(),
   enabled: AD_CONFIG.ENABLE_ADS,
   initialized,
-  canRequestAds: canServeLimitedAds(),
+  canRequestAds: getCanRequestAds(),
   debug: AD_CONFIG.ENABLE_DEBUG_LABELS,
 });
 
@@ -38,27 +53,35 @@ export const getAdRenderState = (
     return { shouldRender: false, showPlaceholder: false, reason: "disabled" };
   }
 
-  if (!canServeLimitedAds()) {
-    return { shouldRender: false, showPlaceholder: false, reason: "no-consent" };
-  }
-
   const permission = getAdPermission(pathname);
   if (permission === "deny") {
     return { shouldRender: false, showPlaceholder: false, reason: "disabled" };
   }
 
   const platform = getPlatform();
-  const unitId = getAdUnitId(placement);
 
-  if (platform === "mobile" && hasMobileAppId() && unitId && isNativeAdsBridgeAvailable()) {
+  if (platform === "mobile" && isNativeAdsBridgeAvailable()) {
     return { shouldRender: true, showPlaceholder: false, reason: "mobile-ready" };
   }
 
-  if (platform === "mobile" && hasMobileAppId() && !isNativeAdsBridgeAvailable()) {
-    return { shouldRender: true, showPlaceholder: true, reason: "mobile-bridge-missing" };
+  if (!getCanRequestAds()) {
+    return { shouldRender: false, showPlaceholder: false, reason: "no-consent" };
   }
 
-  return { shouldRender: true, showPlaceholder: true, reason: "web-placeholder" };
+  if (platform === "mobile") {
+    return {
+      shouldRender: AD_CONFIG.ENABLE_WEB_PLACEHOLDERS,
+      showPlaceholder: AD_CONFIG.ENABLE_WEB_PLACEHOLDERS,
+      reason: "mobile-bridge-missing",
+    };
+  }
+
+  void placement;
+  return {
+    shouldRender: AD_CONFIG.ENABLE_WEB_PLACEHOLDERS,
+    showPlaceholder: AD_CONFIG.ENABLE_WEB_PLACEHOLDERS,
+    reason: "web-placeholder",
+  };
 };
 
 export const showBanner = async (
@@ -89,6 +112,7 @@ export const showInterstitialIfReady = async (
   placement: Extract<AdPlacement, "calculator_interstitial">
 ): Promise<AdInterstitialResult> => {
   if (!AD_CONFIG.ENABLE_ADS) return { shown: false, reason: "disabled" };
+  if (!getCanRequestAds()) return { shown: false, reason: "not-ready" };
   if (!isNativeAdsBridgeAvailable()) return { shown: false, reason: "bridge-missing" };
 
   try {

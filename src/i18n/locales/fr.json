@@ -36,7 +36,9 @@
     "unknown": "Inconnu",
     "validate": "Valider",
     "waste_plus": "Pertes +",
-    "back_to_quote": "Retour au devis"
+    "back_to_quote": "Retour au devis",
+    "open": "Ouvrir",
+    "total": "Total"
   },
   "calculator": {
     "open": "Ouvrir le calculateur",
@@ -2555,7 +2557,7 @@
     "export_error": "Erreur d’export",
     "file_read_error": "Erreur de lecture",
     "file_too_big": "Fichier trop volumineux",
-    "footer": "Réglages",
+    "footer": "Vos préférences et projets restent stockés sur votre appareil.",
     "import_confirm": "Importer cette sauvegarde ?",
     "invalid_backup": "Sauvegarde invalide",
     "pro": {
@@ -2564,14 +2566,28 @@
     },
     "restore_ok": "Restauration réussie",
     "support": {
-      "help": "Aide",
-      "privacy": "Confidentialité"
+      "help": "Aide & FAQ",
+      "privacy": "Politique de confidentialité"
     },
     "tabs": {
       "app": "App",
       "company": "Entreprise"
     },
-    "title": "Réglages"
+    "title": "Réglages",
+    "ads": {
+      "title": "Publicité & confidentialité",
+      "enabled_status": "Les demandes publicitaires sont autorisées.",
+      "disabled_status": "Les demandes publicitaires sont actuellement bloquées.",
+      "mode": "Mode actuel",
+      "personalized_status": "Annonces personnalisées autorisées.",
+      "limited_status": "Annonces limitées ou non personnalisées.",
+      "privacy_required": "Une entrée de gestion des choix doit rester accessible.",
+      "privacy_optional": "Aucun formulaire complémentaire n’est exigé dans cette session.",
+      "actions": "Actions",
+      "manage_choices": "Gérer mes choix publicitaires",
+      "reset_choices": "Réinitialiser mes choix",
+      "reset_confirm": "Réinitialiser vos choix publicitaires et de confidentialité ?"
+    }
   },
   "tutorial_auth": {
     "access_code": "Code d’accès",

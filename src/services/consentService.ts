@@ -6,6 +6,7 @@ import {
   safeStorageRemove,
   writeJson,
 } from "./persistentStorage";
+import { isNativeAdsBridgeAvailable } from "./platformService";
 
 const CONSENT_KEY_NEW = "batiquant_consent";
 const CONSENT_KEY_OLD = "baticalc_consent";
@@ -136,7 +137,10 @@ export const canServePersonalizedAds = (): boolean => {
   );
 };
 
-export const canServeLimitedAds = (): boolean => true;
+export const canServeLimitedAds = (): boolean => {
+  if (isNativeAdsBridgeAvailable()) return true;
+  return hasUserChoice();
+};
 
 export const getAdsMode = (): AdsMode =>
   canServePersonalizedAds() ? "personalized" : "limited";

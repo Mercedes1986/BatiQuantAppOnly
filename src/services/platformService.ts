@@ -8,6 +8,8 @@ declare global {
       hideBanner?: (placement?: string) => Promise<void> | void;
       showInterstitial?: (placement: string) => Promise<boolean> | boolean;
       openPrivacyOptions?: () => Promise<void> | void;
+      canRequestAds?: () => Promise<boolean> | boolean;
+      privacyOptionsRequired?: () => Promise<boolean> | boolean;
     };
   }
 }
@@ -26,3 +28,16 @@ export const getPlatform = (): AdPlatform => {
 
 export const getNativeAdsBridge = () =>
   isNativeAdsBridgeAvailable() ? window.BatiQuantNativeAds! : null;
+
+export const getNativeBoolean = (getter: "canRequestAds" | "privacyOptionsRequired"): boolean | null => {
+  const bridge = getNativeAdsBridge();
+  const candidate = bridge?.[getter];
+  if (typeof candidate !== "function") return null;
+
+  try {
+    const value = candidate();
+    return typeof value === "boolean" ? value : null;
+  } catch {
+    return null;
+  }
+};

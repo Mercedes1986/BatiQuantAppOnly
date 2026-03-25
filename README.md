@@ -71,3 +71,17 @@ Les composants `AdSlot` servent maintenant à :
 - `npm run build` : build production
 - `npm run preview` : aperçu local du build
 - `npm run ci` : typecheck + build + audit
+
+
+## Configuration Android AdMob
+
+La couche Android lit en priorité ces propriétés Gradle (ou variables d’environnement du même nom) :
+
+```properties
+BATIQUANT_ADMOB_APP_ID=
+BATIQUANT_ADMOB_BANNER_HOME=
+BATIQUANT_ADMOB_BANNER_RESULT=
+BATIQUANT_ADMOB_INTERSTITIAL_CALC_DONE=
+```
+
+Sans configuration explicite, le projet utilise les identifiants de test Google pour éviter d’envoyer du trafic invalide pendant le développement.
