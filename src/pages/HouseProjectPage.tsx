@@ -14,6 +14,8 @@ import {
   Pencil,
   Home,
   Trash2,
+  FolderOpen,
+  Hammer,
 } from "lucide-react";
 import {
   getHouseProjects,
@@ -576,177 +578,217 @@ export const HouseProjectPage: React.FC = () => {
   }
 
   // ===== LIST PAGE (same aesthetic as Projects) =====
+  // ===== LIST PAGE (same aesthetic as Projects) =====
+  const projectsTotalEstimate = projects.reduce((sum, project) => sum + getProjectTotal(project), 0);
+  const projectsTotalSurface = projects.reduce((sum, project) => sum + Number(project.params.surfaceArea || 0), 0);
+
   return (
-    <div className="app-shell app-shell--house min-h-full bg-transparent p-4 safe-bottom-offset">
-      <div className="max-w-6xl mx-auto space-y-4">
-      <section className="rounded-[28px] border border-slate-200/80 bg-white/72 backdrop-blur-md shadow-sm p-5 md:p-6">
-      <div className="mb-3 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-        <div>
-          <h1 className="text-2xl font-extrabold text-slate-800">
-            {t("house.my_sites", { defaultValue: "My sites (full estimate)" })}
-          </h1>
-          <p className="mt-1 text-sm text-slate-500">
-            {t("house.my_sites_subtitle", {
-              defaultValue: "Create a site and save results step-by-step (full tracking).",
-            })}
-          </p>
-        </div>
-
-        <button
-          onClick={openAllQuotes}
-          className="inline-flex items-center justify-center rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-extrabold text-slate-700 shadow-sm transition-all hover:border-blue-200 hover:text-blue-700"
-          type="button"
-        >
-          <FileText size={18} className="mr-2" />
-          {t("house.all_quotes", { defaultValue: "All quotes" })}
-        </button>
-      </div>
-
-      {/* HERO CTA (like Projects) */}
-      {!isCreating && (
-        <button
-          onClick={() => setIsCreating(true)}
-          className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-transform active:scale-[0.98] hover:shadow-md w-full mb-5"
-          type="button"
-        >
-          <div className="absolute inset-0">
-            <img
-              src={heroImageSrc}
-              alt=""
-              className="w-full h-full object-cover"
-              draggable={false}
-              onError={(e) => {
-                (e.currentTarget as HTMLImageElement).src = "/images/menu/fallback.jpg";
-              }}
-            />
-            <div className="absolute inset-0 bg-black/25" />
-            <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/35 to-black/10" />
-          </div>
-
-          <div className="relative z-10 w-full p-5 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-full bg-white/90 border border-white/60 flex items-center justify-center shadow-sm">
-                <Plus className="text-blue-600" size={22} />
+    <div className="app-shell app-shell--house min-h-full bg-transparent px-4 pb-4 safe-bottom-offset">
+      <div className="mx-auto max-w-6xl space-y-3">
+        <section className="rounded-[28px] border border-slate-200/80 bg-white/72 p-5 shadow-sm backdrop-blur-md md:p-6">
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <div className="min-w-0">
+                <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-blue-100 bg-blue-50 px-3 py-1 text-xs font-extrabold text-blue-700">
+                  <Hammer size={14} />
+                  {t("house.my_sites", { defaultValue: "My sites (full estimate)" })}
+                </div>
+                <h1 className="text-2xl font-extrabold tracking-tight text-slate-900">
+                  {t("house.page_heading", { defaultValue: "Sites & full estimate tracking" })}
+                </h1>
+                <p className="mt-1 text-sm font-medium text-slate-500">
+                  {t("house.my_sites_subtitle", {
+                    defaultValue: "Create a site and save results step-by-step (full tracking).",
+                  })}
+                </p>
               </div>
-              <div className="text-left">
-                <div className="text-white font-extrabold text-base leading-tight">
+
+              <div className="flex flex-wrap gap-2 sm:justify-end">
+                <button
+                  onClick={() => setIsCreating(true)}
+                  className="inline-flex items-center justify-center rounded-2xl bg-blue-600 px-4 py-2.5 text-sm font-extrabold text-white shadow-sm transition-all hover:bg-blue-700 active:scale-[0.98]"
+                  type="button"
+                >
+                  <Plus size={18} className="mr-2" />
                   {t("house.create_site", { defaultValue: "Create a site" })}
-                </div>
-                <div className="text-white/80 text-xs font-semibold mt-0.5">
-                  {t("house.new_project", { defaultValue: "New project" })}
-                </div>
+                </button>
+
+                <button
+                  onClick={openAllQuotes}
+                  className="inline-flex items-center justify-center rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-extrabold text-slate-700 shadow-sm transition-all hover:border-blue-200 hover:text-blue-700"
+                  type="button"
+                >
+                  <FileText size={18} className="mr-2" />
+                  {t("house.all_quotes", { defaultValue: "All quotes" })}
+                </button>
               </div>
             </div>
 
-            <div className="w-9 h-9 rounded-full bg-white/20 border border-white/30 flex items-center justify-center">
-              <ChevronRight className="text-white" size={18} />
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+              <div className="rounded-2xl border border-slate-200/80 bg-white/85 p-4 shadow-sm">
+                <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 text-blue-600">
+                  <FolderOpen size={18} />
+                </div>
+                <div className="text-xs font-bold uppercase tracking-wide text-slate-400">
+                  {t("house.saved_count", { defaultValue: "Saved sites" })}
+                </div>
+                <div className="mt-1 text-2xl font-extrabold text-slate-900">{projects.length}</div>
+              </div>
+
+              <div className="rounded-2xl border border-slate-200/80 bg-white/85 p-4 shadow-sm">
+                <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 text-blue-600">
+                  <Ruler size={18} />
+                </div>
+                <div className="text-xs font-bold uppercase tracking-wide text-slate-400">
+                  {t("house.total_surface", { defaultValue: "Total living area" })}
+                </div>
+                <div className="mt-1 text-2xl font-extrabold text-slate-900">
+                  {Number(projectsTotalSurface).toLocaleString(i18n.language || undefined)} m²
+                </div>
+              </div>
+
+              <div className="rounded-2xl border border-blue-100 bg-blue-50/90 p-4 shadow-sm sm:col-span-2 xl:col-span-1">
+                <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-2xl border border-blue-100 bg-white text-blue-600">
+                  <Layers size={18} />
+                </div>
+                <div className="text-xs font-bold uppercase tracking-wide text-blue-500">
+                  {t("house.total_estimated", { defaultValue: "Estimated total" })}
+                </div>
+                <div className="mt-1 text-2xl font-extrabold text-slate-900">{euro.format(projectsTotalEstimate)}</div>
+                <div className="mt-2 text-sm font-semibold text-blue-900/80">
+                  {t("house.create_site_hint", {
+                    defaultValue: "Create a site to track every step and generate a full quote.",
+                  })}
+                </div>
+              </div>
             </div>
           </div>
-        </button>
-      )}
+        </section>
 
-      </section>
-
-      {isCreating ? (
-        <div className="bg-white/72 backdrop-blur-md p-5 rounded-[28px] shadow-sm border border-blue-100 animate-in zoom-in-95">
-          <h2 className="font-extrabold text-lg mb-4">
-            {t("house.new_site", { defaultValue: "New site" })}
-          </h2>
-
-          <div className="space-y-4">
-            <div>
-              <label className="block text-xs font-extrabold text-slate-500 mb-1">
-                {t("house.project_name", { defaultValue: "Project name" })}
-              </label>
-              <input
-                type="text"
-                autoFocus
-                value={newName}
-                onChange={(e) => setNewName(e.target.value)}
-                placeholder={t("house.project_placeholder", { defaultValue: "e.g. New house build" })}
-                className="w-full p-3 border rounded-lg bg-white text-slate-900"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-extrabold text-slate-500 mb-1">
-                {t("house.surface_living_m2", { defaultValue: "Living area (m²)" })}
-              </label>
-              <input
-                type="number"
-                value={newSurface}
-                onChange={(e) => setNewSurface(e.target.value)}
-                placeholder="100"
-                className="w-full p-3 border rounded-lg bg-white text-slate-900"
-              />
-            </div>
-
-            <div className="flex gap-3 pt-2">
+        {isCreating ? (
+          <div className="rounded-[28px] border border-blue-100 bg-white/72 p-5 shadow-sm backdrop-blur-md animate-in zoom-in-95">
+            <div className="mb-4 flex items-center justify-between gap-3">
+              <h2 className="text-lg font-extrabold text-slate-900">
+                {t("house.new_site", { defaultValue: "New site" })}
+              </h2>
               <button
                 onClick={() => setIsCreating(false)}
-                className="flex-1 py-3 text-slate-500 font-extrabold"
+                className="rounded-full border border-slate-200 bg-white p-2 text-slate-400 transition-colors hover:text-slate-600"
                 type="button"
+                aria-label={t("common.cancel", { defaultValue: "Cancel" })}
               >
-                {t("common.cancel", { defaultValue: "Cancel" })}
-              </button>
-
-              <button
-                onClick={handleCreate}
-                className="flex-1 py-3 bg-blue-600 text-white font-extrabold rounded-lg shadow-md"
-                type="button"
-              >
-                {t("house.create", { defaultValue: "Create" })}
+                <X size={18} />
               </button>
             </div>
-          </div>
-        </div>
-      ) : (
-        <div className="space-y-3">
-          {projects.map((p) => {
-            const total = getProjectTotal(p);
-            return (
-              <div
-                key={p.id}
-                onClick={() => selectProject(p)}
-                className="bg-white/72 backdrop-blur-sm p-4 rounded-[24px] shadow-sm border border-slate-200/80 flex justify-between items-center cursor-pointer active:scale-[0.98] transition-transform hover:border-blue-200"
-              >
-                <div className="flex items-center space-x-4">
-                  <div className="bg-blue-100 p-3 rounded-full text-blue-600">
-                    <Home size={24} />
-                  </div>
-                  <div>
-                    <h3 className="font-extrabold text-slate-800">{p.name}</h3>
-                    <p className="text-xs text-slate-500">
-                      {p.params.surfaceArea} m² •{" "}
-                      {new Date(p.date).toLocaleDateString(i18n.language || undefined)}
-                    </p>
-                  </div>
-                </div>
 
-                <div className="flex items-center gap-2">
-                  <span className="font-extrabold text-slate-700 bg-slate-50 border border-slate-200 px-3 py-1 rounded-lg">
-                    {euro.format(total)}
-                  </span>
-
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDelete(p.id);
-                    }}
-                    className="p-2 text-slate-300 hover:text-red-400"
-                    type="button"
-                    aria-label={t("common.delete", { defaultValue: "Delete" })}
-                  >
-                    <Trash2 size={18} />
-                  </button>
-
-                  <ChevronRight className="text-slate-300" size={20} />
-                </div>
+            <div className="space-y-4">
+              <div>
+                <label className="mb-1 block text-xs font-extrabold text-slate-500">
+                  {t("house.project_name", { defaultValue: "Project name" })}
+                </label>
+                <input
+                  type="text"
+                  autoFocus
+                  value={newName}
+                  onChange={(e) => setNewName(e.target.value)}
+                  placeholder={t("house.project_placeholder", { defaultValue: "e.g. New house build" })}
+                  className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition-colors focus:border-blue-300"
+                />
               </div>
-            );
-          })}
-        </div>
-      )}
+
+              <div>
+                <label className="mb-1 block text-xs font-extrabold text-slate-500">
+                  {t("house.surface_living_m2", { defaultValue: "Living area (m²)" })}
+                </label>
+                <input
+                  type="number"
+                  value={newSurface}
+                  onChange={(e) => setNewSurface(e.target.value)}
+                  placeholder="100"
+                  className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition-colors focus:border-blue-300"
+                />
+              </div>
+
+              <div className="flex gap-3 pt-2">
+                <button
+                  onClick={() => setIsCreating(false)}
+                  className="flex-1 rounded-2xl border border-slate-200 bg-white py-3 font-extrabold text-slate-600 shadow-sm transition-colors hover:border-slate-300"
+                  type="button"
+                >
+                  {t("common.cancel", { defaultValue: "Cancel" })}
+                </button>
+
+                <button
+                  onClick={handleCreate}
+                  className="flex-1 rounded-2xl bg-blue-600 py-3 font-extrabold text-white shadow-sm transition-colors hover:bg-blue-700"
+                  type="button"
+                >
+                  {t("house.create", { defaultValue: "Create" })}
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : projects.length === 0 ? (
+          <div className="rounded-[28px] border border-dashed border-slate-200 bg-white/65 py-14 text-center text-slate-400 backdrop-blur-sm">
+            <Home size={60} className="mx-auto text-slate-300" />
+            <p className="mt-4 font-medium text-slate-500">
+              {t("house.empty", { defaultValue: "No saved site yet." })}
+            </p>
+            <button
+              onClick={() => setIsCreating(true)}
+              className="mt-5 inline-flex items-center rounded-2xl bg-blue-600 px-4 py-3 text-sm font-extrabold text-white shadow-sm transition-all hover:bg-blue-700 active:scale-[0.98]"
+              type="button"
+            >
+              <Plus size={18} className="mr-2" />
+              {t("house.create_site", { defaultValue: "Create a site" })}
+            </button>
+          </div>
+        ) : (
+          <div className="grid gap-3">
+            {projects.map((p) => {
+              const total = getProjectTotal(p);
+              return (
+                <div
+                  key={p.id}
+                  onClick={() => selectProject(p)}
+                  className="flex cursor-pointer items-center justify-between rounded-[24px] border border-slate-200/80 bg-white/72 p-5 shadow-sm transition-all hover:border-blue-200 active:scale-[0.98]"
+                >
+                  <div className="flex min-w-0 items-center gap-4">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-blue-100 bg-blue-50 text-blue-600">
+                      <Home size={22} />
+                    </div>
+                    <div className="min-w-0">
+                      <h3 className="truncate text-lg font-extrabold text-slate-800">{p.name}</h3>
+                      <p className="mt-1 text-xs font-medium text-slate-500">
+                        {p.params.surfaceArea} m² • {new Date(p.date).toLocaleDateString(i18n.language || undefined)}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="ml-3 flex items-center gap-2">
+                    <span className="rounded-xl border border-slate-200 bg-slate-100/90 px-3 py-1.5 text-sm font-extrabold text-slate-700">
+                      {euro.format(total)}
+                    </span>
+
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDelete(p.id);
+                      }}
+                      className="rounded-xl p-2 text-slate-300 transition-colors hover:bg-red-50 hover:text-red-400"
+                      type="button"
+                      aria-label={t("common.delete", { defaultValue: "Delete" })}
+                    >
+                      <Trash2 size={18} />
+                    </button>
+
+                    <ChevronRight className="text-slate-300" size={20} />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     </div>
   );
