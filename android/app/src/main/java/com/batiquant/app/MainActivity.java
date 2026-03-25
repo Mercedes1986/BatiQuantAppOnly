@@ -12,7 +12,9 @@ public class MainActivity extends BridgeActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (bridge == null || bridge.getWebView() == null) return;
+        if (bridge == null || bridge.getWebView() == null) {
+            return;
+        }
 
         WebView webView = bridge.getWebView();
         nativeAdsBridge = new BatiQuantNativeAdsBridge(this, webView);
@@ -20,7 +22,7 @@ public class MainActivity extends BridgeActivity {
     }
 
     @Override
-    protected void onResume() {
+    public void onResume() {
         super.onResume();
         if (nativeAdsBridge != null && bridge != null) {
             nativeAdsBridge.rebindWebView(bridge.getWebView());
@@ -29,7 +31,7 @@ public class MainActivity extends BridgeActivity {
     }
 
     @Override
-    protected void onPause() {
+    public void onPause() {
         if (nativeAdsBridge != null) {
             nativeAdsBridge.onHostPause();
         }
@@ -37,7 +39,7 @@ public class MainActivity extends BridgeActivity {
     }
 
     @Override
-    protected void onDestroy() {
+    public void onDestroy() {
         if (nativeAdsBridge != null) {
             nativeAdsBridge.onHostDestroy();
         }
