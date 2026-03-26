@@ -1,5 +1,5 @@
 import React from "react";
-import { ArrowLeft, CircleHelp, FileText, HardDrive, Shield, Smartphone } from "lucide-react";
+import { ArrowLeft, FileText, HardDrive, Shield, Smartphone } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 
@@ -53,9 +53,9 @@ export const HelpPage: React.FC = () => {
           </button>
 
           <div className="mt-4 flex items-start gap-3">
-            <div className="rounded-2xl bg-blue-100 p-3 text-blue-700">
-              <CircleHelp size={22} />
-            </div>
+           <div className="rounded-2xl bg-blue-100 p-3 text-blue-700">
+  <FileText size={22} />
+</div>
             <div>
               <h1 className="text-2xl font-extrabold text-slate-900">{t("support_pages.help.title")}</h1>
               <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
