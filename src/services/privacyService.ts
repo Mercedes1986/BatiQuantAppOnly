@@ -14,8 +14,12 @@ import {
 } from "@/services/platformService";
 import type { PrivacyState } from "@/types/privacy";
 
+export const getInAppHelpPath = (): string => "/app/help";
+
+export const getInAppPrivacyPolicyPath = (): string => "/app/privacy";
+
 export const getPrivacyPolicyUrl = (): string =>
-  AD_CONFIG.PRIVACY_POLICY_URL || "/privacy-policy.html";
+  AD_CONFIG.PRIVACY_POLICY_URL || getInAppPrivacyPolicyPath();
 
 export const getPrivacyState = (): PrivacyState => {
   const consent = getConsent();

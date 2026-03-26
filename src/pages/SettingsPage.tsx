@@ -17,11 +17,13 @@ import {
   Upload,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 
 import { CompanyProfileForm } from "@/components/documents/CompanyProfileForm";
 import { setPreferredLanguage } from "@/services/persistentStorage";
 import {
-  getPrivacyPolicyUrl,
+  getInAppHelpPath,
+  getInAppPrivacyPolicyPath,
   getPrivacyState,
   openPrivacyOptions,
   resetPrivacyChoices,
@@ -80,16 +82,10 @@ const currencySelectLabel = (currency: Currency): string => {
   }
 };
 
-const openExternalPage = (url: string) => {
-  try {
-    window.open(url, "_blank", "noopener,noreferrer");
-  } catch {
-    window.location.href = url;
-  }
-};
 
 export const SettingsPage: React.FC = () => {
   const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [activeTab, setActiveTab] = useState<SettingsTab>("app");
@@ -98,8 +94,8 @@ export const SettingsPage: React.FC = () => {
   const [privacyVersion, setPrivacyVersion] = useState(0);
 
   const versionLabel = useMemo(() => getAppVersion(), []);
-  const privacyPolicyUrl = useMemo(() => getPrivacyPolicyUrl(), []);
-  const helpUrl = useMemo(() => "/help.html", []);
+  const privacyPolicyPath = useMemo(() => getInAppPrivacyPolicyPath(), []);
+  const helpPath = useMemo(() => getInAppHelpPath(), []);
   const privacyState = useMemo(() => getPrivacyState(), [privacyVersion]);
 
   useEffect(() => {
@@ -561,7 +557,7 @@ export const SettingsPage: React.FC = () => {
                 <button
                   type="button"
                   className={rowClass}
-                  onClick={() => openExternalPage(helpUrl)}
+                  onClick={() => navigate(helpPath)}
                 >
                   <div className="flex items-center gap-3">
                     <HelpCircle size={18} className="text-slate-400" />
@@ -574,7 +570,7 @@ export const SettingsPage: React.FC = () => {
                 <button
                   type="button"
                   className={rowClass}
-                  onClick={() => openExternalPage(privacyPolicyUrl)}
+                  onClick={() => navigate(privacyPolicyPath)}
                 >
                   <div className="flex items-center gap-3">
                     <Shield size={18} className="text-slate-400" />

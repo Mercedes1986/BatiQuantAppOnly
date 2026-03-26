@@ -184,17 +184,17 @@ export const resetConsent = () => {
   const state = { ...DEFAULT_STATE };
   emitConsentUpdated(state);
 
-  try {
-    window.dispatchEvent(new Event("consent-open"));
-  } catch {
-    // ignore
-  }
+  openConsent({ dismissible: true });
 };
 
-export const openConsent = () => {
+export const openConsent = (options?: { dismissible?: boolean }) => {
   if (!isBrowser()) return;
   try {
-    window.dispatchEvent(new Event("consent-open"));
+    window.dispatchEvent(
+      new CustomEvent("consent-open", {
+        detail: { dismissible: options?.dismissible ?? true },
+      })
+    );
   } catch {
     // ignore
   }

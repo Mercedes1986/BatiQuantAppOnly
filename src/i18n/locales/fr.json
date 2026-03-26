@@ -3057,5 +3057,44 @@
     "created_on": "Date",
     "project": "Projet",
     "no_project": "Non lié"
+  },
+  "support_pages": {
+    "help": {
+      "title": "Aide & FAQ",
+      "subtitle": "Retrouvez les informations essentielles sur les sauvegardes, les documents, la publicité et l’usage mobile sans quitter l’application.",
+      "sections": {
+        "backup": {
+          "title": "Sauvegarde",
+          "body": "Utilisez l’écran Réglages pour exporter régulièrement une sauvegarde JSON de vos projets et préférences."
+        },
+        "privacy": {
+          "title": "Publicité & confidentialité",
+          "body": "Depuis Réglages, ouvrez Publicité & confidentialité pour revoir vos choix et rouvrir le formulaire si nécessaire."
+        },
+        "documents": {
+          "title": "Documents",
+          "body": "Les devis et factures se gèrent depuis les écrans de documents. Vérifiez votre profil entreprise avant impression."
+        },
+        "mobile": {
+          "title": "Version mobile",
+          "body": "Pendant le développement Android, conservez les identifiants de test Google AdMob avant de les remplacer par vos identifiants réels."
+        }
+      }
+    },
+    "privacy": {
+      "title": "Politique de confidentialité",
+      "subtitle": "Ce résumé intégré à l’application doit être complété et aligné avec les documents définitifs de publication Google Play.",
+      "updated": "Version brouillon pour publication mobile",
+      "sections": {
+        "local_data": {
+          "title": "Données locales",
+          "body": "L’application peut stocker localement des préférences, des paramètres et des sauvegardes de projets sur votre appareil."
+        },
+        "ads": {
+          "title": "Publicité",
+          "body": "La version mobile peut intégrer AdMob via une couche native. Les choix de confidentialité doivent rester accessibles depuis les réglages de l’application."
+        }
+      }
+    }
   }
 }

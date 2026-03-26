@@ -27,6 +27,8 @@ import { HouseProjectPage } from "./pages/HouseProjectPage";
 import { MaterialsPage } from "./pages/MaterialsPage";
 import { AppMenuPage } from "./pages/AppMenuPage";
 import { QuickToolsPage } from "./pages/QuickToolsPage";
+import { HelpPage } from "./pages/support/HelpPage";
+import { PrivacyPolicyPage } from "./pages/support/PrivacyPolicyPage";
 
 // Documents
 import { QuoteEditorPage } from "./pages/documents/QuoteEditorPage";
@@ -509,7 +511,7 @@ const AppLayout = () => {
 
     if (p.includes("/app/house")) return pick("bg-house.png");
     if (p.includes("/app/materials")) return pick("bg-materials.png");
-    if (p.includes("/app/settings")) return pick("bg-settings.png");
+    if (p.includes("/app/settings") || p.includes("/app/help") || p.includes("/app/privacy")) return pick("bg-settings.png");
     if (p.includes("/app/quotes") || p.includes("/app/invoices") || p.includes("/app/print")) return pick("bg-docs.png");
     if (p.includes("/app/menu")) return pick("bg-menu.png");
     if (p.includes("/app/quick-tools")) return pick("bg-menu.png");
@@ -662,6 +664,8 @@ const AppRouter: React.FC = () => (
           <Route path="projects" element={<ProjectsPage />} />
           <Route path="materials" element={<MaterialsPage />} />
           <Route path="settings" element={<SettingsPage />} />
+          <Route path="help" element={<HelpPage />} />
+          <Route path="privacy" element={<PrivacyPolicyPage />} />
           <Route path="calculator" element={<ProjectCalculatorWrapper />} />
           <Route path="quotes" element={<QuotesListPage />} />
           <Route path="quotes/:id" element={<QuoteEditorPage />} />
