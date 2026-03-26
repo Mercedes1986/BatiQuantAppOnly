@@ -1814,7 +1814,11 @@
     "siret": "SIRET",
     "upload_logo": "Importer un logo",
     "vat": "N° TVA",
-    "zip": "Code postal"
+    "zip": "Code postal",
+    "terms_title": "Conditions générales des devis",
+    "terms_hint": "Ce texte sera ajouté automatiquement à la fin des devis et factures imprimés.",
+    "terms": "Conditions générales",
+    "terms_ph": "Ex : Devis valable 30 jours. Acompte de 30 % à la commande. Solde à la réception des travaux. Délais donnés à titre indicatif sous réserve des approvisionnements. Toute prestation complémentaire fera l'objet d'un avenant."
   },
   "consent": {
     "accept": "Accepter",
@@ -1848,7 +1852,8 @@
     "total_ht": "Total HT",
     "total_ttc": "Total TTC",
     "valid_until": "Valable jusqu’au",
-    "vat": "TVA"
+    "vat": "TVA",
+    "terms_conditions": "Conditions générales"
   },
   "errors": {
     "generic_hint": "Réessayez ou contactez le support si le problème persiste.",

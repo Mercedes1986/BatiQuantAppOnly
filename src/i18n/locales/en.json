@@ -1736,7 +1736,11 @@
     "siret": "SIRET",
     "upload_logo": "Upload logo",
     "vat": "VAT number",
-    "zip": "ZIP code"
+    "zip": "ZIP code",
+    "terms_title": "Quote terms and conditions",
+    "terms_hint": "This text will be added automatically at the end of printed quotes and invoices.",
+    "terms": "Terms and conditions",
+    "terms_ph": "Example: Quote valid for 30 days. 30% deposit due on order. Balance due on completion. Lead times are indicative and depend on supply availability. Any additional work will require an approved change order."
   },
   "consent": {
     "accept": "Accept",
@@ -1770,7 +1774,8 @@
     "total_ht": "Total (excl. tax)",
     "total_ttc": "Total (incl. tax)",
     "valid_until": "Valid until",
-    "vat": "VAT"
+    "vat": "VAT",
+    "terms_conditions": "Terms and conditions"
   },
   "errors": {
     "generic_hint": "Please try again or contact support if the issue persists.",
