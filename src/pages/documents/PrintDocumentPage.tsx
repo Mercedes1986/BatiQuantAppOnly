@@ -157,16 +157,13 @@ export const PrintDocumentPage: React.FC = () => {
           height: "100dvh",
           overflowY: "auto",
           WebkitOverflowScrolling: "touch",
-          paddingTop: "calc(var(--app-top-gap, env(safe-area-inset-top, 0px)) + 18px)",
+          paddingTop: "4px",
           paddingRight: "12px",
           paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 20px)",
           paddingLeft: "12px",
         }}
       >
-        <div
-          className="no-print sticky z-20 mb-5 flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white/95 px-3 py-3 shadow-sm backdrop-blur"
-          style={{ top: "calc(var(--app-top-gap, env(safe-area-inset-top, 0px)) + 6px)" }}
-        >
+        <div className="no-print sticky top-0 z-20 mb-3 flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white/95 px-3 py-3 shadow-sm backdrop-blur">
           <button
             type="button"
             onClick={handleBack}
@@ -186,7 +183,7 @@ export const PrintDocumentPage: React.FC = () => {
           </button>
         </div>
 
-        <div className="mx-auto max-w-[210mm] px-1 pb-10 print:px-0 print:pb-0 md:px-3 md:pb-12">
+        <div className="mx-auto max-w-[210mm] px-1 pt-1 pb-10 print:px-0 print:pb-0 md:px-3 md:pt-2 md:pb-12">
           <div className="mb-10 flex flex-col gap-6 border-b border-slate-100 pb-8 md:mb-12 md:flex-row md:items-start md:justify-between">
             <div className="flex-1 md:pr-8">
               {company.logoUrl ? (
