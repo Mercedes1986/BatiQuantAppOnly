@@ -126,7 +126,10 @@ export const ProjectsPage: React.FC = () => {
 
     return (
       <div className="relative min-h-full bg-transparent safe-bottom-offset">
-        <div className="safe-top-header sticky top-safe-offset z-30 border-b border-slate-200/80 bg-white/80 shadow-sm backdrop-blur-xl no-print">
+        <div
+          className="sticky z-30 border-b border-slate-200/80 bg-white/80 shadow-sm backdrop-blur-xl no-print"
+          style={{ top: "calc(var(--app-top-gap) + 6px)" }}
+        >
           <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3">
             <button
               onClick={closeProject}
@@ -299,27 +302,30 @@ export const ProjectsPage: React.FC = () => {
   );
 
   return (
-    <div className="min-h-full bg-transparent px-4 pb-4 safe-bottom-offset">
-      <div className="mx-auto max-w-6xl space-y-3">
-        <section className="rounded-[28px] border border-slate-200/80 bg-white/72 p-5 shadow-sm backdrop-blur-md md:p-6">
-          <div className="flex flex-col gap-4">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-              <div className="min-w-0">
-                <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-blue-100 bg-blue-50 px-3 py-1 text-xs font-extrabold text-blue-700">
+    <div
+      className="min-h-full bg-transparent px-4 pb-4 safe-bottom-offset"
+      style={{ paddingTop: "calc(var(--app-top-gap) + 14px)" }}
+    >
+      <div className="mx-auto max-w-6xl space-y-4">
+        <section className="rounded-[30px] border border-slate-200/80 bg-white/72 p-5 shadow-sm backdrop-blur-md md:p-7">
+          <div className="flex flex-col gap-5">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+              <div className="min-w-0 pt-1">
+                <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-blue-100 bg-blue-50 px-3 py-1 text-xs font-extrabold text-blue-700">
                   <Calculator size={14} />
                   {t("projects.title", { defaultValue: "My projects (calculations)" })}
                 </div>
-                <h1 className="text-2xl font-extrabold tracking-tight text-slate-900">
+                <h1 className="text-[1.95rem] font-extrabold tracking-tight text-slate-900 md:text-[2.15rem]">
                   {t("projects.page_heading", { defaultValue: "Projects & saved calculations" })}
                 </h1>
-                <p className="mt-1 text-sm font-medium text-slate-500">
+                <p className="mt-2 max-w-2xl text-sm font-medium leading-relaxed text-slate-500">
                   {t("projects.subtitle", {
                     defaultValue: "Saved from individual calculators (single calculations).",
                   })}
                 </p>
               </div>
 
-              <div className="flex flex-wrap gap-2 sm:justify-end">
+              <div className="flex flex-wrap gap-2 sm:justify-end sm:self-center">
                 <button
                   onClick={() => navigate("/app/calculators")}
                   className="inline-flex items-center justify-center rounded-2xl bg-blue-600 px-4 py-2.5 text-sm font-extrabold text-white shadow-sm transition-all hover:bg-blue-700 active:scale-[0.98]"
@@ -339,6 +345,8 @@ export const ProjectsPage: React.FC = () => {
                 </button>
               </div>
             </div>
+
+            <div className="h-px w-full bg-gradient-to-r from-white/20 via-slate-200/70 to-white/20" />
 
             <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
               <div className="rounded-2xl border border-slate-200/80 bg-white/85 p-4 shadow-sm">

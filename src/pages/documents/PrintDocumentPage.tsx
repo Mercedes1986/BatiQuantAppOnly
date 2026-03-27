@@ -157,13 +157,16 @@ export const PrintDocumentPage: React.FC = () => {
           height: "100dvh",
           overflowY: "auto",
           WebkitOverflowScrolling: "touch",
-          paddingTop: "12px",
+          paddingTop: "calc(var(--app-top-gap, env(safe-area-inset-top, 0px)) + 18px)",
           paddingRight: "12px",
           paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 20px)",
           paddingLeft: "12px",
         }}
       >
-        <div className="no-print safe-top-header sticky top-safe-offset z-20 mb-4 flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white/95 px-3 py-3 shadow-sm backdrop-blur">
+        <div
+          className="no-print sticky z-20 mb-5 flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white/95 px-3 py-3 shadow-sm backdrop-blur"
+          style={{ top: "calc(var(--app-top-gap, env(safe-area-inset-top, 0px)) + 6px)" }}
+        >
           <button
             type="button"
             onClick={handleBack}
