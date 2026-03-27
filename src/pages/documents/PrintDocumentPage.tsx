@@ -149,41 +149,31 @@ export const PrintDocumentPage: React.FC = () => {
   const vatPct = localizedDoc.totalHT > 0 ? (localizedDoc.totalVAT / localizedDoc.totalHT) * 100 : 0;
 
   return (
-    <div className="min-h-screen bg-slate-100 print:bg-white">
-      <div
-        className="mx-auto box-border max-w-[210mm] bg-white font-sans text-slate-900 print:max-w-none print:overflow-visible print:p-0"
-        style={{
-          minHeight: "100dvh",
-          height: "100dvh",
-          overflowY: "auto",
-          WebkitOverflowScrolling: "touch",
-          paddingTop: "4px",
-          paddingRight: "12px",
-          paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 20px)",
-          paddingLeft: "12px",
-        }}
-      >
-        <div className="no-print sticky top-0 z-20 mb-3 flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white/95 px-3 py-3 shadow-sm backdrop-blur">
-          <button
-            type="button"
-            onClick={handleBack}
-            className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-bold text-slate-700 transition-colors hover:border-blue-200 hover:text-blue-700"
-          >
-            <ArrowLeft size={16} />
-            {t("common.back", { defaultValue: "Retour" })}
-          </button>
+    <div className="app-shell app-shell--projects min-h-full print:bg-white">
+      <div className="page-narrow safe-bottom-pad max-w-[210mm] space-y-4 print:max-w-none print:px-0 print:pb-0">
+        <section className="no-print glass-panel rounded-[28px] px-4 py-3 shadow-sm sm:px-5">
+          <div className="flex items-center justify-between gap-3">
+            <button
+              type="button"
+              onClick={handleBack}
+              className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-bold text-slate-700 transition-colors hover:border-blue-200 hover:text-blue-700"
+            >
+              <ArrowLeft size={16} />
+              {t("common.back", { defaultValue: "Retour" })}
+            </button>
 
-          <button
-            type="button"
-            onClick={handlePrint}
-            className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-3 py-2 text-sm font-bold text-white transition-colors hover:bg-slate-800"
-          >
-            <Printer size={16} />
-            {t("common.print", { defaultValue: "Imprimer" })}
-          </button>
-        </div>
+            <button
+              type="button"
+              onClick={handlePrint}
+              className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-3 py-2 text-sm font-bold text-white transition-colors hover:bg-slate-800"
+            >
+              <Printer size={16} />
+              {t("common.print", { defaultValue: "Imprimer" })}
+            </button>
+          </div>
+        </section>
 
-        <div className="mx-auto max-w-[210mm] px-1 pt-1 pb-10 print:px-0 print:pb-0 md:px-3 md:pt-2 md:pb-12">
+        <section className="rounded-[28px] border border-slate-200 bg-white p-5 font-sans text-slate-900 shadow-sm print:rounded-none print:border-0 print:p-0 print:shadow-none md:p-8">
           <div className="mb-10 flex flex-col gap-6 border-b border-slate-100 pb-8 md:mb-12 md:flex-row md:items-start md:justify-between">
             <div className="flex-1 md:pr-8">
               {company.logoUrl ? (
@@ -374,7 +364,7 @@ export const PrintDocumentPage: React.FC = () => {
               </p>
             </div>
           </div>
-        </div>
+        </section>
 
         <style>{`
           @media print {
