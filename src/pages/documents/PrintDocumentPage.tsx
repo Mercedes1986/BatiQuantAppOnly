@@ -7,9 +7,13 @@ import { getQuote, getInvoice, getCompanyProfile } from "../../services/document
 import { BaseDocument, CompanyProfile } from "../../types";
 import { localizeLegacyText } from "../../constants";
 
-const localizeLegacyLineDescription = (description: string) => localizeLegacyText(String(description || ""));
+const localizeLegacyLineDescription = (description: string) =>
+  localizeLegacyText(String(description || ""));
 
-const localizeLegacyNotes = (notes: string | undefined, t: (key: string, options?: any) => string) => {
+const localizeLegacyNotes = (
+  notes: string | undefined,
+  t: (key: string, options?: any) => string,
+) => {
   if (!notes) return "";
 
   const pairs: Array<[string, string]> = [
@@ -34,7 +38,8 @@ const localizeLegacyNotes = (notes: string | undefined, t: (key: string, options
     [
       "Waterproofing should go on a clean, dry surface — and protect it with a drainage membrane.",
       t("tips.substructure.1", {
-        defaultValue: "Waterproofing should go on a clean, dry surface — and protect it with a drainage membrane.",
+        defaultValue:
+          "Waterproofing should go on a clean, dry surface — and protect it with a drainage membrane.",
       }),
     ],
     [
@@ -46,13 +51,15 @@ const localizeLegacyNotes = (notes: string | undefined, t: (key: string, options
     [
       "On shuttering blocks, calculate fill concrete separately — it depends on the block type.",
       t("tips.substructure.3", {
-        defaultValue: "On shuttering blocks, calculate fill concrete separately — it depends on the block type.",
+        defaultValue:
+          "On shuttering blocks, calculate fill concrete separately — it depends on the block type.",
       }),
     ],
     [
       "Check bond pattern and keep joints consistent to reduce waste and improve alignment.",
       t("tips.walls.1", {
-        defaultValue: "Check bond pattern and keep joints consistent to reduce waste and improve alignment.",
+        defaultValue:
+          "Check bond pattern and keep joints consistent to reduce waste and improve alignment.",
       }),
     ],
     [
@@ -70,7 +77,8 @@ const localizeLegacyNotes = (notes: string | undefined, t: (key: string, options
     [
       "Compact in layers: most outdoor failures come from insufficient base preparation.",
       t("tips.exterior.1", {
-        defaultValue: "Compact in layers: most outdoor failures come from insufficient base preparation.",
+        defaultValue:
+          "Compact in layers: most outdoor failures come from insufficient base preparation.",
       }),
     ],
     [
@@ -85,7 +93,6 @@ const localizeLegacyNotes = (notes: string | undefined, t: (key: string, options
   for (const [src, localized] of pairs) {
     value = value.split(src).join(localized);
   }
-
   return value;
 };
 
@@ -96,7 +103,6 @@ export const PrintDocumentPage: React.FC = () => {
 
   const [doc] = useState<BaseDocument | null>(() => {
     if (!id || !type) return null;
-
     const found = type === "quote" ? getQuote(id) : getInvoice(id);
     return (found ?? null) as BaseDocument | null;
   });
@@ -149,9 +155,22 @@ export const PrintDocumentPage: React.FC = () => {
   const vatPct = localizedDoc.totalHT > 0 ? (localizedDoc.totalVAT / localizedDoc.totalHT) * 100 : 0;
 
   return (
-    <div className="app-shell app-shell--projects min-h-full print:bg-white">
-      <div className="page-narrow safe-bottom-pad max-w-[210mm] space-y-4 print:max-w-none print:px-0 print:pb-0">
-        <section className="no-print glass-panel rounded-[28px] px-4 py-3 shadow-sm sm:px-5">
+    <div
+      className="bg-[linear-gradient(180deg,#cfd7ff_0%,#eef2ff_28%,#f8fafc_100%)] print:bg-white"
+      style={{
+        paddingTop: "calc(var(--app-top-gap, 18px) + 8px)",
+        paddingRight: "12px",
+        paddingBottom: "calc(var(--bottom-nav-space, 96px) + 12px)",
+        paddingLeft: "12px",
+      }}
+    >
+      <div
+        className="mx-auto flex max-w-[210mm] min-h-0 flex-col print:block"
+        style={{
+          height: "calc(100dvh - var(--app-top-gap, 18px) - var(--bottom-nav-space, 96px) - 20px)",
+        }}
+      >
+        <div className="no-print mb-3 rounded-[28px] border border-white/50 bg-white/72 p-3 shadow-sm backdrop-blur-md">
           <div className="flex items-center justify-between gap-3">
             <button
               type="button"
@@ -171,9 +190,15 @@ export const PrintDocumentPage: React.FC = () => {
               {t("common.print", { defaultValue: "Imprimer" })}
             </button>
           </div>
-        </section>
+        </div>
 
-        <section className="rounded-[28px] border border-slate-200 bg-white p-5 font-sans text-slate-900 shadow-sm print:rounded-none print:border-0 print:p-0 print:shadow-none md:p-8">
+        <div
+          className="min-h-0 flex-1 overflow-y-auto overscroll-contain rounded-[30px] border border-white/60 bg-white p-5 font-sans text-slate-900 shadow-sm print:h-auto print:overflow-visible print:rounded-none print:border-0 print:bg-white print:p-0 print:shadow-none md:p-8"
+          style={{
+            WebkitOverflowScrolling: "touch",
+            touchAction: "pan-y",
+          }}
+        >
           <div className="mb-10 flex flex-col gap-6 border-b border-slate-100 pb-8 md:mb-12 md:flex-row md:items-start md:justify-between">
             <div className="flex-1 md:pr-8">
               {company.logoUrl ? (
@@ -189,7 +214,9 @@ export const PrintDocumentPage: React.FC = () => {
               )}
 
               <div className="space-y-1 text-xs leading-snug text-slate-600 md:text-sm">
-                {company.logoUrl && <p className="mb-1 text-base font-bold text-slate-800 md:text-lg">{company.name}</p>}
+                {company.logoUrl && (
+                  <p className="mb-1 text-base font-bold text-slate-800 md:text-lg">{company.name}</p>
+                )}
                 <p>{company.address}</p>
                 <p>
                   {company.zip} {company.city}
@@ -306,7 +333,9 @@ export const PrintDocumentPage: React.FC = () => {
                       {line.unitPrice !== 0 ? `${Number(line.unitPrice).toFixed(2)} €` : ""}
                     </td>
                     <td className="py-3 pl-4 text-right align-top font-bold text-slate-800">
-                      {line.unitPrice !== 0 ? `${(Number(line.quantity) * Number(line.unitPrice)).toFixed(2)} €` : ""}
+                      {line.unitPrice !== 0
+                        ? `${(Number(line.quantity) * Number(line.unitPrice)).toFixed(2)} €`
+                        : ""}
                     </td>
                   </tr>
                 ))}
@@ -330,12 +359,14 @@ export const PrintDocumentPage: React.FC = () => {
                 <span className="text-base font-bold text-slate-800">
                   {t("doc.net_to_pay", { defaultValue: "NET À PAYER" })}
                 </span>
-                <span className="text-2xl font-bold text-blue-600">{localizedDoc.totalTTC.toFixed(2)} €</span>
+                <span className="text-2xl font-bold text-blue-600">
+                  {localizedDoc.totalTTC.toFixed(2)} €
+                </span>
               </div>
             </div>
           </div>
 
-          <div className="mt-auto break-inside-avoid border-t border-slate-200 pt-8 text-xs text-slate-500">
+          <div className="break-inside-avoid border-t border-slate-200 pt-8 text-xs text-slate-500">
             {localizedDoc.notes ? (
               <div className="mb-6 rounded-lg border border-slate-100 bg-slate-50 p-4">
                 <p className="mb-1 font-bold text-slate-700">
@@ -354,7 +385,7 @@ export const PrintDocumentPage: React.FC = () => {
               </div>
             ) : null}
 
-            <div className="space-y-1 text-center">
+            <div className="space-y-1 pb-4 text-center">
               <p className="font-bold text-slate-700">{company.name}</p>
               <p className="text-[10px] uppercase tracking-wide">
                 {company.footerNote || `SIRET ${company.siret} - ${company.address} ${company.city}`}
@@ -364,7 +395,7 @@ export const PrintDocumentPage: React.FC = () => {
               </p>
             </div>
           </div>
-        </section>
+        </div>
 
         <style>{`
           @media print {
