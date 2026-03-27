@@ -226,7 +226,7 @@ export const HouseProjectPage: React.FC = () => {
 
     return (
       <div className="app-shell app-shell--house min-h-full bg-transparent safe-bottom-offset">
-        <div className="sticky top-0 z-20 border-b border-slate-200/80 bg-white/80 backdrop-blur-xl shadow-sm">
+        <div className="safe-top-header sticky top-safe-offset z-20 border-b border-slate-200/80 bg-white/80 backdrop-blur-xl shadow-sm">
           <div className="p-4 flex items-center justify-between">
             <button
               onClick={closeProject}

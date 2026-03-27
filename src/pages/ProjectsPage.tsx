@@ -126,7 +126,7 @@ export const ProjectsPage: React.FC = () => {
 
     return (
       <div className="relative min-h-full bg-transparent safe-bottom-offset">
-        <div className="sticky top-0 z-30 border-b border-slate-200/80 bg-white/80 shadow-sm backdrop-blur-xl no-print">
+        <div className="safe-top-header sticky top-safe-offset z-30 border-b border-slate-200/80 bg-white/80 shadow-sm backdrop-blur-xl no-print">
           <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3">
             <button
               onClick={closeProject}

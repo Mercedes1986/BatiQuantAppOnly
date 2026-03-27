@@ -218,7 +218,7 @@ input:-webkit-autofill:active {
   --app-safe-right: var(--safe-area-inset-right, env(safe-area-inset-right, 0px));
   --app-safe-bottom: var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px));
   --app-safe-left: var(--safe-area-inset-left, env(safe-area-inset-left, 0px));
-  --app-top-gap: max(12px, var(--app-safe-top));
+  --app-top-gap: max(16px, var(--app-safe-top));
   --bottom-nav-height: 84px;
   --native-banner-space: 0px;
   --bottom-nav-space: calc(var(--bottom-nav-height) + var(--app-safe-bottom) + 8px + var(--native-banner-space));
@@ -240,11 +240,11 @@ body {
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
-  padding-top: var(--app-top-gap);
+  padding-top: calc(var(--app-top-gap) + 4px);
   padding-bottom: 18px;
   padding-left: max(0px, var(--app-safe-left));
   padding-right: max(0px, var(--app-safe-right));
-  scroll-padding-top: calc(var(--app-top-gap) + 12px);
+  scroll-padding-top: calc(var(--app-top-gap) + 20px);
 }
 
 .app-bottom-nav-host {
@@ -261,7 +261,7 @@ body {
 }
 
 .safe-top-offset {
-  padding-top: calc(var(--app-top-gap) + 8px);
+  padding-top: calc(var(--app-top-gap) + 12px);
 }
 
 .safe-bottom-offset {

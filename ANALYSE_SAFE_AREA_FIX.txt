@@ -1,0 +1,13 @@
+Correctif global safe area Android.
+
+But:
+- empêcher le contenu de passer sous la barre système Android
+- descendre les headers sticky sous la barre d'heure/batterie
+- garder un déploiement identique sur les autres pages
+
+Actions:
+1. MainActivity.java : force decor fits system windows + WebView fitsSystemWindows.
+2. activity_main.xml : root et WebView marqués fitsSystemWindows.
+3. index.css : top gap global renforcé + scroll padding ajusté.
+4. Headers sticky : migration de top-0 vers safe-top-header + top-safe-offset sur les pages concernées.
+5. PrintDocumentPage : padding top interne simplifié pour éviter le conflit avec safe-area Android.

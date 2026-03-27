@@ -245,7 +245,7 @@ export const MaterialsPage: React.FC = () => {
 
   return (
     <div className="safe-bottom-offset min-h-full bg-transparent">
-      <div className="bg-white sticky top-0 z-20 border-b border-slate-200 shadow-sm">
+      <div className="safe-top-header bg-white sticky top-safe-offset z-20 border-b border-slate-200 shadow-sm">
         <div className="p-4 max-w-7xl mx-auto">
           <div className="flex justify-between items-center gap-3 mb-4">
             <h1 className="text-2xl font-extrabold text-slate-800">

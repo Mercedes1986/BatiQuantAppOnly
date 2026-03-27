@@ -1,3 +1,8 @@
-src/main.tsx
-src/services/consentService.ts
-src/services/persistentStorage.ts
+android/app/src/main/java/com/batiquant/app/MainActivity.java
+android/app/src/main/res/layout/activity_main.xml
+src/index.css
+src/pages/ProjectsPage.tsx
+src/pages/HouseProjectPage.tsx
+src/pages/MaterialsPage.tsx
+src/pages/documents/InvoiceEditorPage.tsx
+src/pages/documents/PrintDocumentPage.tsx
