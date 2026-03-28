@@ -2034,7 +2034,13 @@
       "quote": "Devis",
       "steps": "Étapes"
     },
-    "all_quotes": "Tous les devis"
+    "all_quotes": "Tous les devis",
+    "page_heading": "Chantiers & suivi complet des estimations",
+    "saved_count": "Chantiers enregistrés",
+    "total_surface": "Surface habitable totale",
+    "total_estimated": "Total estimé",
+    "create_site_hint": "Créez un chantier pour suivre chaque étape et générer un devis complet.",
+    "empty": "Aucun chantier enregistré."
   },
   "hvac": {
     "area_placeholder": "Surface (m²)",
@@ -2486,7 +2492,9 @@
     "total_estimated": "Total estimé",
     "create_new": "Créer un calcul",
     "create_new_hint": "Choisissez un calculateur et sauvegardez le résultat ici",
-    "all_quotes": "Tous les devis"
+    "all_quotes": "Tous les devis",
+    "page_heading": "Projets & calculs enregistrés",
+    "saved_count": "Projets enregistrés"
   },
   "quote": {
     "addline": {

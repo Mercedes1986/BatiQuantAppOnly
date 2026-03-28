@@ -1956,7 +1956,13 @@
       "quote": "Quote",
       "steps": "Steps"
     },
-    "all_quotes": "All quotes"
+    "all_quotes": "All quotes",
+    "page_heading": "Sites & full estimate tracking",
+    "saved_count": "Saved sites",
+    "total_surface": "Total living area",
+    "total_estimated": "Estimated total",
+    "create_site_hint": "Create a site to track every step and generate a full quote.",
+    "empty": "No saved site yet."
   },
   "hvac": {
     "area_placeholder": "Area (m²)",
@@ -2283,7 +2289,9 @@
     "total_estimated": "Total estimated",
     "create_new": "Create a calculation",
     "create_new_hint": "Choose a calculator and save the result here",
-    "all_quotes": "All quotes"
+    "all_quotes": "All quotes",
+    "page_heading": "Projects & saved calculations",
+    "saved_count": "Saved projects"
   },
   "quote": {
     "addline": {
