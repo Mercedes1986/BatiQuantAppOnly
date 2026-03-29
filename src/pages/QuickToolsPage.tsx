@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 
 import { QuickToolsCalculator, type ToolKey } from "@/components/calculators/QuickToolsCalc";
+import AdPlacementBlock from "@/components/ads/AdPlacementBlock";
 import type { CalculationResult } from "@/types";
 
 type ToolConfig = {
@@ -243,6 +244,10 @@ export const QuickToolsPage: React.FC = () => {
               )}
             </div>
           )}
+
+          <div className="pt-2">
+            <AdPlacementBlock placement="quicktools_banner" variant="inline" minHeight={140} />
+          </div>
         </div>
       </div>
     );
@@ -281,6 +286,10 @@ export const QuickToolsPage: React.FC = () => {
               openLabel={t("menu.open", { defaultValue: "Open" })}
             />
           ))}
+        </div>
+
+        <div className="pt-2">
+          <AdPlacementBlock placement="quicktools_banner" variant="inline" minHeight={140} />
         </div>
       </div>
     </div>

@@ -3,11 +3,11 @@ import { useLocation } from "react-router-dom";
 
 import AdSlot, { type AdSlotVariant } from "./AdSlot";
 import { AD_CONFIG, getAdUnitId } from "../../config/adsConfig";
-import { getAdRenderState, hideBanner, showBanner } from "../../services/adsService";
+import { getAdLifecycleEvents, getAdRenderState, hideBanner, showBanner } from "../../services/adsService";
 import type { AdPlacement, AdSlotRenderState } from "../../types/ads";
 
 interface AdPlacementBlockProps {
-  placement: Extract<AdPlacement, "dashboard_banner" | "calculator_result_banner">;
+  placement: Exclude<AdPlacement, "calculator_interstitial">;
   variant?: AdSlotVariant;
   minHeight?: number;
   className?: string;
@@ -37,13 +37,16 @@ export const AdPlacementBlock: React.FC<AdPlacementBlockProps> = ({
 
   useEffect(() => {
     const refresh = () => setRenderState(defaultRenderState(pathname, placement));
+    const { adFreeUpdated } = getAdLifecycleEvents();
 
     window.addEventListener("consent-updated", refresh);
     window.addEventListener("batiquant-native-privacy", refresh as EventListener);
+    window.addEventListener(adFreeUpdated, refresh as EventListener);
 
     return () => {
       window.removeEventListener("consent-updated", refresh);
       window.removeEventListener("batiquant-native-privacy", refresh as EventListener);
+      window.removeEventListener(adFreeUpdated, refresh as EventListener);
     };
   }, [pathname, placement]);
 

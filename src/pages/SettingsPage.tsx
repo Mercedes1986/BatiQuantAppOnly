@@ -29,6 +29,7 @@ import {
   resetPrivacyChoices,
 } from "@/services/privacyService";
 import { exportAppData, importAppData } from "@/services/materialsService";
+import { getAdFreeEventName, hasAdFreeEntitlement } from "@/services/purchaseService";
 import { getSettings, saveSettings } from "@/services/storage";
 
 type SettingsTab = "app" | "company";
@@ -97,6 +98,7 @@ export const SettingsPage: React.FC = () => {
   const privacyPolicyPath = useMemo(() => getInAppPrivacyPolicyPath(), []);
   const helpPath = useMemo(() => getInAppHelpPath(), []);
   const privacyState = useMemo(() => getPrivacyState(), [privacyVersion]);
+  const hasNoAds = useMemo(() => hasAdFreeEntitlement(), [privacyVersion]);
 
   useEffect(() => {
     try {
@@ -109,13 +111,16 @@ export const SettingsPage: React.FC = () => {
 
   useEffect(() => {
     const refresh = () => setPrivacyVersion((current) => current + 1);
+    const adFreeEvent = getAdFreeEventName();
 
     window.addEventListener("consent-updated", refresh);
     window.addEventListener("batiquant-native-privacy", refresh as EventListener);
+    window.addEventListener(adFreeEvent, refresh as EventListener);
 
     return () => {
       window.removeEventListener("consent-updated", refresh);
       window.removeEventListener("batiquant-native-privacy", refresh as EventListener);
+      window.removeEventListener(adFreeEvent, refresh as EventListener);
     };
   }, []);
 
@@ -334,9 +339,13 @@ export const SettingsPage: React.FC = () => {
                     {t("settings.pro.title", { defaultValue: "Version Pro" })}
                   </h3>
                   <p className="text-xs text-slate-500">
-                    {t("settings.pro.subtitle", {
-                      defaultValue: "Licence active • Mode Hors-ligne",
-                    })}
+                    {hasNoAds
+                      ? t("settings.pro.ad_free_active", {
+                          defaultValue: "Licence Pro active • Publicités désactivées",
+                        })
+                      : t("settings.pro.ad_free_pending", {
+                          defaultValue: "Avec la licence Pro, les publicités sont désactivées automatiquement.",
+                        })}
                   </p>
                 </div>
               </div>
@@ -480,7 +489,11 @@ export const SettingsPage: React.FC = () => {
                       })}
                     </h3>
                     <p className="text-xs text-slate-500">
-                      {privacyState.canRequestAds
+                      {hasNoAds
+                        ? t("settings.ads.ad_free_status", {
+                            defaultValue: "La licence Pro désactive toutes les publicités dans l’application.",
+                          })
+                        : privacyState.canRequestAds
                         ? t("settings.ads.enabled_status", {
                             defaultValue: "Les demandes publicitaires sont autorisées.",
                           })
@@ -500,7 +513,11 @@ export const SettingsPage: React.FC = () => {
                     {t("settings.ads.mode", { defaultValue: "Mode actuel" })}
                   </div>
                   <p className="mt-2 text-sm text-slate-600">
-                    {privacyState.adsMode === "personalized"
+                    {hasNoAds
+                      ? t("settings.ads.ad_free_mode", {
+                          defaultValue: "Mode sans publicité actif.",
+                        })
+                      : privacyState.adsMode === "personalized"
                       ? t("settings.ads.personalized_status", {
                           defaultValue: "Annonces personnalisées autorisées.",
                         })
@@ -528,6 +545,13 @@ export const SettingsPage: React.FC = () => {
                     {t("settings.ads.actions", { defaultValue: "Actions" })}
                   </div>
                   <div className="mt-3 grid gap-2">
+                    {!hasNoAds ? (
+                      <p className="rounded-xl border border-blue-100 bg-blue-50 px-3 py-2 text-xs font-medium text-blue-800">
+                        {t("settings.ads.remove_ads_hint", {
+                          defaultValue: "Les publicités se désactivent automatiquement après l’achat ou la restauration d’une licence Pro.",
+                        })}
+                      </p>
+                    ) : null}
                     <button
                       type="button"
                       onClick={handleOpenPrivacyOptions}

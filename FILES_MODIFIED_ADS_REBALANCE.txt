@@ -1,0 +1,12 @@
+src/services/purchaseService.ts
+src/types/ads.ts
+src/config/adsConfig.ts
+src/services/adsService.ts
+src/components/ads/AdPlacementBlock.tsx
+src/pages/ProjectsPage.tsx
+src/pages/HouseProjectPage.tsx
+src/pages/MaterialsPage.tsx
+src/pages/QuickToolsPage.tsx
+src/pages/SettingsPage.tsx
+src/i18n/locales/en.json
+src/i18n/locales/fr.json

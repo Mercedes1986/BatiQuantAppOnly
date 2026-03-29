@@ -23,9 +23,15 @@ export const AD_CONFIG = {
   MOBILE_APP_ID_IOS: String(env.VITE_ADMOB_APP_ID_IOS || "").trim(),
   UNITS: {
     dashboard_banner: String(env.VITE_ADMOB_BANNER_HOME || "").trim(),
-    calculator_result_banner: String(env.VITE_ADMOB_BANNER_RESULT || "").trim(),
+    projects_banner: String(env.VITE_ADMOB_BANNER_PROJECTS || env.VITE_ADMOB_BANNER_HOME || "").trim(),
+    house_banner: String(env.VITE_ADMOB_BANNER_HOUSE || env.VITE_ADMOB_BANNER_HOME || "").trim(),
+    materials_banner: String(env.VITE_ADMOB_BANNER_MATERIALS || env.VITE_ADMOB_BANNER_HOME || "").trim(),
+    quicktools_banner: String(env.VITE_ADMOB_BANNER_QUICKTOOLS || env.VITE_ADMOB_BANNER_HOME || "").trim(),
+    calculator_result_banner: String(env.VITE_ADMOB_BANNER_RESULT || env.VITE_ADMOB_BANNER_HOME || "").trim(),
     calculator_interstitial: String(env.VITE_ADMOB_INTERSTITIAL_CALC_DONE || "").trim(),
   } as Record<AdPlacement, string>,
+  INTERSTITIAL_COOLDOWN_MS: Number(env.VITE_ADMOB_INTERSTITIAL_COOLDOWN_MS || 180000),
+  INTERSTITIAL_EVERY_N_RESULTS: Math.max(3, Number(env.VITE_ADMOB_INTERSTITIAL_EVERY_N_RESULTS || 4)),
   DENY_LIST: ["/app/settings", "/app/quotes", "/app/invoices", "/app/print"],
   SAFE_ROUTES: [
     "/app",

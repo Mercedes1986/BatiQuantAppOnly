@@ -2575,7 +2575,9 @@
     "invalid_backup": "Sauvegarde invalide",
     "pro": {
       "subtitle": "Débloquez des fonctionnalités avancées.",
-      "title": "Pro"
+      "title": "Pro",
+      "ad_free_active": "Licence Pro active • Publicités désactivées",
+      "ad_free_pending": "Avec la licence Pro, les publicités sont désactivées automatiquement."
     },
     "restore_ok": "Restauration réussie",
     "support": {
@@ -2599,7 +2601,10 @@
       "actions": "Actions",
       "manage_choices": "Gérer mes choix publicitaires",
       "reset_choices": "Réinitialiser mes choix",
-      "reset_confirm": "Réinitialiser vos choix publicitaires et de confidentialité ?"
+      "reset_confirm": "Réinitialiser vos choix publicitaires et de confidentialité ?",
+      "ad_free_status": "La licence Pro désactive toutes les publicités dans l’application.",
+      "ad_free_mode": "Mode sans publicité actif.",
+      "remove_ads_hint": "Les publicités se désactivent automatiquement après l’achat ou la restauration d’une licence Pro."
     }
   },
   "tutorial_auth": {

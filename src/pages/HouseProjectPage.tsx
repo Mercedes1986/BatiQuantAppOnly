@@ -32,6 +32,7 @@ import { createQuoteFromProject } from "@/services/documentLogic";
 import { getCompanyProfile, getQuotes } from "@/services/documentsStorage";
 import { ClientModal } from "@/components/documents/ClientModal";
 import { useTranslation } from "react-i18next";
+import AdPlacementBlock from "@/components/ads/AdPlacementBlock";
 
 /**
  * Update goals:
@@ -789,6 +790,10 @@ export const HouseProjectPage: React.FC = () => {
             })}
           </div>
         )}
+
+        <div className="pt-2">
+          <AdPlacementBlock placement="house_banner" variant="inline" minHeight={140} />
+        </div>
       </div>
     </div>
   );

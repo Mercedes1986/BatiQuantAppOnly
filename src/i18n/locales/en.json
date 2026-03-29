@@ -2372,7 +2372,9 @@
     "invalid_backup": "Invalid backup",
     "pro": {
       "subtitle": "Unlock advanced features.",
-      "title": "Pro"
+      "title": "Pro",
+      "ad_free_active": "Pro license active • Ads disabled",
+      "ad_free_pending": "With the Pro license, ads are disabled automatically."
     },
     "restore_ok": "Restore successful",
     "support": {
@@ -2396,7 +2398,10 @@
       "actions": "Actions",
       "manage_choices": "Manage my ad choices",
       "reset_choices": "Reset my choices",
-      "reset_confirm": "Reset your advertising and privacy choices?"
+      "reset_confirm": "Reset your advertising and privacy choices?",
+      "ad_free_status": "The Pro license disables all ads in the app.",
+      "ad_free_mode": "Ad-free mode is active.",
+      "remove_ads_hint": "Ads are automatically disabled after purchasing or restoring a Pro license."
     }
   },
   "tutorial_auth": {

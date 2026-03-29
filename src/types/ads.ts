@@ -1,6 +1,10 @@
 export type AdPlatform = "none" | "web" | "mobile";
 export type AdPlacement =
   | "dashboard_banner"
+  | "projects_banner"
+  | "house_banner"
+  | "materials_banner"
+  | "quicktools_banner"
   | "calculator_result_banner"
   | "calculator_interstitial";
 
@@ -27,5 +31,12 @@ export interface AdSlotRenderState {
 
 export interface AdInterstitialResult {
   shown: boolean;
-  reason: "disabled" | "not-ready" | "bridge-missing" | "shown";
+  reason:
+    | "disabled"
+    | "ad-free"
+    | "not-ready"
+    | "bridge-missing"
+    | "cooldown"
+    | "frequency-capped"
+    | "shown";
 }

@@ -20,6 +20,7 @@ import { createQuoteFromSimpleProject } from "../services/documentLogic";
 import { getCompanyProfile } from "../services/documentsStorage";
 import { Project, ClientInfo } from "../types";
 import { ClientModal } from "../components/documents/ClientModal";
+import AdPlacementBlock from "../components/ads/AdPlacementBlock";
 
 const CHART_COLORS = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6"] as const;
 
@@ -428,6 +429,10 @@ export const ProjectsPage: React.FC = () => {
             })}
           </div>
         )}
+
+        <div className="pt-2">
+          <AdPlacementBlock placement="projects_banner" variant="inline" minHeight={140} />
+        </div>
       </div>
     </div>
   );
