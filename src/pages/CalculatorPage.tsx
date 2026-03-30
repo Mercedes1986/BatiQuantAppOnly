@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   AlertTriangle,
@@ -94,7 +94,7 @@ export const CalculatorPage: React.FC<Props> = ({ type, onBack, onNavigateProjec
     [i18n.language],
   );
 
-  const handleCalculated = async (nextResult: CalculationResult) => {
+  const handleCalculated = useCallback(async (nextResult: CalculationResult) => {
     const sequence = ++calculationSequenceRef.current;
 
     const resultKey = JSON.stringify({
@@ -108,7 +108,7 @@ export const CalculatorPage: React.FC<Props> = ({ type, onBack, onNavigateProjec
 
     if (sequence !== calculationSequenceRef.current) return;
     setResult(nextResult);
-  };
+  }, [type]);
 
   if (!config) {
     return (

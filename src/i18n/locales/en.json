@@ -70,7 +70,8 @@
     "projects": "Projects",
     "materials": "Materials",
     "settings": "Settings",
-    "quick_tools": "Express"
+    "quick_tools": "Express",
+    "calculators": "Calculators"
   },
   "struct": {
     "tabs": {

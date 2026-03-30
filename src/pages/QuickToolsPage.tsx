@@ -144,6 +144,9 @@ export const QuickToolsPage: React.FC = () => {
   const { tool } = useParams<{ tool?: string }>();
 
   const [result, setResult] = React.useState<CalculationResult | null>(null);
+  const handleCalculated = React.useCallback((nextResult: CalculationResult) => {
+    setResult(nextResult);
+  }, []);
 
   const tools = React.useMemo(() => getToolConfigs(t), [t]);
   const activeTool = tools.find((item) => item.key === tool);
@@ -192,7 +195,7 @@ export const QuickToolsPage: React.FC = () => {
           </section>
 
           <section className="app-card rounded-[30px] p-4 sm:p-5">
-            <QuickToolsCalculator onCalculate={setResult} forcedTool={activeTool.key} hideToolSelector />
+            <QuickToolsCalculator onCalculate={handleCalculated} forcedTool={activeTool.key} hideToolSelector />
           </section>
 
           {result && (

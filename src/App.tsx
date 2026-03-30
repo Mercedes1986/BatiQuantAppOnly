@@ -1,5 +1,5 @@
 // src/App.tsx
-import React, { useEffect, useMemo, useState, Suspense } from "react";
+import React, { useCallback, useEffect, useMemo, useState, Suspense } from "react";
 import {
   BrowserRouter,
   Routes,
@@ -212,6 +212,9 @@ const ProjectCalculatorWrapper: React.FC = () => {
 
   const [project, setProject] = useState<HouseProject | null>(null);
   const [result, setResult] = useState<any>(null);
+  const handleProjectCalculated = useCallback((nextResult: any) => {
+    setResult(nextResult);
+  }, []);
 
   useEffect(() => {
     if (!projectId) return;
@@ -300,7 +303,7 @@ const ProjectCalculatorWrapper: React.FC = () => {
 
   const renderCalculator = () => {
     const props = {
-      onCalculate: setResult,
+      onCalculate: handleProjectCalculated,
       initialArea: project?.params.surfaceArea,
       initialPerimeter: project?.params.perimeter,
     };
@@ -539,7 +542,7 @@ const AppLayout = () => {
 
     if (tab === "menu") navigate("/app/menu");
     if (tab === "quick-tools") navigate("/app/quick-tools");
-    if (tab === "projects") navigate("/app/projects");
+    if (tab === "projects") navigate("/app/calculators");
     if (tab === "house") navigate("/app/house");
     if (tab === "materials") navigate("/app/materials");
   };

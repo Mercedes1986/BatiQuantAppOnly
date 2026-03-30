@@ -70,7 +70,8 @@
     "projects": "Projets",
     "materials": "Matériaux",
     "settings": "Réglages",
-    "quick_tools": "Express"
+    "quick_tools": "Express",
+    "calculators": "Calculs"
   },
   "menu": {
     "title": "Tableau de bord chantier",

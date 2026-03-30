@@ -27,9 +27,5 @@ if (!rootElement) throw new Error("Root element #root not found");
     // ignore storage bootstrap failures and continue booting the app
   }
 
-  ReactDOM.createRoot(rootElement).render(
-    <React.StrictMode>
-      <App />
-    </React.StrictMode>
-  );
+  ReactDOM.createRoot(rootElement).render(<App />);
 })();

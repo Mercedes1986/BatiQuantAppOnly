@@ -20,7 +20,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, onChange }) =>
     () => [
       { id: "menu", icon: LayoutGrid, label: t("nav.menu", { defaultValue: "Home" }) },
       { id: "quick-tools", icon: Calculator, label: t("nav.quick_tools", { defaultValue: "Express" }) },
-      { id: "projects", icon: FolderOpen, label: t("nav.projects", { defaultValue: "Projects" }) },
+      { id: "projects", icon: FolderOpen, label: t("nav.calculators", { defaultValue: "Calculators" }) },
       { id: "house", icon: Hammer, label: t("nav.site", { defaultValue: "Site" }) },
       { id: "materials", icon: Package, label: t("nav.materials", { defaultValue: "Materials" }) },
     ],
