@@ -38,7 +38,9 @@
     "waste_plus": "Pertes +",
     "back_to_quote": "Retour au devis",
     "open": "Ouvrir",
-    "total": "Total"
+    "total": "Total",
+    "email": "Envoyer par mail",
+    "download": "Télécharger"
   },
   "calculator": {
     "open": "Ouvrir le calculateur",
@@ -1854,7 +1856,13 @@
     "total_ttc": "Total TTC",
     "valid_until": "Valable jusqu’au",
     "vat": "TVA",
-    "terms_conditions": "Conditions générales"
+    "terms_conditions": "Conditions générales",
+    "print_opened": "Fenêtre d’impression ouverte.",
+    "share_opened": "Partage ouvert.",
+    "email_opened": "Préparation de l’e-mail ouverte.",
+    "download_saved": "Document enregistré sur votre appareil.",
+    "share_copied": "Texte du document copié. Vous pouvez maintenant le coller où vous voulez.",
+    "action_failed": "Action indisponible sur cet appareil."
   },
   "errors": {
     "generic_hint": "Réessayez ou contactez le support si le problème persiste.",

@@ -38,7 +38,9 @@
     "waste_plus": "Waste +",
     "back_to_quote": "Back to quote",
     "open": "Open",
-    "total": "Total"
+    "total": "Total",
+    "email": "Email",
+    "download": "Download"
   },
   "calculator": {
     "open": "Open calculator",
@@ -1776,7 +1778,13 @@
     "total_ttc": "Total (incl. tax)",
     "valid_until": "Valid until",
     "vat": "VAT",
-    "terms_conditions": "Terms and conditions"
+    "terms_conditions": "Terms and conditions",
+    "print_opened": "Print window opened.",
+    "share_opened": "Share sheet opened.",
+    "email_opened": "Email composer opened.",
+    "download_saved": "Document saved on your device.",
+    "share_copied": "Document text copied. You can now paste it anywhere.",
+    "action_failed": "Action unavailable on this device."
   },
   "errors": {
     "generic_hint": "Please try again or contact support if the issue persists.",

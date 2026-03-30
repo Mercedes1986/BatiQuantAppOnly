@@ -10,6 +10,16 @@ declare global {
       openPrivacyOptions?: () => Promise<void> | void;
       canRequestAds?: () => Promise<boolean> | boolean;
       privacyOptionsRequired?: () => Promise<boolean> | boolean;
+      printHtmlDocument?: (jobName: string, html: string) => Promise<boolean> | boolean;
+      shareHtmlDocument?: (title: string, fileName: string, html: string) => Promise<boolean> | boolean;
+      emailHtmlDocument?: (
+        to: string,
+        subject: string,
+        body: string,
+        fileName: string,
+        html: string,
+      ) => Promise<boolean> | boolean;
+      downloadHtmlDocument?: (fileName: string, html: string) => Promise<boolean> | boolean;
     };
   }
 }
