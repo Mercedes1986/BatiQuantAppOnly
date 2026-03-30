@@ -187,6 +187,7 @@ const buildDocumentHtml = (
     generatedBy: string;
     numberPrefix: string;
   },
+  langCode: string,
 ) => {
   const vatPct = doc.totalHT > 0 ? (doc.totalVAT / doc.totalHT) * 100 : 0;
   const issueDate = safeDate(doc.date);
@@ -232,7 +233,7 @@ const buildDocumentHtml = (
     : "";
 
   return `<!DOCTYPE html>
-<html lang="fr">
+<html lang="${escapeHtml(langCode)}">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -360,7 +361,7 @@ const buildDocumentHtml = (
 };
 
 export const PrintDocumentPage: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const { type, id } = useParams<{ type: string; id: string }>();
   const [actionMessage, setActionMessage] = useState<string | null>(null);
@@ -437,8 +438,8 @@ export const PrintDocumentPage: React.FC = () => {
 
   const htmlContent = useMemo(() => {
     if (!localizedDoc || !company) return "";
-    return buildDocumentHtml(localizedDoc, company, labels);
-  }, [company, labels, localizedDoc]);
+    return buildDocumentHtml(localizedDoc, company, labels, i18n.resolvedLanguage || i18n.language || "fr");
+  }, [company, i18n.language, i18n.resolvedLanguage, labels, localizedDoc]);
 
   const textContent = useMemo(() => {
     if (!localizedDoc || !company) return "";
@@ -467,6 +468,12 @@ export const PrintDocumentPage: React.FC = () => {
   }, [company, docTitle, localizedDoc]);
 
   const nativeBridge = getNativeAdsBridge();
+  const hasNativeDocumentActions = Boolean(
+    nativeBridge?.printHtmlDocument ||
+      nativeBridge?.shareHtmlDocument ||
+      nativeBridge?.emailHtmlDocument ||
+      nativeBridge?.downloadHtmlDocument,
+  );
 
   const handlePrint = () => {
     if (!localizedDoc || !company) return;
@@ -641,7 +648,7 @@ export const PrintDocumentPage: React.FC = () => {
                 className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-bold text-slate-700 transition-colors hover:border-blue-200 hover:text-blue-700"
               >
                 <Mail size={16} />
-                {t("common.email", { defaultValue: "Envoyer par mail" })}
+                {t("common.send_email", { defaultValue: "Envoyer par e-mail" })}
               </button>
 
               <button
@@ -667,6 +674,15 @@ export const PrintDocumentPage: React.FC = () => {
           {actionMessage ? (
             <div className="mt-3 rounded-2xl border border-blue-100 bg-blue-50 px-3 py-2 text-sm font-medium text-blue-700">
               {actionMessage}
+            </div>
+          ) : null}
+
+          {hasNativeDocumentActions ? (
+            <div className="mt-3 rounded-2xl border border-amber-100 bg-amber-50 px-3 py-2 text-xs font-medium text-amber-800">
+              {t("doc.native_actions_hint", {
+                defaultValue:
+                  "Les écrans Android d’impression et de partage utilisent la langue du téléphone et se ferment avec le bouton retour du téléphone.",
+              })}
             </div>
           ) : null}
         </div>

@@ -39,8 +39,9 @@
     "back_to_quote": "Back to quote",
     "open": "Open",
     "total": "Total",
+    "download": "Download",
     "email": "Email",
-    "download": "Download"
+    "send_email": "Send by email"
   },
   "calculator": {
     "open": "Open calculator",
@@ -1783,8 +1784,9 @@
     "share_opened": "Share sheet opened.",
     "email_opened": "Email composer opened.",
     "download_saved": "Document saved on your device.",
-    "share_copied": "Document text copied. You can now paste it anywhere.",
-    "action_failed": "Action unavailable on this device."
+    "share_copied": "Document text copied. You can now paste it where you want.",
+    "action_failed": "Action unavailable on this device.",
+    "native_actions_hint": "Android print and share screens use the phone language and close with the phone back button."
   },
   "errors": {
     "generic_hint": "Please try again or contact support if the issue persists.",

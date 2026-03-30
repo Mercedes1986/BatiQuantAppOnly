@@ -39,8 +39,9 @@
     "back_to_quote": "Retour au devis",
     "open": "Ouvrir",
     "total": "Total",
-    "email": "Envoyer par mail",
-    "download": "Télécharger"
+    "download": "Télécharger",
+    "email": "E-mail",
+    "send_email": "Envoyer par e-mail"
   },
   "calculator": {
     "open": "Ouvrir le calculateur",
@@ -1857,12 +1858,13 @@
     "valid_until": "Valable jusqu’au",
     "vat": "TVA",
     "terms_conditions": "Conditions générales",
-    "print_opened": "Fenêtre d’impression ouverte.",
+    "print_opened": "Fenêtre d'impression ouverte.",
     "share_opened": "Partage ouvert.",
     "email_opened": "Préparation de l’e-mail ouverte.",
     "download_saved": "Document enregistré sur votre appareil.",
     "share_copied": "Texte du document copié. Vous pouvez maintenant le coller où vous voulez.",
-    "action_failed": "Action indisponible sur cet appareil."
+    "action_failed": "Action indisponible sur cet appareil.",
+    "native_actions_hint": "Les écrans Android d’impression et de partage utilisent la langue du téléphone et se ferment avec le bouton retour du téléphone."
   },
   "errors": {
     "generic_hint": "Réessayez ou contactez le support si le problème persiste.",
