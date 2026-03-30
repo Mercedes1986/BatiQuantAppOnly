@@ -11,7 +11,7 @@ import {
   FileStack,
   BarChart3,
 } from "lucide-react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import { deleteProject, getProjects, onProjectsChanged } from "../services/storage";
@@ -36,21 +36,22 @@ const toSafeNumber = (value: unknown): number => {
   return Number.isFinite(parsed) ? parsed : 0;
 };
 
-const getProjectTotal = (project: Project | null | undefined): number =>
-  Array.isArray(project?.items)
-    ? project.items.reduce((sum, item) => sum + toSafeNumber(item?.totalPrice), 0)
-    : 0;
+const getSafeItems = (project: Project | null | undefined): Project["items"] =>
+  Array.isArray(project?.items) ? project.items : [];
 
-const getItemCount = (project: Project | null | undefined): number =>
-  Array.isArray(project?.items) ? project.items.length : 0;
+const getProjectTotal = (project: Project | null | undefined): number =>
+  getSafeItems(project).reduce((sum, item) => sum + toSafeNumber(item?.totalPrice), 0);
+
+const getItemCount = (project: Project | null | undefined): number => getSafeItems(project).length;
 
 const getProjectBreakdown = (project: Project | null | undefined) => {
-  if (!project?.items?.length) return [];
+  const items = getSafeItems(project);
+  if (items.length === 0) return [];
 
   const total = getProjectTotal(project);
   if (total <= 0) return [];
 
-  return project.items
+  return items
     .map((item) => ({
       id: item.id,
       name: item.name || "Item",
@@ -78,12 +79,10 @@ const formatProjectDate = (value: string, locale?: string): string => {
 export const ProjectsPage: React.FC = () => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useSearchParams();
 
   const [projects, setProjects] = useState<Project[]>([]);
+  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
   const [showClientModal, setShowClientModal] = useState(false);
-
-  const selectedProjectId = searchParams.get("id");
 
   const euro = useMemo(
     () =>
@@ -96,7 +95,15 @@ export const ProjectsPage: React.FC = () => {
   );
 
   useEffect(() => {
-    const refreshProjects = () => setProjects(sortProjects(getProjects()));
+    const refreshProjects = () => {
+      try {
+        setProjects(sortProjects(getProjects()));
+      } catch (error) {
+        console.error("Failed to load projects:", error);
+        setProjects([]);
+      }
+    };
+
     refreshProjects();
 
     const unsubscribe = onProjectsChanged((detail) => {
@@ -114,22 +121,24 @@ export const ProjectsPage: React.FC = () => {
   );
 
   useEffect(() => {
-    if (!selectedProjectId) return;
-    if (!selectedProject) {
-      setSearchParams({}, { replace: true });
+    if (selectedProjectId && !selectedProject) {
+      setSelectedProjectId(null);
+      setShowClientModal(false);
     }
-  }, [selectedProject, selectedProjectId, setSearchParams]);
+  }, [selectedProject, selectedProjectId]);
 
   const openProject = (project: Project) => {
-    setSearchParams({ id: project.id }, { replace: true });
+    setSelectedProjectId(project.id);
+    setShowClientModal(false);
   };
 
   const closeProject = () => {
-    setSearchParams({}, { replace: true });
+    setSelectedProjectId(null);
+    setShowClientModal(false);
   };
 
-  const handleDelete = (id: string, e: React.MouseEvent) => {
-    e.stopPropagation();
+  const handleDelete = (id: string, event: React.MouseEvent) => {
+    event.stopPropagation();
     const ok = window.confirm(
       t("projects.confirm_delete", {
         defaultValue: "Delete this project permanently?",
@@ -137,7 +146,18 @@ export const ProjectsPage: React.FC = () => {
     );
     if (!ok) return;
 
-    deleteProject(id);
+    try {
+      deleteProject(id);
+    } catch (error) {
+      console.error("Failed to delete project:", error);
+      window.alert(
+        t("projects.delete_error", {
+          defaultValue: "Unable to delete this project.",
+        })
+      );
+      return;
+    }
+
     if (selectedProject?.id === id) {
       closeProject();
     }
@@ -182,12 +202,13 @@ export const ProjectsPage: React.FC = () => {
   if (selectedProject) {
     const totalCost = getProjectTotal(selectedProject);
     const breakdown = getProjectBreakdown(selectedProject);
+    const items = getSafeItems(selectedProject);
 
     return (
       <div className="app-shell app-shell--projects min-h-full bg-transparent safe-bottom-offset">
         <div className="page-narrow space-y-4">
-          <div className="no-print sticky top-0 z-30">
-            <section className="glass-panel rounded-[30px] px-4 py-3 shadow-sm backdrop-blur-xl sm:px-5">
+          <div className="no-print">
+            <section className="glass-panel rounded-[30px] px-4 py-3 shadow-sm sm:px-5">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <button
                   onClick={closeProject}
@@ -275,8 +296,8 @@ export const ProjectsPage: React.FC = () => {
                 </h2>
 
                 <ul className="space-y-3">
-                  {selectedProject.items.length > 0 ? (
-                    selectedProject.items.map((item) => (
+                  {items.length > 0 ? (
+                    items.map((item) => (
                       <li
                         key={item.id}
                         className="flex items-center justify-between gap-3 rounded-2xl border border-slate-200/80 bg-white/85 p-3.5 print:border-slate-300"
