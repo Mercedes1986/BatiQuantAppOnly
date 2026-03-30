@@ -3,28 +3,77 @@ import {
   Trash2,
   Printer,
   ChevronRight,
-  PieChart,
   FileText,
   FolderOpen,
   Plus,
   Calculator,
   Package,
   FileStack,
+  BarChart3,
 } from "lucide-react";
-import { PieChart as RePieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
-import { getProjects, deleteProject } from "../services/storage";
+import { deleteProject, getProjects, onProjectsChanged } from "../services/storage";
 import { createQuoteFromSimpleProject } from "../services/documentLogic";
 import { getCompanyProfile } from "../services/documentsStorage";
-import { Project, ClientInfo } from "../types";
+import type { ClientInfo, Project } from "../types";
 import { ClientModal } from "../components/documents/ClientModal";
 
-const CHART_COLORS = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6"] as const;
+const CHART_COLORS = [
+  "bg-blue-500",
+  "bg-emerald-500",
+  "bg-amber-500",
+  "bg-rose-500",
+  "bg-violet-500",
+] as const;
 
 const sortProjects = (items: Project[]) =>
   [...items].sort((a, b) => new Date(b.date || 0).getTime() - new Date(a.date || 0).getTime());
+
+const toSafeNumber = (value: unknown): number => {
+  const parsed = typeof value === "number" ? value : Number(value);
+  return Number.isFinite(parsed) ? parsed : 0;
+};
+
+const getProjectTotal = (project: Project | null | undefined): number =>
+  Array.isArray(project?.items)
+    ? project.items.reduce((sum, item) => sum + toSafeNumber(item?.totalPrice), 0)
+    : 0;
+
+const getItemCount = (project: Project | null | undefined): number =>
+  Array.isArray(project?.items) ? project.items.length : 0;
+
+const getProjectBreakdown = (project: Project | null | undefined) => {
+  if (!project?.items?.length) return [];
+
+  const total = getProjectTotal(project);
+  if (total <= 0) return [];
+
+  return project.items
+    .map((item) => ({
+      id: item.id,
+      name: item.name || "Item",
+      value: Math.max(0, toSafeNumber(item.totalPrice)),
+      quantity: toSafeNumber(item.quantity),
+      unit: item.unit || "",
+      unitPrice: Math.max(0, toSafeNumber(item.unitPrice)),
+    }))
+    .filter((item) => item.value > 0)
+    .sort((a, b) => b.value - a.value)
+    .slice(0, 6)
+    .map((item, index) => ({
+      ...item,
+      ratio: Math.max(6, Math.round((item.value / total) * 100)),
+      tone: CHART_COLORS[index % CHART_COLORS.length],
+    }));
+};
+
+const formatProjectDate = (value: string, locale?: string): string => {
+  const parsed = Date.parse(value);
+  if (!Number.isFinite(parsed)) return "-";
+  return new Date(parsed).toLocaleDateString(locale || undefined);
+};
 
 export const ProjectsPage: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -32,7 +81,6 @@ export const ProjectsPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [projects, setProjects] = useState<Project[]>([]);
-  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [showClientModal, setShowClientModal] = useState(false);
 
   const selectedProjectId = searchParams.get("id");
@@ -48,22 +96,35 @@ export const ProjectsPage: React.FC = () => {
   );
 
   useEffect(() => {
-    setProjects(sortProjects(getProjects()));
-  }, [selectedProject]);
+    const refreshProjects = () => setProjects(sortProjects(getProjects()));
+    refreshProjects();
+
+    const unsubscribe = onProjectsChanged((detail) => {
+      if (detail.key === "projects") {
+        refreshProjects();
+      }
+    });
+
+    return unsubscribe;
+  }, []);
+
+  const selectedProject = useMemo(
+    () => projects.find((project) => project.id === selectedProjectId) ?? null,
+    [projects, selectedProjectId]
+  );
 
   useEffect(() => {
     if (!selectedProjectId) return;
-    const match = getProjects().find((project) => project.id === selectedProjectId);
-    if (match) setSelectedProject(match);
-  }, [selectedProjectId]);
+    if (!selectedProject) {
+      setSearchParams({}, { replace: true });
+    }
+  }, [selectedProject, selectedProjectId, setSearchParams]);
 
   const openProject = (project: Project) => {
-    setSelectedProject(project);
     setSearchParams({ id: project.id }, { replace: true });
   };
 
   const closeProject = () => {
-    setSelectedProject(null);
     setSearchParams({}, { replace: true });
   };
 
@@ -77,8 +138,9 @@ export const ProjectsPage: React.FC = () => {
     if (!ok) return;
 
     deleteProject(id);
-    setProjects(sortProjects(getProjects()));
-    if (selectedProject?.id === id) closeProject();
+    if (selectedProject?.id === id) {
+      closeProject();
+    }
   };
 
   const handlePrint = () => window.print();
@@ -107,8 +169,8 @@ export const ProjectsPage: React.FC = () => {
       const quoteId = createQuoteFromSimpleProject(selectedProject, profile, client);
       setShowClientModal(false);
       navigate(`/app/quotes/${quoteId}`);
-    } catch (e) {
-      console.error(e);
+    } catch (error) {
+      console.error(error);
       window.alert(
         t("projects.quote_error", {
           defaultValue: "Error while creating the quote.",
@@ -118,11 +180,8 @@ export const ProjectsPage: React.FC = () => {
   };
 
   if (selectedProject) {
-    const totalCost = selectedProject.items.reduce((sum, item) => sum + item.totalPrice, 0);
-    const chartData = selectedProject.items.map((item) => ({
-      name: item.name,
-      value: item.totalPrice,
-    }));
+    const totalCost = getProjectTotal(selectedProject);
+    const breakdown = getProjectBreakdown(selectedProject);
 
     return (
       <div className="app-shell app-shell--projects min-h-full bg-transparent safe-bottom-offset">
@@ -168,7 +227,7 @@ export const ProjectsPage: React.FC = () => {
                   </button>
 
                   <button
-                    onClick={(e) => handleDelete(selectedProject.id, e)}
+                    onClick={(event) => handleDelete(selectedProject.id, event)}
                     className="rounded-2xl p-2.5 text-slate-400 transition-colors hover:bg-red-50 hover:text-red-600"
                     title={t("common.delete", { defaultValue: "Delete" })}
                     type="button"
@@ -191,7 +250,7 @@ export const ProjectsPage: React.FC = () => {
                   <h1 className="mb-1 text-3xl font-extrabold text-slate-900">{selectedProject.name}</h1>
                   <p className="text-sm font-medium text-slate-500">
                     {t("projects.created_on", { defaultValue: "Created on" })}{" "}
-                    {new Date(selectedProject.date).toLocaleDateString(i18n.language || undefined)}
+                    {formatProjectDate(selectedProject.date, i18n.language)}
                   </p>
                 </div>
 
@@ -216,50 +275,67 @@ export const ProjectsPage: React.FC = () => {
                 </h2>
 
                 <ul className="space-y-3">
-                  {selectedProject.items.map((item) => (
-                    <li
-                      key={item.id}
-                      className="flex items-center justify-between gap-3 rounded-2xl border border-slate-200/80 bg-white/85 p-3.5 print:border-slate-300"
-                    >
-                      <div className="min-w-0">
-                        <span className="block truncate text-sm font-extrabold text-slate-700">{item.name}</span>
-                        <span className="text-xs font-medium text-slate-500">
-                          {item.quantity} {item.unit} × {euro.format(item.unitPrice)}
-                        </span>
-                      </div>
+                  {selectedProject.items.length > 0 ? (
+                    selectedProject.items.map((item) => (
+                      <li
+                        key={item.id}
+                        className="flex items-center justify-between gap-3 rounded-2xl border border-slate-200/80 bg-white/85 p-3.5 print:border-slate-300"
+                      >
+                        <div className="min-w-0">
+                          <span className="block truncate text-sm font-extrabold text-slate-700">{item.name}</span>
+                          <span className="text-xs font-medium text-slate-500">
+                            {toSafeNumber(item.quantity)} {item.unit} × {euro.format(toSafeNumber(item.unitPrice))}
+                          </span>
+                        </div>
 
-                      <span className="whitespace-nowrap font-extrabold text-slate-800">{euro.format(item.totalPrice)}</span>
+                        <span className="whitespace-nowrap font-extrabold text-slate-800">
+                          {euro.format(toSafeNumber(item.totalPrice))}
+                        </span>
+                      </li>
+                    ))
+                  ) : (
+                    <li className="rounded-2xl border border-dashed border-slate-200 bg-white/70 p-4 text-sm text-slate-500">
+                      {t("projects.empty_details", { defaultValue: "No saved materials in this project yet." })}
                     </li>
-                  ))}
+                  )}
                 </ul>
               </section>
 
               <div className="space-y-4 print:hidden">
                 <section className="glass-panel rounded-[30px] p-5 md:p-6">
                   <h2 className="mb-4 flex items-center text-lg font-extrabold text-slate-800">
-                    <PieChart className="mr-2 text-slate-400" size={20} />
+                    <BarChart3 className="mr-2 text-slate-400" size={20} />
                     {t("projects.cost_breakdown", { defaultValue: "Cost breakdown" })}
                   </h2>
 
-                  <div className="h-64 w-full">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <RePieChart>
-                        <Pie data={chartData} cx="50%" cy="50%" innerRadius={60} outerRadius={82} paddingAngle={5} dataKey="value">
-                          {chartData.map((_, index) => (
-                            <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
-                          ))}
-                        </Pie>
-                        <Tooltip
-                          formatter={(value: number) => euro.format(value)}
-                          contentStyle={{
-                            borderRadius: "16px",
-                            border: "1px solid #e2e8f0",
-                            boxShadow: "0 8px 24px rgba(15,23,42,0.08)",
-                          }}
-                        />
-                      </RePieChart>
-                    </ResponsiveContainer>
-                  </div>
+                  {breakdown.length > 0 ? (
+                    <div className="space-y-3">
+                      {breakdown.map((item) => (
+                        <div key={item.id} className="space-y-1.5 rounded-2xl border border-slate-200/80 bg-white/80 p-3">
+                          <div className="flex items-center justify-between gap-3">
+                            <div className="min-w-0">
+                              <div className="truncate text-sm font-extrabold text-slate-800">{item.name}</div>
+                              <div className="text-xs text-slate-500">
+                                {item.quantity} {item.unit} • {euro.format(item.unitPrice)}
+                              </div>
+                            </div>
+                            <div className="whitespace-nowrap text-sm font-extrabold text-slate-800">
+                              {euro.format(item.value)}
+                            </div>
+                          </div>
+                          <div className="h-2.5 overflow-hidden rounded-full bg-slate-100">
+                            <div className={`h-full rounded-full ${item.tone}`} style={{ width: `${item.ratio}%` }} />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="rounded-2xl border border-dashed border-slate-200 bg-white/70 p-4 text-sm text-slate-500">
+                      {t("projects.no_breakdown", {
+                        defaultValue: "The cost breakdown will appear once the saved lines contain amounts.",
+                      })}
+                    </div>
+                  )}
                 </section>
 
                 <section className="rounded-[28px] border border-blue-100 bg-blue-50/90 p-5 shadow-sm print:border-slate-900 print:bg-transparent md:p-6">
@@ -297,10 +373,7 @@ export const ProjectsPage: React.FC = () => {
     );
   }
 
-  const projectsTotalEstimate = projects.reduce(
-    (sum, project) => sum + project.items.reduce((projectSum, item) => projectSum + item.totalPrice, 0),
-    0
-  );
+  const projectsTotalEstimate = projects.reduce((sum, project) => sum + getProjectTotal(project), 0);
 
   return (
     <div className="app-shell app-shell--projects min-h-full bg-transparent safe-bottom-offset">
@@ -402,28 +475,29 @@ export const ProjectsPage: React.FC = () => {
         ) : (
           <div className="grid gap-3">
             {projects.map((project) => {
-              const total = project.items.reduce((sum, item) => sum + item.totalPrice, 0);
+              const total = getProjectTotal(project);
               return (
-                <div
+                <button
                   key={project.id}
                   onClick={() => openProject(project)}
-                  className="glass-panel flex cursor-pointer items-center justify-between rounded-[24px] p-5 transition-all hover:border-blue-200 active:scale-[0.98]"
+                  className="glass-panel flex w-full items-center justify-between rounded-[24px] p-5 text-left transition-all hover:border-blue-200 active:scale-[0.98]"
+                  type="button"
                 >
-                  <div>
-                    <h3 className="text-lg font-extrabold text-slate-800">{project.name}</h3>
+                  <div className="min-w-0">
+                    <h3 className="truncate text-lg font-extrabold text-slate-800">{project.name}</h3>
                     <p className="mt-1 text-xs font-medium text-slate-500">
-                      {new Date(project.date).toLocaleDateString(i18n.language || undefined)} • {project.items.length}{" "}
+                      {formatProjectDate(project.date, i18n.language)} • {getItemCount(project)}{" "}
                       {t("projects.items", { defaultValue: "items" })}
                     </p>
                   </div>
 
-                  <div className="flex items-center space-x-3">
+                  <div className="ml-3 flex items-center space-x-3">
                     <span className="rounded-xl border border-slate-200 bg-slate-100/90 px-3 py-1.5 text-sm font-extrabold text-slate-700">
                       {euro.format(total)}
                     </span>
-                    <ChevronRight className="text-slate-300" size={20} />
+                    <ChevronRight className="shrink-0 text-slate-300" size={20} />
                   </div>
-                </div>
+                </button>
               );
             })}
           </div>

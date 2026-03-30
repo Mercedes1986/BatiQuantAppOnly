@@ -22,6 +22,7 @@ import {
   saveHouseProject,
   deleteHouseProject,
   generateId,
+  onProjectsChanged,
 } from "@/services/storage";
 import { HouseProject, ConstructionStepId, ClientInfo, CalculatorType } from "@/types";
 import { getConstructionSteps, type ConstructionStepDef, type ConstructionStepGroup } from "@/constants";
@@ -89,6 +90,13 @@ export const HouseProjectPage: React.FC = () => {
 
   useEffect(() => {
     refreshAll();
+    const unsubscribe = onProjectsChanged((detail) => {
+      if (detail.key === "house_projects") {
+        refreshAll();
+      }
+    });
+
+    return unsubscribe;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectIdFromUrl]);
 

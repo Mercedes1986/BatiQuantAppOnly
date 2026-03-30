@@ -1,4 +1,4 @@
-import type { Project, UserSettings, HouseProject } from "../types";
+import type { HouseProject, Project, UserSettings } from "../types";
 import {
   canUsePersistentStorage,
   markNamespaceMigrated,
@@ -35,29 +35,146 @@ const DEFAULT_SETTINGS: UserSettings = {
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   !!value && typeof value === "object" && !Array.isArray(value);
 
+const toTrimmedString = (value: unknown, fallback = ""): string =>
+  typeof value === "string" ? value.trim() : fallback;
+
+const toFiniteNumber = (value: unknown, fallback = 0): number => {
+  const parsed = typeof value === "number" ? value : Number(value);
+  return Number.isFinite(parsed) ? parsed : fallback;
+};
+
+const toIsoDateString = (value: unknown): string => {
+  const raw = typeof value === "string" && value.trim() ? value : new Date().toISOString();
+  const timestamp = Date.parse(raw);
+  return Number.isFinite(timestamp) ? new Date(timestamp).toISOString() : new Date().toISOString();
+};
+
+const sanitizeMaterialItem = (value: unknown): Project["items"][number] | null => {
+  if (!isRecord(value)) return null;
+
+  const id = toTrimmedString(value.id);
+  const name = toTrimmedString(value.name);
+  if (!id || !name) return null;
+
+  const quantity = Math.max(0, toFiniteNumber(value.quantity));
+  const unitPrice = Math.max(0, toFiniteNumber(value.unitPrice));
+  const quantityRaw = Math.max(0, toFiniteNumber(value.quantityRaw, quantity));
+  const explicitTotal = toFiniteNumber(value.totalPrice, quantity * unitPrice);
+  const totalPrice = Math.max(0, explicitTotal || quantity * unitPrice);
+
+  return {
+    id,
+    name,
+    quantity,
+    quantityRaw,
+    unit: toTrimmedString(value.unit, "unit") as Project["items"][number]["unit"],
+    unitPrice,
+    totalPrice,
+    category: toTrimmedString(value.category, "STRUCTURAL") as Project["items"][number]["category"],
+    details: toTrimmedString(value.details) || undefined,
+    stepId: toTrimmedString(value.stepId) || undefined,
+    refKey: toTrimmedString(value.refKey) || undefined,
+    imageUrl: toTrimmedString(value.imageUrl) || undefined,
+  };
+};
+
+const sanitizeProject = (value: unknown): Project | null => {
+  if (!isRecord(value)) return null;
+
+  const id = toTrimmedString(value.id);
+  const name = toTrimmedString(value.name);
+  if (!id || !name) return null;
+
+  const items = Array.isArray(value.items)
+    ? value.items
+        .map((item) => sanitizeMaterialItem(item))
+        .filter((item): item is Project["items"][number] => item !== null)
+    : [];
+
+  return {
+    id,
+    name,
+    date: toIsoDateString(value.date),
+    items,
+    notes: typeof value.notes === "string" ? value.notes : "",
+    calculatorType: toTrimmedString(value.calculatorType) || undefined,
+    calculatorLabel: toTrimmedString(value.calculatorLabel) || undefined,
+    calculatorSnapshot: isRecord(value.calculatorSnapshot)
+      ? (value.calculatorSnapshot as Project["calculatorSnapshot"])
+      : undefined,
+  };
+};
+
+const sanitizeHouseStep = (value: unknown): HouseProject["steps"][keyof HouseProject["steps"]] => {
+  if (!isRecord(value)) return undefined;
+
+  const materials = Array.isArray(value.materials)
+    ? value.materials
+        .map((item) => sanitizeMaterialItem(item))
+        .filter((item): item is Project["items"][number] => item !== null)
+    : [];
+
+  const explicitCost = toFiniteNumber(value.cost, materials.reduce((sum, item) => sum + item.totalPrice, 0));
+  const status = value.status === "done" ? "done" : "pending";
+
+  return {
+    status,
+    materials,
+    cost: Math.max(0, explicitCost),
+    notes: typeof value.notes === "string" ? value.notes : undefined,
+    calculatorType: toTrimmedString(value.calculatorType) || undefined,
+    calculatorSnapshot: isRecord(value.calculatorSnapshot)
+      ? (value.calculatorSnapshot as NonNullable<HouseProject["steps"][keyof HouseProject["steps"]]>["calculatorSnapshot"])
+      : undefined,
+  };
+};
+
+const sanitizeHouseProject = (value: unknown): HouseProject | null => {
+  if (!isRecord(value)) return null;
+
+  const id = toTrimmedString(value.id);
+  const name = toTrimmedString(value.name);
+  if (!id || !name) return null;
+
+  const params = isRecord(value.params) ? value.params : {};
+  const rawSteps = isRecord(value.steps) ? value.steps : {};
+  const nextSteps: HouseProject["steps"] = {};
+
+  Object.entries(rawSteps).forEach(([stepId, stepValue]) => {
+    const sanitizedStep = sanitizeHouseStep(stepValue);
+    if (sanitizedStep) {
+      nextSteps[stepId as keyof HouseProject["steps"]] = sanitizedStep;
+    }
+  });
+
+  return {
+    id,
+    name,
+    date: toIsoDateString(value.date),
+    params: {
+      surfaceArea: Math.max(0, toFiniteNumber(params.surfaceArea)),
+      groundArea: Math.max(0, toFiniteNumber(params.groundArea, params.surfaceArea)),
+      perimeter: Math.max(0, toFiniteNumber(params.perimeter)),
+      levels: Math.max(1, Math.trunc(toFiniteNumber(params.levels, 1)) || 1),
+      ceilingHeight: Math.max(0, toFiniteNumber(params.ceilingHeight, 2.5)),
+    },
+    steps: nextSteps,
+    quote: isRecord(value.quote) ? (value.quote as HouseProject["quote"]) : undefined,
+  };
+};
+
 const sanitizeProjectList = (value: unknown): Project[] => {
   if (!Array.isArray(value)) return [];
-  return value.filter(
-    (project): project is Project =>
-      isRecord(project) &&
-      typeof project.id === "string" &&
-      typeof project.name === "string" &&
-      typeof project.date === "string" &&
-      Array.isArray(project.items)
-  );
+  return value
+    .map((project) => sanitizeProject(project))
+    .filter((project): project is Project => project !== null);
 };
 
 const sanitizeHouseProjectList = (value: unknown): HouseProject[] => {
   if (!Array.isArray(value)) return [];
-  return value.filter(
-    (project): project is HouseProject =>
-      isRecord(project) &&
-      typeof project.id === "string" &&
-      typeof project.name === "string" &&
-      typeof project.date === "string" &&
-      isRecord(project.params) &&
-      isRecord(project.steps)
-  );
+  return value
+    .map((project) => sanitizeHouseProject(project))
+    .filter((project): project is HouseProject => project !== null);
 };
 
 const sanitizeSettings = (value: unknown): UserSettings => {
@@ -116,10 +233,13 @@ export const getProjects = (): Project[] => {
 export const saveProject = (project: Project): void => {
   ensureMigratedOnce();
   const projects = getProjects();
-  const idx = projects.findIndex((p) => p.id === project.id);
+  const sanitized = sanitizeProject(project);
+  if (!sanitized) return;
 
-  if (idx >= 0) projects[idx] = project;
-  else projects.push(project);
+  const idx = projects.findIndex((p) => p.id === sanitized.id);
+
+  if (idx >= 0) projects[idx] = sanitized;
+  else projects.push(sanitized);
 
   writeJson(PROJECTS_KEY, projects);
   emitChanged({ reason: "save", key: "projects" });
@@ -146,10 +266,13 @@ export const getHouseProjects = (): HouseProject[] => {
 export const saveHouseProject = (project: HouseProject): void => {
   ensureMigratedOnce();
   const projects = getHouseProjects();
-  const idx = projects.findIndex((p) => p.id === project.id);
+  const sanitized = sanitizeHouseProject(project);
+  if (!sanitized) return;
 
-  if (idx >= 0) projects[idx] = project;
-  else projects.push(project);
+  const idx = projects.findIndex((p) => p.id === sanitized.id);
+
+  if (idx >= 0) projects[idx] = sanitized;
+  else projects.push(sanitized);
 
   writeJson(HOUSE_PROJECTS_KEY, projects);
   emitChanged({ reason: "save", key: "house_projects" });
