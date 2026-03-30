@@ -1,7 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 
-import AdPlacementBlock from "../components/ads/AdPlacementBlock";
 import { CalculatorCard } from "../components/ui/CalculatorCard";
 import { getCalculators } from "../constants";
 import { CalculatorType } from "../types";
@@ -40,14 +39,6 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onSelectCalc }) =>
                 onClick={() => onSelectCalc(calc.id)}
               />
             ))}
-        </div>
-
-        <div className="mt-10">
-          <AdPlacementBlock
-            placement="dashboard_banner"
-            variant="inline"
-            minHeight={180}
-          />
         </div>
       </div>
     </div>

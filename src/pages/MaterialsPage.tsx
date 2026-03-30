@@ -18,7 +18,6 @@ import {
   Info,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import AdPlacementBlock from "../components/ads/AdPlacementBlock";
 
 import {
   getSystemMaterialsList,
@@ -710,10 +709,6 @@ export const MaterialsPage: React.FC = () => {
           </div>
         </div>
       )}
-
-      <div className="max-w-7xl mx-auto px-4 pb-4 pt-2">
-        <AdPlacementBlock placement="materials_banner" variant="inline" minHeight={140} />
-      </div>
 
       {mappingTarget && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">

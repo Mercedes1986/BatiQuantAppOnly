@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   AlertTriangle,
@@ -9,7 +9,6 @@ import {
   Share2,
 } from "lucide-react";
 
-import AdPlacementBlock from "../components/ads/AdPlacementBlock";
 import { ConcreteCalculator } from "../components/calculators/ConcreteCalculator";
 import { ElectricityCalculator } from "../components/calculators/ElectricityCalculator";
 import { ExteriorCalculator } from "../components/calculators/ExteriorCalculator";
@@ -59,7 +58,7 @@ export const CalculatorPage: React.FC<Props> = ({ type, onBack, onNavigateProjec
   const [newProjectName, setNewProjectName] = useState("");
   const [showTips, setShowTips] = useState(false);
 
-  const lastInterstitialKeyRef = useRef<string>("");
+  const calculationSequenceRef = useRef(0);
 
   const tips = (getStaticTips()[type] || []) as string[];
   const hasTips = tips.length > 0;
@@ -92,24 +91,24 @@ export const CalculatorPage: React.FC<Props> = ({ type, onBack, onNavigateProjec
         style: "currency",
         currency: "EUR",
       }),
-    [i18n.language]
+    [i18n.language],
   );
 
-  useEffect(() => {
-    if (!displayResult) return;
+  const handleCalculated = async (nextResult: CalculationResult) => {
+    const sequence = ++calculationSequenceRef.current;
 
     const resultKey = JSON.stringify({
       type,
-      summary: displayResult.summary,
-      totalCost: Number(displayResult.totalCost || 0),
-      materials: displayResult.materials.length,
+      summary: nextResult.summary,
+      totalCost: Number(nextResult.totalCost || 0),
+      materials: nextResult.materials.length,
     });
 
-    if (lastInterstitialKeyRef.current === resultKey) return;
-    lastInterstitialKeyRef.current = resultKey;
+    await showInterstitialIfReady("calculator_interstitial", { contextKey: resultKey });
 
-    void showInterstitialIfReady("calculator_interstitial");
-  }, [displayResult, type]);
+    if (sequence !== calculationSequenceRef.current) return;
+    setResult(nextResult);
+  };
 
   if (!config) {
     return (
@@ -122,45 +121,45 @@ export const CalculatorPage: React.FC<Props> = ({ type, onBack, onNavigateProjec
   const renderCalculator = () => {
     switch (type) {
       case CalculatorType.PAINT:
-        return <PaintCalculator onCalculate={setResult} />;
+        return <PaintCalculator onCalculate={handleCalculated} />;
       case CalculatorType.CONCRETE:
-        return <ConcreteCalculator onCalculate={setResult} />;
+        return <ConcreteCalculator onCalculate={handleCalculated} />;
       case CalculatorType.TILES:
-        return <TileCalculator onCalculate={setResult} />;
+        return <TileCalculator onCalculate={handleCalculated} />;
       case CalculatorType.RAGREAGE:
-        return <LevelingCalculator onCalculate={setResult} />;
+        return <LevelingCalculator onCalculate={handleCalculated} />;
       case CalculatorType.PLACO:
-        return <PlacoCalculator onCalculate={setResult} />;
+        return <PlacoCalculator onCalculate={handleCalculated} />;
       case CalculatorType.STRUCTURAL:
-        return <StructuralCalculator onCalculate={setResult} />;
+        return <StructuralCalculator onCalculate={handleCalculated} />;
       case CalculatorType.GROUNDWORK:
-        return <StructuralCalculator onCalculate={setResult} initialMode="groundwork" hideTabs />;
+        return <StructuralCalculator onCalculate={handleCalculated} initialMode="groundwork" hideTabs />;
       case CalculatorType.FOUNDATIONS:
-        return <FoundationsCalculator onCalculate={setResult} />;
+        return <FoundationsCalculator onCalculate={handleCalculated} />;
       case CalculatorType.WALLS:
-        return <StructuralCalculator onCalculate={setResult} initialMode="walls" hideTabs />;
+        return <StructuralCalculator onCalculate={handleCalculated} initialMode="walls" hideTabs />;
       case CalculatorType.SUBSTRUCTURE:
-        return <SubstructureCalculator onCalculate={setResult} />;
+        return <SubstructureCalculator onCalculate={handleCalculated} />;
       case CalculatorType.STAIRS:
-        return <StairCalculator onCalculate={setResult} />;
+        return <StairCalculator onCalculate={handleCalculated} />;
       case CalculatorType.ROOF:
-        return <RoofCalculator onCalculate={setResult} />;
+        return <RoofCalculator onCalculate={handleCalculated} />;
       case CalculatorType.JOINERY:
-        return <JoineryCalculator onCalculate={setResult} />;
+        return <JoineryCalculator onCalculate={handleCalculated} />;
       case CalculatorType.ELECTRICITY:
-        return <ElectricityCalculator onCalculate={setResult} />;
+        return <ElectricityCalculator onCalculate={handleCalculated} />;
       case CalculatorType.PLUMBING:
-        return <PlumbingCalculator onCalculate={setResult} />;
+        return <PlumbingCalculator onCalculate={handleCalculated} />;
       case CalculatorType.HVAC:
-        return <HvacCalculator onCalculate={setResult} />;
+        return <HvacCalculator onCalculate={handleCalculated} />;
       case CalculatorType.SCREED:
-        return <ScreedCalculator onCalculate={setResult} />;
+        return <ScreedCalculator onCalculate={handleCalculated} />;
       case CalculatorType.FACADE:
-        return <FacadeCalculator onCalculate={setResult} />;
+        return <FacadeCalculator onCalculate={handleCalculated} />;
       case CalculatorType.EXTERIOR:
-        return <ExteriorCalculator onCalculate={setResult} />;
+        return <ExteriorCalculator onCalculate={handleCalculated} />;
       case CalculatorType.QUICK_TOOLS:
-        return <QuickToolsCalculator onCalculate={setResult} />;
+        return <QuickToolsCalculator onCalculate={handleCalculated} />;
       default:
         return (
           <div className="p-4 text-center text-slate-500">
@@ -206,11 +205,11 @@ export const CalculatorPage: React.FC<Props> = ({ type, onBack, onNavigateProjec
       "",
       t("calculator.materials_estimated", { defaultValue: "Estimated materials" }),
       ...displayResult.materials.map(
-        (material) => `• ${material.name}: ${material.quantity} ${material.unit}`
+        (material) => `• ${material.name}: ${material.quantity} ${material.unit}`,
       ),
       "",
       `${t("common.total", { defaultValue: "Total" })}: ${euro.format(
-        Number(displayResult.totalCost || 0)
+        Number(displayResult.totalCost || 0),
       )}`,
     ].join("\n");
 
@@ -228,7 +227,7 @@ export const CalculatorPage: React.FC<Props> = ({ type, onBack, onNavigateProjec
         alert(
           t("calculator.share_copied", {
             defaultValue: "Result copied to clipboard.",
-          })
+          }),
         );
         return;
       }
@@ -239,7 +238,7 @@ export const CalculatorPage: React.FC<Props> = ({ type, onBack, onNavigateProjec
     alert(
       t("calculator.share_unavailable", {
         defaultValue: "Sharing is unavailable on this device.",
-      })
+      }),
     );
   };
 
@@ -401,14 +400,6 @@ export const CalculatorPage: React.FC<Props> = ({ type, onBack, onNavigateProjec
                   <span>{t("common.share", { defaultValue: "Share" })}</span>
                 </button>
               </div>
-            </div>
-
-            <div className="pt-2">
-              <AdPlacementBlock
-                placement="calculator_result_banner"
-                variant="inline"
-                minHeight={180}
-              />
             </div>
           </div>
         )}

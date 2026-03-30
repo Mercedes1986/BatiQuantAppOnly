@@ -38,5 +38,8 @@ export interface AdInterstitialResult {
     | "bridge-missing"
     | "cooldown"
     | "frequency-capped"
+    | "duplicate-result"
     | "shown";
 }
+
+export type NativeInterstitialPhase = "shown" | "dismissed" | "failed";

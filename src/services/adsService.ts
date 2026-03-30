@@ -12,15 +12,56 @@ import type {
   AdPlacement,
   AdRuntimeState,
   AdSlotRenderState,
+  NativeInterstitialPhase,
 } from "@/types/ads";
 
 let initialized = false;
 let interstitialTriggerCount = 0;
 let lastInterstitialShownAt = 0;
+let lastInterstitialContextKey = "";
+let lastInterstitialContextAt = 0;
+
+const NATIVE_INTERSTITIAL_EVENT = "batiquant-interstitial";
 
 const getCanRequestAds = (): boolean => {
   const nativeCanRequestAds = getNativeBoolean("canRequestAds");
   return nativeCanRequestAds ?? canServeLimitedAds();
+};
+
+const isBannerPlacement = (placement: AdPlacement): placement is Exclude<AdPlacement, "calculator_interstitial"> =>
+  placement !== "calculator_interstitial";
+
+const waitForInterstitialLifecycle = (
+  placement: Extract<AdPlacement, "calculator_interstitial">,
+): Promise<{ sawShown: boolean; phase: NativeInterstitialPhase | "timeout" }> => {
+  if (typeof window === "undefined") {
+    return Promise.resolve({ sawShown: false, phase: "timeout" });
+  }
+
+  return new Promise((resolve) => {
+    let sawShown = false;
+
+    const cleanup = (phase: NativeInterstitialPhase | "timeout") => {
+      clearTimeout(timer);
+      window.removeEventListener(NATIVE_INTERSTITIAL_EVENT, onEvent as EventListener);
+      resolve({ sawShown, phase });
+    };
+
+    const onEvent = (event: Event) => {
+      const detail = (event as CustomEvent<{ placement?: string; phase?: NativeInterstitialPhase }>).detail;
+      if (!detail || detail.placement !== placement || !detail.phase) return;
+
+      if (detail.phase === "shown") {
+        sawShown = true;
+        return;
+      }
+
+      cleanup(detail.phase);
+    };
+
+    const timer = window.setTimeout(() => cleanup("timeout"), AD_CONFIG.INTERSTITIAL_WAIT_TIMEOUT_MS);
+    window.addEventListener(NATIVE_INTERSTITIAL_EVENT, onEvent as EventListener);
+  });
 };
 
 export const getAdsRuntimeState = (): AdRuntimeState => ({
@@ -50,9 +91,13 @@ export const initializeAds = async (): Promise<AdRuntimeState> => {
 
 export const getAdRenderState = (
   pathname: string,
-  placement: AdPlacement
+  placement: AdPlacement,
 ): AdSlotRenderState => {
   if (!AD_CONFIG.ENABLE_ADS || hasAdFreeEntitlement()) {
+    return { shouldRender: false, showPlaceholder: false, reason: "disabled" };
+  }
+
+  if (isBannerPlacement(placement) && !AD_CONFIG.ENABLE_INLINE_BANNERS) {
     return { shouldRender: false, showPlaceholder: false, reason: "disabled" };
   }
 
@@ -79,7 +124,6 @@ export const getAdRenderState = (
     };
   }
 
-  void placement;
   return {
     shouldRender: AD_CONFIG.ENABLE_WEB_PLACEHOLDERS,
     showPlaceholder: AD_CONFIG.ENABLE_WEB_PLACEHOLDERS,
@@ -88,8 +132,9 @@ export const getAdRenderState = (
 };
 
 export const showBanner = async (
-  placement: Exclude<AdPlacement, "calculator_interstitial">
+  placement: Exclude<AdPlacement, "calculator_interstitial">,
 ): Promise<boolean> => {
+  if (!AD_CONFIG.ENABLE_INLINE_BANNERS) return false;
   if (hasAdFreeEntitlement()) return false;
   if (!isNativeAdsBridgeAvailable()) return false;
   try {
@@ -101,8 +146,9 @@ export const showBanner = async (
 };
 
 export const hideBanner = async (
-  placement?: Exclude<AdPlacement, "calculator_interstitial">
+  placement?: Exclude<AdPlacement, "calculator_interstitial">,
 ): Promise<boolean> => {
+  if (!AD_CONFIG.ENABLE_INLINE_BANNERS) return false;
   if (!isNativeAdsBridgeAvailable()) return false;
   try {
     await getNativeAdsBridge()?.hideBanner?.(placement);
@@ -113,10 +159,25 @@ export const hideBanner = async (
 };
 
 export const showInterstitialIfReady = async (
-  placement: Extract<AdPlacement, "calculator_interstitial">
+  placement: Extract<AdPlacement, "calculator_interstitial">,
+  options?: { contextKey?: string },
 ): Promise<AdInterstitialResult> => {
   if (!AD_CONFIG.ENABLE_ADS) return { shown: false, reason: "disabled" };
   if (hasAdFreeEntitlement()) return { shown: false, reason: "ad-free" };
+
+  if (options?.contextKey) {
+    const now = Date.now();
+    const isDuplicate =
+      lastInterstitialContextKey === options.contextKey &&
+      now - lastInterstitialContextAt < AD_CONFIG.INTERSTITIAL_REPEAT_RESULT_WINDOW_MS;
+
+    lastInterstitialContextKey = options.contextKey;
+    lastInterstitialContextAt = now;
+
+    if (isDuplicate) {
+      return { shown: false, reason: "duplicate-result" };
+    }
+  }
 
   interstitialTriggerCount += 1;
 
@@ -133,12 +194,22 @@ export const showInterstitialIfReady = async (
   if (!isNativeAdsBridgeAvailable()) return { shown: false, reason: "bridge-missing" };
 
   try {
+    const lifecyclePromise = waitForInterstitialLifecycle(placement);
     const shown = await getNativeAdsBridge()?.showInterstitial?.(placement);
-    if (shown) {
+    if (!shown) {
+      return { shown: false, reason: "not-ready" };
+    }
+
+    const lifecycle = await lifecyclePromise;
+    const completedSuccessfully =
+      lifecycle.phase === "dismissed" || (lifecycle.phase === "timeout" && lifecycle.sawShown);
+
+    if (completedSuccessfully) {
       interstitialTriggerCount = 0;
-      lastInterstitialShownAt = now;
+      lastInterstitialShownAt = Date.now();
       return { shown: true, reason: "shown" };
     }
+
     return { shown: false, reason: "not-ready" };
   } catch {
     return { shown: false, reason: "not-ready" };
