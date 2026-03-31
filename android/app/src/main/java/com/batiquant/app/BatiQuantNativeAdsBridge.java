@@ -350,10 +350,10 @@ public class BatiQuantNativeAdsBridge {
 
                         mainHandler.postDelayed(() -> {
                             int contentWidth = Math.max(view.getWidth(), activity.getResources().getDisplayMetrics().widthPixels);
-                            int contentHeight = Math.max((int) Math.ceil(view.getContentHeight() * view.getScale()), view.computeVerticalScrollRange());
-                            if (contentHeight <= 0) {
-                                contentHeight = Math.max(view.getHeight(), activity.getResources().getDisplayMetrics().heightPixels);
-                            }
+                            int scaledContentHeight = (int) Math.ceil(view.getContentHeight() * view.getScale());
+                            int contentHeight = scaledContentHeight > 0
+                                    ? scaledContentHeight
+                                    : Math.max(view.getHeight(), activity.getResources().getDisplayMetrics().heightPixels);
 
                             view.measure(
                                     View.MeasureSpec.makeMeasureSpec(contentWidth, View.MeasureSpec.EXACTLY),
@@ -392,8 +392,10 @@ public class BatiQuantNativeAdsBridge {
 
         try {
             int viewWidth = Math.max(sourceView.getWidth(), activity.getResources().getDisplayMetrics().widthPixels);
-            int rawContentHeight = Math.max((int) Math.ceil(sourceView.getContentHeight() * sourceView.getScale()), sourceView.computeVerticalScrollRange());
-            int viewHeight = rawContentHeight > 0 ? rawContentHeight : Math.max(sourceView.getHeight(), activity.getResources().getDisplayMetrics().heightPixels);
+            int scaledContentHeight = (int) Math.ceil(sourceView.getContentHeight() * sourceView.getScale());
+            int viewHeight = scaledContentHeight > 0
+                    ? scaledContentHeight
+                    : Math.max(sourceView.getHeight(), activity.getResources().getDisplayMetrics().heightPixels);
 
             sourceView.measure(
                     View.MeasureSpec.makeMeasureSpec(viewWidth, View.MeasureSpec.EXACTLY),
