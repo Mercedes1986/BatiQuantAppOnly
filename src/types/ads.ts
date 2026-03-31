@@ -39,6 +39,7 @@ export interface AdInterstitialResult {
     | "cooldown"
     | "frequency-capped"
     | "duplicate-result"
+    | "armed"
     | "shown";
 }
 

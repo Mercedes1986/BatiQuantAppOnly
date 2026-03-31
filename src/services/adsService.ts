@@ -16,10 +16,12 @@ import type {
 } from "@/types/ads";
 
 let initialized = false;
-let interstitialTriggerCount = 0;
+let interstitialOpportunityCount = 0;
 let lastInterstitialShownAt = 0;
 let lastInterstitialContextKey = "";
 let lastInterstitialContextAt = 0;
+let pendingInterstitialPlacement: Extract<AdPlacement, "calculator_interstitial"> | null = null;
+let pendingInterstitialContextKey = "";
 
 const NATIVE_INTERSTITIAL_EVENT = "batiquant-interstitial";
 
@@ -62,6 +64,11 @@ const waitForInterstitialLifecycle = (
     const timer = window.setTimeout(() => cleanup("timeout"), AD_CONFIG.INTERSTITIAL_WAIT_TIMEOUT_MS);
     window.addEventListener(NATIVE_INTERSTITIAL_EVENT, onEvent as EventListener);
   });
+};
+
+const clearPendingInterstitialInternal = () => {
+  pendingInterstitialPlacement = null;
+  pendingInterstitialContextKey = "";
 };
 
 export const getAdsRuntimeState = (): AdRuntimeState => ({
@@ -158,10 +165,10 @@ export const hideBanner = async (
   }
 };
 
-export const showInterstitialIfReady = async (
+export const armInterstitialAfterCalculation = (
   placement: Extract<AdPlacement, "calculator_interstitial">,
   options?: { contextKey?: string },
-): Promise<AdInterstitialResult> => {
+): AdInterstitialResult => {
   if (!AD_CONFIG.ENABLE_ADS) return { shown: false, reason: "disabled" };
   if (hasAdFreeEntitlement()) return { shown: false, reason: "ad-free" };
 
@@ -175,28 +182,67 @@ export const showInterstitialIfReady = async (
     lastInterstitialContextAt = now;
 
     if (isDuplicate) {
+      clearPendingInterstitialInternal();
       return { shown: false, reason: "duplicate-result" };
     }
   }
 
-  interstitialTriggerCount += 1;
+  interstitialOpportunityCount += 1;
 
-  if (interstitialTriggerCount < AD_CONFIG.INTERSTITIAL_EVERY_N_RESULTS) {
+  if (interstitialOpportunityCount < AD_CONFIG.INTERSTITIAL_EVERY_N_RESULTS) {
+    clearPendingInterstitialInternal();
     return { shown: false, reason: "frequency-capped" };
   }
 
   const now = Date.now();
   if (now - lastInterstitialShownAt < AD_CONFIG.INTERSTITIAL_COOLDOWN_MS) {
+    clearPendingInterstitialInternal();
     return { shown: false, reason: "cooldown" };
   }
 
-  if (!getCanRequestAds()) return { shown: false, reason: "not-ready" };
-  if (!isNativeAdsBridgeAvailable()) return { shown: false, reason: "bridge-missing" };
+  if (!getCanRequestAds()) {
+    clearPendingInterstitialInternal();
+    return { shown: false, reason: "not-ready" };
+  }
+
+  if (!isNativeAdsBridgeAvailable()) {
+    clearPendingInterstitialInternal();
+    return { shown: false, reason: "bridge-missing" };
+  }
+
+  pendingInterstitialPlacement = placement;
+  pendingInterstitialContextKey = options?.contextKey || "";
+  return { shown: false, reason: "armed" };
+};
+
+export const showPendingInterstitialIfReady = async (
+  placement: Extract<AdPlacement, "calculator_interstitial">,
+): Promise<AdInterstitialResult> => {
+  if (!AD_CONFIG.ENABLE_ADS) return { shown: false, reason: "disabled" };
+  if (hasAdFreeEntitlement()) {
+    clearPendingInterstitialInternal();
+    return { shown: false, reason: "ad-free" };
+  }
+
+  if (pendingInterstitialPlacement !== placement) {
+    return { shown: false, reason: "not-ready" };
+  }
+
+  if (!getCanRequestAds()) {
+    clearPendingInterstitialInternal();
+    return { shown: false, reason: "not-ready" };
+  }
+
+  if (!isNativeAdsBridgeAvailable()) {
+    clearPendingInterstitialInternal();
+    return { shown: false, reason: "bridge-missing" };
+  }
 
   try {
     const lifecyclePromise = waitForInterstitialLifecycle(placement);
     const shown = await getNativeAdsBridge()?.showInterstitial?.(placement);
     if (!shown) {
+      clearPendingInterstitialInternal();
       return { shown: false, reason: "not-ready" };
     }
 
@@ -204,16 +250,38 @@ export const showInterstitialIfReady = async (
     const completedSuccessfully =
       lifecycle.phase === "dismissed" || (lifecycle.phase === "timeout" && lifecycle.sawShown);
 
+    clearPendingInterstitialInternal();
+
     if (completedSuccessfully) {
-      interstitialTriggerCount = 0;
+      interstitialOpportunityCount = 0;
       lastInterstitialShownAt = Date.now();
       return { shown: true, reason: "shown" };
     }
 
     return { shown: false, reason: "not-ready" };
   } catch {
+    clearPendingInterstitialInternal();
     return { shown: false, reason: "not-ready" };
   }
+};
+
+export const clearPendingInterstitial = (
+  placement?: Extract<AdPlacement, "calculator_interstitial">,
+): void => {
+  if (!placement || pendingInterstitialPlacement === placement) {
+    clearPendingInterstitialInternal();
+  }
+};
+
+export const showInterstitialIfReady = async (
+  placement: Extract<AdPlacement, "calculator_interstitial">,
+  options?: { contextKey?: string },
+): Promise<AdInterstitialResult> => {
+  const armed = armInterstitialAfterCalculation(placement, options);
+  if (armed.reason !== "armed") {
+    return armed;
+  }
+  return showPendingInterstitialIfReady(placement);
 };
 
 export const getAdLifecycleEvents = () => ({

@@ -28,6 +28,13 @@ declare global {
         chooserTitle?: string,
       ) => Promise<boolean> | boolean;
       downloadPdfDocument?: (requestId: string, fileName: string, html: string) => Promise<boolean> | boolean;
+      initializeBilling?: () => Promise<void> | void;
+      refreshPurchases?: () => Promise<void> | void;
+      launchRemoveAdsPurchase?: () => Promise<boolean> | boolean;
+      isAdFreePurchased?: () => Promise<boolean> | boolean;
+      isBillingReady?: () => Promise<boolean> | boolean;
+      isRemoveAdsProductReady?: () => Promise<boolean> | boolean;
+      getRemoveAdsProductId?: () => Promise<string> | string;
     };
   }
 }
@@ -51,6 +58,22 @@ export interface NativeDocumentEventDetail {
   message?: string;
 }
 
+export type NativePurchasePhase =
+  | "status"
+  | "purchase-success"
+  | "purchase-cancelled"
+  | "purchase-error"
+  | "restore-complete";
+
+export interface NativePurchaseEventDetail {
+  phase: NativePurchasePhase;
+  entitled: boolean;
+  billingReady: boolean;
+  productReady: boolean;
+  productId?: string;
+  message?: string;
+}
+
 const DOCUMENT_EVENT_NAME = "batiquant-native-document";
 const DOCUMENT_ACTION_TIMEOUT_MS = 30000;
 
@@ -69,7 +92,14 @@ export const getPlatform = (): AdPlatform => {
 export const getNativeAdsBridge = () =>
   isNativeAdsBridgeAvailable() ? window.BatiQuantNativeAds! : null;
 
-export const getNativeBoolean = (getter: "canRequestAds" | "privacyOptionsRequired"): boolean | null => {
+export const getNativeBoolean = (
+  getter:
+    | "canRequestAds"
+    | "privacyOptionsRequired"
+    | "isAdFreePurchased"
+    | "isBillingReady"
+    | "isRemoveAdsProductReady",
+): boolean | null => {
   const bridge = getNativeAdsBridge();
   const candidate = bridge?.[getter];
   if (typeof candidate !== "function") return null;
@@ -77,6 +107,21 @@ export const getNativeBoolean = (getter: "canRequestAds" | "privacyOptionsRequir
   try {
     const value = candidate();
     return typeof value === "boolean" ? value : null;
+  } catch {
+    return null;
+  }
+};
+
+export const getNativeString = (
+  getter: "getRemoveAdsProductId",
+): string | null => {
+  const bridge = getNativeAdsBridge();
+  const candidate = bridge?.[getter];
+  if (typeof candidate !== "function") return null;
+
+  try {
+    const value = candidate();
+    return typeof value === "string" ? value : null;
   } catch {
     return null;
   }
@@ -90,6 +135,16 @@ export const supportsNativeDocumentActions = (): boolean => {
     typeof bridge.sharePdfDocument === "function" &&
     typeof bridge.emailPdfDocument === "function" &&
     typeof bridge.downloadPdfDocument === "function"
+  );
+};
+
+export const supportsNativeBillingActions = (): boolean => {
+  const bridge = getNativeAdsBridge();
+  return !!(
+    bridge &&
+    typeof bridge.initializeBilling === "function" &&
+    typeof bridge.refreshPurchases === "function" &&
+    typeof bridge.launchRemoveAdsPurchase === "function"
   );
 };
 

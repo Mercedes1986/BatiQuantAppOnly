@@ -29,7 +29,13 @@ import {
   resetPrivacyChoices,
 } from "@/services/privacyService";
 import { exportAppData, importAppData } from "@/services/materialsService";
-import { getAdFreeEventName, hasAdFreeEntitlement } from "@/services/purchaseService";
+import {
+  getAdFreeEventName,
+  getPurchaseRuntimeState,
+  refreshPurchaseState,
+  restoreAdFreePurchases,
+  startRemoveAdsPurchase,
+} from "@/services/purchaseService";
 import { getSettings, saveSettings } from "@/services/storage";
 
 type SettingsTab = "app" | "company";
@@ -93,12 +99,15 @@ export const SettingsPage: React.FC = () => {
   const [currency, setCurrency] = useState<Currency>("EUR");
   const [isImporting, setIsImporting] = useState(false);
   const [privacyVersion, setPrivacyVersion] = useState(0);
+  const [purchaseBusy, setPurchaseBusy] = useState<null | "buy" | "restore">(null);
+  const [purchaseMessage, setPurchaseMessage] = useState("");
 
   const versionLabel = useMemo(() => getAppVersion(), []);
   const privacyPolicyPath = useMemo(() => getInAppPrivacyPolicyPath(), []);
   const helpPath = useMemo(() => getInAppHelpPath(), []);
   const privacyState = useMemo(() => getPrivacyState(), [privacyVersion]);
-  const hasNoAds = useMemo(() => hasAdFreeEntitlement(), [privacyVersion]);
+  const purchaseState = useMemo(() => getPurchaseRuntimeState(), [privacyVersion]);
+  const hasNoAds = purchaseState.entitled;
 
   useEffect(() => {
     try {
@@ -115,11 +124,13 @@ export const SettingsPage: React.FC = () => {
 
     window.addEventListener("consent-updated", refresh);
     window.addEventListener("batiquant-native-privacy", refresh as EventListener);
+    window.addEventListener("batiquant-native-purchase", refresh as EventListener);
     window.addEventListener(adFreeEvent, refresh as EventListener);
 
     return () => {
       window.removeEventListener("consent-updated", refresh);
       window.removeEventListener("batiquant-native-privacy", refresh as EventListener);
+      window.removeEventListener("batiquant-native-purchase", refresh as EventListener);
       window.removeEventListener(adFreeEvent, refresh as EventListener);
     };
   }, []);
@@ -274,6 +285,71 @@ export const SettingsPage: React.FC = () => {
     setPrivacyVersion((current) => current + 1);
   };
 
+  const refreshPurchaseUi = () => {
+    setPrivacyVersion((current) => current + 1);
+  };
+
+  const handleBuyRemoveAds = async () => {
+    setPurchaseBusy("buy");
+    setPurchaseMessage("");
+
+    try {
+      const state = await startRemoveAdsPurchase();
+      setPurchaseMessage(
+        state.entitled
+          ? t("settings.pro.purchase_success", {
+              defaultValue: "Achat confirmé • Les publicités sont maintenant désactivées.",
+            })
+          : t("settings.pro.purchase_pending", {
+              defaultValue: "Achat en attente de validation par Google Play.",
+            }),
+      );
+      refreshPurchaseUi();
+    } catch (error) {
+      const rawMessage = error instanceof Error ? error.message : "purchase-failed";
+      setPurchaseMessage(
+        rawMessage === "purchase-cancelled"
+          ? t("settings.pro.purchase_cancelled", {
+              defaultValue: "Achat annulé.",
+            })
+          : t("settings.pro.purchase_error", {
+              defaultValue: "Impossible de lancer l’achat sans pub pour le moment.",
+            }),
+      );
+      refreshPurchaseUi();
+    } finally {
+      setPurchaseBusy(null);
+    }
+  };
+
+  const handleRestorePurchases = async () => {
+    setPurchaseBusy("restore");
+    setPurchaseMessage("");
+
+    try {
+      const state = await restoreAdFreePurchases();
+      setPurchaseMessage(
+        state.entitled
+          ? t("settings.pro.restore_success", {
+              defaultValue: "Achat restauré • Les publicités sont désactivées.",
+            })
+          : t("settings.pro.restore_empty", {
+              defaultValue: "Aucun achat sans pub actif n’a été trouvé sur ce compte Google Play.",
+            }),
+      );
+      refreshPurchaseUi();
+    } catch {
+      setPurchaseMessage(
+        t("settings.pro.restore_error", {
+          defaultValue: "Impossible de restaurer les achats pour le moment.",
+        }),
+      );
+      refreshPurchaseUi();
+    } finally {
+      setPurchaseBusy(null);
+    }
+  };
+
   const tabButton = (tab: SettingsTab, label: string, icon: React.ReactNode) => (
     <button
       type="button"
@@ -330,25 +406,111 @@ export const SettingsPage: React.FC = () => {
         ) : (
           <div className="space-y-4">
             <section className="overflow-hidden rounded-[28px] border border-slate-200/80 bg-white/72 shadow-sm backdrop-blur-md">
-              <div className="flex items-center p-5">
-                <div className="mr-3 rounded-2xl bg-emerald-100 p-3 text-emerald-600">
-                  <User size={20} />
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-extrabold text-slate-800">
-                    {t("settings.pro.title", { defaultValue: "Version Pro" })}
-                  </h3>
-                  <p className="text-xs text-slate-500">
-                    {hasNoAds
-                      ? t("settings.pro.ad_free_active", {
-                          defaultValue: "Licence Pro active • Publicités désactivées",
-                        })
-                      : t("settings.pro.ad_free_pending", {
-                          defaultValue: "Avec la licence Pro, les publicités sont désactivées automatiquement.",
-                        })}
-                  </p>
+              <div className="border-b border-slate-100 p-5">
+                <div className="flex items-center gap-3">
+                  <div className="rounded-2xl bg-emerald-100 p-3 text-emerald-600">
+                    <User size={20} />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-extrabold text-slate-800">
+                      {t("settings.pro.title", { defaultValue: "Version sans pub" })}
+                    </h3>
+                    <p className="text-xs text-slate-500">
+                      {hasNoAds
+                        ? t("settings.pro.ad_free_active", {
+                            defaultValue: "Achat sans pub actif • Publicités désactivées",
+                          })
+                        : purchaseState.billingReady && purchaseState.productReady
+                        ? t("settings.pro.ad_free_pending", {
+                            defaultValue: "Un achat Google Play peut désactiver toutes les publicités de l’application.",
+                          })
+                        : t("settings.pro.billing_unavailable", {
+                            defaultValue: "L’achat sans pub n’est pas encore disponible sur cet appareil ou cette build.",
+                          })}
+                    </p>
+                  </div>
                 </div>
               </div>
+
+              <div className="grid gap-3 p-5 md:grid-cols-2">
+                <div className="rounded-2xl border border-slate-200 bg-white/80 p-4">
+                  <div className="text-sm font-extrabold text-slate-700">
+                    {t("settings.pro.status_title", { defaultValue: "État Google Play" })}
+                  </div>
+                  <p className="mt-2 text-sm text-slate-600">
+                    {hasNoAds
+                      ? t("settings.pro.status_active", {
+                          defaultValue: "Achat détecté et validé sur cet appareil.",
+                        })
+                      : purchaseState.billingReady && purchaseState.productReady
+                      ? t("settings.pro.status_ready", {
+                          defaultValue: "Google Play Billing est prêt et le produit sans pub est disponible.",
+                        })
+                      : purchaseState.billingReady
+                      ? t("settings.pro.status_product_missing", {
+                          defaultValue: "Google Play est prêt, mais le produit sans pub n’est pas encore trouvé.",
+                        })
+                      : t("settings.pro.status_connecting", {
+                          defaultValue: "Connexion Google Play en attente ou indisponible.",
+                        })}
+                  </p>
+                  {purchaseState.productId ? (
+                    <p className="mt-2 text-xs text-slate-400">
+                      {t("settings.pro.product_id", { defaultValue: "ID produit" })}: {purchaseState.productId}
+                    </p>
+                  ) : null}
+                </div>
+
+                <div className="rounded-2xl border border-slate-200 bg-white/80 p-4">
+                  <div className="text-sm font-extrabold text-slate-700">
+                    {t("settings.pro.actions_title", { defaultValue: "Actions" })}
+                  </div>
+                  <div className="mt-3 grid gap-2">
+                    {!hasNoAds ? (
+                      <button
+                        type="button"
+                        onClick={handleBuyRemoveAds}
+                        disabled={purchaseBusy !== null || !purchaseState.billingReady || !purchaseState.productReady}
+                        className="rounded-xl bg-emerald-600 px-4 py-3 text-sm font-extrabold text-white shadow-md transition-colors hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        {purchaseBusy === "buy"
+                          ? t("settings.pro.buy_loading", { defaultValue: "Ouverture de Google Play..." })
+                          : t("settings.pro.buy_button", { defaultValue: "Acheter la version sans pub" })}
+                      </button>
+                    ) : null}
+                    <button
+                      type="button"
+                      onClick={handleRestorePurchases}
+                      disabled={purchaseBusy !== null || !purchaseState.billingReady}
+                      className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-extrabold text-slate-700 transition-colors hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      <RotateCcw size={16} />
+                      {purchaseBusy === "restore"
+                        ? t("settings.pro.restore_loading", { defaultValue: "Restauration en cours..." })
+                        : t("settings.pro.restore_button", { defaultValue: "Restaurer mes achats" })}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setPurchaseMessage("");
+                        void refreshPurchaseState().then(refreshPurchaseUi).catch(refreshPurchaseUi);
+                      }}
+                      disabled={purchaseBusy !== null}
+                      className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-extrabold text-slate-700 transition-colors hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      {t("settings.pro.refresh_button", { defaultValue: "Actualiser l’état Google Play" })}
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {purchaseMessage ? (
+                <div className="px-5 pb-5">
+                  <p className="rounded-xl border border-blue-100 bg-blue-50 px-3 py-2 text-xs font-medium text-blue-800">
+                    {purchaseMessage}
+                  </p>
+                </div>
+              ) : null}
             </section>
 
             <section className="overflow-hidden rounded-[28px] border border-slate-200/80 bg-white/72 shadow-sm backdrop-blur-md">

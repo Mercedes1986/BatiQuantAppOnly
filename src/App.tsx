@@ -47,6 +47,7 @@ import { ArrowLeft, Save, Loader2, AlertTriangle } from "lucide-react";
 import ConsentModal from "./components/privacy/ConsentModal";
 import { initializeAds } from "./services/adsService";
 import { initConsent } from "./services/consentService";
+import { initializePurchaseState } from "./services/purchaseService";
 
 // --- helper: keep prop typing for React.lazy ---
 const lazyNamed = <T extends React.ComponentType<any>>(factory: () => Promise<{ default: T }>) =>
@@ -692,8 +693,20 @@ const AppRouter: React.FC = () => (
 
 const App: React.FC = () => {
   useEffect(() => {
-    initConsent();
-    void initializeAds();
+    let cancelled = false;
+
+    const boot = async () => {
+      await initializePurchaseState();
+      if (cancelled) return;
+      initConsent();
+      await initializeAds();
+    };
+
+    void boot();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   return <AppRouter />;

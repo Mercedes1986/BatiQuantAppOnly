@@ -411,7 +411,7 @@ const sanitizeBackupSettings = (value: unknown): UserSettings | undefined =>
     ? {
         currency: typeof value.currency === "string" && value.currency.trim() ? value.currency : "€",
         taxRate: typeof value.taxRate === "number" && Number.isFinite(value.taxRate) ? value.taxRate : 20,
-        isPro: typeof value.isPro === "boolean" ? value.isPro : false,
+        isPro: false,
       }
     : undefined;
 
@@ -478,7 +478,7 @@ export const exportAppData = (): string => {
     laborSettings: getLaborSettings(),
     projects: getProjects(),
     houseProjects: getHouseProjects(),
-    userSettings: getSettings(),
+    userSettings: { ...getSettings(), isPro: false },
     companyProfile: getCompanyProfile(),
     quotes: getQuotes(),
     invoices: getInvoices(),
@@ -521,7 +521,7 @@ export const importAppData = (jsonString: string, mode: "merge" | "replace"): bo
       setLaborSettingsSafe(laborSettings);
       replaceProjects(projects);
       replaceHouseProjects(houseProjects);
-      if (userSettings) replaceSettings(userSettings);
+      if (userSettings) replaceSettings({ ...userSettings, isPro: getSettings().isPro });
       if (companyProfile !== undefined) replaceCompanyProfile(companyProfile);
       replaceQuotes(quotes);
       replaceInvoices(invoices);
@@ -536,7 +536,7 @@ export const importAppData = (jsonString: string, mode: "merge" | "replace"): bo
       setLaborSettingsSafe(laborSettings);
       replaceProjects(mergeById(getProjects(), projects));
       replaceHouseProjects(mergeById(getHouseProjects(), houseProjects));
-      if (userSettings) replaceSettings({ ...getSettings(), ...userSettings });
+      if (userSettings) replaceSettings({ ...getSettings(), ...userSettings, isPro: getSettings().isPro });
       if (companyProfile) replaceCompanyProfile(companyProfile);
       replaceQuotes(mergeById(getQuotes(), quotes));
       replaceInvoices(mergeById(getInvoices(), invoices));

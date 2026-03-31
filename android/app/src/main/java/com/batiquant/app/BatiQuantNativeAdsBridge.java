@@ -2,7 +2,6 @@ package com.batiquant.app;
 
 import android.app.Activity;
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
@@ -10,7 +9,6 @@ import android.graphics.pdf.PdfDocument;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
-import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
@@ -21,6 +19,16 @@ import android.webkit.WebViewClient;
 import androidx.annotation.NonNull;
 import androidx.core.content.FileProvider;
 
+import com.android.billingclient.api.AcknowledgePurchaseParams;
+import com.android.billingclient.api.BillingClient;
+import com.android.billingclient.api.BillingClientStateListener;
+import com.android.billingclient.api.BillingFlowParams;
+import com.android.billingclient.api.BillingResult;
+import com.android.billingclient.api.ProductDetails;
+import com.android.billingclient.api.Purchase;
+import com.android.billingclient.api.PurchasesUpdatedListener;
+import com.android.billingclient.api.QueryProductDetailsParams;
+import com.android.billingclient.api.QueryPurchasesParams;
 import com.google.android.gms.ads.AdError;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.FullScreenContentCallback;
@@ -39,11 +47,14 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Collections;
+import java.util.List;
 
 public class BatiQuantNativeAdsBridge {
     private static final String TAG = "BatiQuantAds";
     private static final String DEFAULT_TEST_INTERSTITIAL_ID = "ca-app-pub-3940256099942544/1033173712";
     private static final String DOCUMENT_EVENT = "batiquant-native-document";
+    private static final String PURCHASE_EVENT = "batiquant-native-purchase";
 
     private final Activity activity;
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
@@ -51,9 +62,14 @@ public class BatiQuantNativeAdsBridge {
     private WebView webView;
     private InterstitialAd interstitialAd;
     private ConsentInformation consentInformation;
+    private BillingClient billingClient;
+    private ProductDetails removeAdsProductDetails;
 
     private boolean mobileAdsInitialized = false;
     private boolean interstitialLoading = false;
+    private boolean billingConnecting = false;
+    private boolean billingReady = false;
+    private boolean adFreePurchased = false;
 
     private interface PdfReadyCallback {
         void onSuccess(File pdfFile);
@@ -73,6 +89,83 @@ public class BatiQuantNativeAdsBridge {
     @JavascriptInterface
     public void initialize() {
         runOnMainThread(this::refreshConsentAndMaybeInitializeAds);
+    }
+
+    @JavascriptInterface
+    public void initializeBilling() {
+        runOnMainThread(this::connectBillingClientIfNeeded);
+    }
+
+    @JavascriptInterface
+    public void refreshPurchases() {
+        runOnMainThread(() -> {
+            connectBillingClientIfNeeded();
+            if (billingReady) {
+                queryRemoveAdsProductDetails();
+                queryExistingPurchases();
+            }
+        });
+    }
+
+    @JavascriptInterface
+    public boolean launchRemoveAdsPurchase() {
+        if (BuildConfig.PLAY_BILLING_REMOVE_ADS_PRODUCT_ID == null
+                || BuildConfig.PLAY_BILLING_REMOVE_ADS_PRODUCT_ID.trim().isEmpty()) {
+            dispatchPurchaseEvent("purchase-error", "remove-ads-product-missing");
+            return false;
+        }
+
+        if (!billingReady || removeAdsProductDetails == null) {
+            runOnMainThread(() -> {
+                connectBillingClientIfNeeded();
+                queryRemoveAdsProductDetails();
+                dispatchPurchaseStatus("billing-not-ready");
+            });
+            return false;
+        }
+
+        runOnMainThread(() -> {
+            try {
+                BillingFlowParams.ProductDetailsParams productDetailsParams =
+                        BillingFlowParams.ProductDetailsParams.newBuilder()
+                                .setProductDetails(removeAdsProductDetails)
+                                .build();
+
+                BillingFlowParams flowParams = BillingFlowParams.newBuilder()
+                        .setProductDetailsParamsList(Collections.singletonList(productDetailsParams))
+                        .build();
+
+                BillingResult result = billingClient.launchBillingFlow(activity, flowParams);
+                if (result.getResponseCode() != BillingClient.BillingResponseCode.OK) {
+                    dispatchPurchaseEvent("purchase-error", safeText(result.getDebugMessage(), "launch-billing-failed"));
+                }
+            } catch (Throwable error) {
+                Log.w(TAG, "Unable to launch billing flow", error);
+                dispatchPurchaseEvent("purchase-error", "launch-billing-exception");
+            }
+        });
+
+        return true;
+    }
+
+    @JavascriptInterface
+    public boolean isAdFreePurchased() {
+        return adFreePurchased;
+    }
+
+    @JavascriptInterface
+    public boolean isBillingReady() {
+        return billingReady;
+    }
+
+    @JavascriptInterface
+    public boolean isRemoveAdsProductReady() {
+        return removeAdsProductDetails != null;
+    }
+
+    @JavascriptInterface
+    public String getRemoveAdsProductId() {
+        return safeText(BuildConfig.PLAY_BILLING_REMOVE_ADS_PRODUCT_ID, "");
     }
 
     @JavascriptInterface
@@ -303,7 +396,12 @@ public class BatiQuantNativeAdsBridge {
     }
 
     public void onHostResume() {
-        // no-op
+        runOnMainThread(() -> {
+            connectBillingClientIfNeeded();
+            if (billingReady) {
+                queryExistingPurchases();
+            }
+        });
     }
 
     public void onHostPause() {
@@ -311,7 +409,180 @@ public class BatiQuantNativeAdsBridge {
     }
 
     public void onHostDestroy() {
-        runOnMainThread(this::voidBannerPlacement);
+        runOnMainThread(() -> {
+            voidBannerPlacement();
+            if (billingClient != null) {
+                try {
+                    billingClient.endConnection();
+                } catch (Throwable ignored) {
+                    // ignore
+                }
+            }
+            billingClient = null;
+            billingReady = false;
+            billingConnecting = false;
+        });
+    }
+
+    private void connectBillingClientIfNeeded() {
+        if (BuildConfig.PLAY_BILLING_REMOVE_ADS_PRODUCT_ID == null
+                || BuildConfig.PLAY_BILLING_REMOVE_ADS_PRODUCT_ID.trim().isEmpty()) {
+            dispatchPurchaseStatus("remove-ads-product-missing");
+            return;
+        }
+
+        if (billingClient != null && billingClient.isReady()) {
+            billingReady = true;
+            queryRemoveAdsProductDetails();
+            queryExistingPurchases();
+            return;
+        }
+
+        if (billingConnecting) return;
+        billingConnecting = true;
+
+        PurchasesUpdatedListener purchasesUpdatedListener = this::onPurchasesUpdated;
+        billingClient = BillingClient.newBuilder(activity)
+                .setListener(purchasesUpdatedListener)
+                .enablePendingPurchases()
+                .build();
+
+        billingClient.startConnection(new BillingClientStateListener() {
+            @Override
+            public void onBillingSetupFinished(@NonNull BillingResult billingResult) {
+                billingConnecting = false;
+                billingReady = billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK;
+                if (!billingReady) {
+                    Log.w(TAG, "Billing setup failed: " + billingResult.getDebugMessage());
+                    dispatchPurchaseStatus(safeText(billingResult.getDebugMessage(), "billing-setup-failed"));
+                    return;
+                }
+
+                queryRemoveAdsProductDetails();
+                queryExistingPurchases();
+            }
+
+            @Override
+            public void onBillingServiceDisconnected() {
+                billingConnecting = false;
+                billingReady = false;
+                removeAdsProductDetails = null;
+                dispatchPurchaseStatus("billing-disconnected");
+            }
+        });
+    }
+
+    private void queryRemoveAdsProductDetails() {
+        if (billingClient == null || !billingReady) {
+            dispatchPurchaseStatus("billing-not-ready");
+            return;
+        }
+
+        String productId = safeText(BuildConfig.PLAY_BILLING_REMOVE_ADS_PRODUCT_ID, "");
+        if (productId.isEmpty()) {
+            removeAdsProductDetails = null;
+            dispatchPurchaseStatus("remove-ads-product-missing");
+            return;
+        }
+
+        QueryProductDetailsParams.Product product = QueryProductDetailsParams.Product.newBuilder()
+                .setProductId(productId)
+                .setProductType(BillingClient.ProductType.INAPP)
+                .build();
+
+        QueryProductDetailsParams params = QueryProductDetailsParams.newBuilder()
+                .setProductList(Collections.singletonList(product))
+                .build();
+
+        billingClient.queryProductDetailsAsync(params, (billingResult, productDetailsResult) -> {
+            if (billingResult.getResponseCode() != BillingClient.BillingResponseCode.OK) {
+                Log.w(TAG, "Product details query failed: " + billingResult.getDebugMessage());
+                removeAdsProductDetails = null;
+                dispatchPurchaseStatus(safeText(billingResult.getDebugMessage(), "product-query-failed"));
+                return;
+            }
+
+            List<ProductDetails> detailsList = productDetailsResult.getProductDetailsList();
+            removeAdsProductDetails = (detailsList != null && !detailsList.isEmpty()) ? detailsList.get(0) : null;
+            dispatchPurchaseStatus(removeAdsProductDetails != null ? "product-ready" : "product-not-found");
+        });
+    }
+
+    private void queryExistingPurchases() {
+        if (billingClient == null || !billingReady) {
+            dispatchPurchaseStatus("billing-not-ready");
+            return;
+        }
+
+        QueryPurchasesParams params = QueryPurchasesParams.newBuilder()
+                .setProductType(BillingClient.ProductType.INAPP)
+                .build();
+
+        billingClient.queryPurchasesAsync(params, (billingResult, purchases) -> {
+            if (billingResult.getResponseCode() != BillingClient.BillingResponseCode.OK) {
+                Log.w(TAG, "Query purchases failed: " + billingResult.getDebugMessage());
+                dispatchPurchaseStatus(safeText(billingResult.getDebugMessage(), "query-purchases-failed"));
+                return;
+            }
+
+            processPurchases(purchases, "restore-complete");
+        });
+    }
+
+    private void onPurchasesUpdated(@NonNull BillingResult billingResult, List<Purchase> purchases) {
+        int responseCode = billingResult.getResponseCode();
+        if (responseCode == BillingClient.BillingResponseCode.OK && purchases != null) {
+            processPurchases(purchases, "purchase-success");
+            return;
+        }
+
+        if (responseCode == BillingClient.BillingResponseCode.USER_CANCELED) {
+            dispatchPurchaseEvent("purchase-cancelled", "user-cancelled");
+            return;
+        }
+
+        dispatchPurchaseEvent("purchase-error", safeText(billingResult.getDebugMessage(), "purchase-update-failed"));
+    }
+
+    private void processPurchases(List<Purchase> purchases, String successPhase) {
+        boolean entitled = false;
+
+        if (purchases != null) {
+            for (Purchase purchase : purchases) {
+                if (purchase == null) continue;
+                if (!containsRemoveAdsProduct(purchase)) continue;
+
+                if (purchase.getPurchaseState() == Purchase.PurchaseState.PURCHASED) {
+                    entitled = true;
+                    acknowledgePurchaseIfNeeded(purchase);
+                }
+            }
+        }
+
+        adFreePurchased = entitled;
+        dispatchPurchaseEvent(successPhase, entitled ? "ad-free-active" : "no-active-remove-ads-purchase");
+    }
+
+    private boolean containsRemoveAdsProduct(Purchase purchase) {
+        String productId = safeText(BuildConfig.PLAY_BILLING_REMOVE_ADS_PRODUCT_ID, "");
+        if (productId.isEmpty()) return false;
+        List<String> products = purchase.getProducts();
+        return products != null && products.contains(productId);
+    }
+
+    private void acknowledgePurchaseIfNeeded(Purchase purchase) {
+        if (purchase.isAcknowledged()) return;
+        if (billingClient == null || !billingReady) return;
+
+        AcknowledgePurchaseParams params = AcknowledgePurchaseParams.newBuilder()
+                .setPurchaseToken(purchase.getPurchaseToken())
+                .build();
+
+        billingClient.acknowledgePurchase(params, billingResult -> {
+            if (billingResult.getResponseCode() != BillingClient.BillingResponseCode.OK) {
+                Log.w(TAG, "Acknowledge purchase failed: " + billingResult.getDebugMessage());
+            }
+        });
     }
 
     private void generatePdfFromHtml(
@@ -531,15 +802,6 @@ public class BatiQuantNativeAdsBridge {
         }, 100L);
     }
 
-    private void closeQuietly(ParcelFileDescriptor descriptor) {
-        if (descriptor == null) return;
-        try {
-            descriptor.close();
-        } catch (Throwable ignored) {
-            // ignore
-        }
-    }
-
     private void refreshConsentAndMaybeInitializeAds() {
         consentInformation = UserMessagingPlatform.getConsentInformation(activity);
 
@@ -656,6 +918,31 @@ public class BatiQuantNativeAdsBridge {
                         + escapeForJs(action)
                         + "', phase: '"
                         + escapeForJs(phase)
+                        + "', message: '"
+                        + escapeForJs(message)
+                        + "' } }));"
+        );
+    }
+
+    private void dispatchPurchaseStatus(String message) {
+        dispatchPurchaseEvent("status", message);
+    }
+
+    private void dispatchPurchaseEvent(String phase, String message) {
+        String productId = safeText(BuildConfig.PLAY_BILLING_REMOVE_ADS_PRODUCT_ID, "");
+        boolean productReady = removeAdsProductDetails != null;
+
+        postJavascript(
+                "window.dispatchEvent(new CustomEvent('" + PURCHASE_EVENT + "', { detail: { phase: '"
+                        + escapeForJs(phase)
+                        + "', entitled: "
+                        + adFreePurchased
+                        + ", billingReady: "
+                        + billingReady
+                        + ", productReady: "
+                        + productReady
+                        + ", productId: '"
+                        + escapeForJs(productId)
                         + "', message: '"
                         + escapeForJs(message)
                         + "' } }));"

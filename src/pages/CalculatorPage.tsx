@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   AlertTriangle,
@@ -28,7 +28,7 @@ import { StructuralCalculator } from "../components/calculators/StructuralCalcul
 import { SubstructureCalculator } from "../components/calculators/SubstructureCalculator";
 import { TileCalculator } from "../components/calculators/TileCalculator";
 import { getCalculators, getStaticTips, localizeLegacyText } from "../constants";
-import { showInterstitialIfReady } from "../services/adsService";
+import { armInterstitialAfterCalculation, clearPendingInterstitial, showPendingInterstitialIfReady } from "../services/adsService";
 import { generateId, saveProject } from "../services/storage";
 import { CalculatorType } from "../types";
 import type {
@@ -94,7 +94,7 @@ export const CalculatorPage: React.FC<Props> = ({ type, onBack, onNavigateProjec
     [i18n.language],
   );
 
-  const handleCalculated = useCallback(async (nextResult: CalculationResult) => {
+  const handleCalculated = useCallback((nextResult: CalculationResult) => {
     const sequence = ++calculationSequenceRef.current;
 
     const resultKey = JSON.stringify({
@@ -104,11 +104,17 @@ export const CalculatorPage: React.FC<Props> = ({ type, onBack, onNavigateProjec
       materials: nextResult.materials.length,
     });
 
-    await showInterstitialIfReady("calculator_interstitial", { contextKey: resultKey });
-
     if (sequence !== calculationSequenceRef.current) return;
     setResult(nextResult);
+    armInterstitialAfterCalculation("calculator_interstitial", { contextKey: resultKey });
   }, [type]);
+
+
+  useEffect(() => {
+    return () => {
+      clearPendingInterstitial("calculator_interstitial");
+    };
+  }, []);
 
   if (!config) {
     return (
@@ -171,6 +177,13 @@ export const CalculatorPage: React.FC<Props> = ({ type, onBack, onNavigateProjec
     }
   };
 
+  const handleBackClick = useCallback(async () => {
+    if (displayResult) {
+      await showPendingInterstitialIfReady("calculator_interstitial");
+    }
+    onBack();
+  }, [displayResult, onBack]);
+
   const handleAddToProject = () => {
     if (!displayResult) return;
 
@@ -191,6 +204,7 @@ export const CalculatorPage: React.FC<Props> = ({ type, onBack, onNavigateProjec
     };
 
     saveProject(project);
+    clearPendingInterstitial("calculator_interstitial");
     setShowSaveModal(false);
     setNewProjectName("");
     onNavigateProjects();
@@ -249,7 +263,7 @@ export const CalculatorPage: React.FC<Props> = ({ type, onBack, onNavigateProjec
           <div className="mb-4 flex items-center justify-between gap-3">
             <button
               type="button"
-              onClick={onBack}
+              onClick={handleBackClick}
               className="inline-flex items-center rounded-xl border border-white/70 bg-white/75 px-3 py-2 text-sm font-extrabold text-slate-700 shadow-sm transition-colors hover:bg-white"
             >
               <ArrowLeft size={18} className="mr-2" />
