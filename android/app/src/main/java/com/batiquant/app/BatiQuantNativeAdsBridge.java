@@ -406,8 +406,8 @@ public class BatiQuantNativeAdsBridge {
             final int pageWidth = 1240;
             final int pageHeight = 1754;
             final float scale = pageWidth / (float) viewWidth;
-            final int scaledContentHeight = Math.max(1, Math.round(viewHeight * scale));
-            final int pageCount = Math.max(1, (int) Math.ceil(scaledContentHeight / (float) pageHeight));
+            final int scaledPdfHeight = Math.max(1, Math.round(viewHeight * scale));
+            final int pageCount = Math.max(1, (int) Math.ceil(scaledPdfHeight / (float) pageHeight));
 
             document = new PdfDocument();
 
