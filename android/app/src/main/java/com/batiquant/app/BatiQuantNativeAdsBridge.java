@@ -6,15 +6,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
-import android.os.CancellationSignal;
+import android.graphics.pdf.PdfDocument;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.ParcelFileDescriptor;
-import android.print.PageRange;
-import android.print.PrintAttributes;
-import android.print.PrintDocumentAdapter;
-import android.print.PrintDocumentInfo;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
@@ -336,12 +332,15 @@ public class BatiQuantNativeAdsBridge {
                 printWebView.getSettings().setDomStorageEnabled(false);
                 printWebView.getSettings().setAllowFileAccess(false);
                 printWebView.getSettings().setLoadsImagesAutomatically(true);
-                printWebView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+                printWebView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+
+                final int initialWidth = activity.getResources().getDisplayMetrics().widthPixels;
+                final int initialHeight = activity.getResources().getDisplayMetrics().heightPixels;
                 printWebView.measure(
-                        View.MeasureSpec.makeMeasureSpec(activity.getResources().getDisplayMetrics().widthPixels, View.MeasureSpec.EXACTLY),
-                        View.MeasureSpec.makeMeasureSpec(activity.getResources().getDisplayMetrics().heightPixels, View.MeasureSpec.AT_MOST)
+                        View.MeasureSpec.makeMeasureSpec(initialWidth, View.MeasureSpec.EXACTLY),
+                        View.MeasureSpec.makeMeasureSpec(initialHeight, View.MeasureSpec.EXACTLY)
                 );
-                printWebView.layout(0, 0, printWebView.getMeasuredWidth(), printWebView.getMeasuredHeight());
+                printWebView.layout(0, 0, initialWidth, initialHeight);
 
                 printWebView.setWebViewClient(new WebViewClient() {
                     @Override
@@ -349,19 +348,33 @@ public class BatiQuantNativeAdsBridge {
                         if (started[0]) return;
                         started[0] = true;
 
-                        mainHandler.postDelayed(() -> writeWebViewToPdf(view, safeText(title, "BatiQuant"), targetFile, new PdfReadyCallback() {
-                            @Override
-                            public void onSuccess(File pdfFile) {
-                                destroyWebViewQuietly(printWebView);
-                                callback.onSuccess(pdfFile);
+                        mainHandler.postDelayed(() -> {
+                            int contentWidth = Math.max(view.getWidth(), activity.getResources().getDisplayMetrics().widthPixels);
+                            int contentHeight = Math.max((int) Math.ceil(view.getContentHeight() * view.getScale()), view.computeVerticalScrollRange());
+                            if (contentHeight <= 0) {
+                                contentHeight = Math.max(view.getHeight(), activity.getResources().getDisplayMetrics().heightPixels);
                             }
 
-                            @Override
-                            public void onError(String message, Throwable throwable) {
-                                destroyWebViewQuietly(printWebView);
-                                callback.onError(message, throwable);
-                            }
-                        }), 250L);
+                            view.measure(
+                                    View.MeasureSpec.makeMeasureSpec(contentWidth, View.MeasureSpec.EXACTLY),
+                                    View.MeasureSpec.makeMeasureSpec(contentHeight, View.MeasureSpec.EXACTLY)
+                            );
+                            view.layout(0, 0, contentWidth, contentHeight);
+
+                            writeWebViewToPdf(view, targetFile, new PdfReadyCallback() {
+                                @Override
+                                public void onSuccess(File pdfFile) {
+                                    destroyWebViewQuietly(printWebView);
+                                    callback.onSuccess(pdfFile);
+                                }
+
+                                @Override
+                                public void onError(String message, Throwable throwable) {
+                                    destroyWebViewQuietly(printWebView);
+                                    callback.onError(message, throwable);
+                                }
+                            });
+                        }, 500L);
                     }
                 });
 
@@ -373,60 +386,62 @@ public class BatiQuantNativeAdsBridge {
         });
     }
 
-    private void writeWebViewToPdf(WebView sourceView, String jobName, File targetFile, PdfReadyCallback callback) {
+    private void writeWebViewToPdf(WebView sourceView, File targetFile, PdfReadyCallback callback) {
+        PdfDocument document = null;
+        FileOutputStream outputStream = null;
+
         try {
-            PrintDocumentAdapter adapter = sourceView.createPrintDocumentAdapter(jobName);
-            PrintAttributes attributes = new PrintAttributes.Builder()
-                    .setMediaSize(PrintAttributes.MediaSize.ISO_A4)
-                    .setResolution(new PrintAttributes.Resolution("batiquant", "batiquant", 300, 300))
-                    .setMinMargins(PrintAttributes.Margins.NO_MARGINS)
-                    .build();
+            int viewWidth = Math.max(sourceView.getWidth(), activity.getResources().getDisplayMetrics().widthPixels);
+            int rawContentHeight = Math.max((int) Math.ceil(sourceView.getContentHeight() * sourceView.getScale()), sourceView.computeVerticalScrollRange());
+            int viewHeight = rawContentHeight > 0 ? rawContentHeight : Math.max(sourceView.getHeight(), activity.getResources().getDisplayMetrics().heightPixels);
 
-            ParcelFileDescriptor descriptor = ParcelFileDescriptor.open(
-                    targetFile,
-                    ParcelFileDescriptor.MODE_CREATE
-                            | ParcelFileDescriptor.MODE_READ_WRITE
-                            | ParcelFileDescriptor.MODE_TRUNCATE
+            sourceView.measure(
+                    View.MeasureSpec.makeMeasureSpec(viewWidth, View.MeasureSpec.EXACTLY),
+                    View.MeasureSpec.makeMeasureSpec(viewHeight, View.MeasureSpec.EXACTLY)
             );
+            sourceView.layout(0, 0, viewWidth, viewHeight);
 
-            adapter.onLayout(null, attributes, null, new PrintDocumentAdapter.LayoutResultCallback() {
-                @Override
-                public void onLayoutFinished(PrintDocumentInfo info, boolean changed) {
-                    adapter.onWrite(new PageRange[]{PageRange.ALL_PAGES}, descriptor, new CancellationSignal(), new PrintDocumentAdapter.WriteResultCallback() {
-                        @Override
-                        public void onWriteFinished(PageRange[] pages) {
-                            closeQuietly(descriptor);
-                            callback.onSuccess(targetFile);
-                        }
+            final int pageWidth = 1240;
+            final int pageHeight = 1754;
+            final float scale = pageWidth / (float) viewWidth;
+            final int scaledContentHeight = Math.max(1, Math.round(viewHeight * scale));
+            final int pageCount = Math.max(1, (int) Math.ceil(scaledContentHeight / (float) pageHeight));
 
-                        @Override
-                        public void onWriteFailed(CharSequence error) {
-                            closeQuietly(descriptor);
-                            callback.onError(error != null ? error.toString() : "write-failed", null);
-                        }
+            document = new PdfDocument();
 
-                        @Override
-                        public void onWriteCancelled() {
-                            closeQuietly(descriptor);
-                            callback.onError("write-cancelled", null);
-                        }
-                    });
-                }
+            for (int pageIndex = 0; pageIndex < pageCount; pageIndex++) {
+                PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(pageWidth, pageHeight, pageIndex + 1).create();
+                PdfDocument.Page page = document.startPage(pageInfo);
+                page.getCanvas().save();
+                page.getCanvas().scale(scale, scale);
+                page.getCanvas().translate(0, -((pageIndex * pageHeight) / scale));
+                sourceView.draw(page.getCanvas());
+                page.getCanvas().restore();
+                document.finishPage(page);
+            }
 
-                @Override
-                public void onLayoutFailed(CharSequence error) {
-                    closeQuietly(descriptor);
-                    callback.onError(error != null ? error.toString() : "layout-failed", null);
-                }
-
-                @Override
-                public void onLayoutCancelled() {
-                    closeQuietly(descriptor);
-                    callback.onError("layout-cancelled", null);
-                }
-            }, null);
+            outputStream = new FileOutputStream(targetFile, false);
+            document.writeTo(outputStream);
+            outputStream.flush();
+            callback.onSuccess(targetFile);
         } catch (Throwable error) {
             callback.onError("pdf-write-failed", error);
+        } finally {
+            if (document != null) {
+                try {
+                    document.close();
+                } catch (Throwable ignored) {
+                    // ignore
+                }
+            }
+
+            if (outputStream != null) {
+                try {
+                    outputStream.close();
+                } catch (Throwable ignored) {
+                    // ignore
+                }
+            }
         }
     }
 
