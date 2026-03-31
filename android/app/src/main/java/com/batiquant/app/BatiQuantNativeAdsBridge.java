@@ -6,14 +6,18 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
+import android.os.CancellationSignal;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.ParcelFileDescriptor;
+import android.print.PageRange;
 import android.print.PrintAttributes;
 import android.print.PrintDocumentAdapter;
-import android.print.PrintManager;
+import android.print.PrintDocumentInfo;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.View;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -34,13 +38,16 @@ import com.google.android.ump.ConsentRequestParameters;
 import com.google.android.ump.UserMessagingPlatform;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
 
 public class BatiQuantNativeAdsBridge {
     private static final String TAG = "BatiQuantAds";
     private static final String DEFAULT_TEST_INTERSTITIAL_ID = "ca-app-pub-3940256099942544/1033173712";
+    private static final String DOCUMENT_EVENT = "batiquant-native-document";
 
     private final Activity activity;
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
@@ -51,6 +58,12 @@ public class BatiQuantNativeAdsBridge {
 
     private boolean mobileAdsInitialized = false;
     private boolean interstitialLoading = false;
+
+    private interface PdfReadyCallback {
+        void onSuccess(File pdfFile);
+
+        void onError(String message, Throwable throwable);
+    }
 
     public BatiQuantNativeAdsBridge(Activity activity, WebView webView) {
         this.activity = activity;
@@ -118,111 +131,33 @@ public class BatiQuantNativeAdsBridge {
     }
 
     @JavascriptInterface
-    public boolean printHtmlDocument(String jobName, String html) {
-        if (html == null || html.trim().isEmpty()) return false;
+    public boolean openPdfDocument(String requestId, String title, String fileName, String html) {
+        if (html == null || html.trim().isEmpty()) {
+            dispatchDocumentEvent(requestId, "open", "error", "empty-html");
+            return false;
+        }
 
-        runOnMainThread(() -> {
-            try {
-                final WebView printWebView = new WebView(activity);
-                final boolean[] started = {false};
-
-                printWebView.getSettings().setJavaScriptEnabled(false);
-                printWebView.setWebViewClient(new WebViewClient() {
-                    @Override
-                    public void onPageFinished(WebView view, String url) {
-                        if (started[0]) return;
-                        started[0] = true;
-
-                        try {
-                            PrintManager printManager = (PrintManager) activity.getSystemService(Context.PRINT_SERVICE);
-                            String safeJobName = safeText(jobName, "BatiQuant");
-                            PrintDocumentAdapter adapter;
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                adapter = view.createPrintDocumentAdapter(safeJobName);
-                            } else {
-                                adapter = view.createPrintDocumentAdapter();
-                            }
-                            printManager.print(
-                                    safeJobName,
-                                    adapter,
-                                    new PrintAttributes.Builder().build()
-                            );
-                        } catch (Throwable error) {
-                            Log.w(TAG, "Unable to print HTML document", error);
-                        } finally {
-                            mainHandler.postDelayed(() -> {
-                                try {
-                                    printWebView.destroy();
-                                } catch (Throwable ignored) {
-                                }
-                            }, 1200);
-                        }
-                    }
-                });
-
-                printWebView.loadDataWithBaseURL(null, html, "text/html", "UTF-8", null);
-            } catch (Throwable error) {
-                Log.w(TAG, "Unable to initialize print WebView", error);
-            }
-        });
-
-        return true;
-    }
-
-    @JavascriptInterface
-    public boolean shareHtmlDocument(String title, String fileName, String html) {
-        if (html == null || html.trim().isEmpty()) return false;
-
-        runOnMainThread(() -> {
-            try {
-                File file = writeHtmlToCache(fileName, html);
-                Uri uri = FileProvider.getUriForFile(
-                        activity,
-                        activity.getPackageName() + ".fileprovider",
-                        file
-                );
-
-                Intent sendIntent = new Intent(Intent.ACTION_SEND);
-                sendIntent.setType("text/html");
-                sendIntent.putExtra(Intent.EXTRA_SUBJECT, safeText(title, "BatiQuant"));
-                sendIntent.putExtra(Intent.EXTRA_STREAM, uri);
-                sendIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-
-                activity.startActivity(Intent.createChooser(sendIntent, safeText(title, "Partager")));
-            } catch (Throwable error) {
-                Log.w(TAG, "Unable to share HTML document", error);
-            }
-        });
-
-        return true;
-    }
-
-    @JavascriptInterface
-    public boolean emailHtmlDocument(String to, String subject, String body, String fileName, String html) {
-        if (html == null || html.trim().isEmpty()) return false;
-
-        runOnMainThread(() -> {
-            try {
-                File file = writeHtmlToCache(fileName, html);
-                Uri uri = FileProvider.getUriForFile(
-                        activity,
-                        activity.getPackageName() + ".fileprovider",
-                        file
-                );
-
-                Intent emailIntent = new Intent(Intent.ACTION_SEND);
-                emailIntent.setType("message/rfc822");
-                if (to != null && !to.trim().isEmpty()) {
-                    emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{to.trim()});
+        generatePdfFromHtml(requestId, "open", title, fileName, html, new PdfReadyCallback() {
+            @Override
+            public void onSuccess(File pdfFile) {
+                try {
+                    Uri uri = toDocumentUri(pdfFile);
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setDataAndType(uri, "application/pdf");
+                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    activity.startActivity(Intent.createChooser(intent, safeText(title, "PDF")));
+                    dispatchDocumentEvent(requestId, "open", "success", pdfFile.getName());
+                } catch (Throwable error) {
+                    Log.w(TAG, "Unable to open PDF document", error);
+                    dispatchDocumentEvent(requestId, "open", "error", "open-failed");
                 }
-                emailIntent.putExtra(Intent.EXTRA_SUBJECT, safeText(subject, "BatiQuant"));
-                emailIntent.putExtra(Intent.EXTRA_TEXT, safeText(body, ""));
-                emailIntent.putExtra(Intent.EXTRA_STREAM, uri);
-                emailIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            }
 
-                activity.startActivity(Intent.createChooser(emailIntent, safeText(subject, "Envoyer le document")));
-            } catch (Throwable error) {
-                Log.w(TAG, "Unable to prepare email intent", error);
+            @Override
+            public void onError(String message, Throwable throwable) {
+                Log.w(TAG, "Unable to prepare PDF for opening", throwable);
+                dispatchDocumentEvent(requestId, "open", "error", safeText(message, "open-failed"));
             }
         });
 
@@ -230,49 +165,110 @@ public class BatiQuantNativeAdsBridge {
     }
 
     @JavascriptInterface
-    public boolean downloadHtmlDocument(String fileName, String html) {
-        if (html == null || html.trim().isEmpty()) return false;
+    public boolean sharePdfDocument(String requestId, String title, String fileName, String html, String chooserTitle) {
+        if (html == null || html.trim().isEmpty()) {
+            dispatchDocumentEvent(requestId, "share", "error", "empty-html");
+            return false;
+        }
 
-        final String safeFileName = sanitizeFileName(fileName, "document-batiquant.html");
-
-        runOnMainThread(() -> {
-            try {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    ContentValues values = new ContentValues();
-                    values.put(MediaStore.Downloads.DISPLAY_NAME, safeFileName);
-                    values.put(MediaStore.Downloads.MIME_TYPE, "text/html");
-                    values.put(MediaStore.Downloads.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS + "/BatiQuant");
-                    values.put(MediaStore.Downloads.IS_PENDING, 1);
-
-                    Uri uri = activity.getContentResolver().insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values);
-                    if (uri != null) {
-                        try (OutputStream outputStream = activity.getContentResolver().openOutputStream(uri)) {
-                            if (outputStream != null) {
-                                outputStream.write(html.getBytes(StandardCharsets.UTF_8));
-                                outputStream.flush();
-                            }
-                        }
-                        values.clear();
-                        values.put(MediaStore.Downloads.IS_PENDING, 0);
-                        activity.getContentResolver().update(uri, values, null, null);
-                    }
-                } else {
-                    File directory = activity.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS);
-                    if (directory == null) {
-                        directory = activity.getCacheDir();
-                    }
-                    if (!directory.exists()) {
-                        //noinspection ResultOfMethodCallIgnored
-                        directory.mkdirs();
-                    }
-                    File file = new File(directory, safeFileName);
-                    try (FileOutputStream outputStream = new FileOutputStream(file)) {
-                        outputStream.write(html.getBytes(StandardCharsets.UTF_8));
-                        outputStream.flush();
-                    }
+        generatePdfFromHtml(requestId, "share", title, fileName, html, new PdfReadyCallback() {
+            @Override
+            public void onSuccess(File pdfFile) {
+                try {
+                    Uri uri = toDocumentUri(pdfFile);
+                    Intent sendIntent = new Intent(Intent.ACTION_SEND);
+                    sendIntent.setType("application/pdf");
+                    sendIntent.putExtra(Intent.EXTRA_SUBJECT, safeText(title, "BatiQuant"));
+                    sendIntent.putExtra(Intent.EXTRA_STREAM, uri);
+                    sendIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    activity.startActivity(Intent.createChooser(sendIntent, safeText(chooserTitle, "Partager le PDF")));
+                    dispatchDocumentEvent(requestId, "share", "success", pdfFile.getName());
+                } catch (Throwable error) {
+                    Log.w(TAG, "Unable to share PDF document", error);
+                    dispatchDocumentEvent(requestId, "share", "error", "share-failed");
                 }
-            } catch (Throwable error) {
-                Log.w(TAG, "Unable to save HTML document", error);
+            }
+
+            @Override
+            public void onError(String message, Throwable throwable) {
+                Log.w(TAG, "Unable to prepare PDF for sharing", throwable);
+                dispatchDocumentEvent(requestId, "share", "error", safeText(message, "share-failed"));
+            }
+        });
+
+        return true;
+    }
+
+    @JavascriptInterface
+    public boolean emailPdfDocument(
+            String requestId,
+            String to,
+            String subject,
+            String body,
+            String fileName,
+            String html,
+            String chooserTitle
+    ) {
+        if (html == null || html.trim().isEmpty()) {
+            dispatchDocumentEvent(requestId, "email", "error", "empty-html");
+            return false;
+        }
+
+        generatePdfFromHtml(requestId, "email", subject, fileName, html, new PdfReadyCallback() {
+            @Override
+            public void onSuccess(File pdfFile) {
+                try {
+                    Uri uri = toDocumentUri(pdfFile);
+                    Intent emailIntent = new Intent(Intent.ACTION_SEND);
+                    emailIntent.setType("application/pdf");
+                    if (to != null && !to.trim().isEmpty()) {
+                        emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{to.trim()});
+                    }
+                    emailIntent.putExtra(Intent.EXTRA_SUBJECT, safeText(subject, "BatiQuant"));
+                    emailIntent.putExtra(Intent.EXTRA_TEXT, safeText(body, ""));
+                    emailIntent.putExtra(Intent.EXTRA_STREAM, uri);
+                    emailIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    activity.startActivity(Intent.createChooser(emailIntent, safeText(chooserTitle, "Envoyer par e-mail")));
+                    dispatchDocumentEvent(requestId, "email", "success", pdfFile.getName());
+                } catch (Throwable error) {
+                    Log.w(TAG, "Unable to prepare email with PDF document", error);
+                    dispatchDocumentEvent(requestId, "email", "error", "email-failed");
+                }
+            }
+
+            @Override
+            public void onError(String message, Throwable throwable) {
+                Log.w(TAG, "Unable to prepare PDF for email", throwable);
+                dispatchDocumentEvent(requestId, "email", "error", safeText(message, "email-failed"));
+            }
+        });
+
+        return true;
+    }
+
+    @JavascriptInterface
+    public boolean downloadPdfDocument(String requestId, String fileName, String html) {
+        if (html == null || html.trim().isEmpty()) {
+            dispatchDocumentEvent(requestId, "download", "error", "empty-html");
+            return false;
+        }
+
+        generatePdfFromHtml(requestId, "download", fileName, fileName, html, new PdfReadyCallback() {
+            @Override
+            public void onSuccess(File pdfFile) {
+                try {
+                    String savedLocation = savePdfToDownloads(pdfFile, fileName);
+                    dispatchDocumentEvent(requestId, "download", "success", savedLocation);
+                } catch (Throwable error) {
+                    Log.w(TAG, "Unable to download PDF document", error);
+                    dispatchDocumentEvent(requestId, "download", "error", "download-failed");
+                }
+            }
+
+            @Override
+            public void onError(String message, Throwable throwable) {
+                Log.w(TAG, "Unable to prepare PDF for download", throwable);
+                dispatchDocumentEvent(requestId, "download", "error", safeText(message, "download-failed"));
             }
         });
 
@@ -320,6 +316,211 @@ public class BatiQuantNativeAdsBridge {
 
     public void onHostDestroy() {
         runOnMainThread(this::voidBannerPlacement);
+    }
+
+    private void generatePdfFromHtml(
+            String requestId,
+            String action,
+            String title,
+            String fileName,
+            String html,
+            PdfReadyCallback callback
+    ) {
+        runOnMainThread(() -> {
+            try {
+                final File targetFile = new File(ensureDocumentsCacheDir(), sanitizePdfFileName(fileName, "document-batiquant.pdf"));
+                final WebView printWebView = new WebView(activity);
+                final boolean[] started = {false};
+
+                printWebView.getSettings().setJavaScriptEnabled(false);
+                printWebView.getSettings().setDomStorageEnabled(false);
+                printWebView.getSettings().setAllowFileAccess(false);
+                printWebView.getSettings().setLoadsImagesAutomatically(true);
+                printWebView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+                printWebView.measure(
+                        View.MeasureSpec.makeMeasureSpec(activity.getResources().getDisplayMetrics().widthPixels, View.MeasureSpec.EXACTLY),
+                        View.MeasureSpec.makeMeasureSpec(activity.getResources().getDisplayMetrics().heightPixels, View.MeasureSpec.AT_MOST)
+                );
+                printWebView.layout(0, 0, printWebView.getMeasuredWidth(), printWebView.getMeasuredHeight());
+
+                printWebView.setWebViewClient(new WebViewClient() {
+                    @Override
+                    public void onPageFinished(WebView view, String url) {
+                        if (started[0]) return;
+                        started[0] = true;
+
+                        mainHandler.postDelayed(() -> writeWebViewToPdf(view, safeText(title, "BatiQuant"), targetFile, new PdfReadyCallback() {
+                            @Override
+                            public void onSuccess(File pdfFile) {
+                                destroyWebViewQuietly(printWebView);
+                                callback.onSuccess(pdfFile);
+                            }
+
+                            @Override
+                            public void onError(String message, Throwable throwable) {
+                                destroyWebViewQuietly(printWebView);
+                                callback.onError(message, throwable);
+                            }
+                        }), 250L);
+                    }
+                });
+
+                printWebView.loadDataWithBaseURL(null, html, "text/html", "UTF-8", null);
+            } catch (Throwable error) {
+                Log.w(TAG, "Unable to initialize PDF generation", error);
+                callback.onError(action + "-init-failed", error);
+            }
+        });
+    }
+
+    private void writeWebViewToPdf(WebView sourceView, String jobName, File targetFile, PdfReadyCallback callback) {
+        try {
+            PrintDocumentAdapter adapter = sourceView.createPrintDocumentAdapter(jobName);
+            PrintAttributes attributes = new PrintAttributes.Builder()
+                    .setMediaSize(PrintAttributes.MediaSize.ISO_A4)
+                    .setResolution(new PrintAttributes.Resolution("batiquant", "batiquant", 300, 300))
+                    .setMinMargins(PrintAttributes.Margins.NO_MARGINS)
+                    .build();
+
+            ParcelFileDescriptor descriptor = ParcelFileDescriptor.open(
+                    targetFile,
+                    ParcelFileDescriptor.MODE_CREATE
+                            | ParcelFileDescriptor.MODE_READ_WRITE
+                            | ParcelFileDescriptor.MODE_TRUNCATE
+            );
+
+            adapter.onLayout(null, attributes, null, new PrintDocumentAdapter.LayoutResultCallback() {
+                @Override
+                public void onLayoutFinished(PrintDocumentInfo info, boolean changed) {
+                    adapter.onWrite(new PageRange[]{PageRange.ALL_PAGES}, descriptor, new CancellationSignal(), new PrintDocumentAdapter.WriteResultCallback() {
+                        @Override
+                        public void onWriteFinished(PageRange[] pages) {
+                            closeQuietly(descriptor);
+                            callback.onSuccess(targetFile);
+                        }
+
+                        @Override
+                        public void onWriteFailed(CharSequence error) {
+                            closeQuietly(descriptor);
+                            callback.onError(error != null ? error.toString() : "write-failed", null);
+                        }
+
+                        @Override
+                        public void onWriteCancelled() {
+                            closeQuietly(descriptor);
+                            callback.onError("write-cancelled", null);
+                        }
+                    });
+                }
+
+                @Override
+                public void onLayoutFailed(CharSequence error) {
+                    closeQuietly(descriptor);
+                    callback.onError(error != null ? error.toString() : "layout-failed", null);
+                }
+
+                @Override
+                public void onLayoutCancelled() {
+                    closeQuietly(descriptor);
+                    callback.onError("layout-cancelled", null);
+                }
+            }, null);
+        } catch (Throwable error) {
+            callback.onError("pdf-write-failed", error);
+        }
+    }
+
+    private File ensureDocumentsCacheDir() {
+        File directory = new File(activity.getCacheDir(), "documents");
+        if (!directory.exists()) {
+            //noinspection ResultOfMethodCallIgnored
+            directory.mkdirs();
+        }
+        return directory;
+    }
+
+    private Uri toDocumentUri(File file) {
+        return FileProvider.getUriForFile(
+                activity,
+                activity.getPackageName() + ".fileprovider",
+                file
+        );
+    }
+
+    private String savePdfToDownloads(File sourceFile, String requestedFileName) throws IOException {
+        String safeFileName = sanitizePdfFileName(requestedFileName, sourceFile.getName());
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            ContentValues values = new ContentValues();
+            values.put(MediaStore.Downloads.DISPLAY_NAME, safeFileName);
+            values.put(MediaStore.Downloads.MIME_TYPE, "application/pdf");
+            values.put(MediaStore.Downloads.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS + "/BatiQuant");
+            values.put(MediaStore.Downloads.IS_PENDING, 1);
+
+            Uri uri = activity.getContentResolver().insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values);
+            if (uri == null) {
+                throw new IOException("Unable to create MediaStore entry");
+            }
+
+            try (InputStream inputStream = new FileInputStream(sourceFile);
+                 OutputStream outputStream = activity.getContentResolver().openOutputStream(uri)) {
+                if (outputStream == null) {
+                    throw new IOException("Unable to open output stream for download");
+                }
+                copyStream(inputStream, outputStream);
+            }
+
+            values.clear();
+            values.put(MediaStore.Downloads.IS_PENDING, 0);
+            activity.getContentResolver().update(uri, values, null, null);
+            return safeFileName;
+        }
+
+        File directory = activity.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS);
+        if (directory == null) {
+            directory = new File(activity.getCacheDir(), "downloads");
+        }
+        if (!directory.exists()) {
+            //noinspection ResultOfMethodCallIgnored
+            directory.mkdirs();
+        }
+
+        File targetFile = new File(directory, safeFileName);
+        try (InputStream inputStream = new FileInputStream(sourceFile);
+             OutputStream outputStream = new FileOutputStream(targetFile, false)) {
+            copyStream(inputStream, outputStream);
+        }
+
+        return targetFile.getAbsolutePath();
+    }
+
+    private void copyStream(InputStream inputStream, OutputStream outputStream) throws IOException {
+        byte[] buffer = new byte[8192];
+        int read;
+        while ((read = inputStream.read(buffer)) != -1) {
+            outputStream.write(buffer, 0, read);
+        }
+        outputStream.flush();
+    }
+
+    private void destroyWebViewQuietly(WebView targetWebView) {
+        mainHandler.postDelayed(() -> {
+            try {
+                targetWebView.stopLoading();
+                targetWebView.destroy();
+            } catch (Throwable ignored) {
+                // ignore
+            }
+        }, 100L);
+    }
+
+    private void closeQuietly(ParcelFileDescriptor descriptor) {
+        if (descriptor == null) return;
+        try {
+            descriptor.close();
+        } catch (Throwable ignored) {
+            // ignore
+        }
     }
 
     private void refreshConsentAndMaybeInitializeAds() {
@@ -430,6 +631,20 @@ public class BatiQuantNativeAdsBridge {
         );
     }
 
+    private void dispatchDocumentEvent(String requestId, String action, String phase, String message) {
+        postJavascript(
+                "window.dispatchEvent(new CustomEvent('" + DOCUMENT_EVENT + "', { detail: { requestId: '"
+                        + escapeForJs(requestId)
+                        + "', action: '"
+                        + escapeForJs(action)
+                        + "', phase: '"
+                        + escapeForJs(phase)
+                        + "', message: '"
+                        + escapeForJs(message)
+                        + "' } }));"
+        );
+    }
+
     private void voidBannerPlacement() {
         postJavascript(
                 "(function(){"
@@ -439,27 +654,16 @@ public class BatiQuantNativeAdsBridge {
         );
     }
 
-    private File writeHtmlToCache(String fileName, String html) throws Exception {
-        File directory = new File(activity.getCacheDir(), "documents");
-        if (!directory.exists()) {
-            //noinspection ResultOfMethodCallIgnored
-            directory.mkdirs();
-        }
-
-        File file = new File(directory, sanitizeFileName(fileName, "document-batiquant.html"));
-        try (FileOutputStream outputStream = new FileOutputStream(file, false)) {
-            outputStream.write(html.getBytes(StandardCharsets.UTF_8));
-            outputStream.flush();
-        }
-        return file;
-    }
-
-    private String sanitizeFileName(String input, String fallback) {
+    private String sanitizePdfFileName(String input, String fallback) {
         String candidate = input == null ? "" : input.trim();
         if (candidate.isEmpty()) candidate = fallback;
         candidate = candidate.replaceAll("[^a-zA-Z0-9._-]+", "_");
-        if (!candidate.toLowerCase().endsWith(".html")) {
-            candidate = candidate + ".html";
+        if (!candidate.toLowerCase().endsWith(".pdf")) {
+            int dotIndex = candidate.lastIndexOf('.');
+            if (dotIndex > 0) {
+                candidate = candidate.substring(0, dotIndex);
+            }
+            candidate = candidate + ".pdf";
         }
         return candidate;
     }

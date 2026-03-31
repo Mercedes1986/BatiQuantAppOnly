@@ -10,19 +10,49 @@ declare global {
       openPrivacyOptions?: () => Promise<void> | void;
       canRequestAds?: () => Promise<boolean> | boolean;
       privacyOptionsRequired?: () => Promise<boolean> | boolean;
-      printHtmlDocument?: (jobName: string, html: string) => Promise<boolean> | boolean;
-      shareHtmlDocument?: (title: string, fileName: string, html: string) => Promise<boolean> | boolean;
-      emailHtmlDocument?: (
+      openPdfDocument?: (requestId: string, title: string, fileName: string, html: string) => Promise<boolean> | boolean;
+      sharePdfDocument?: (
+        requestId: string,
+        title: string,
+        fileName: string,
+        html: string,
+        chooserTitle?: string,
+      ) => Promise<boolean> | boolean;
+      emailPdfDocument?: (
+        requestId: string,
         to: string,
         subject: string,
         body: string,
         fileName: string,
         html: string,
+        chooserTitle?: string,
       ) => Promise<boolean> | boolean;
-      downloadHtmlDocument?: (fileName: string, html: string) => Promise<boolean> | boolean;
+      downloadPdfDocument?: (requestId: string, fileName: string, html: string) => Promise<boolean> | boolean;
     };
   }
 }
+
+export type NativeDocumentAction = "open" | "share" | "email" | "download";
+
+export interface NativeDocumentRequest {
+  title: string;
+  fileName: string;
+  html: string;
+  chooserTitle?: string;
+  to?: string;
+  subject?: string;
+  body?: string;
+}
+
+export interface NativeDocumentEventDetail {
+  requestId: string;
+  action: NativeDocumentAction;
+  phase: "success" | "error";
+  message?: string;
+}
+
+const DOCUMENT_EVENT_NAME = "batiquant-native-document";
+const DOCUMENT_ACTION_TIMEOUT_MS = 30000;
 
 const isBrowser = () => typeof window !== "undefined";
 
@@ -50,4 +80,106 @@ export const getNativeBoolean = (getter: "canRequestAds" | "privacyOptionsRequir
   } catch {
     return null;
   }
+};
+
+export const supportsNativeDocumentActions = (): boolean => {
+  const bridge = getNativeAdsBridge();
+  return !!(
+    bridge &&
+    typeof bridge.openPdfDocument === "function" &&
+    typeof bridge.sharePdfDocument === "function" &&
+    typeof bridge.emailPdfDocument === "function" &&
+    typeof bridge.downloadPdfDocument === "function"
+  );
+};
+
+const createRequestId = () =>
+  `doc_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+
+const parseDocumentEvent = (event: Event): NativeDocumentEventDetail | null => {
+  const customEvent = event as CustomEvent<NativeDocumentEventDetail>;
+  if (!customEvent?.detail) return null;
+  const detail = customEvent.detail;
+  if (!detail.requestId || !detail.action || !detail.phase) return null;
+  return detail;
+};
+
+export const runNativeDocumentAction = (
+  action: NativeDocumentAction,
+  request: NativeDocumentRequest,
+): Promise<NativeDocumentEventDetail> => {
+  if (!supportsNativeDocumentActions()) {
+    return Promise.reject(new Error("native-document-actions-unavailable"));
+  }
+
+  const bridge = getNativeAdsBridge();
+  if (!bridge) {
+    return Promise.reject(new Error("native-bridge-unavailable"));
+  }
+
+  const requestId = createRequestId();
+
+  return new Promise<NativeDocumentEventDetail>((resolve, reject) => {
+    const cleanup = () => {
+      window.removeEventListener(DOCUMENT_EVENT_NAME, onEvent as EventListener);
+      window.clearTimeout(timeoutId);
+    };
+
+    const onEvent = (event: Event) => {
+      const detail = parseDocumentEvent(event);
+      if (!detail || detail.requestId !== requestId || detail.action !== action) return;
+      cleanup();
+      if (detail.phase === "success") {
+        resolve(detail);
+      } else {
+        reject(new Error(detail.message || `${action}-failed`));
+      }
+    };
+
+    const timeoutId = window.setTimeout(() => {
+      cleanup();
+      reject(new Error(`${action}-timeout`));
+    }, DOCUMENT_ACTION_TIMEOUT_MS);
+
+    window.addEventListener(DOCUMENT_EVENT_NAME, onEvent as EventListener);
+
+    try {
+      const started = (() => {
+        switch (action) {
+          case "open":
+            return bridge.openPdfDocument?.(requestId, request.title, request.fileName, request.html);
+          case "share":
+            return bridge.sharePdfDocument?.(
+              requestId,
+              request.title,
+              request.fileName,
+              request.html,
+              request.chooserTitle ?? request.title,
+            );
+          case "email":
+            return bridge.emailPdfDocument?.(
+              requestId,
+              request.to ?? "",
+              request.subject ?? request.title,
+              request.body ?? "",
+              request.fileName,
+              request.html,
+              request.chooserTitle ?? request.title,
+            );
+          case "download":
+            return bridge.downloadPdfDocument?.(requestId, request.fileName, request.html);
+          default:
+            return false;
+        }
+      })();
+
+      if (started === false) {
+        cleanup();
+        reject(new Error(`${action}-not-started`));
+      }
+    } catch (error) {
+      cleanup();
+      reject(error instanceof Error ? error : new Error(`${action}-exception`));
+    }
+  });
 };

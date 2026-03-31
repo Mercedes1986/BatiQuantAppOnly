@@ -38,10 +38,7 @@
     "waste_plus": "Pertes +",
     "back_to_quote": "Retour au devis",
     "open": "Ouvrir",
-    "total": "Total",
-    "download": "Télécharger",
-    "email": "E-mail",
-    "send_email": "Envoyer par e-mail"
+    "total": "Total"
   },
   "calculator": {
     "open": "Ouvrir le calculateur",
@@ -1857,14 +1854,7 @@
     "total_ttc": "Total TTC",
     "valid_until": "Valable jusqu’au",
     "vat": "TVA",
-    "terms_conditions": "Conditions générales",
-    "print_opened": "Fenêtre d'impression ouverte.",
-    "share_opened": "Partage ouvert.",
-    "email_opened": "Préparation de l’e-mail ouverte.",
-    "download_saved": "Document enregistré sur votre appareil.",
-    "share_copied": "Texte du document copié. Vous pouvez maintenant le coller où vous voulez.",
-    "action_failed": "Action indisponible sur cet appareil.",
-    "native_actions_hint": "Les écrans Android d’impression et de partage utilisent la langue du téléphone et se ferment avec le bouton retour du téléphone."
+    "terms_conditions": "Conditions générales"
   },
   "errors": {
     "generic_hint": "Réessayez ou contactez le support si le problème persiste.",
@@ -3125,5 +3115,33 @@
         }
       }
     }
+  },
+  "documents": {
+    "actions": {
+      "share": "Partager le PDF",
+      "share_short": "Partager",
+      "email": "Envoyer par e-mail",
+      "email_short": "Envoyer par e-mail",
+      "download_short": "Télécharger",
+      "open_pdf": "PDF / imprimer",
+      "email_body": "Bonjour,\n\nVeuillez trouver le document en pièce jointe.\n\nCordialement,"
+    },
+    "status": {
+      "open_success": "PDF prêt. Ouvrez-le depuis votre lecteur pour l’imprimer si besoin.",
+      "share_success": "Partage ouvert.",
+      "email_success": "E-mail prêt.",
+      "download_success": "PDF enregistré sur le mobile.",
+      "open_error": "Impossible de préparer le PDF.",
+      "share_error": "Impossible d’ouvrir le partage.",
+      "email_error": "Impossible d’ouvrir l’e-mail.",
+      "download_error": "Impossible d’enregistrer le PDF.",
+      "popup_blocked": "La fenêtre PDF a été bloquée."
+    },
+    "pdf": {
+      "default_title": "Document BatiQuant",
+      "file_prefix_quote": "Devis",
+      "file_prefix_invoice": "Facture"
+    },
+    "mobile_pdf_hint": "Sur mobile, BatiQuant génère un PDF pour garder l’écran en français avec votre bouton Retour. Pour imprimer, ouvrez le PDF dans votre lecteur puis utilisez l’option Imprimer du lecteur."
   }
 }

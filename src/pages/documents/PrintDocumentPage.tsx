@@ -1,12 +1,12 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { ArrowLeft, Printer, Share2, Mail, Download } from "lucide-react";
+import { ArrowLeft, Download, FileText, Mail, Share2 } from "lucide-react";
 
 import { getQuote, getInvoice, getCompanyProfile } from "../../services/documentsStorage";
 import { BaseDocument, CompanyProfile } from "../../types";
 import { localizeLegacyText } from "../../constants";
-import { getNativeAdsBridge } from "../../services/platformService";
+import { runNativeDocumentAction, supportsNativeDocumentActions } from "../../services/platformService";
 
 const localizeLegacyLineDescription = (description: string) =>
   localizeLegacyText(String(description || ""));
@@ -107,16 +107,17 @@ const escapeHtml = (value: unknown) =>
 
 const preserveLineBreaks = (value: string) => escapeHtml(value).replace(/\n/g, "<br />");
 
-const safeDate = (value: string | undefined, fallback = "") => {
+const safeDate = (value: string | undefined, locale: string, fallback = "") => {
   if (!value) return fallback;
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return fallback;
-  return date.toLocaleDateString();
+  return date.toLocaleDateString(locale || undefined);
 };
 
 const buildDocumentText = (
   doc: BaseDocument,
   company: CompanyProfile,
+  locale: string,
   labels: {
     docTitle: string;
     issueDate: string;
@@ -142,15 +143,15 @@ const buildDocumentText = (
   const chunks = [
     `${labels.docTitle} ${doc.number}`,
     `${company.name}`,
-    `${labels.issueDate}: ${safeDate(doc.date)}`,
+    `${labels.issueDate}: ${safeDate(doc.date, locale)}`,
     "",
     `${labels.recipient}: ${doc.client.name}`,
     `${doc.client.address}`,
     `${doc.client.zip} ${doc.client.city}`,
   ];
 
-  if ((doc as any).validUntil) chunks.push(`${labels.validUntil}: ${safeDate((doc as any).validUntil)}`);
-  if ((doc as any).paymentDate) chunks.push(`${labels.paymentDate}: ${safeDate((doc as any).paymentDate)}`);
+  if ((doc as any).validUntil) chunks.push(`${labels.validUntil}: ${safeDate((doc as any).validUntil, locale)}`);
+  if ((doc as any).paymentDate) chunks.push(`${labels.paymentDate}: ${safeDate((doc as any).paymentDate, locale)}`);
 
   chunks.push(
     "",
@@ -169,6 +170,7 @@ const buildDocumentText = (
 const buildDocumentHtml = (
   doc: BaseDocument,
   company: CompanyProfile,
+  locale: string,
   labels: {
     docTitle: string;
     recipient: string;
@@ -187,12 +189,11 @@ const buildDocumentHtml = (
     generatedBy: string;
     numberPrefix: string;
   },
-  langCode: string,
 ) => {
   const vatPct = doc.totalHT > 0 ? (doc.totalVAT / doc.totalHT) * 100 : 0;
-  const issueDate = safeDate(doc.date);
-  const validUntil = (doc as any).validUntil ? safeDate((doc as any).validUntil) : "";
-  const paymentDate = (doc as any).paymentDate ? safeDate((doc as any).paymentDate) : "";
+  const issueDate = safeDate(doc.date, locale);
+  const validUntil = (doc as any).validUntil ? safeDate((doc as any).validUntil, locale) : "";
+  const paymentDate = (doc as any).paymentDate ? safeDate((doc as any).paymentDate, locale) : "";
 
   const rows = doc.lines
     .map((line) => {
@@ -233,7 +234,7 @@ const buildDocumentHtml = (
     : "";
 
   return `<!DOCTYPE html>
-<html lang="${escapeHtml(langCode)}">
+<html lang="${escapeHtml(locale.startsWith("fr") ? "fr" : "en")}">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -259,31 +260,28 @@ const buildDocumentHtml = (
     .muted { color: var(--muted); }
     .doc-head { display: flex; justify-content: space-between; gap: 20px; padding: 28px 0 18px; }
     table { width: 100%; border-collapse: collapse; font-size: 14px; }
-    th { text-align: left; padding: 12px 8px 12px 0; border-bottom: 2px solid var(--ink); }
-    td { padding: 12px 8px 12px 0; border-bottom: 1px solid #f1f5f9; vertical-align: top; }
-    .section td { background: var(--soft); font-weight: 700; text-transform: uppercase; letter-spacing: .08em; font-size: 11px; }
-    .center { text-align: center; }
-    .right { text-align: right; }
-    .strong { font-weight: 700; }
-    .totals { margin-left: auto; margin-top: 24px; width: 320px; border: 1px solid var(--line); background: var(--soft); border-radius: 18px; padding: 18px; }
-    .totals-row { display: flex; justify-content: space-between; gap: 16px; margin-bottom: 12px; color: var(--muted); }
-    .totals-main { display: flex; justify-content: space-between; gap: 16px; padding-top: 14px; border-top: 1px solid var(--line); font-size: 18px; font-weight: 800; color: var(--ink); }
-    .totals-main span:last-child { color: var(--accent); font-size: 28px; }
-    .note-box { margin-top: 18px; border: 1px solid var(--line); background: var(--soft); border-radius: 14px; padding: 14px 16px; font-size: 13px; color: #475569; line-height: 1.55; }
+    thead th { text-align: left; padding: 12px 8px; border-bottom: 2px solid #0f172a; }
+    thead th.center { text-align: center; }
+    thead th.right { text-align: right; }
+    tbody td { padding: 12px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    tbody td.center { text-align: center; color: var(--muted); }
+    tbody td.right { text-align: right; color: var(--muted); }
+    tbody td.strong { color: var(--ink); font-weight: 700; }
+    tbody tr.section td { background: var(--soft); font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--ink); padding-top: 18px; }
+    .totals { display: flex; justify-content: flex-end; margin-top: 28px; }
+    .totals-card { width: 310px; border: 1px solid var(--line); background: var(--soft); border-radius: 18px; padding: 18px; }
+    .totals-line { display: flex; justify-content: space-between; margin-bottom: 10px; color: var(--muted); }
+    .totals-line.border { padding-bottom: 14px; margin-bottom: 14px; border-bottom: 1px solid var(--line); }
+    .totals-final { display: flex; justify-content: space-between; align-items: center; font-weight: 700; }
+    .totals-final .amount { color: var(--accent); font-size: 28px; }
+    .note-box { margin-top: 18px; border: 1px solid var(--line); background: var(--soft); border-radius: 16px; padding: 14px; font-size: 12px; color: var(--muted); }
     .note-title { font-weight: 700; color: var(--ink); margin-bottom: 6px; }
-    .footer { margin-top: 28px; padding-top: 22px; border-top: 1px solid var(--line); font-size: 12px; color: var(--muted); text-align: center; }
+    .footer { padding-top: 24px; margin-top: 32px; border-top: 1px solid var(--line); text-align: center; font-size: 11px; color: var(--muted); }
+    .footer strong { color: var(--ink); }
     @media print {
-      @page { size: A4; margin: 14mm; }
-      html, body { background: white; }
-      body { padding: 0; }
+      @page { size: A4; margin: 12mm; }
+      body { background: #fff; padding: 0; }
       .page { box-shadow: none; border-radius: 0; max-width: none; padding: 0; }
-    }
-    @media (max-width: 720px) {
-      body { padding: 0; }
-      .page { border-radius: 0; padding: 18px; }
-      .top, .doc-head { display: block; }
-      .recipient-card, .totals { width: 100%; margin-top: 16px; }
-      h2 { font-size: 26px; }
     }
   </style>
 </head>
@@ -292,25 +290,26 @@ const buildDocumentHtml = (
     <div class="top">
       <div class="company">
         ${logo}
-        ${company.logoUrl ? `<div style="font-size:20px;font-weight:800;margin-bottom:10px;">${escapeHtml(company.name)}</div>` : ""}
-        <div class="muted" style="font-size:14px;line-height:1.6;">
+        ${company.logoUrl ? `<div style="font-size:18px;font-weight:700;color:#0f172a;margin-bottom:8px;">${escapeHtml(company.name)}</div>` : ""}
+        <div class="muted" style="font-size:13px;line-height:1.65;">
           <div>${escapeHtml(company.address)}</div>
           <div>${escapeHtml(company.zip)} ${escapeHtml(company.city)}</div>
-          <div style="margin-top:12px;">Tél: ${escapeHtml(company.phone)}</div>
-          <div>Email: ${escapeHtml(company.email)}</div>
-          <div>SIRET: ${escapeHtml(company.siret)}</div>
+          <div style="margin-top:10px;">${escapeHtml(company.phone || "")}</div>
+          <div>${escapeHtml(company.email || "")}</div>
+          <div>SIRET: ${escapeHtml(company.siret || "")}</div>
           ${company.tvaNumber ? `<div>TVA: ${escapeHtml(company.tvaNumber)}</div>` : ""}
         </div>
       </div>
-
       <div class="recipient">
         <div class="recipient-card">
           <div class="meta-title">${escapeHtml(labels.recipient)}</div>
-          <div style="font-size:20px;font-weight:700;margin-bottom:8px;">${escapeHtml(doc.client.name)}</div>
-          <div>${escapeHtml(doc.client.address)}</div>
-          <div>${escapeHtml(doc.client.zip)} ${escapeHtml(doc.client.city)}</div>
-          ${doc.client.phone ? `<div style="margin-top:10px;color:var(--muted);">${escapeHtml(doc.client.phone)}</div>` : ""}
-          ${doc.client.email ? `<div style="color:var(--muted);">${escapeHtml(doc.client.email)}</div>` : ""}
+          <div style="font-size:18px;font-weight:700;margin-bottom:8px;">${escapeHtml(doc.client.name)}</div>
+          <div class="muted" style="font-size:14px;line-height:1.6;">
+            <div>${escapeHtml(doc.client.address)}</div>
+            <div>${escapeHtml(doc.client.zip)} ${escapeHtml(doc.client.city)}</div>
+            ${doc.client.phone ? `<div style="margin-top:8px;">${escapeHtml(doc.client.phone)}</div>` : ""}
+            ${doc.client.email ? `<div>${escapeHtml(doc.client.email)}</div>` : ""}
+          </div>
         </div>
       </div>
     </div>
@@ -330,41 +329,47 @@ const buildDocumentHtml = (
     <table>
       <thead>
         <tr>
-          <th style="width:55%;">${escapeHtml(labels.desc)}</th>
-          <th class="center" style="width:15%;">${escapeHtml(labels.qty)}</th>
-          <th class="right" style="width:15%;">${escapeHtml(labels.unitPrice)}</th>
-          <th class="right" style="width:15%;">${escapeHtml(labels.totalHTCol)}</th>
+          <th>${escapeHtml(labels.desc)}</th>
+          <th class="center">${escapeHtml(labels.qty)}</th>
+          <th class="right">${escapeHtml(labels.unitPrice)}</th>
+          <th class="right">${escapeHtml(labels.totalHTCol)}</th>
         </tr>
       </thead>
-      <tbody>
-        ${rows}
-      </tbody>
+      <tbody>${rows}</tbody>
     </table>
 
     <div class="totals">
-      <div class="totals-row"><span>${escapeHtml(labels.totalHT)}</span><strong>${Number(doc.totalHT).toFixed(2)} €</strong></div>
-      <div class="totals-row"><span>${escapeHtml(labels.vat)} (${vatPct.toFixed(1)}%)</span><strong>${Number(doc.totalVAT).toFixed(2)} €</strong></div>
-      <div class="totals-main"><span>${escapeHtml(labels.netToPay)}</span><span>${Number(doc.totalTTC).toFixed(2)} €</span></div>
+      <div class="totals-card">
+        <div class="totals-line"><span>${escapeHtml(labels.totalHT)}</span><strong>${Number(doc.totalHT).toFixed(2)} €</strong></div>
+        <div class="totals-line border"><span>${escapeHtml(labels.vat)} (${vatPct.toFixed(1)}%)</span><span>${Number(doc.totalVAT).toFixed(2)} €</span></div>
+        <div class="totals-final"><span>${escapeHtml(labels.netToPay)}</span><span class="amount">${Number(doc.totalTTC).toFixed(2)} €</span></div>
+      </div>
     </div>
 
     ${notesBlock}
     ${termsBlock}
 
     <div class="footer">
-      <div style="font-weight:700;color:var(--ink);margin-bottom:6px;">${escapeHtml(company.name)}</div>
+      <div><strong>${escapeHtml(company.name)}</strong></div>
       <div>${escapeHtml(company.footerNote || `SIRET ${company.siret} - ${company.address} ${company.city}`)}</div>
-      <div style="padding-top:10px;color:#cbd5e1;">${escapeHtml(labels.generatedBy)} BatiQuant</div>
+      <div style="margin-top:10px;color:#94a3b8;">${escapeHtml(labels.generatedBy)} BatiQuant</div>
     </div>
   </div>
 </body>
 </html>`;
 };
 
+type ActionState = "open" | "share" | "email" | "download" | null;
+
+type NoticeState = {
+  tone: "success" | "error" | "info";
+  text: string;
+} | null;
+
 export const PrintDocumentPage: React.FC = () => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const { type, id } = useParams<{ type: string; id: string }>();
-  const [actionMessage, setActionMessage] = useState<string | null>(null);
 
   const [doc] = useState<BaseDocument | null>(() => {
     if (!id || !type) return null;
@@ -373,8 +378,12 @@ export const PrintDocumentPage: React.FC = () => {
   });
 
   const [company] = useState<CompanyProfile | null>(() => getCompanyProfile() ?? null);
+  const [busyAction, setBusyAction] = useState<ActionState>(null);
+  const [notice, setNotice] = useState<NoticeState>(null);
 
   const isQuote = useMemo(() => type === "quote", [type]);
+  const supportsNativePdf = supportsNativeDocumentActions();
+  const locale = useMemo(() => i18n.resolvedLanguage || i18n.language || "fr-FR", [i18n.language, i18n.resolvedLanguage]);
 
   const localizedDoc = useMemo(() => {
     if (!doc) return null;
@@ -388,12 +397,6 @@ export const PrintDocumentPage: React.FC = () => {
       notes: localizeLegacyNotes(doc.notes, t),
     };
   }, [doc, t]);
-
-  useEffect(() => {
-    if (!actionMessage) return;
-    const timer = window.setTimeout(() => setActionMessage(null), 3200);
-    return () => window.clearTimeout(timer);
-  }, [actionMessage]);
 
   const handleBack = () => {
     if (window.history.length > 1) {
@@ -412,186 +415,148 @@ export const PrintDocumentPage: React.FC = () => {
   const labels = useMemo(
     () => ({
       docTitle: isQuote
-        ? t("doc.quote_title", { defaultValue: "Devis" })
-        : t("doc.invoice_title", { defaultValue: "Facture" }),
+        ? t("doc.quote_title", { defaultValue: "Devis client" })
+        : t("doc.invoice_title", { defaultValue: "Facture client" }),
       recipient: t("doc.recipient", { defaultValue: "Destinataire" }),
       issueDate: t("doc.issue_date", { defaultValue: "Date d'émission" }),
       validUntil: t("doc.valid_until", { defaultValue: "Valable jusqu'au" }),
-      paymentDate: t("invoice.payment_date", { defaultValue: "Date paiement" }),
+      paymentDate: t("invoice.payment_date", { defaultValue: "Date de paiement" }),
       desc: t("doc.line.desc", { defaultValue: "Désignation" }),
       qty: t("doc.line.qty", { defaultValue: "Quantité" }),
       unitPrice: t("doc.line.unit_price_ht", { defaultValue: "P.U. HT" }),
       totalHTCol: t("doc.line.total_ht", { defaultValue: "Total HT" }),
       totalHT: t("doc.total_ht", { defaultValue: "Total HT" }),
       vat: t("doc.vat", { defaultValue: "TVA" }),
-      totalTTC: t("doc.total_ttc", { defaultValue: "Total TTC" }),
-      netToPay: t("doc.net_to_pay", { defaultValue: "NET À PAYER" }),
-      notes: t("doc.notes", { defaultValue: "Notes / Conditions" }),
+      netToPay: t("doc.net_to_pay", { defaultValue: "Net à payer" }),
+      notes: t("doc.notes", { defaultValue: "Notes" }),
       terms: t("doc.terms_conditions", { defaultValue: "Conditions générales" }),
       generatedBy: t("doc.generated_by", { defaultValue: "Document généré par" }),
       numberPrefix: t("doc.number_prefix", { defaultValue: "N°" }),
+      totalTTC: t("doc.total_ttc", { defaultValue: "Total TTC" }),
     }),
     [isQuote, t],
   );
 
-  const docTitle = labels.docTitle;
-
-  const htmlContent = useMemo(() => {
+  const documentHtml = useMemo(() => {
     if (!localizedDoc || !company) return "";
-    return buildDocumentHtml(localizedDoc, company, labels, i18n.resolvedLanguage || i18n.language || "fr");
-  }, [company, i18n.language, i18n.resolvedLanguage, labels, localizedDoc]);
+    return buildDocumentHtml(localizedDoc, company, locale, labels);
+  }, [company, labels, locale, localizedDoc]);
 
-  const textContent = useMemo(() => {
+  const documentText = useMemo(() => {
     if (!localizedDoc || !company) return "";
-    return buildDocumentText(localizedDoc, company, {
-      docTitle,
-      issueDate: labels.issueDate,
-      validUntil: labels.validUntil,
-      paymentDate: labels.paymentDate,
-      recipient: labels.recipient,
-      totalHT: labels.totalHT,
-      vat: labels.vat,
-      totalTTC: labels.netToPay,
-      generatedBy: labels.generatedBy,
-    });
-  }, [company, docTitle, labels, localizedDoc]);
+    return buildDocumentText(localizedDoc, company, locale, labels);
+  }, [company, labels, locale, localizedDoc]);
 
-  const fileBaseName = useMemo(() => {
-    if (!localizedDoc) return isQuote ? "devis-batiquant" : "facture-batiquant";
-    const safeNumber = localizedDoc.number.replace(/[^a-zA-Z0-9_-]+/g, "_");
-    return `${isQuote ? "Devis" : "Facture"}_${safeNumber}`;
-  }, [isQuote, localizedDoc]);
+  const pdfTitle = useMemo(() => {
+    if (!localizedDoc) return t("documents.pdf.default_title", { defaultValue: "Document BatiQuant" });
+    return `${labels.docTitle} ${localizedDoc.number}`;
+  }, [labels.docTitle, localizedDoc, t]);
 
-  const emailSubject = useMemo(() => {
-    if (!localizedDoc || !company) return docTitle;
-    return `${docTitle} ${localizedDoc.number} - ${company.name}`;
-  }, [company, docTitle, localizedDoc]);
+  const pdfFileName = useMemo(() => {
+    if (!localizedDoc) return "document-batiquant.pdf";
+    const prefix = isQuote
+      ? t("documents.pdf.file_prefix_quote", { defaultValue: "Devis" })
+      : t("documents.pdf.file_prefix_invoice", { defaultValue: "Facture" });
+    return `${prefix}_${localizedDoc.number}.pdf`;
+  }, [isQuote, localizedDoc, t]);
 
-  const nativeBridge = getNativeAdsBridge();
-  const hasNativeDocumentActions = Boolean(
-    nativeBridge?.printHtmlDocument ||
-      nativeBridge?.shareHtmlDocument ||
-      nativeBridge?.emailHtmlDocument ||
-      nativeBridge?.downloadHtmlDocument,
+  const emailBody = useMemo(
+    () =>
+      t("documents.actions.email_body", {
+        defaultValue: "Bonjour,\n\nVeuillez trouver le document en pièce jointe.\n\nCordialement,",
+      }),
+    [t],
   );
 
-  const handlePrint = () => {
-    if (!localizedDoc || !company) return;
-
-    try {
-      if (nativeBridge?.printHtmlDocument && htmlContent) {
-        const success = nativeBridge.printHtmlDocument(emailSubject, htmlContent);
-        if (success !== false) {
-          setActionMessage(t("doc.print_opened", { defaultValue: "Fenêtre d'impression ouverte." }));
-          return;
-        }
-      }
-    } catch {
-      // fallback below
+  const openPdfFallback = () => {
+    if (!documentHtml) return;
+    const pdfWindow = window.open("", "_blank", "noopener,noreferrer");
+    if (!pdfWindow) {
+      setNotice({ tone: "error", text: t("documents.status.popup_blocked", { defaultValue: "La fenêtre PDF a été bloquée." }) });
+      return;
     }
-
-    window.print();
+    pdfWindow.document.open();
+    pdfWindow.document.write(documentHtml);
+    pdfWindow.document.close();
   };
 
-  const handleShare = async () => {
+  const downloadHtmlFallback = () => {
+    if (!documentHtml) return;
+    const blob = new Blob([documentHtml], { type: "text/html;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = pdfFileName.replace(/\.pdf$/i, ".html");
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleAction = async (action: Exclude<ActionState, null>) => {
     if (!localizedDoc || !company) return;
 
-    try {
-      if (nativeBridge?.shareHtmlDocument && htmlContent) {
-        const success = nativeBridge.shareHtmlDocument(emailSubject, `${fileBaseName}.html`, htmlContent);
-        if (success !== false) {
-          setActionMessage(t("doc.share_opened", { defaultValue: "Partage ouvert." }));
-          return;
-        }
-      }
+    setBusyAction(action);
+    setNotice(null);
 
-      if (navigator.share) {
-        await navigator.share({
-          title: emailSubject,
-          text: textContent,
+    try {
+      if (supportsNativePdf) {
+        await runNativeDocumentAction(action, {
+          title: pdfTitle,
+          fileName: pdfFileName,
+          html: documentHtml,
+          chooserTitle:
+            action === "share"
+              ? t("documents.actions.share", { defaultValue: "Partager le PDF" })
+              : action === "email"
+              ? t("documents.actions.email", { defaultValue: "Envoyer par e-mail" })
+              : pdfTitle,
+          to: localizedDoc.client.email || "",
+          subject: pdfTitle,
+          body: `${emailBody}\n\n${documentText}`,
         });
-        return;
-      }
-    } catch {
-      // browser fallback below
-    }
-
-    try {
-      await navigator.clipboard.writeText(textContent);
-      setActionMessage(
-        t("doc.share_copied", {
-          defaultValue: "Texte du document copié. Vous pouvez maintenant le coller où vous voulez.",
-        }),
-      );
-    } catch {
-      setActionMessage(t("doc.action_failed", { defaultValue: "Action indisponible sur cet appareil." }));
-    }
-  };
-
-  const handleEmail = () => {
-    if (!localizedDoc || !company) return;
-    const to = localizedDoc.client.email || "";
-
-    try {
-      if (nativeBridge?.emailHtmlDocument && htmlContent) {
-        const success = nativeBridge.emailHtmlDocument(
-          to,
-          emailSubject,
-          textContent,
-          `${fileBaseName}.html`,
-          htmlContent,
-        );
-        if (success !== false) {
-          setActionMessage(t("doc.email_opened", { defaultValue: "Préparation de l’e-mail ouverte." }));
-          return;
+      } else {
+        if (action === "open") {
+          openPdfFallback();
+        } else if (action === "download") {
+          downloadHtmlFallback();
+        } else if (action === "share" && typeof navigator !== "undefined" && typeof navigator.share === "function") {
+          await navigator.share({ title: pdfTitle, text: documentText });
+        } else if (action === "email") {
+          const href = `mailto:${encodeURIComponent(localizedDoc.client.email || "")}?subject=${encodeURIComponent(
+            pdfTitle,
+          )}&body=${encodeURIComponent(`${emailBody}\n\n${documentText}`)}`;
+          window.location.href = href;
+        } else {
+          openPdfFallback();
         }
       }
+
+      setNotice({
+        tone: "success",
+        text:
+          action === "open"
+            ? t("documents.status.open_success", { defaultValue: "PDF prêt. Ouvrez-le depuis votre lecteur pour l’imprimer si besoin." })
+            : action === "share"
+            ? t("documents.status.share_success", { defaultValue: "Partage ouvert." })
+            : action === "email"
+            ? t("documents.status.email_success", { defaultValue: "E-mail prêt." })
+            : t("documents.status.download_success", { defaultValue: "PDF enregistré sur le mobile." }),
+      });
     } catch {
-      // fallback below
-    }
-
-    const mailto = `mailto:${encodeURIComponent(to)}?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(
-      textContent,
-    )}`;
-    window.location.href = mailto;
-  };
-
-  const handleDownload = () => {
-    if (!localizedDoc || !company || !htmlContent) return;
-
-    try {
-      if (nativeBridge?.downloadHtmlDocument) {
-        const success = nativeBridge.downloadHtmlDocument(`${fileBaseName}.html`, htmlContent);
-        if (success !== false) {
-          setActionMessage(
-            t("doc.download_saved", {
-              defaultValue: "Document enregistré sur votre appareil.",
-            }),
-          );
-          return;
-        }
-      }
-    } catch {
-      // fallback below
-    }
-
-    try {
-      const blob = new Blob([htmlContent], { type: "text/html;charset=utf-8" });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `${fileBaseName}.html`;
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.setTimeout(() => URL.revokeObjectURL(url), 0);
-      setActionMessage(
-        t("doc.download_saved", {
-          defaultValue: "Document enregistré sur votre appareil.",
-        }),
-      );
-    } catch {
-      setActionMessage(t("doc.action_failed", { defaultValue: "Action indisponible sur cet appareil." }));
+      setNotice({
+        tone: "error",
+        text:
+          action === "open"
+            ? t("documents.status.open_error", { defaultValue: "Impossible de préparer le PDF." })
+            : action === "share"
+            ? t("documents.status.share_error", { defaultValue: "Impossible d’ouvrir le partage." })
+            : action === "email"
+            ? t("documents.status.email_error", { defaultValue: "Impossible d’ouvrir l’e-mail." })
+            : t("documents.status.download_error", { defaultValue: "Impossible d’enregistrer le PDF." }),
+      });
+    } finally {
+      setBusyAction(null);
     }
   };
 
@@ -632,56 +597,70 @@ export const PrintDocumentPage: React.FC = () => {
               {t("common.back", { defaultValue: "Retour" })}
             </button>
 
-            <div className="flex flex-wrap items-center justify-end gap-2">
+            <div className="flex flex-wrap justify-end gap-2">
               <button
                 type="button"
-                onClick={handleShare}
-                className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-bold text-slate-700 transition-colors hover:border-blue-200 hover:text-blue-700"
+                onClick={() => void handleAction("share")}
+                disabled={busyAction !== null}
+                className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-bold text-slate-700 transition-colors hover:border-blue-200 hover:text-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 <Share2 size={16} />
-                {t("common.share", { defaultValue: "Partager" })}
+                {t("documents.actions.share_short", { defaultValue: "Partager" })}
               </button>
 
               <button
                 type="button"
-                onClick={handleEmail}
-                className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-bold text-slate-700 transition-colors hover:border-blue-200 hover:text-blue-700"
+                onClick={() => void handleAction("email")}
+                disabled={busyAction !== null}
+                className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-bold text-slate-700 transition-colors hover:border-blue-200 hover:text-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 <Mail size={16} />
-                {t("common.send_email", { defaultValue: "Envoyer par e-mail" })}
+                {t("documents.actions.email_short", { defaultValue: "Envoyer par e-mail" })}
               </button>
 
               <button
                 type="button"
-                onClick={handleDownload}
-                className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-bold text-slate-700 transition-colors hover:border-blue-200 hover:text-blue-700"
+                onClick={() => void handleAction("download")}
+                disabled={busyAction !== null}
+                className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-bold text-slate-700 transition-colors hover:border-blue-200 hover:text-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 <Download size={16} />
-                {t("common.download", { defaultValue: "Télécharger" })}
+                {t("documents.actions.download_short", { defaultValue: "Télécharger" })}
               </button>
 
               <button
                 type="button"
-                onClick={handlePrint}
-                className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-3 py-2 text-sm font-bold text-white transition-colors hover:bg-slate-800"
+                onClick={() => void handleAction("open")}
+                disabled={busyAction !== null}
+                className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-3 py-2 text-sm font-bold text-white transition-colors hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
               >
-                <Printer size={16} />
-                {t("common.print", { defaultValue: "Imprimer" })}
+                <FileText size={16} />
+                {supportsNativePdf
+                  ? t("documents.actions.open_pdf", { defaultValue: "PDF / imprimer" })
+                  : t("common.print", { defaultValue: "Imprimer" })}
               </button>
             </div>
           </div>
 
-          {actionMessage ? (
-            <div className="mt-3 rounded-2xl border border-blue-100 bg-blue-50 px-3 py-2 text-sm font-medium text-blue-700">
-              {actionMessage}
+          {notice ? (
+            <div
+              className={`mt-3 rounded-2xl px-3 py-2 text-sm font-medium ${
+                notice.tone === "error"
+                  ? "bg-red-50 text-red-700"
+                  : notice.tone === "success"
+                  ? "bg-emerald-50 text-emerald-700"
+                  : "bg-slate-100 text-slate-600"
+              }`}
+            >
+              {notice.text}
             </div>
           ) : null}
 
-          {hasNativeDocumentActions ? (
-            <div className="mt-3 rounded-2xl border border-amber-100 bg-amber-50 px-3 py-2 text-xs font-medium text-amber-800">
-              {t("doc.native_actions_hint", {
+          {supportsNativePdf ? (
+            <div className="mt-3 rounded-2xl bg-slate-50 px-3 py-2 text-xs text-slate-500">
+              {t("documents.mobile_pdf_hint", {
                 defaultValue:
-                  "Les écrans Android d’impression et de partage utilisent la langue du téléphone et se ferment avec le bouton retour du téléphone.",
+                  "Sur mobile, BatiQuant génère un PDF pour garder l’écran en français avec votre bouton Retour. Pour imprimer, ouvrez le PDF dans votre lecteur puis utilisez l’option Imprimer du lecteur.",
               })}
             </div>
           ) : null}
@@ -767,7 +746,7 @@ export const PrintDocumentPage: React.FC = () => {
                 <span className="font-medium text-slate-400">
                   {t("doc.issue_date", { defaultValue: "Date d'émission" })} :
                 </span>{" "}
-                {new Date(localizedDoc.date).toLocaleDateString()}
+                {safeDate(localizedDoc.date, locale)}
               </p>
 
               {"validUntil" in localizedDoc && (localizedDoc as any).validUntil ? (
@@ -775,7 +754,7 @@ export const PrintDocumentPage: React.FC = () => {
                   <span className="font-medium text-slate-400">
                     {t("doc.valid_until", { defaultValue: "Valable jusqu'au" })} :
                   </span>{" "}
-                  {new Date((localizedDoc as any).validUntil).toLocaleDateString()}
+                  {safeDate((localizedDoc as any).validUntil, locale)}
                 </p>
               ) : null}
 
@@ -784,7 +763,7 @@ export const PrintDocumentPage: React.FC = () => {
                   <span className="font-medium text-slate-400">
                     {t("invoice.payment_date", { defaultValue: "Date paiement" })} :
                   </span>{" "}
-                  {new Date((localizedDoc as any).paymentDate).toLocaleDateString()}
+                  {safeDate((localizedDoc as any).paymentDate, locale)}
                 </p>
               ) : null}
             </div>

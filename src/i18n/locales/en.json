@@ -38,10 +38,7 @@
     "waste_plus": "Waste +",
     "back_to_quote": "Back to quote",
     "open": "Open",
-    "total": "Total",
-    "download": "Download",
-    "email": "Email",
-    "send_email": "Send by email"
+    "total": "Total"
   },
   "calculator": {
     "open": "Open calculator",
@@ -1779,14 +1776,7 @@
     "total_ttc": "Total (incl. tax)",
     "valid_until": "Valid until",
     "vat": "VAT",
-    "terms_conditions": "Terms and conditions",
-    "print_opened": "Print window opened.",
-    "share_opened": "Share sheet opened.",
-    "email_opened": "Email composer opened.",
-    "download_saved": "Document saved on your device.",
-    "share_copied": "Document text copied. You can now paste it where you want.",
-    "action_failed": "Action unavailable on this device.",
-    "native_actions_hint": "Android print and share screens use the phone language and close with the phone back button."
+    "terms_conditions": "Terms and conditions"
   },
   "errors": {
     "generic_hint": "Please try again or contact support if the issue persists.",
@@ -2922,5 +2912,33 @@
         }
       }
     }
+  },
+  "documents": {
+    "actions": {
+      "share": "Share PDF",
+      "share_short": "Share",
+      "email": "Send by email",
+      "email_short": "Send by email",
+      "download_short": "Download",
+      "open_pdf": "PDF / print",
+      "email_body": "Hello,\n\nPlease find the attached document.\n\nBest regards,"
+    },
+    "status": {
+      "open_success": "PDF ready. Open it in your PDF viewer to print it if needed.",
+      "share_success": "Sharing opened.",
+      "email_success": "Email draft opened.",
+      "download_success": "PDF saved on the device.",
+      "open_error": "Unable to prepare the PDF.",
+      "share_error": "Unable to open sharing.",
+      "email_error": "Unable to open email.",
+      "download_error": "Unable to save the PDF.",
+      "popup_blocked": "The PDF window was blocked."
+    },
+    "pdf": {
+      "default_title": "BatiQuant document",
+      "file_prefix_quote": "Quote",
+      "file_prefix_invoice": "Invoice"
+    },
+    "mobile_pdf_hint": "On mobile, BatiQuant generates a PDF so the document screen stays in your app with its Back button. To print, open the PDF in your viewer and use the viewer’s print option."
   }
 }
