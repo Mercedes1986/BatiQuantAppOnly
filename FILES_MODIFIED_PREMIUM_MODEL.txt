@@ -1,0 +1,16 @@
+Premium model update (phase 1)
+
+Files modified:
+- tsconfig.json
+- src/services/premiumService.ts
+- src/pages/HouseProjectPage.tsx
+- src/pages/SettingsPage.tsx
+- src/i18n/locales/fr.json
+- src/i18n/locales/en.json
+
+Model implemented:
+- Free version keeps ads
+- Free version includes 1 chantier/site
+- Paid version (BatiQuant Pro) removes ads
+- Paid version unlocks unlimited chantier/site tracking
+- Settings page now explains the value of the paid plan

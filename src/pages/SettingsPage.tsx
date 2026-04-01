@@ -36,7 +36,8 @@ import {
   restoreAdFreePurchases,
   startRemoveAdsPurchase,
 } from "@/services/purchaseService";
-import { getSettings, saveSettings } from "@/services/storage";
+import { getHouseProjects, getSettings, saveSettings } from "@/services/storage";
+import { FREE_HOUSE_PROJECT_LIMIT } from "@/services/premiumService";
 
 type SettingsTab = "app" | "company";
 type Currency = "EUR" | "USD" | "CAD" | "CHF";
@@ -108,6 +109,7 @@ export const SettingsPage: React.FC = () => {
   const privacyState = useMemo(() => getPrivacyState(), [privacyVersion]);
   const purchaseState = useMemo(() => getPurchaseRuntimeState(), [privacyVersion]);
   const hasNoAds = purchaseState.entitled;
+  const houseProjectsCount = useMemo(() => getHouseProjects().length, [privacyVersion]);
 
   useEffect(() => {
     try {
@@ -298,10 +300,10 @@ export const SettingsPage: React.FC = () => {
       setPurchaseMessage(
         state.entitled
           ? t("settings.pro.purchase_success", {
-              defaultValue: "Achat confirmé • Les publicités sont maintenant désactivées.",
+              defaultValue: "BatiQuant Pro activé • Les publicités sont désactivées et les chantiers illimités sont débloqués.",
             })
           : t("settings.pro.purchase_pending", {
-              defaultValue: "Achat en attente de validation par Google Play.",
+              defaultValue: "BatiQuant Pro est en attente de validation par Google Play.",
             }),
       );
       refreshPurchaseUi();
@@ -313,7 +315,7 @@ export const SettingsPage: React.FC = () => {
               defaultValue: "Achat annulé.",
             })
           : t("settings.pro.purchase_error", {
-              defaultValue: "Impossible de lancer l’achat sans pub pour le moment.",
+              defaultValue: "Impossible d’ouvrir l’achat BatiQuant Pro pour le moment.",
             }),
       );
       refreshPurchaseUi();
@@ -331,10 +333,10 @@ export const SettingsPage: React.FC = () => {
       setPurchaseMessage(
         state.entitled
           ? t("settings.pro.restore_success", {
-              defaultValue: "Achat restauré • Les publicités sont désactivées.",
+              defaultValue: "BatiQuant Pro restauré • Les publicités sont désactivées et les chantiers illimités sont débloqués.",
             })
           : t("settings.pro.restore_empty", {
-              defaultValue: "Aucun achat sans pub actif n’a été trouvé sur ce compte Google Play.",
+              defaultValue: "Aucun achat BatiQuant Pro actif n’a été trouvé sur ce compte Google Play.",
             }),
       );
       refreshPurchaseUi();
@@ -413,19 +415,19 @@ export const SettingsPage: React.FC = () => {
                   </div>
                   <div className="flex-1">
                     <h3 className="font-extrabold text-slate-800">
-                      {t("settings.pro.title", { defaultValue: "Version sans pub" })}
+                      {t("settings.pro.title", { defaultValue: "BatiQuant Pro" })}
                     </h3>
                     <p className="text-xs text-slate-500">
                       {hasNoAds
                         ? t("settings.pro.ad_free_active", {
-                            defaultValue: "Achat sans pub actif • Publicités désactivées",
+                            defaultValue: "BatiQuant Pro actif • Publicités désactivées et chantiers illimités.",
                           })
                         : purchaseState.billingReady && purchaseState.productReady
                         ? t("settings.pro.ad_free_pending", {
-                            defaultValue: "Un achat Google Play peut désactiver toutes les publicités de l’application.",
+                            defaultValue: "Passez à BatiQuant Pro pour supprimer les pubs et débloquer les chantiers illimités.",
                           })
                         : t("settings.pro.billing_unavailable", {
-                            defaultValue: "L’achat sans pub n’est pas encore disponible sur cet appareil ou cette build.",
+                            defaultValue: "BatiQuant Pro n’est pas encore disponible sur cet appareil ou cette build.",
                           })}
                     </p>
                   </div>
@@ -440,30 +442,55 @@ export const SettingsPage: React.FC = () => {
                   <p className="mt-2 text-sm text-slate-600">
                     {hasNoAds
                       ? t("settings.pro.status_active", {
-                          defaultValue: "Achat détecté et validé sur cet appareil.",
+                          defaultValue: "BatiQuant Pro est actif sur cet appareil.",
                         })
                       : purchaseState.billingReady && purchaseState.productReady
                       ? t("settings.pro.status_ready", {
-                          defaultValue: "Google Play Billing est prêt et le produit sans pub est disponible.",
+                          defaultValue: "Google Play est prêt. Vous pouvez activer BatiQuant Pro maintenant.",
                         })
                       : purchaseState.billingReady
                       ? t("settings.pro.status_product_missing", {
-                          defaultValue: "Google Play est prêt, mais le produit sans pub n’est pas encore trouvé.",
+                          defaultValue: "Google Play est prêt, mais le produit Pro n’est pas encore trouvé.",
                         })
                       : t("settings.pro.status_connecting", {
                           defaultValue: "Connexion Google Play en attente ou indisponible.",
                         })}
                   </p>
+                  <div className="mt-3 rounded-2xl border border-slate-200 bg-slate-50 p-3">
+                    <div className="text-xs font-extrabold uppercase tracking-wide text-slate-400">
+                      {t("settings.pro.plan_title", { defaultValue: "Current plan" })}
+                    </div>
+                    <div className="mt-2 text-sm font-extrabold text-slate-800">
+                      {hasNoAds
+                        ? t("settings.pro.plan_pro", { defaultValue: "BatiQuant Pro" })
+                        : t("settings.pro.plan_free", { defaultValue: "Free version with ads" })}
+                    </div>
+                    <p className="mt-1 text-xs text-slate-500">
+                      {hasNoAds
+                        ? t("settings.pro.plan_sites_pro", { defaultValue: "Unlimited site tracking enabled." })
+                        : t("settings.pro.plan_sites_free", { defaultValue: "1 free site included before upgrade." })}
+                    </p>
+                    <p className="mt-2 text-xs font-bold text-slate-600">
+                      {hasNoAds
+                        ? t("settings.pro.plan_usage_unlimited", { defaultValue: "Saved sites: {{count}} • unlimited", count: houseProjectsCount })
+                        : t("settings.pro.plan_usage_free", { defaultValue: "Saved sites: {{count}} / {{limit}}", count: houseProjectsCount, limit: FREE_HOUSE_PROJECT_LIMIT })}
+                    </p>
+                  </div>
                   {purchaseState.productId ? (
                     <p className="mt-2 text-xs text-slate-400">
-                      {t("settings.pro.product_id", { defaultValue: "ID produit" })}: {purchaseState.productId}
+                      {t("settings.pro.product_id", { defaultValue: "Product ID" })}: {purchaseState.productId}
                     </p>
                   ) : null}
                 </div>
 
                 <div className="rounded-2xl border border-slate-200 bg-white/80 p-4">
                   <div className="text-sm font-extrabold text-slate-700">
-                    {t("settings.pro.actions_title", { defaultValue: "Actions" })}
+                    {t("settings.pro.actions_title", { defaultValue: "Upgrade & restore" })}
+                  </div>
+                  <div className="mt-3 rounded-2xl border border-emerald-100 bg-emerald-50/60 p-3 text-xs font-semibold text-emerald-900">
+                    <div>• {t("settings.pro.benefit_no_ads", { defaultValue: "Remove all ads" })}</div>
+                    <div className="mt-1">• {t("settings.pro.benefit_unlimited_sites", { defaultValue: "Unlock unlimited site tracking" })}</div>
+                    <div className="mt-1">• {t("settings.pro.benefit_restore", { defaultValue: "Restore purchases on a new device" })}</div>
                   </div>
                   <div className="mt-3 grid gap-2">
                     {!hasNoAds ? (
@@ -475,7 +502,7 @@ export const SettingsPage: React.FC = () => {
                       >
                         {purchaseBusy === "buy"
                           ? t("settings.pro.buy_loading", { defaultValue: "Ouverture de Google Play..." })
-                          : t("settings.pro.buy_button", { defaultValue: "Acheter la version sans pub" })}
+                          : t("settings.pro.buy_button", { defaultValue: "Passer à BatiQuant Pro" })}
                       </button>
                     ) : null}
                     <button

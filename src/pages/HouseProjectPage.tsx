@@ -16,6 +16,8 @@ import {
   Trash2,
   FolderOpen,
   Hammer,
+  Lock,
+  ShieldCheck,
 } from "lucide-react";
 import {
   getHouseProjects,
@@ -33,6 +35,7 @@ import { createQuoteFromProject } from "@/services/documentLogic";
 import { getCompanyProfile, getQuotes } from "@/services/documentsStorage";
 import { ClientModal } from "@/components/documents/ClientModal";
 import { useTranslation } from "react-i18next";
+import { FREE_HOUSE_PROJECT_LIMIT, getHouseProjectLimit, getPremiumEventName, hasPremiumAccess } from "@/services/premiumService";
 
 /**
  * Update goals:
@@ -60,6 +63,11 @@ export const HouseProjectPage: React.FC = () => {
   const [editParams, setEditParams] = useState({ surface: "", perimeter: "", height: "" });
 
   const [showClientModal, setShowClientModal] = useState(false);
+  const [planVersion, setPlanVersion] = useState(0);
+  const [showUpgradeNotice, setShowUpgradeNotice] = useState(false);
+
+  const premiumEnabled = useMemo(() => hasPremiumAccess(), [planVersion]);
+  const houseProjectLimit = useMemo(() => getHouseProjectLimit(premiumEnabled), [premiumEnabled]);
 
   // Hero image (same spirit as Projects page)
   const heroImageSrc = "/images/chantiers/creer-chantier.png";
@@ -100,8 +108,33 @@ export const HouseProjectPage: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectIdFromUrl]);
 
+  useEffect(() => {
+    const premiumEvent = getPremiumEventName();
+    const refreshPlan = () => setPlanVersion((current) => current + 1);
+
+    window.addEventListener(premiumEvent, refreshPlan as EventListener);
+    return () => window.removeEventListener(premiumEvent, refreshPlan as EventListener);
+  }, []);
+
   const selectProject = (p: HouseProject) => {
     setSearchParams({ id: p.id }, { replace: true });
+  };
+
+  const freeLimitReached = !premiumEnabled && projects.length >= houseProjectLimit;
+
+  const openPremiumSettings = () => {
+    navigate("/app/settings");
+  };
+
+  const startCreateFlow = () => {
+    if (!premiumEnabled && projects.length >= houseProjectLimit) {
+      setShowUpgradeNotice(true);
+      setIsCreating(false);
+      return;
+    }
+
+    setShowUpgradeNotice(false);
+    setIsCreating(true);
   };
 
   const closeProject = () => {
@@ -122,6 +155,12 @@ export const HouseProjectPage: React.FC = () => {
   const handleCreate = () => {
     if (!newName.trim()) return;
 
+    if (!premiumEnabled && projects.length >= houseProjectLimit) {
+      setShowUpgradeNotice(true);
+      setIsCreating(false);
+      return;
+    }
+
     const surface = parseFloat(newSurface) || 100;
 
     const newProj: HouseProject = {
@@ -139,6 +178,7 @@ export const HouseProjectPage: React.FC = () => {
     };
 
     saveHouseProject(newProj);
+    setShowUpgradeNotice(false);
     setIsCreating(false);
     setNewName("");
     setNewSurface("");
@@ -613,7 +653,7 @@ export const HouseProjectPage: React.FC = () => {
 
               <div className="flex flex-wrap gap-2 sm:justify-end">
                 <button
-                  onClick={() => setIsCreating(true)}
+                  onClick={startCreateFlow}
                   className="inline-flex items-center justify-center rounded-2xl bg-blue-600 px-4 py-2.5 text-sm font-extrabold text-white shadow-sm transition-all hover:bg-blue-700 active:scale-[0.98]"
                   type="button"
                 >
@@ -672,6 +712,73 @@ export const HouseProjectPage: React.FC = () => {
             </div>
           </div>
         </section>
+
+        {!premiumEnabled ? (
+          <section className="rounded-[28px] border border-amber-200/80 bg-amber-50/90 p-5 shadow-sm backdrop-blur-md">
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+              <div className="min-w-0">
+                <div className="inline-flex items-center gap-2 rounded-full border border-amber-200 bg-white px-3 py-1 text-xs font-extrabold text-amber-700">
+                  <Lock size={14} />
+                  {t("house.premium.free_plan_badge", { defaultValue: "Free plan" })}
+                </div>
+                <h2 className="mt-3 text-lg font-extrabold text-slate-900">
+                  {t("house.premium.banner_title", { defaultValue: "1 free site included" })}
+                </h2>
+                <p className="mt-1 text-sm text-slate-600">
+                  {t("house.premium.banner_body", {
+                    defaultValue:
+                      "The free version includes 1 site with ads. Upgrade to BatiQuant Pro to remove ads and unlock unlimited sites.",
+                  })}
+                </p>
+              </div>
+
+              <div className="rounded-2xl border border-white/80 bg-white/80 px-4 py-3 text-sm font-extrabold text-slate-700 shadow-sm">
+                {projects.length} / {FREE_HOUSE_PROJECT_LIMIT} {t("house.premium.sites_used", { defaultValue: "site used" })}
+              </div>
+            </div>
+
+            <div className="mt-4 grid gap-3 md:grid-cols-3">
+              <div className="rounded-2xl border border-amber-100 bg-white/80 p-4">
+                <div className="text-xs font-extrabold uppercase tracking-wide text-amber-600">
+                  {t("house.premium.keep_free_title", { defaultValue: "Free" })}
+                </div>
+                <div className="mt-2 text-sm font-semibold text-slate-700">
+                  {t("house.premium.keep_free_body", { defaultValue: "Calculators, Express and 1 site with ads." })}
+                </div>
+              </div>
+
+              <div className="rounded-2xl border border-emerald-100 bg-white/80 p-4 md:col-span-2">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <div className="text-xs font-extrabold uppercase tracking-wide text-emerald-600">
+                      {t("house.premium.pro_title", { defaultValue: "BatiQuant Pro" })}
+                    </div>
+                    <div className="mt-2 text-sm font-semibold text-slate-700">
+                      {t("house.premium.pro_body", { defaultValue: "No ads and unlimited site tracking." })}
+                    </div>
+                  </div>
+                  <ShieldCheck size={18} className="shrink-0 text-emerald-600" />
+                </div>
+
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <button
+                    onClick={openPremiumSettings}
+                    className="inline-flex items-center justify-center rounded-2xl bg-emerald-600 px-4 py-2.5 text-sm font-extrabold text-white shadow-sm transition-all hover:bg-emerald-700 active:scale-[0.98]"
+                    type="button"
+                  >
+                    {t("house.premium.upgrade_button", { defaultValue: "Upgrade to Pro" })}
+                  </button>
+
+                  {showUpgradeNotice ? (
+                    <span className="inline-flex items-center rounded-2xl border border-amber-200 bg-white px-3 py-2 text-xs font-bold text-amber-700">
+                      {t("house.premium.limit_reached_inline", { defaultValue: "Free limit reached: unlock Pro to create more sites." })}
+                    </span>
+                  ) : null}
+                </div>
+              </div>
+            </div>
+          </section>
+        ) : null}
 
         {isCreating ? (
           <div className="rounded-[28px] border border-blue-100 bg-white/72 p-5 shadow-sm backdrop-blur-md animate-in zoom-in-95">
@@ -743,7 +850,7 @@ export const HouseProjectPage: React.FC = () => {
               {t("house.empty", { defaultValue: "No saved site yet." })}
             </p>
             <button
-              onClick={() => setIsCreating(true)}
+              onClick={startCreateFlow}
               className="mt-5 inline-flex items-center rounded-2xl bg-blue-600 px-4 py-3 text-sm font-extrabold text-white shadow-sm transition-all hover:bg-blue-700 active:scale-[0.98]"
               type="button"
             >
