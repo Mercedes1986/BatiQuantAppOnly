@@ -45,7 +45,7 @@ import type { HouseProject } from "./types";
 
 import { ArrowLeft, Save, Loader2, AlertTriangle } from "lucide-react";
 import ConsentModal from "./components/privacy/ConsentModal";
-import { initializeAds } from "./services/adsService";
+import { armInterstitialAfterCalculation, clearPendingInterstitial, initializeAds, showPendingInterstitialIfReady } from "./services/adsService";
 import { initConsent } from "./services/consentService";
 import { initializePurchaseState } from "./services/purchaseService";
 
@@ -215,6 +215,22 @@ const ProjectCalculatorWrapper: React.FC = () => {
   const [result, setResult] = useState<any>(null);
   const handleProjectCalculated = useCallback((nextResult: any) => {
     setResult(nextResult);
+
+    const resultKey = JSON.stringify({
+      type: calcType || "project-calculator",
+      stepId: stepId || "",
+      summary: String(nextResult?.summary || ""),
+      totalCost: Number(nextResult?.totalCost || 0),
+      materials: Array.isArray(nextResult?.materials) ? nextResult.materials.length : 0,
+    });
+
+    armInterstitialAfterCalculation("calculator_interstitial", { contextKey: resultKey });
+  }, [calcType, stepId]);
+
+  useEffect(() => {
+    return () => {
+      clearPendingInterstitial("calculator_interstitial");
+    };
   }, []);
 
   useEffect(() => {
@@ -223,14 +239,18 @@ const ProjectCalculatorWrapper: React.FC = () => {
     if (p) setProject(p);
   }, [projectId]);
 
-  const handleBack = () => {
+  const handleBack = async () => {
+    if (result) {
+      await showPendingInterstitialIfReady("calculator_interstitial");
+    }
+
     if (projectId) navigate(`/app/house?id=${projectId}`);
     else navigate("/app/house");
   };
 
   const normalize = (s: unknown) => String(s ?? "").trim().toLowerCase();
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!project || !result || !stepId) return;
 
     const updatedProject: HouseProject = { ...project };
@@ -299,7 +319,7 @@ const ProjectCalculatorWrapper: React.FC = () => {
     }
 
     saveHouseProject(updatedProject);
-    handleBack();
+    await handleBack();
   };
 
   const renderCalculator = () => {
@@ -538,15 +558,25 @@ const AppLayout = () => {
               ? "menu"
               : "menu";
 
-  const handleNavChange = (tab: string) => {
+  const exitCalculatorFlow = useCallback(async () => {
+    const leavingCalculatorFlow = currentCalc !== null || location.pathname.startsWith("/app/calculator");
+
+    if (leavingCalculatorFlow) {
+      await showPendingInterstitialIfReady("calculator_interstitial");
+    }
+
     setCurrentCalc(null);
+  }, [currentCalc, location.pathname]);
+
+  const handleNavChange = useCallback(async (tab: string) => {
+    await exitCalculatorFlow();
 
     if (tab === "menu") navigate("/app/menu");
     if (tab === "quick-tools") navigate("/app/quick-tools");
     if (tab === "projects") navigate("/app/calculators");
     if (tab === "house") navigate("/app/house");
     if (tab === "materials") navigate("/app/materials");
-  };
+  }, [exitCalculatorFlow, navigate]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -601,9 +631,9 @@ const AppLayout = () => {
     >
       <CalculatorPage
         type={currentCalc}
-        onBack={() => setCurrentCalc(null)}
-        onNavigateProjects={() => {
-          setCurrentCalc(null);
+        onBack={exitCalculatorFlow}
+        onNavigateProjects={async () => {
+          await exitCalculatorFlow();
           navigate("/app/projects");
         }}
       />

@@ -28,7 +28,7 @@ import { StructuralCalculator } from "../components/calculators/StructuralCalcul
 import { SubstructureCalculator } from "../components/calculators/SubstructureCalculator";
 import { TileCalculator } from "../components/calculators/TileCalculator";
 import { getCalculators, getStaticTips, localizeLegacyText } from "../constants";
-import { armInterstitialAfterCalculation, clearPendingInterstitial, showPendingInterstitialIfReady } from "../services/adsService";
+import { armInterstitialAfterCalculation, clearPendingInterstitial } from "../services/adsService";
 import { generateId, saveProject } from "../services/storage";
 import { CalculatorType } from "../types";
 import type {
@@ -39,8 +39,8 @@ import type {
 
 interface Props {
   type: CalculatorType;
-  onBack: () => void;
-  onNavigateProjects: () => void;
+  onBack: () => void | Promise<void>;
+  onNavigateProjects: () => void | Promise<void>;
 }
 
 export const CalculatorPage: React.FC<Props> = ({ type, onBack, onNavigateProjects }) => {
@@ -178,13 +178,10 @@ export const CalculatorPage: React.FC<Props> = ({ type, onBack, onNavigateProjec
   };
 
   const handleBackClick = useCallback(async () => {
-    if (displayResult) {
-      await showPendingInterstitialIfReady("calculator_interstitial");
-    }
-    onBack();
-  }, [displayResult, onBack]);
+    await onBack();
+  }, [onBack]);
 
-  const handleAddToProject = () => {
+  const handleAddToProject = async () => {
     if (!displayResult) return;
 
     const dateLabel = new Date().toLocaleDateString(i18n.language || "en-GB");
@@ -204,10 +201,9 @@ export const CalculatorPage: React.FC<Props> = ({ type, onBack, onNavigateProjec
     };
 
     saveProject(project);
-    clearPendingInterstitial("calculator_interstitial");
     setShowSaveModal(false);
     setNewProjectName("");
-    onNavigateProjects();
+    await onNavigateProjects();
   };
 
   const handleShare = async () => {
