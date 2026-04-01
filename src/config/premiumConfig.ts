@@ -1,0 +1,1 @@
+export const FREE_HOUSE_PROJECT_LIMIT = 1;

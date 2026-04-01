@@ -1,3 +1,4 @@
+import { FREE_HOUSE_PROJECT_LIMIT } from "@/config/premiumConfig";
 import type { HouseProject, Project, UserSettings } from "../types";
 import {
   canUsePersistentStorage,
@@ -25,6 +26,10 @@ type ProjectsEventDetail = {
   reason: "save" | "delete" | "settings" | "import";
   key: "projects" | "house_projects" | "settings";
 };
+
+export type SaveHouseProjectResult =
+  | { ok: true; project: HouseProject }
+  | { ok: false; reason: "invalid" | "limit-reached"; limit?: number; currentCount?: number };
 
 const DEFAULT_SETTINGS: UserSettings = {
   currency: "€",
@@ -225,6 +230,17 @@ const readProjects = (): Project[] => sanitizeProjectList(readJson<unknown>(PROJ
 const readHouseProjects = (): HouseProject[] => sanitizeHouseProjectList(readJson<unknown>(HOUSE_PROJECTS_KEY, []));
 const readSettings = (): UserSettings => sanitizeSettings(readJson<unknown>(SETTINGS_KEY, DEFAULT_SETTINGS));
 
+const isHouseProjectsPremiumEnabled = (): boolean => readSettings().isPro === true;
+
+const enforceHouseProjectLimit = (projects: HouseProject[]): HouseProject[] => {
+  if (isHouseProjectsPremiumEnabled()) return projects;
+  if (projects.length <= FREE_HOUSE_PROJECT_LIMIT) return projects;
+
+  return [...projects]
+    .sort((a, b) => Date.parse(b.date || "") - Date.parse(a.date || ""))
+    .slice(0, FREE_HOUSE_PROJECT_LIMIT);
+};
+
 export const getProjects = (): Project[] => {
   ensureMigratedOnce();
   return readProjects();
@@ -263,24 +279,37 @@ export const getHouseProjects = (): HouseProject[] => {
   return readHouseProjects();
 };
 
-export const saveHouseProject = (project: HouseProject): void => {
+export const saveHouseProject = (project: HouseProject): SaveHouseProjectResult => {
   ensureMigratedOnce();
   const projects = getHouseProjects();
   const sanitized = sanitizeHouseProject(project);
-  if (!sanitized) return;
+  if (!sanitized) return { ok: false, reason: "invalid" };
 
   const idx = projects.findIndex((p) => p.id === sanitized.id);
 
-  if (idx >= 0) projects[idx] = sanitized;
-  else projects.push(sanitized);
+  if (idx >= 0) {
+    projects[idx] = sanitized;
+  } else {
+    if (!isHouseProjectsPremiumEnabled() && projects.length >= FREE_HOUSE_PROJECT_LIMIT) {
+      return {
+        ok: false,
+        reason: "limit-reached",
+        limit: FREE_HOUSE_PROJECT_LIMIT,
+        currentCount: projects.length,
+      };
+    }
+
+    projects.push(sanitized);
+  }
 
   writeJson(HOUSE_PROJECTS_KEY, projects);
   emitChanged({ reason: "save", key: "house_projects" });
+  return { ok: true, project: sanitized };
 };
 
 export const replaceHouseProjects = (projects: HouseProject[]): void => {
   ensureMigratedOnce();
-  writeJson(HOUSE_PROJECTS_KEY, sanitizeHouseProjectList(projects));
+  writeJson(HOUSE_PROJECTS_KEY, enforceHouseProjectLimit(sanitizeHouseProjectList(projects)));
   emitChanged({ reason: "import", key: "house_projects" });
 };
 

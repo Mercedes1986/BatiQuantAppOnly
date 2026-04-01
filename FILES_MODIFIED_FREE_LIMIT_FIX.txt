@@ -1,0 +1,10 @@
+Files updated for the free-vs-pro house project limit fix:
+- src/config/premiumConfig.ts
+- src/services/premiumService.ts
+- src/services/storage.ts
+- src/pages/HouseProjectPage.tsx
+
+What changed:
+- Central storage now refuses creation of a new house project when the free limit is reached.
+- The UI now handles the storage refusal and shows the upgrade notice/message.
+- Import/replace flows are also capped through replaceHouseProjects for free users.

@@ -177,13 +177,26 @@ export const HouseProjectPage: React.FC = () => {
       steps: {},
     };
 
-    saveHouseProject(newProj);
+    const saved = saveHouseProject(newProj);
+    if (!saved.ok) {
+      setShowUpgradeNotice(saved.reason === "limit-reached");
+      setProjects(getHouseProjects());
+      if (saved.reason === "limit-reached") {
+        window.alert(
+          t("house.premium.limit_reached_inline", {
+            defaultValue: "Free limit reached: unlock Pro to create more sites.",
+          }),
+        );
+      }
+      return;
+    }
+
     setShowUpgradeNotice(false);
     setIsCreating(false);
     setNewName("");
     setNewSurface("");
     setProjects(getHouseProjects());
-    selectProject(newProj);
+    selectProject(saved.project);
   };
 
   const handleDelete = (id: string) => {
