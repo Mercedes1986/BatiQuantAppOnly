@@ -176,6 +176,27 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate,
     if (values.prices !== undefined) setPrices(values.prices as any);
   }, [initialSnapshot]);
 
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+
+    if (!showForm) {
+      document.body.classList.remove("overflow-hidden");
+      return;
+    }
+
+    const previousOverflow = document.body.style.overflow;
+    const previousTouchAction = document.body.style.touchAction;
+
+    document.body.style.overflow = "hidden";
+    document.body.style.touchAction = "none";
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.body.style.touchAction = previousTouchAction;
+      document.body.classList.remove("overflow-hidden");
+    };
+  }, [showForm]);
+
   const snapshot: CalculatorSnapshot = {
     version: 1,
     calculatorType: CalculatorType.JOINERY,
@@ -684,190 +705,206 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate,
 
           {/* Modal */}
           {showForm && typeof document !== "undefined" && createPortal(
-            <div className="fixed inset-0 z-[9999] bg-slate-950/55 px-3 py-4 backdrop-blur-[1px] sm:flex sm:items-center sm:justify-center sm:p-6">
-              <div className="mx-auto flex h-[calc(100dvh-2rem)] w-full max-w-md flex-col overflow-hidden rounded-[26px] border border-white/70 bg-white shadow-[0_28px_80px_rgba(15,23,42,0.28)] sm:h-auto sm:max-h-[92dvh]">
-                <div className="sticky top-0 z-20 flex items-center justify-between border-b border-slate-100 bg-white px-4 py-4">
+            <div
+              className="fixed inset-0 z-[10000] bg-slate-950/60 backdrop-blur-[2px] sm:flex sm:items-center sm:justify-center sm:p-6"
+              onClick={() => setShowForm(false)}
+            >
+              <div
+                className="flex h-screen w-screen flex-col bg-white supports-[height:100dvh]:h-[100dvh] sm:h-auto sm:max-h-[92dvh] sm:w-full sm:max-w-lg sm:overflow-hidden sm:rounded-[28px] sm:border sm:border-white/70 sm:shadow-[0_28px_80px_rgba(15,23,42,0.28)]"
+                onClick={(e) => e.stopPropagation()}
+                role="dialog"
+                aria-modal="true"
+                aria-label={editingId ? t("common.edit", { defaultValue: "Edit" }) : t("common.add", { defaultValue: "Add" })}
+              >
+                <div className="flex items-center justify-between border-b border-slate-100 bg-white px-4 pb-4 pt-[calc(env(safe-area-inset-top,0px)+1rem)] sm:px-5 sm:py-4">
                   <h3 className="font-bold text-slate-800">
                     {editingId ? t("common.edit", { defaultValue: "Edit" }) : t("common.add", { defaultValue: "Add" })}
                   </h3>
-                  <button type="button" onClick={() => setShowForm(false)} aria-label={t("common.close", { defaultValue: "Close" })}>
-                    <X size={20} className="text-slate-400" />
-                  </button>
-                </div>
-
-                <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4">
-                  <div className="space-y-4 pb-4">
-                  <div>
-                    <label className="block text-xs font-bold text-slate-500 mb-1">
-                      {t("common.type", { defaultValue: "Type" })}
-                    </label>
-                    <select
-                      value={formType}
-                      onChange={(e) => {
-                        const tt = e.target.value as JoineryType;
-                        setFormType(tt);
-                        setFormLabel(getTypeLabel(t, tt));
-                        if (tt === "door" || tt === "garage" || tt === "velux") setFormShutter("none");
-                      }}
-                      className="w-full p-2 border rounded bg-white text-slate-900"
-                    >
-                      <option value="window">{t("joinery.type.window", { defaultValue: "Window" })}</option>
-                      <option value="door">{t("joinery.type.door", { defaultValue: "Door" })}</option>
-                      <option value="bay">{t("joinery.type.bay", { defaultValue: "Sliding bay" })}</option>
-                      <option value="velux">{t("joinery.type.velux", { defaultValue: "Roof window" })}</option>
-                      <option value="garage">{t("joinery.type.garage", { defaultValue: "Garage door" })}</option>
-                    </select>
-                  </div>
-
-                  {!editingId && presetOptions.length > 0 && (
-                    <div>
-                      <label className="block text-xs font-bold text-slate-500 mb-1">
-                        {t("common.preset", { defaultValue: "Preset" })}
-                      </label>
-                      <select
-                        onChange={(e) => applyPreset(e.target.value)}
-                        className="w-full p-2 border rounded bg-white text-sm text-slate-900"
-                        defaultValue=""
-                      >
-                        <option value="">{t("common.choose", { defaultValue: "-- Choose --" })}</option>
-                        {presetOptions.map((p) => (
-                          <option key={p.label} value={p.label}>
-                            {p.label}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  )}
-
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-xs font-bold text-slate-500 mb-1">
-                        {t("struct.common.width_m", { defaultValue: "Width (m)" })}
-                      </label>
-                      <input
-                        type="number"
-                        value={formW}
-                        onChange={(e) => setFormW(e.target.value)}
-                        className="w-full p-2 border rounded bg-white text-slate-900"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-bold text-slate-500 mb-1">
-                        {t("struct.common.height_m", { defaultValue: "Height (m)" })}
-                      </label>
-                      <input
-                        type="number"
-                        value={formH}
-                        onChange={(e) => setFormH(e.target.value)}
-                        className="w-full p-2 border rounded bg-white text-slate-900"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-xs font-bold text-slate-500 mb-1">
-                        {t("struct.common.qty", { defaultValue: "Qty" })}
-                      </label>
-                      <input
-                        type="number"
-                        value={formQty}
-                        onChange={(e) => setFormQty(clampInt(toNum(e.target.value, 1), 1, 999))}
-                        className="w-full p-2 border rounded bg-white text-slate-900"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-bold text-slate-500 mb-1">
-                        {t("joinery.material_label", { defaultValue: "Material" })}
-                      </label>
-                      <select
-                        value={formMat}
-                        onChange={(e) => setFormMat(e.target.value as JoineryMaterial)}
-                        className="w-full p-2 border rounded bg-white text-slate-900"
-                      >
-                        <option value="pvc">PVC</option>
-                        <option value="alu">ALU</option>
-                        <option value="wood">{t("joinery.material.wood", { defaultValue: "Wood" })}</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  {(formType === "window" || formType === "bay") && (
-                    <div>
-                      <label className="block text-xs font-bold text-slate-500 mb-1">
-                        {t("joinery.shutter_label", { defaultValue: "Shutter" })}
-                      </label>
-                      <div className="flex bg-slate-100 p-1 rounded">
-                        <button
-                          type="button"
-                          onClick={() => setFormShutter("none")}
-                          className={`flex-1 py-1 text-xs rounded ${formShutter === "none" ? "bg-white shadow" : ""}`}
-                        >
-                          {t("common.none", { defaultValue: "None" })}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setFormShutter("rolling")}
-                          className={`flex-1 py-1 text-xs rounded ${formShutter === "rolling" ? "bg-white shadow" : ""}`}
-                        >
-                          {t("joinery.shutter.rolling", { defaultValue: "Rolling" })}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setFormShutter("swing")}
-                          className={`flex-1 py-1 text-xs rounded ${formShutter === "swing" ? "bg-white shadow" : ""}`}
-                        >
-                          {t("joinery.shutter.swing", { defaultValue: "Swing" })}
-                        </button>
-                      </div>
-                    </div>
-                  )}
-
-                  <div>
-                    <label className="block text-xs font-bold text-slate-500 mb-1">
-                      {t("common.label", { defaultValue: "Label" })}
-                    </label>
-                    <input
-                      type="text"
-                      value={formLabel}
-                      onChange={(e) => setFormLabel(e.target.value)}
-                      className="w-full p-2 border rounded bg-white text-slate-900"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold text-slate-500 mb-1">
-                      {t("joinery.override_supply", { defaultValue: "Override supply price (€/unit)" })}{" "}
-                      <span className="text-[10px] font-normal text-slate-400">
-                        {t("common.optional", { defaultValue: "(optional)" })}
-                      </span>
-                    </label>
-                    <input
-                      type="number"
-                      value={formPriceOverride}
-                      onChange={(e) => setFormPriceOverride(e.target.value)}
-                      className="w-full p-2 border rounded bg-white text-slate-900"
-                      placeholder={t("joinery.override_placeholder", { defaultValue: "Leave empty for auto" })}
-                    />
-                  </div>
-                </div>
-              </div>
-
-                <div className="sticky bottom-0 z-20 flex gap-3 border-t border-slate-100 bg-white px-4 py-4 pb-[calc(env(safe-area-inset-bottom,0px)+1rem)]">
                   <button
                     type="button"
                     onClick={() => setShowForm(false)}
-                    className="flex-1 rounded-xl border border-slate-200 py-3 text-slate-600 font-bold"
+                    aria-label={t("common.close", { defaultValue: "Close" })}
+                    className="rounded-full p-1 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600"
                   >
-                    {t("common.cancel", { defaultValue: "Cancel" })}
+                    <X size={20} />
                   </button>
-                  <button
-                    type="button"
-                    onClick={handleSaveItem}
-                    className="flex-1 rounded-xl bg-blue-600 py-3 text-white font-bold shadow-sm"
-                  >
-                    {t("common.save", { defaultValue: "Save" })}
-                  </button>
+                </div>
+
+                <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-4 sm:px-5">
+                  <div className="space-y-4 pb-6">
+                    <div>
+                      <label className="mb-1 block text-xs font-bold text-slate-500">
+                        {t("common.type", { defaultValue: "Type" })}
+                      </label>
+                      <select
+                        value={formType}
+                        onChange={(e) => {
+                          const tt = e.target.value as JoineryType;
+                          setFormType(tt);
+                          setFormLabel(getTypeLabel(t, tt));
+                          if (tt === "door" || tt === "garage" || tt === "velux") setFormShutter("none");
+                        }}
+                        className="w-full rounded border border-slate-200 bg-white p-2 text-slate-900"
+                      >
+                        <option value="window">{t("joinery.type.window", { defaultValue: "Window" })}</option>
+                        <option value="door">{t("joinery.type.door", { defaultValue: "Door" })}</option>
+                        <option value="bay">{t("joinery.type.bay", { defaultValue: "Sliding bay" })}</option>
+                        <option value="velux">{t("joinery.type.velux", { defaultValue: "Roof window" })}</option>
+                        <option value="garage">{t("joinery.type.garage", { defaultValue: "Garage door" })}</option>
+                      </select>
+                    </div>
+
+                    {!editingId && presetOptions.length > 0 && (
+                      <div>
+                        <label className="mb-1 block text-xs font-bold text-slate-500">
+                          {t("common.preset", { defaultValue: "Preset" })}
+                        </label>
+                        <select
+                          onChange={(e) => applyPreset(e.target.value)}
+                          className="w-full rounded border border-slate-200 bg-white p-2 text-sm text-slate-900"
+                          defaultValue=""
+                        >
+                          <option value="">{t("common.choose", { defaultValue: "-- Choose --" })}</option>
+                          {presetOptions.map((p) => (
+                            <option key={p.label} value={p.label}>
+                              {p.label}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="mb-1 block text-xs font-bold text-slate-500">
+                          {t("struct.common.width_m", { defaultValue: "Width (m)" })}
+                        </label>
+                        <input
+                          type="number"
+                          value={formW}
+                          onChange={(e) => setFormW(e.target.value)}
+                          className="w-full rounded border border-slate-200 bg-white p-2 text-slate-900"
+                        />
+                      </div>
+                      <div>
+                        <label className="mb-1 block text-xs font-bold text-slate-500">
+                          {t("struct.common.height_m", { defaultValue: "Height (m)" })}
+                        </label>
+                        <input
+                          type="number"
+                          value={formH}
+                          onChange={(e) => setFormH(e.target.value)}
+                          className="w-full rounded border border-slate-200 bg-white p-2 text-slate-900"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="mb-1 block text-xs font-bold text-slate-500">
+                          {t("struct.common.qty", { defaultValue: "Qty" })}
+                        </label>
+                        <input
+                          type="number"
+                          value={formQty}
+                          onChange={(e) => setFormQty(clampInt(toNum(e.target.value, 1), 1, 999))}
+                          className="w-full rounded border border-slate-200 bg-white p-2 text-slate-900"
+                        />
+                      </div>
+                      <div>
+                        <label className="mb-1 block text-xs font-bold text-slate-500">
+                          {t("joinery.material_label", { defaultValue: "Material" })}
+                        </label>
+                        <select
+                          value={formMat}
+                          onChange={(e) => setFormMat(e.target.value as JoineryMaterial)}
+                          className="w-full rounded border border-slate-200 bg-white p-2 text-slate-900"
+                        >
+                          <option value="pvc">PVC</option>
+                          <option value="alu">ALU</option>
+                          <option value="wood">{t("joinery.material.wood", { defaultValue: "Wood" })}</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    {(formType === "window" || formType === "bay") && (
+                      <div>
+                        <label className="mb-1 block text-xs font-bold text-slate-500">
+                          {t("joinery.shutter_label", { defaultValue: "Shutter" })}
+                        </label>
+                        <div className="flex rounded bg-slate-100 p-1">
+                          <button
+                            type="button"
+                            onClick={() => setFormShutter("none")}
+                            className={`flex-1 rounded py-1 text-xs ${formShutter === "none" ? "bg-white shadow" : ""}`}
+                          >
+                            {t("common.none", { defaultValue: "None" })}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setFormShutter("rolling")}
+                            className={`flex-1 rounded py-1 text-xs ${formShutter === "rolling" ? "bg-white shadow" : ""}`}
+                          >
+                            {t("joinery.shutter.rolling", { defaultValue: "Rolling" })}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setFormShutter("swing")}
+                            className={`flex-1 rounded py-1 text-xs ${formShutter === "swing" ? "bg-white shadow" : ""}`}
+                          >
+                            {t("joinery.shutter.swing", { defaultValue: "Swing" })}
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+                    <div>
+                      <label className="mb-1 block text-xs font-bold text-slate-500">
+                        {t("common.label", { defaultValue: "Label" })}
+                      </label>
+                      <input
+                        type="text"
+                        value={formLabel}
+                        onChange={(e) => setFormLabel(e.target.value)}
+                        className="w-full rounded border border-slate-200 bg-white p-2 text-slate-900"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="mb-1 block text-xs font-bold text-slate-500">
+                        {t("joinery.override_supply", { defaultValue: "Override supply price (€/unit)" })}{" "}
+                        <span className="text-[10px] font-normal text-slate-400">
+                          {t("common.optional", { defaultValue: "(optional)" })}
+                        </span>
+                      </label>
+                      <input
+                        type="number"
+                        value={formPriceOverride}
+                        onChange={(e) => setFormPriceOverride(e.target.value)}
+                        className="w-full rounded border border-slate-200 bg-white p-2 text-slate-900"
+                        placeholder={t("joinery.override_placeholder", { defaultValue: "Leave empty for auto" })}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="border-t border-slate-100 bg-white px-4 pb-[calc(env(safe-area-inset-bottom,0px)+1rem)] pt-3 sm:px-5 sm:py-4">
+                  <div className="flex gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setShowForm(false)}
+                      className="flex-1 rounded-xl border border-slate-200 py-3 font-bold text-slate-600"
+                    >
+                      {t("common.cancel", { defaultValue: "Cancel" })}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleSaveItem}
+                      className="flex-1 rounded-xl bg-blue-600 py-3 font-bold text-white shadow-sm"
+                    >
+                      {t("common.save", { defaultValue: "Save" })}
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>,
