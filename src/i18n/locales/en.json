@@ -202,7 +202,9 @@
       "price_truck": "Truck trip (€/trip)",
       "price_dump": "Disposal (€/t)",
       "labor_m3": "Labor (€/m³)",
-      "summary_excavated": "{{m3}} m³ excavated"
+      "summary_excavated": "{{m3}} m³ excavated",
+      "earth_mgmt": "Spoil management",
+      "reuse_fill": "Reused backfill"
     },
     "fd": {
       "steps": {

@@ -1908,11 +1908,11 @@ export const StructuralCalculator: React.FC<Props> = ({
               </div>
 
               <div className="bg-white p-3 rounded-xl border border-slate-200">
-                <h4 className="text-xs font-bold text-slate-500 uppercase mb-3">{tr("struct.gw.earth_mgmt")}</h4>
+                <h4 className="text-xs font-bold text-slate-500 uppercase mb-3">{tr("struct.gw.earth_mgmt", { defaultValue: "Gestion des déblais" })}</h4>
 
                 <div className="mb-4">
                   <label className="flex justify-between text-sm font-bold text-slate-700 mb-1">
-                    <span>{tr("struct.gw.reuse_fill")}</span>
+                    <span>{tr("struct.gw.reused_fill")}</span>
                     <span>{gwReuseOnSite}%</span>
                   </label>
                   <input

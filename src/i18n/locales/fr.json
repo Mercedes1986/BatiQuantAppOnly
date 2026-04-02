@@ -310,7 +310,9 @@
       "price_truck": "Rotation camion (€/rotation)",
       "price_dump": "Décharge (€/t)",
       "labor_m3": "MO (€/m³)",
-      "summary_excavated": "{{m3}} m³ excavés"
+      "summary_excavated": "{{m3}} m³ excavés",
+      "earth_mgmt": "Gestion des déblais",
+      "reuse_fill": "Remblai réutilisé"
     },
     "fd": {
       "steps": {
