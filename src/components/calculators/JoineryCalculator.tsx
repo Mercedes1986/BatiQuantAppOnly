@@ -851,6 +851,7 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate,
                     />
                   </div>
                 </div>
+              </div>
 
                 <div className="sticky bottom-0 z-20 flex gap-3 border-t border-slate-100 bg-white px-4 py-4 pb-[calc(env(safe-area-inset-bottom,0px)+1rem)]">
                   <button
