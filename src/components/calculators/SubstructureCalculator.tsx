@@ -461,6 +461,7 @@ export const SubstructureCalculator: React.FC<Props> = ({ onCalculate,
         id: "bitumen",
         name: t("calc.substructure.mat.bitumen", {
           n: bitumenLayers,
+          s: bitumenLayers > 1 ? "s" : "",
           defaultValue: `Bitumen coating (${bitumenLayers} coat${bitumenLayers > 1 ? "s" : ""})`,
         }),
         quantity: buckets,

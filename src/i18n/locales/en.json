@@ -529,13 +529,13 @@
         "waste_pct": "Waste (%)"
       },
       "details": {
-        "bags_of": "Bags of",
-        "bpe_step": "Ready-mix details",
-        "formwork_calc": "Formwork calculation",
+        "bags_of": "{{bags}} bags of {{kg}} kg",
+        "bpe_step": "Ordered in 0.5 m³ increments (need: {{need}} m³)",
+        "formwork_calc": "{{ml}} lm × {{h}} m",
         "overlap_15": "15 cm overlap",
-        "spacing_m": "Spacing (m)",
-        "thickness_cm": "Thickness (cm)",
-        "useful_area_panel": "Usable panel area"
+        "spacing_m": "Spacing ≈ {{m}} m",
+        "thickness_cm": "Thk. {{cm}} cm",
+        "useful_area_panel": "≈ {{m2}} m² usable / panel"
       },
       "inputs": {
         "area_m2": "Area (m²)",
@@ -559,7 +559,7 @@
       },
       "materials": {
         "bpe": "Ready-mix concrete",
-        "cement_named": "Cement ({{label}})",
+        "cement_named": "Cement ({{dosage}} kg/m³)",
         "delivery": "Delivery",
         "delivery_pump": "Pump delivery",
         "edge_strip": "Edge strip",
@@ -569,7 +569,7 @@
         "insulation_named": "Insulation ({{label}})",
         "joints": "Joints",
         "labor": "Labor",
-        "mesh_named": "Mesh ({{type}})",
+        "mesh_named": "Mesh ({{label}})",
         "polyane": "Polythene sheet",
         "sand": "Sand"
       },
@@ -623,7 +623,7 @@
         "joints": "Joints",
         "mesh": "Mesh"
       },
-      "summary": "Concrete slab estimate",
+      "summary": "{{m3}} m³ of concrete",
       "summary_zero": "Enter dimensions to see results.",
       "usage": {
         "driveway": "Driveway",
@@ -1471,11 +1471,11 @@
         "wall": "Wall"
       },
       "mat": {
-        "bitumen": "Bitumen coating",
-        "bitumen_detail": "{{l}} L",
+        "bitumen": "Bitumen coating ({{n}} coat{{s}})",
+        "bitumen_detail": "{{kg}} kg over {{m2}} m²",
         "blocks_details": "{{units}} units/m² — th. {{th}} cm",
         "delta_ms": "Delta MS membrane",
-        "delta_ms_overlap": "Overlap",
+        "delta_ms_overlap": "≈ +15% overlaps",
         "delta_profile": "Delta profile",
         "dpc": "DPC (damp proof course)",
         "dpc_ratio": "≈ 1 roll / 20 m",

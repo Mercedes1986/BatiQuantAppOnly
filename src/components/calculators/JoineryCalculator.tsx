@@ -1,5 +1,6 @@
 // src/components/calculators/JoineryCalculator.tsx
 import React, { useEffect, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 
 import { CalculatorType, CalculationResult, Unit, CalculatorSnapshot } from "@/types";
@@ -682,19 +683,20 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate,
           </button>
 
           {/* Modal */}
-          {showForm && (
-            <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-              <div className="bg-white rounded-2xl w-full max-w-sm max-h-[90vh] overflow-y-auto">
-                <div className="p-4 border-b border-slate-100 flex justify-between items-center sticky top-0 bg-white z-10">
+          {showForm && typeof document !== "undefined" && createPortal(
+            <div className="fixed inset-0 z-[9999] bg-slate-950/55 px-3 py-4 backdrop-blur-[1px] sm:flex sm:items-center sm:justify-center sm:p-6">
+              <div className="mx-auto flex h-[calc(100dvh-2rem)] w-full max-w-md flex-col overflow-hidden rounded-[26px] border border-white/70 bg-white shadow-[0_28px_80px_rgba(15,23,42,0.28)] sm:h-auto sm:max-h-[92dvh]">
+                <div className="sticky top-0 z-20 flex items-center justify-between border-b border-slate-100 bg-white px-4 py-4">
                   <h3 className="font-bold text-slate-800">
                     {editingId ? t("common.edit", { defaultValue: "Edit" }) : t("common.add", { defaultValue: "Add" })}
                   </h3>
-                  <button type="button" onClick={() => setShowForm(false)} aria-label="Close">
+                  <button type="button" onClick={() => setShowForm(false)} aria-label={t("common.close", { defaultValue: "Close" })}>
                     <X size={20} className="text-slate-400" />
                   </button>
                 </div>
 
-                <div className="p-4 space-y-4">
+                <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4">
+                  <div className="space-y-4 pb-4">
                   <div>
                     <label className="block text-xs font-bold text-slate-500 mb-1">
                       {t("common.type", { defaultValue: "Type" })}
@@ -850,24 +852,25 @@ export const JoineryCalculator: React.FC<Props> = ({ onCalculate,
                   </div>
                 </div>
 
-                <div className="p-4 border-t border-slate-100 flex gap-3 sticky bottom-0 bg-white">
+                <div className="sticky bottom-0 z-20 flex gap-3 border-t border-slate-100 bg-white px-4 py-4 pb-[calc(env(safe-area-inset-bottom,0px)+1rem)]">
                   <button
                     type="button"
                     onClick={() => setShowForm(false)}
-                    className="flex-1 py-3 text-slate-500 font-bold"
+                    className="flex-1 rounded-xl border border-slate-200 py-3 text-slate-600 font-bold"
                   >
                     {t("common.cancel", { defaultValue: "Cancel" })}
                   </button>
                   <button
                     type="button"
                     onClick={handleSaveItem}
-                    className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold"
+                    className="flex-1 rounded-xl bg-blue-600 py-3 text-white font-bold shadow-sm"
                   >
                     {t("common.save", { defaultValue: "Save" })}
                   </button>
                 </div>
               </div>
-            </div>
+            </div>,
+            document.body
           )}
         </div>
       )}

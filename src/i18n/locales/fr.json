@@ -529,13 +529,13 @@
         "waste_pct": "Pertes (%)"
       },
       "details": {
-        "bags_of": "Sacs de",
-        "bpe_step": "Détails BPE",
-        "formwork_calc": "Calcul du coffrage",
+        "bags_of": "{{bags}} sacs de {{kg}} kg",
+        "bpe_step": "Commande par pas de 0,5 m³ (besoin : {{need}} m³)",
+        "formwork_calc": "{{ml}} ml × {{h}} m",
         "overlap_15": "Recouvrement 15 cm",
-        "spacing_m": "Espacement (m)",
-        "thickness_cm": "Épaisseur (cm)",
-        "useful_area_panel": "Surface utile d’un panneau"
+        "spacing_m": "Espacement ≈ {{m}} m",
+        "thickness_cm": "Ép. {{cm}} cm",
+        "useful_area_panel": "≈ {{m2}} m² utiles / panneau"
       },
       "inputs": {
         "area_m2": "Surface (m²)",
@@ -559,7 +559,7 @@
       },
       "materials": {
         "bpe": "Béton BPE",
-        "cement_named": "Ciment ({{label}})",
+        "cement_named": "Ciment ({{dosage}} kg/m³)",
         "delivery": "Livraison",
         "delivery_pump": "Livraison + pompe",
         "edge_strip": "Bande périphérique",
@@ -569,7 +569,7 @@
         "insulation_named": "Isolation ({{label}})",
         "joints": "Joints",
         "labor": "Main d’œuvre",
-        "mesh_named": "Treillis ({{type}})",
+        "mesh_named": "Treillis ({{label}})",
         "polyane": "Polyane",
         "sand": "Sable"
       },
@@ -623,7 +623,7 @@
         "joints": "Joints",
         "mesh": "Treillis"
       },
-      "summary": "Estimation dalle béton",
+      "summary": "{{m3}} m³ de béton",
       "summary_zero": "Saisissez des dimensions pour afficher les résultats.",
       "usage": {
         "driveway": "Allée",
@@ -1530,11 +1530,11 @@
         "wall": "Mur"
       },
       "mat": {
-        "bitumen": "Enduit bitumineux",
-        "bitumen_detail": "{{l}} L",
+        "bitumen": "Enduit bitumineux ({{n}} couche{{s}})",
+        "bitumen_detail": "{{kg}} kg sur {{m2}} m²",
         "blocks_details": "{{units}} unités/m² — ép. {{th}} cm",
         "delta_ms": "Membrane Delta MS",
-        "delta_ms_overlap": "Recouvrement",
+        "delta_ms_overlap": "≈ +15 % de recouvrement",
         "delta_profile": "Profil Delta",
         "dpc": "Arase étanche",
         "dpc_ratio": "≈ 1 rouleau / 20 m",
