@@ -221,9 +221,9 @@ export const AppMenuPage: React.FC = () => {
   const primaryCards: ActionCard[] = useMemo(
     () => [
       {
-        title: t("menu.cards.quicktools.title", { defaultValue: "Quick site tools" }),
+        title: t("menu.cards.quicktools.title", { defaultValue: "Quick checks" }),
         desc: t("menu.cards.quicktools.desc", {
-          defaultValue: "Fast calculators for conversions, slopes, packaging and instant checks.",
+          defaultValue: "Fast tools for conversions, packaging, slopes and one-shot answers in under a minute.",
         }),
         path: "/app/quick-tools",
         icon: <Sparkles size={18} className="text-blue-700" />,
@@ -244,6 +244,11 @@ export const AppMenuPage: React.FC = () => {
 
   const shortcuts: Shortcut[] = useMemo(
     () => [
+      {
+        label: t("menu.shortcuts.estimators", { defaultValue: "Detailed estimators" }),
+        path: "/app/calculators",
+        icon: <LayoutGrid size={18} />,
+      },
       {
         label: t("menu.shortcuts.all_quotes", { defaultValue: "All quotes" }),
         path: "/app/quotes",

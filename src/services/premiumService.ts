@@ -1,7 +1,8 @@
+import { FREE_HOUSE_PROJECT_LIMIT, PREMIUM_PLAN_NAME } from "@/config/premiumConfig";
 import { getAdFreeEventName, hasAdFreeEntitlement } from "@/services/purchaseService";
 import { getHouseProjects } from "@/services/storage";
 
-export const FREE_HOUSE_PROJECT_LIMIT = 1;
+export { FREE_HOUSE_PROJECT_LIMIT, PREMIUM_PLAN_NAME };
 
 export const hasPremiumAccess = (): boolean => hasAdFreeEntitlement();
 

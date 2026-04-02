@@ -261,15 +261,39 @@ export const QuickToolsPage: React.FC = () => {
             </div>
             <div>
               <h1 className="text-[30px] font-extrabold tracking-tight text-slate-900">
-                {t("quick.page_title", { defaultValue: "Quick site tools" })}
+                {t("quick.page_title", { defaultValue: "Quick checks" })}
               </h1>
               <p className="mt-1 text-sm leading-relaxed text-slate-500">
                 {t("quick.page_subtitle", {
                   defaultValue:
-                    "Standalone tools for conversions, net areas, packaging, timber decking, detailed drywall, detailed tiling, roofing, fencing, gravel / fill and insulation.",
+                    "Use these tools for fast conversions and one-shot checks. For full quantities, materials and costs, open the Estimators tab.",
                 })}
               </p>
             </div>
+          </div>
+        </section>
+
+        <section className="rounded-[28px] border border-blue-100 bg-white/80 p-4 shadow-sm backdrop-blur-md">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <div className="text-xs font-extrabold uppercase tracking-[0.18em] text-blue-500">
+                {t("quick.compare.badge", { defaultValue: "Quick tools vs estimators" })}
+              </div>
+              <p className="mt-2 text-sm text-slate-600">
+                {t("quick.compare.body", {
+                  defaultValue:
+                    "Quick tools answer one question fast. Estimators build a complete result with materials, totals and project saving.",
+                })}
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => navigate('/app/calculators')}
+              className="inline-flex items-center justify-center rounded-2xl border border-blue-200 bg-blue-50 px-4 py-2.5 text-sm font-extrabold text-blue-700 transition-colors hover:bg-blue-100"
+            >
+              {t("quick.compare.cta", { defaultValue: "Open estimators" })}
+            </button>
           </div>
         </section>
 

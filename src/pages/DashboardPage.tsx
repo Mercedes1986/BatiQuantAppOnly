@@ -17,14 +17,12 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onSelectCalc }) =>
       <div className="max-w-7xl mx-auto p-4">
         <section className="glass-panel mb-4 rounded-[32px] px-5 py-5">
           <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">
-            {t("app.name", { defaultValue: "Bati" })}
-            <span className="text-blue-600">
-              {t("app.name_suffix", { defaultValue: "Quant" })}
-            </span>
+            {t("dashboard.hero_title", { defaultValue: "Detailed estimators" })}
           </h1>
-          <p className="text-sm text-slate-500">
-            {t("dashboard.subtitle", {
-              defaultValue: "The go-to tool for your job sites.",
+          <p className="mt-2 text-sm text-slate-500">
+            {t("dashboard.hero_subtitle", {
+              defaultValue:
+                "Use the full calculators when you need detailed quantities, materials and cost breakdowns for a real job-site estimate.",
             })}
           </p>
         </section>
@@ -33,11 +31,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onSelectCalc }) =>
           {getCalculators()
             .filter((calc) => calc.id !== CalculatorType.QUICK_TOOLS)
             .map((calc) => (
-              <CalculatorCard
-                key={calc.id}
-                config={calc}
-                onClick={() => onSelectCalc(calc.id)}
-              />
+              <CalculatorCard key={calc.id} config={calc} onClick={() => onSelectCalc(calc.id)} />
             ))}
         </div>
       </div>

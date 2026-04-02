@@ -204,10 +204,10 @@ export const getPurchaseRuntimeState = (): PurchaseRuntimeState => {
   if (!nativeSnapshot) return cached;
 
   const merged: PurchaseRuntimeState = {
-    entitled: nativeSnapshot.entitled || cached.entitled,
-    source: nativeSnapshot.entitled ? "billing" : cached.source,
-    billingReady: nativeSnapshot.billingReady || cached.billingReady,
-    productReady: nativeSnapshot.productReady || cached.productReady,
+    entitled: nativeSnapshot.entitled,
+    source: nativeSnapshot.entitled ? "billing" : "none",
+    billingReady: nativeSnapshot.billingReady,
+    productReady: nativeSnapshot.productReady,
     productId: nativeSnapshot.productId || cached.productId,
     message: nativeSnapshot.message || cached.message,
     updatedAt: Date.now(),

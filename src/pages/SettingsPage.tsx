@@ -129,6 +129,8 @@ export const SettingsPage: React.FC = () => {
     window.addEventListener("batiquant-native-purchase", refresh as EventListener);
     window.addEventListener(adFreeEvent, refresh as EventListener);
 
+    void refreshPurchaseState().then(refresh).catch(refresh);
+
     return () => {
       window.removeEventListener("consent-updated", refresh);
       window.removeEventListener("batiquant-native-privacy", refresh as EventListener);
@@ -487,11 +489,38 @@ export const SettingsPage: React.FC = () => {
                   <div className="text-sm font-extrabold text-slate-700">
                     {t("settings.pro.actions_title", { defaultValue: "Upgrade & restore" })}
                   </div>
-                  <div className="mt-3 rounded-2xl border border-emerald-100 bg-emerald-50/60 p-3 text-xs font-semibold text-emerald-900">
-                    <div>• {t("settings.pro.benefit_no_ads", { defaultValue: "Remove all ads" })}</div>
-                    <div className="mt-1">• {t("settings.pro.benefit_unlimited_sites", { defaultValue: "Unlock unlimited site tracking" })}</div>
-                    <div className="mt-1">• {t("settings.pro.benefit_restore", { defaultValue: "Restore purchases on a new device" })}</div>
+                  <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                    <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3">
+                      <div className="text-[11px] font-extrabold uppercase tracking-wide text-slate-500">
+                        {t("settings.pro.plan_free", { defaultValue: "Free version with ads" })}
+                      </div>
+                      <div className="mt-2 text-xs text-slate-600">
+                        • {t("settings.pro.free_benefit_estimators", { defaultValue: "Full estimators and quick tools" })}
+                      </div>
+                      <div className="mt-1 text-xs text-slate-600">
+                        • {t("settings.pro.free_benefit_sites", { defaultValue: "1 saved site with ads" })}
+                      </div>
+                    </div>
+                    <div className="rounded-2xl border border-emerald-100 bg-emerald-50/60 p-3 text-emerald-900">
+                      <div className="text-[11px] font-extrabold uppercase tracking-wide text-emerald-700">
+                        {t("settings.pro.plan_pro", { defaultValue: "BatiQuant Pro" })}
+                      </div>
+                      <div className="mt-2 text-xs font-semibold">
+                        • {t("settings.pro.benefit_no_ads", { defaultValue: "Remove all ads" })}
+                      </div>
+                      <div className="mt-1 text-xs font-semibold">
+                        • {t("settings.pro.benefit_unlimited_sites", { defaultValue: "Unlock unlimited site tracking" })}
+                      </div>
+                      <div className="mt-1 text-xs font-semibold">
+                        • {t("settings.pro.benefit_restore", { defaultValue: "Restore purchases on a new device" })}
+                      </div>
+                    </div>
                   </div>
+                  <p className="mt-3 rounded-2xl border border-blue-100 bg-blue-50 px-3 py-2 text-xs font-medium text-blue-800">
+                    {t("settings.pro.value_pitch", {
+                      defaultValue: "Pro keeps the free app simple: the same calculators, but no ads and unlimited site tracking when you start managing real jobs.",
+                    })}
+                  </p>
                   <div className="mt-3 grid gap-2">
                     {!hasNoAds ? (
                       <button

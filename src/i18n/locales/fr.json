@@ -71,7 +71,9 @@
     "materials": "Matériaux",
     "settings": "Réglages",
     "quick_tools": "Express",
-    "calculators": "Calculs"
+    "calculators": "Calculs",
+    "quick_checks": "Outils",
+    "estimators": "Calculs"
   },
   "menu": {
     "title": "Tableau de bord chantier",
@@ -111,8 +113,8 @@
         "badge": "RECOMMANDÉ"
       },
       "quicktools": {
-        "title": "Calculs rapides chantier",
-        "desc": "Calculs rapides pour conversions, pentes, conditionnements et contrôles express.",
+        "title": "Outils rapides",
+        "desc": "Des vérifications ultra rapides pour conversions, pentes, conditionnements et réponses en moins d’une minute.",
         "badge": "RAPIDE"
       },
       "quick_tools": {
@@ -152,7 +154,8 @@
       "all_projects": "Tous les projets",
       "materials": "Matériaux & prix",
       "settings": "Réglages",
-      "backup": "Sauvegarde JSON"
+      "backup": "Sauvegarde JSON",
+      "estimators": "Calculs détaillés"
     },
     "resume": {
       "quote_label": "Dernier devis",
@@ -1829,7 +1832,9 @@
     "title": "Consentement cookies"
   },
   "dashboard": {
-    "subtitle": "Aperçu de vos derniers projets et outils."
+    "subtitle": "Aperçu de vos derniers projets et outils.",
+    "hero_title": "Estimateurs détaillés",
+    "hero_subtitle": "Utilisez les calculateurs complets quand vous avez besoin de quantités détaillées, de matériaux et d’un vrai chiffrage chantier."
   },
   "doc": {
     "generated_by": "Généré par",
@@ -2052,7 +2057,13 @@
       "pro_title": "BatiQuant Pro",
       "pro_body": "Sans pub et suivi chantier illimité.",
       "upgrade_button": "Passer à Pro",
-      "limit_reached_inline": "Limite gratuite atteinte : débloquez Pro pour créer plus de chantiers."
+      "limit_reached_inline": "Limite gratuite atteinte : débloquez Pro pour créer plus de chantiers.",
+      "remaining_slots": "{{count}} emplacement gratuit restant avant la mise à niveau",
+      "pro_points": {
+        "unlimited": "Chantiers enregistrés illimités",
+        "no_ads": "Plus aucune coupure pub",
+        "restore": "Restauration de l’achat sur un nouvel appareil"
+      }
     }
   },
   "hvac": {
@@ -2620,7 +2631,10 @@
       "plan_usage_free": "Chantiers enregistrés : {{count}} / {{limit}}",
       "benefit_no_ads": "Supprime toutes les pubs",
       "benefit_unlimited_sites": "Débloque les chantiers illimités",
-      "benefit_restore": "Restaure l’achat sur un nouvel appareil"
+      "benefit_restore": "Restaure l’achat sur un nouvel appareil",
+      "free_benefit_estimators": "Calculateurs complets et outils rapides",
+      "free_benefit_sites": "1 chantier enregistré avec pubs",
+      "value_pitch": "Pro garde l’app simple : les mêmes calculateurs, mais sans pub et avec des chantiers illimités dès que vous suivez de vrais dossiers."
     },
     "restore_ok": "Restauration réussie",
     "support": {
@@ -2967,8 +2981,8 @@
     "HA12": "Fer HA12 (armature)"
   },
   "quick": {
-    "page_title": "Calculs rapides chantier",
-    "page_subtitle": "Outils unitaires pour les conversions, surfaces nettes, conditionnements, terrasse bois, placo détaillé, carrelage détaillé et toiture.",
+    "page_title": "Outils rapides",
+    "page_subtitle": "Utilisez ces outils pour une vérification rapide. Pour un résultat complet avec matériaux et coûts, ouvrez l’onglet Calculs.",
     "page_precision": "Calcul rapide dédié",
     "tools": {
       "convert": "Convertisseur",
@@ -3090,7 +3104,12 @@
       "section_mm2": "Section (mm²)"
     },
     "title": "Calculs rapides chantier",
-    "subtitle": "Micro-outils pour conversions, surfaces, quantités, terrasse bois, ossature placo, carrelage détaillé, toiture, clôture, gravier / remblai et isolation."
+    "subtitle": "Micro-outils pour conversions, surfaces, quantités, terrasse bois, ossature placo, carrelage détaillé, toiture, clôture, gravier / remblai et isolation.",
+    "compare": {
+      "badge": "Outils rapides vs calculs",
+      "body": "Les outils rapides répondent à une question précise. Les calculs complets produisent un résultat détaillé avec matériaux, total et enregistrement projet.",
+      "cta": "Ouvrir les calculs"
+    }
   },
   "wallspecs": {
     "parpaing20": "Parpaing creux 20×20×50 (standard)",

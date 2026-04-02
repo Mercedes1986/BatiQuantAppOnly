@@ -1,0 +1,13 @@
+src/App.tsx
+src/components/BottomNav.tsx
+src/config/premiumConfig.ts
+src/pages/AppMenuPage.tsx
+src/pages/DashboardPage.tsx
+src/pages/HouseProjectPage.tsx
+src/pages/QuickToolsPage.tsx
+src/pages/SettingsPage.tsx
+src/services/premiumService.ts
+src/services/purchaseService.ts
+src/services/storage.ts
+src/i18n/locales/fr.json
+src/i18n/locales/en.json

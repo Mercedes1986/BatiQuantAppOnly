@@ -35,7 +35,7 @@ import { createQuoteFromProject } from "@/services/documentLogic";
 import { getCompanyProfile, getQuotes } from "@/services/documentsStorage";
 import { ClientModal } from "@/components/documents/ClientModal";
 import { useTranslation } from "react-i18next";
-import { FREE_HOUSE_PROJECT_LIMIT, getHouseProjectLimit, getPremiumEventName, hasPremiumAccess } from "@/services/premiumService";
+import { FREE_HOUSE_PROJECT_LIMIT, getHouseProjectLimit, getPremiumEventName, getRemainingFreeHouseProjectSlots, hasPremiumAccess } from "@/services/premiumService";
 
 /**
  * Update goals:
@@ -121,6 +121,10 @@ export const HouseProjectPage: React.FC = () => {
   };
 
   const freeLimitReached = !premiumEnabled && projects.length >= houseProjectLimit;
+  const remainingFreeSlots = useMemo(
+    () => getRemainingFreeHouseProjectSlots(projects.length, premiumEnabled),
+    [premiumEnabled, projects.length],
+  );
 
   const openPremiumSettings = () => {
     navigate("/app/settings");
@@ -740,13 +744,21 @@ export const HouseProjectPage: React.FC = () => {
                 <p className="mt-1 text-sm text-slate-600">
                   {t("house.premium.banner_body", {
                     defaultValue:
-                      "The free version includes 1 site with ads. Upgrade to BatiQuant Pro to remove ads and unlock unlimited sites.",
+                      "The free plan is enough to test the workflow. BatiQuant Pro becomes useful as soon as you need to manage more than one real job-site without ads.",
                   })}
                 </p>
               </div>
 
               <div className="rounded-2xl border border-white/80 bg-white/80 px-4 py-3 text-sm font-extrabold text-slate-700 shadow-sm">
                 {projects.length} / {FREE_HOUSE_PROJECT_LIMIT} {t("house.premium.sites_used", { defaultValue: "site used" })}
+                <div className="mt-1 text-xs font-semibold text-slate-500">
+                  {freeLimitReached
+                    ? t("house.premium.limit_reached_inline", { defaultValue: "Free limit reached: unlock Pro to create more sites." })
+                    : t("house.premium.remaining_slots", {
+                        defaultValue: "{{count}} free slot left before upgrade",
+                        count: remainingFreeSlots,
+                      })}
+                </div>
               </div>
             </div>
 
@@ -767,7 +779,12 @@ export const HouseProjectPage: React.FC = () => {
                       {t("house.premium.pro_title", { defaultValue: "BatiQuant Pro" })}
                     </div>
                     <div className="mt-2 text-sm font-semibold text-slate-700">
-                      {t("house.premium.pro_body", { defaultValue: "No ads and unlimited site tracking." })}
+                      {t("house.premium.pro_body", { defaultValue: "No ads, unlimited site tracking and a cleaner workflow for real job follow-up." })}
+                    </div>
+                    <div className="mt-3 text-xs font-semibold text-emerald-700">
+                      • {t("house.premium.pro_points.unlimited", { defaultValue: "Unlimited saved sites" })}
+                      <br />• {t("house.premium.pro_points.no_ads", { defaultValue: "No ad interruptions" })}
+                      <br />• {t("house.premium.pro_points.restore", { defaultValue: "Purchase restore on a new device" })}
                     </div>
                   </div>
                   <ShieldCheck size={18} className="shrink-0 text-emerald-600" />

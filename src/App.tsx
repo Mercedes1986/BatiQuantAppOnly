@@ -47,7 +47,7 @@ import { ArrowLeft, Save, Loader2, AlertTriangle } from "lucide-react";
 import ConsentModal from "./components/privacy/ConsentModal";
 import { armInterstitialAfterCalculation, clearPendingInterstitial, initializeAds, showPendingInterstitialIfReady } from "./services/adsService";
 import { initConsent } from "./services/consentService";
-import { initializePurchaseState } from "./services/purchaseService";
+import { initializePurchaseState, refreshPurchaseState } from "./services/purchaseService";
 
 // --- helper: keep prop typing for React.lazy ---
 const lazyNamed = <T extends React.ComponentType<any>>(factory: () => Promise<{ default: T }>) =>
@@ -734,8 +734,23 @@ const App: React.FC = () => {
 
     void boot();
 
+    const refreshBillingState = () => {
+      void refreshPurchaseState().catch(() => {
+        // keep cached state when Google Play is temporarily unavailable
+      });
+    };
+
+    const onVisibilityChange = () => {
+      if (document.visibilityState === "visible") refreshBillingState();
+    };
+
+    window.addEventListener("focus", refreshBillingState);
+    document.addEventListener("visibilitychange", onVisibilityChange);
+
     return () => {
       cancelled = true;
+      window.removeEventListener("focus", refreshBillingState);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
     };
   }, []);
 
