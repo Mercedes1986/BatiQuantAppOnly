@@ -1,5 +1,5 @@
 {
   "name": "Version site WEB BatiQuant",
-  "description": "L'outil ultime pour vos chantiers : calculs de matériaux, estimations de coûts et gestion de projets. Rapide, fiable et hors-ligne.",
+  "description": "Application BatiQuant pour les estimations chantier, le suivi de projets et la préparation de documents, avec stockage local et services mobiles selon la configuration publiée.",
   "requestFramePermissions": []
 }

@@ -5,16 +5,186 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>BatiQuant — Politique de confidentialité</title>
     <style>
-      body { font-family: Arial, sans-serif; max-width: 860px; margin: 40px auto; padding: 0 16px; color: #0f172a; line-height: 1.6; }
-      h1, h2 { color: #0f172a; }
+      :root {
+        color-scheme: light;
+        --text: #0f172a;
+        --muted: #475569;
+        --border: #e2e8f0;
+        --bg: #f8fafc;
+        --card: #ffffff;
+        --accent: #0f766e;
+      }
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 960px;
+        margin: 40px auto;
+        padding: 0 16px 40px;
+        color: var(--text);
+        line-height: 1.68;
+        background: var(--bg);
+      }
+      h1, h2, h3 { color: var(--text); }
+      h1 { margin-bottom: 8px; }
+      h2 { margin-top: 28px; }
+      .lead { color: var(--muted); max-width: 860px; }
+      .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        padding: 20px;
+        margin: 16px 0;
+        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
+      }
+      .meta {
+        display: inline-block;
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: #ecfeff;
+        color: var(--accent);
+        font-size: 13px;
+        font-weight: 700;
+      }
+      ul { padding-left: 20px; }
+      a { color: var(--accent); }
+      strong { color: var(--text); }
+      .footer-note {
+        font-size: 14px;
+        color: var(--muted);
+      }
     </style>
   </head>
   <body>
+    <span class="meta">Dernière mise à jour : 3 avril 2026</span>
     <h1>Politique de confidentialité — BatiQuant</h1>
-    <p>Modèle minimal à compléter avant publication Google Play.</p>
-    <h2>Données locales</h2>
-    <p>L’application peut stocker localement des préférences, paramètres et sauvegardes de projets.</p>
-    <h2>Publicité</h2>
-    <p>La version mobile peut intégrer AdMob via une couche native. Les choix de confidentialité doivent être accessibles depuis les réglages de l’application.</p>
+    <p class="lead">
+      Cette politique décrit le traitement des données pour l’application BatiQuant éditée par
+      <strong>OddPixel Factory</strong>. Elle couvre l’usage mobile de l’application, y compris les fonctions de
+      calcul, le stockage local, la publicité Google AdMob, la gestion du consentement et l’achat intégré
+      permettant de supprimer les publicités.
+    </p>
+
+    <div class="card">
+      <h2>1. Responsable de l’application</h2>
+      <p>
+        BatiQuant est éditée par <strong>OddPixel Factory</strong>.
+        Pour les demandes liées à la confidentialité, à la publication ou au support, utilisez l’adresse de
+        contact affichée sur la fiche Google Play officielle de l’application ou sur le site de l’éditeur,
+        lorsqu’il est disponible.
+      </p>
+    </div>
+
+    <div class="card">
+      <h2>2. Données enregistrées localement sur votre appareil</h2>
+      <p>
+        BatiQuant enregistre principalement des données <strong>sur votre appareil</strong> afin de faire fonctionner
+        l’application et de conserver votre travail entre deux sessions.
+      </p>
+      <ul>
+        <li>préférences d’application, langue et devise ;</li>
+        <li>projets, chantiers, calculs enregistrés, documents et paramètres ;</li>
+        <li>profil entreprise saisi par l’utilisateur ;</li>
+        <li>choix de confidentialité et état de licence Pro.</li>
+      </ul>
+      <p>
+        Ces données sont utilisées pour fournir les fonctionnalités de l’application et ne sont pas destinées
+        à être partagées automatiquement par OddPixel Factory depuis l’interface standard de l’application.
+      </p>
+    </div>
+
+    <div class="card">
+      <h2>3. Sauvegardes, import et export</h2>
+      <p>
+        L’application peut permettre l’export de sauvegardes au format JSON et l’import de ces sauvegardes.
+        Lorsque vous exportez un fichier, vous choisissez vous-même où le stocker ou le transmettre.
+        OddPixel Factory ne reçoit pas automatiquement ce fichier via l’application standard.
+      </p>
+    </div>
+
+    <div class="card">
+      <h2>4. Publicité et consentement</h2>
+      <p>
+        La version gratuite de BatiQuant peut afficher des publicités via <strong>Google AdMob</strong>.
+        Selon la région, l’application peut afficher un formulaire de consentement pour vous permettre de gérer
+        vos choix concernant les annonces personnalisées ou limitées. Un accès à ces choix reste disponible dans
+        les réglages de l’application.
+      </p>
+      <p>
+        Le traitement lié à la diffusion publicitaire peut impliquer des données telles que l’identifiant
+        publicitaire, des informations techniques sur l’appareil, l’adresse IP approximative, les données de
+        diagnostic, les informations de consentement et des données liées aux performances publicitaires,
+        conformément aux règles et SDK Google utilisés dans l’application.
+      </p>
+    </div>
+
+    <div class="card">
+      <h2>5. Achat intégré “Supprimer les publicités”</h2>
+      <p>
+        BatiQuant peut proposer un achat intégré Google Play permettant d’activer <strong>BatiQuant Pro</strong>
+        et de désactiver les publicités. La gestion du paiement, de la validation et de la restauration de l’achat
+        relève de <strong>Google Play Billing</strong>. L’application peut stocker localement l’état de la licence
+        afin d’appliquer le mode sans publicité sur l’appareil.
+      </p>
+    </div>
+
+    <div class="card">
+      <h2>6. Partage avec des tiers</h2>
+      <p>
+        Certaines données peuvent être traitées par des prestataires tiers uniquement pour faire fonctionner des
+        services intégrés à l’application, notamment :
+      </p>
+      <ul>
+        <li>Google AdMob pour la diffusion et la mesure des publicités ;</li>
+        <li>Google User Messaging Platform (UMP) pour la gestion du consentement ;</li>
+        <li>Google Play Billing pour les achats intégrés et leur restauration.</li>
+      </ul>
+      <p>
+        Les traitements réalisés par ces services sont soumis à leurs propres politiques et à la configuration
+        effective de l’application publiée.
+      </p>
+    </div>
+
+    <div class="card">
+      <h2>7. Conservation et suppression</h2>
+      <p>
+        Les données locales restent sur l’appareil jusqu’à leur suppression par l’utilisateur, par exemple via la
+        réinitialisation de certaines préférences, l’écrasement par une importation, l’effacement des données de
+        l’application ou la désinstallation.
+      </p>
+      <p>
+        Comme BatiQuant ne repose pas sur la création d’un compte utilisateur dans son fonctionnement standard,
+        il n’existe pas de portail de compte à supprimer dans l’application elle-même.
+      </p>
+    </div>
+
+    <div class="card">
+      <h2>8. Sécurité</h2>
+      <p>
+        OddPixel Factory met en place des mesures raisonnables pour limiter les accès non autorisés aux données
+        traitées par l’application. Toutefois, aucun service ni aucun support de stockage ne peut être garanti
+        comme totalement exempt de risque.
+      </p>
+    </div>
+
+    <div class="card">
+      <h2>9. Enfants</h2>
+      <p>
+        BatiQuant est une application d’outillage et de gestion de chantier destinée à un public professionnel ou
+        averti. Elle n’est pas conçue spécifiquement pour les enfants.
+      </p>
+    </div>
+
+    <div class="card">
+      <h2>10. Modifications</h2>
+      <p>
+        Cette politique peut être mise à jour afin de refléter l’évolution de l’application, de ses SDK, de ses
+        obligations contractuelles ou réglementaires. La date de dernière mise à jour figurera alors en haut de
+        cette page.
+      </p>
+    </div>
+
+    <p class="footer-note">
+      Cette politique doit rester cohérente avec la fiche Google Play, la section Data safety et les SDK réellement
+      activés dans la version publiée de BatiQuant.
+    </p>
   </body>
 </html>

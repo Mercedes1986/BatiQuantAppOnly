@@ -2940,38 +2940,54 @@
   "support_pages": {
     "help": {
       "title": "Help & FAQ",
-      "subtitle": "Find the essential information for backups, documents, ads, and mobile use without leaving the app.",
+      "subtitle": "Find the essential points for backups, documents, privacy, Pro mode, and mobile usage without leaving the app.",
       "sections": {
         "backup": {
           "title": "Backup",
-          "body": "Use the Settings screen to export a JSON backup of your projects and preferences regularly."
+          "body": "Use the Settings screen to export a JSON backup of your projects, sites, settings, and documents on a regular basis."
         },
         "privacy": {
           "title": "Ads & privacy",
-          "body": "From Settings, open Ads & privacy to review your choices and reopen the privacy form when needed."
+          "body": "From Settings, open Ads & privacy to review your choices, check the active ads mode, and reopen the form when needed."
         },
         "documents": {
           "title": "Documents",
-          "body": "Quotes and invoices are managed from the document screens. Check your company profile before printing."
+          "body": "Quotes and invoices are managed from the document screens. Check the company profile before printing, sharing, or sending."
         },
         "mobile": {
           "title": "Mobile version",
-          "body": "During Android development, keep Google AdMob test identifiers until you replace them with your real identifiers."
+          "body": "Calculations and storage mostly work locally, but ads, consent flows, and Google Play purchases may require network access."
         }
       }
     },
     "privacy": {
       "title": "Privacy policy",
-      "subtitle": "This in-app summary must be completed and aligned with your final Google Play publication documents.",
-      "updated": "Draft version for mobile publication",
+      "subtitle": "In-app summary of the policy applied to BatiQuant, local storage, Google AdMob ads, consent handling, and Google Play purchases.",
+      "updated": "Last updated • April 3, 2026",
       "sections": {
+        "publisher": {
+          "title": "Publisher",
+          "body": "BatiQuant is published by OddPixel Factory. For privacy or publication requests, use the contact details displayed on the official Google Play listing or on the publisher website when available."
+        },
         "local_data": {
-          "title": "Local data",
-          "body": "The app may store preferences, settings, and project backups locally on your device."
+          "title": "Locally stored data",
+          "body": "The app mainly stores preferences, language, currency, projects, sites, documents, company profile details, and some technical states such as consent or Pro license status on your device."
+        },
+        "backups": {
+          "title": "Backups and export",
+          "body": "When you export a JSON backup, you choose where it is stored or shared. The standard app does not automatically send that backup to OddPixel Factory."
         },
         "ads": {
-          "title": "Advertising",
-          "body": "The mobile version can integrate AdMob through a native layer. Privacy choices must remain accessible from the app settings."
+          "title": "Advertising and consent",
+          "body": "The free version can display ads through Google AdMob. Depending on the region, a consent form may be shown to manage personalized or limited ads, with a permanent entry point from Settings."
+        },
+        "purchases": {
+          "title": "In-app purchases",
+          "body": "BatiQuant Pro can be activated through Google Play Billing to remove ads and unlock extended usage. Google Play handles payment, validation, and purchase restoration."
+        },
+        "retention": {
+          "title": "Retention and deletion",
+          "body": "Local data remains on the device until removed by the user, for example through import overwrite, app data clearing, or uninstall. The standard app does not rely on a user account that must be deleted."
         }
       }
     }

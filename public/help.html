@@ -5,29 +5,57 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>BatiQuant — Aide</title>
     <style>
-      body { font-family: Arial, sans-serif; max-width: 900px; margin: 40px auto; padding: 0 16px; color: #0f172a; line-height: 1.6; }
-      h1, h2 { color: #0f172a; }
-      .card { border: 1px solid #e2e8f0; border-radius: 18px; padding: 18px; margin: 16px 0; background: #fff; }
+      :root {
+        color-scheme: light;
+        --text: #0f172a;
+        --muted: #475569;
+        --border: #e2e8f0;
+        --bg: #f8fafc;
+      }
+      body { font-family: Arial, sans-serif; max-width: 920px; margin: 40px auto; padding: 0 16px 40px; color: var(--text); line-height: 1.6; background: var(--bg); }
+      h1, h2 { color: var(--text); }
+      .card { border: 1px solid var(--border); border-radius: 18px; padding: 18px; margin: 16px 0; background: #fff; box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04); }
       code { background: #f8fafc; padding: 2px 6px; border-radius: 8px; }
+      .lead { color: var(--muted); }
     </style>
   </head>
   <body>
     <h1>Aide rapide — BatiQuant</h1>
+    <p class="lead">
+      BatiQuant vous aide à estimer des quantités, suivre des projets et préparer des documents de chantier.
+      Les données de travail restent principalement stockées sur votre appareil.
+    </p>
+
     <div class="card">
-      <h2>Sauvegarde</h2>
-      <p>Utilisez l’écran Réglages pour exporter régulièrement une sauvegarde JSON de vos projets et réglages.</p>
+      <h2>Sauvegarde et restauration</h2>
+      <p>Utilisez l’écran Réglages pour exporter régulièrement une sauvegarde JSON de vos projets, chantiers, paramètres et données de documents.</p>
+      <p>Conservez une copie de sauvegarde avant chaque import, car un import peut remplacer les données déjà présentes sur l’appareil.</p>
     </div>
+
     <div class="card">
-      <h2>Publicité et confidentialité</h2>
-      <p>Depuis Réglages, ouvrez <strong>Publicité & confidentialité</strong> pour gérer vos choix et rouvrir le formulaire de confidentialité si nécessaire.</p>
+      <h2>Publicité, confidentialité et consentement</h2>
+      <p>Depuis Réglages, ouvrez <strong>Publicité & confidentialité</strong> pour consulter l’état des annonces, gérer vos choix de confidentialité et rouvrir le formulaire de consentement lorsque cela est proposé.</p>
+      <p>La version Pro désactive les publicités après achat ou restauration via Google Play.</p>
     </div>
+
+    <div class="card">
+      <h2>Mode Pro et achat intégré</h2>
+      <p>La version gratuite peut inclure des publicités et une limite de chantiers enregistrés. <strong>BatiQuant Pro</strong> permet de supprimer les publicités et de débloquer le suivi chantier illimité selon la configuration publiée.</p>
+    </div>
+
     <div class="card">
       <h2>Documents</h2>
-      <p>Les devis et factures se gèrent depuis les écrans documents. Vérifiez votre profil entreprise avant impression.</p>
+      <p>Les devis et factures se gèrent depuis les écrans Documents. Vérifiez votre profil entreprise avant impression ou partage, en particulier le nom, l’adresse, les coordonnées et les mentions utiles.</p>
     </div>
+
     <div class="card">
-      <h2>Version mobile</h2>
-      <p>En développement Android, utilisez les identifiants de test AdMob avant de remplacer par vos identifiants réels.</p>
+      <h2>Connexion réseau</h2>
+      <p>Les fonctions principales de calcul et une grande partie du stockage fonctionnent localement, mais certaines fonctions intégrées, comme les publicités, le consentement ou la validation d’achat Google Play, nécessitent un accès réseau.</p>
+    </div>
+
+    <div class="card">
+      <h2>Développement mobile</h2>
+      <p>En phase de test Android, conservez les identifiants de test Google AdMob jusqu’au passage en production. Vérifiez aussi la cohérence entre la politique de confidentialité, les SDK actifs et la déclaration Data safety dans Google Play Console.</p>
     </div>
   </body>
 </html>

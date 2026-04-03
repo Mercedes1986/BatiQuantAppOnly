@@ -1,5 +1,5 @@
 import React from "react";
-import { ArrowLeft, Database, Shield, ShieldCheck } from "lucide-react";
+import { ArrowLeft, CreditCard, Database, Globe, Shield, ShieldCheck, Trash2, UserRound } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 
@@ -18,14 +18,34 @@ export const PrivacyPolicyPage: React.FC = () => {
 
   const sections = [
     {
+      icon: UserRound,
+      title: t("support_pages.privacy.sections.publisher.title"),
+      body: t("support_pages.privacy.sections.publisher.body"),
+    },
+    {
       icon: Database,
       title: t("support_pages.privacy.sections.local_data.title"),
       body: t("support_pages.privacy.sections.local_data.body"),
     },
     {
+      icon: Globe,
+      title: t("support_pages.privacy.sections.backups.title"),
+      body: t("support_pages.privacy.sections.backups.body"),
+    },
+    {
       icon: Shield,
       title: t("support_pages.privacy.sections.ads.title"),
       body: t("support_pages.privacy.sections.ads.body"),
+    },
+    {
+      icon: CreditCard,
+      title: t("support_pages.privacy.sections.purchases.title"),
+      body: t("support_pages.privacy.sections.purchases.body"),
+    },
+    {
+      icon: Trash2,
+      title: t("support_pages.privacy.sections.retention.title"),
+      body: t("support_pages.privacy.sections.retention.body"),
     },
   ];
 
@@ -58,22 +78,24 @@ export const PrivacyPolicyPage: React.FC = () => {
           </div>
         </section>
 
-        {sections.map(({ icon: Icon, title, body }) => (
-          <section
-            key={title}
-            className="rounded-[28px] border border-slate-200/80 bg-white/72 p-5 shadow-sm backdrop-blur-md"
-          >
-            <div className="flex items-start gap-3">
-              <div className="rounded-2xl bg-slate-100 p-3 text-slate-600">
-                <Icon size={20} />
+        <section className="grid gap-4 md:grid-cols-2">
+          {sections.map(({ icon: Icon, title, body }) => (
+            <article
+              key={title}
+              className="rounded-[28px] border border-slate-200/80 bg-white/72 p-5 shadow-sm backdrop-blur-md"
+            >
+              <div className="flex items-start gap-3">
+                <div className="rounded-2xl bg-slate-100 p-3 text-slate-600">
+                  <Icon size={20} />
+                </div>
+                <div>
+                  <h2 className="text-base font-extrabold text-slate-900">{title}</h2>
+                  <p className="mt-2 text-sm leading-6 text-slate-600">{body}</p>
+                </div>
               </div>
-              <div>
-                <h2 className="text-base font-extrabold text-slate-900">{title}</h2>
-                <p className="mt-2 text-sm leading-6 text-slate-600">{body}</p>
-              </div>
-            </div>
-          </section>
-        ))}
+            </article>
+          ))}
+        </section>
       </div>
     </div>
   );

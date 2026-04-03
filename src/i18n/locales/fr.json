@@ -3143,38 +3143,54 @@
   "support_pages": {
     "help": {
       "title": "Aide & FAQ",
-      "subtitle": "Retrouvez les informations essentielles sur les sauvegardes, les documents, la publicité et l’usage mobile sans quitter l’application.",
+      "subtitle": "Retrouvez les points essentiels sur les sauvegardes, les documents, la confidentialité, le mode Pro et l’usage mobile sans quitter l’application.",
       "sections": {
         "backup": {
           "title": "Sauvegarde",
-          "body": "Utilisez l’écran Réglages pour exporter régulièrement une sauvegarde JSON de vos projets et préférences."
+          "body": "Utilisez l’écran Réglages pour exporter régulièrement une sauvegarde JSON de vos projets, chantiers, paramètres et documents."
         },
         "privacy": {
           "title": "Publicité & confidentialité",
-          "body": "Depuis Réglages, ouvrez Publicité & confidentialité pour revoir vos choix et rouvrir le formulaire si nécessaire."
+          "body": "Depuis Réglages, ouvrez Publicité & confidentialité pour revoir vos choix, vérifier le mode d’annonces appliqué et rouvrir le formulaire si nécessaire."
         },
         "documents": {
           "title": "Documents",
-          "body": "Les devis et factures se gèrent depuis les écrans de documents. Vérifiez votre profil entreprise avant impression."
+          "body": "Les devis et factures se gèrent depuis les écrans de documents. Vérifiez le profil entreprise avant impression, partage ou envoi."
         },
         "mobile": {
           "title": "Version mobile",
-          "body": "Pendant le développement Android, conservez les identifiants de test Google AdMob avant de les remplacer par vos identifiants réels."
+          "body": "Les calculs et le stockage fonctionnent majoritairement en local, mais les publicités, le consentement et les achats Google Play peuvent nécessiter une connexion réseau."
         }
       }
     },
     "privacy": {
       "title": "Politique de confidentialité",
-      "subtitle": "Ce résumé intégré à l’application doit être complété et aligné avec les documents définitifs de publication Google Play.",
-      "updated": "Version brouillon pour publication mobile",
+      "subtitle": "Résumé intégré de la politique appliquée à BatiQuant, au stockage local, aux publicités Google AdMob, au consentement et aux achats Google Play.",
+      "updated": "Dernière mise à jour • 3 avril 2026",
       "sections": {
+        "publisher": {
+          "title": "Éditeur",
+          "body": "BatiQuant est éditée par OddPixel Factory. Pour les demandes liées à la confidentialité ou à la publication, utilisez les coordonnées de contact affichées sur la fiche Google Play officielle de l’application ou sur le site de l’éditeur lorsqu’il est disponible."
+        },
         "local_data": {
-          "title": "Données locales",
-          "body": "L’application peut stocker localement des préférences, des paramètres et des sauvegardes de projets sur votre appareil."
+          "title": "Données stockées localement",
+          "body": "L’application enregistre principalement sur votre appareil les préférences, la langue, la devise, les projets, les chantiers, les documents, le profil entreprise et certains états techniques comme le consentement ou la licence Pro."
+        },
+        "backups": {
+          "title": "Sauvegardes et export",
+          "body": "Quand vous exportez une sauvegarde JSON, vous choisissez vous-même où elle est stockée ou transmise. L’application standard n’envoie pas automatiquement cette sauvegarde à OddPixel Factory."
         },
         "ads": {
-          "title": "Publicité",
-          "body": "La version mobile peut intégrer AdMob via une couche native. Les choix de confidentialité doivent rester accessibles depuis les réglages de l’application."
+          "title": "Publicité et consentement",
+          "body": "La version gratuite peut afficher des publicités via Google AdMob. Selon la région, un formulaire de consentement peut être présenté pour gérer les annonces personnalisées ou limitées, avec un accès permanent depuis les réglages."
+        },
+        "purchases": {
+          "title": "Achats intégrés",
+          "body": "BatiQuant Pro peut être activé via Google Play Billing pour supprimer les publicités et débloquer des usages étendus. Google Play gère le paiement, la validation et la restauration de l’achat."
+        },
+        "retention": {
+          "title": "Conservation et suppression",
+          "body": "Les données locales restent sur l’appareil jusqu’à leur suppression par l’utilisateur, par exemple via un import, l’effacement des données de l’application ou la désinstallation. L’application standard ne repose pas sur un compte utilisateur à supprimer."
         }
       }
     }
