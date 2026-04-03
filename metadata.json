@@ -1,5 +1,5 @@
 {
-  "name": "Version site WEB BatiQuant",
-  "description": "Application BatiQuant pour les estimations chantier, le suivi de projets et la préparation de documents, avec stockage local et services mobiles selon la configuration publiée.",
+  "name": "BatiQuant",
+  "description": "Application mobile BatiQuant pour les estimations chantier, le suivi de projets, les documents et la conformité Google Play autour de la confidentialité, des publicités et de BatiQuant Pro.",
   "requestFramePermissions": []
 }

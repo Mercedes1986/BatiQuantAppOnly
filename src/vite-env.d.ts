@@ -9,6 +9,7 @@ interface ImportMetaEnv {
   readonly VITE_AD_PLATFORM?: "none" | "web" | "mobile";
   readonly VITE_ENABLE_WEB_AD_PLACEHOLDERS?: string;
   readonly VITE_ENABLE_AD_DEBUG?: string;
+  readonly VITE_PRIVACY_POLICY_URL?: string;
   readonly VITE_ADMOB_APP_ID_ANDROID?: string;
   readonly VITE_ADMOB_APP_ID_IOS?: string;
   readonly VITE_ADMOB_BANNER_HOME?: string;

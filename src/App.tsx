@@ -28,7 +28,6 @@ import { MaterialsPage } from "./pages/MaterialsPage";
 import { AppMenuPage } from "./pages/AppMenuPage";
 import { QuickToolsPage } from "./pages/QuickToolsPage";
 import { HelpPage } from "./pages/support/HelpPage";
-import { PrivacyPolicyPage } from "./pages/support/PrivacyPolicyPage";
 
 // Documents
 import { QuoteEditorPage } from "./pages/documents/QuoteEditorPage";
@@ -47,6 +46,7 @@ import { ArrowLeft, Save, Loader2, AlertTriangle } from "lucide-react";
 import ConsentModal from "./components/privacy/ConsentModal";
 import { armInterstitialAfterCalculation, clearPendingInterstitial, initializeAds, showPendingInterstitialIfReady } from "./services/adsService";
 import { initConsent } from "./services/consentService";
+import { getPrivacyPolicyUrl } from "./services/privacyService";
 import { initializePurchaseState, refreshPurchaseState } from "./services/purchaseService";
 
 // --- helper: keep prop typing for React.lazy ---
@@ -90,6 +90,44 @@ class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { has
     return this.props.children;
   }
 }
+
+const PrivacyPolicyRoutePage: React.FC = () => {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const policyUrl = getPrivacyPolicyUrl();
+
+  useEffect(() => {
+    if (/^https?:\/\//i.test(policyUrl)) {
+      window.location.assign(policyUrl);
+      return;
+    }
+
+    navigate(policyUrl, { replace: true });
+  }, [navigate, policyUrl]);
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-slate-50 p-6">
+      <div className="max-w-md w-full rounded-2xl border border-slate-200 bg-white p-6 shadow-sm text-center">
+        <p className="text-sm font-semibold text-slate-500">{t("support_pages.privacy.title")}</p>
+        <h1 className="mt-2 text-xl font-extrabold text-slate-900">
+          {t("settings.support.privacy_policy")}
+        </h1>
+        <p className="mt-3 text-sm leading-6 text-slate-600">
+          {t("settings.support.privacy_description", {
+            defaultValue: "Opening the public privacy policy page.",
+          })}
+        </p>
+        <button
+          type="button"
+          onClick={() => window.location.assign(policyUrl)}
+          className="mt-5 inline-flex items-center justify-center rounded-xl bg-slate-900 px-4 py-2 text-sm font-bold text-white"
+        >
+          {t("settings.support.open_privacy_options", { defaultValue: "Open privacy page" })}
+        </button>
+      </div>
+    </div>
+  );
+};
 
 // Lazy Load Calculators
 const StructuralCalculator = lazyNamed(() =>
@@ -699,7 +737,7 @@ const AppRouter: React.FC = () => (
           <Route path="materials" element={<MaterialsPage />} />
           <Route path="settings" element={<SettingsPage />} />
           <Route path="help" element={<HelpPage />} />
-          <Route path="privacy" element={<PrivacyPolicyPage />} />
+          <Route path="privacy" element={<PrivacyPolicyRoutePage />} />
           <Route path="calculator" element={<ProjectCalculatorWrapper />} />
           <Route path="quotes" element={<QuotesListPage />} />
           <Route path="quotes/:id" element={<QuoteEditorPage />} />

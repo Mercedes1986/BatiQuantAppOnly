@@ -18,8 +18,10 @@ export const getInAppHelpPath = (): string => "/app/help";
 
 export const getInAppPrivacyPolicyPath = (): string => "/app/privacy";
 
+const DEFAULT_PUBLIC_PRIVACY_POLICY_URL = "https://batiquant.fr/privacy-policy.html";
+
 export const getPrivacyPolicyUrl = (): string =>
-  AD_CONFIG.PRIVACY_POLICY_URL || getInAppPrivacyPolicyPath();
+  AD_CONFIG.PRIVACY_POLICY_URL || DEFAULT_PUBLIC_PRIVACY_POLICY_URL;
 
 export const getPrivacyState = (): PrivacyState => {
   const consent = getConsent();

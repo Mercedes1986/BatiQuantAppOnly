@@ -18,31 +18,29 @@
     "types": [
       "vite/client"
     ],
-    "baseUrl": ".",
     "paths": {
       "@/*": [
-        "src/*"
+        "./src/*"
       ],
       "@/constants": [
-        "src/constants.ts"
+        "./src/constants.ts"
       ],
       "@/types": [
-        "src/types.ts"
+        "./src/types.ts"
       ],
       "@/services/*": [
-        "src/services/*"
+        "./src/services/*"
       ],
       "@/components/*": [
-        "src/components/*"
+        "./src/components/*"
       ],
       "@/data/*": [
-        "src/data/*"
+        "./src/data/*"
       ],
       "@/pages/*": [
-        "src/pages/*"
+        "./src/pages/*"
       ]
-    },
-    "ignoreDeprecations": "6.0"
+    }
   },
   "include": [
     "src",
