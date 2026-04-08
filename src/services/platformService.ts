@@ -98,8 +98,22 @@ export const getPlatform = (): AdPlatform => {
   return "web";
 };
 
-export const getNativeAdsBridge = () =>
+type NativeAdsBridge = NonNullable<Window["BatiQuantNativeAds"]>;
+type NativeBackupBridge = NativeAdsBridge & {
+  downloadBackupJson: NonNullable<NativeAdsBridge["downloadBackupJson"]>;
+};
+
+export const getNativeAdsBridge = (): NativeAdsBridge | null =>
   isNativeAdsBridgeAvailable() ? window.BatiQuantNativeAds! : null;
+
+const getNativeBackupBridge = (): NativeBackupBridge | null => {
+  const bridge = getNativeAdsBridge();
+  if (!bridge || typeof bridge.downloadBackupJson !== "function") {
+    return null;
+  }
+
+  return bridge as NativeBackupBridge;
+};
 
 export const getNativeBoolean = (
   getter:
@@ -147,10 +161,7 @@ export const supportsNativeDocumentActions = (): boolean => {
   );
 };
 
-export const supportsNativeBackupActions = (): boolean => {
-  const bridge = getNativeAdsBridge();
-  return !!(bridge && typeof bridge.downloadBackupJson === "function");
-};
+export const supportsNativeBackupActions = (): boolean => getNativeBackupBridge() !== null;
 
 export const supportsNativeBillingActions = (): boolean => {
   const bridge = getNativeAdsBridge();
@@ -286,9 +297,8 @@ export const runNativeBackupDownload = (
     return Promise.reject(new Error("native-backup-actions-unavailable"));
   }
 
-  const bridge = getNativeAdsBridge();
-  const downloadBackupJson = bridge?.downloadBackupJson;
-  if (typeof downloadBackupJson !== "function") {
+  const bridge = getNativeBackupBridge();
+  if (!bridge) {
     return Promise.reject(new Error("native-bridge-unavailable"));
   }
 
@@ -319,7 +329,7 @@ export const runNativeBackupDownload = (
     window.addEventListener(BACKUP_EVENT_NAME, onEvent as EventListener);
 
     try {
-      const started = downloadBackupJson(requestId, fileName, json);
+      const started = bridge.downloadBackupJson(requestId, fileName, json);
       if (started === false) {
         cleanup();
         reject(new Error("backup-download-not-started"));
