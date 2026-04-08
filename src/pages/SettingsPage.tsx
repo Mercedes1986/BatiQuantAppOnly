@@ -38,6 +38,7 @@ import {
 } from "@/services/purchaseService";
 import { getHouseProjects, getSettings, saveSettings } from "@/services/storage";
 import { FREE_HOUSE_PROJECT_LIMIT } from "@/services/premiumService";
+import { downloadBackupJsonFile } from "@/services/platformService";
 
 type SettingsTab = "app" | "company";
 type Currency = "EUR" | "USD" | "CAD" | "CHF";
@@ -143,17 +144,18 @@ export const SettingsPage: React.FC = () => {
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-  const handleExport = () => {
+  const handleExport = async () => {
     try {
       const json = exportAppData();
-      const blob = new Blob([json], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
+      const fileName = `BatiQuant_Backup_${new Date().toISOString().split("T")[0]}.json`;
 
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `BatiQuant_Backup_${new Date().toISOString().split("T")[0]}.json`;
-      link.click();
-      URL.revokeObjectURL(url);
+      await downloadBackupJsonFile(fileName, json);
+
+      alert(
+        t("settings.export_success", {
+          defaultValue: "Sauvegarde exportée avec succès.",
+        })
+      );
     } catch (error) {
       console.error(error);
       alert(

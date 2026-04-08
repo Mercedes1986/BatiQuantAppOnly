@@ -48,6 +48,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 
@@ -55,6 +56,7 @@ public class BatiQuantNativeAdsBridge {
     private static final String TAG = "BatiQuantAds";
     private static final String DEFAULT_TEST_INTERSTITIAL_ID = "ca-app-pub-3940256099942544/1033173712";
     private static final String DOCUMENT_EVENT = "batiquant-native-document";
+    private static final String BACKUP_EVENT = "batiquant-native-backup";
     private static final String PURCHASE_EVENT = "batiquant-native-purchase";
 
     private final Activity activity;
@@ -359,6 +361,30 @@ public class BatiQuantNativeAdsBridge {
             public void onError(String message, Throwable throwable) {
                 Log.w(TAG, "Unable to prepare PDF for download", throwable);
                 dispatchDocumentEvent(requestId, "download", "error", safeText(message, "download-failed"));
+            }
+        });
+
+        return true;
+    }
+
+    @JavascriptInterface
+    public boolean downloadBackupJson(String requestId, String fileName, String json) {
+        if (json == null || json.trim().isEmpty()) {
+            dispatchBackupEvent(requestId, "error", "empty-json");
+            return false;
+        }
+
+        runOnMainThread(() -> {
+            try {
+                String savedLocation = saveTextToDownloads(
+                        safeText(json, "{}"),
+                        sanitizeJsonFileName(fileName, "BatiQuant_Backup.json"),
+                        "application/json"
+                );
+                dispatchBackupEvent(requestId, "success", savedLocation);
+            } catch (Throwable error) {
+                Log.w(TAG, "Unable to download JSON backup", error);
+                dispatchBackupEvent(requestId, "error", "backup-download-failed");
             }
         });
 
@@ -787,6 +813,54 @@ public class BatiQuantNativeAdsBridge {
         return targetFile.getAbsolutePath();
     }
 
+    private String saveTextToDownloads(String content, String requestedFileName, String mimeType) throws IOException {
+        String safeFileName = sanitizeJsonFileName(requestedFileName, "BatiQuant_Backup.json");
+        byte[] bytes = content.getBytes(StandardCharsets.UTF_8);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            ContentValues values = new ContentValues();
+            values.put(MediaStore.Downloads.DISPLAY_NAME, safeFileName);
+            values.put(MediaStore.Downloads.MIME_TYPE, mimeType);
+            values.put(MediaStore.Downloads.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS + "/BatiQuant");
+            values.put(MediaStore.Downloads.IS_PENDING, 1);
+
+            Uri uri = activity.getContentResolver().insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values);
+            if (uri == null) {
+                throw new IOException("Unable to create MediaStore entry");
+            }
+
+            try (OutputStream outputStream = activity.getContentResolver().openOutputStream(uri)) {
+                if (outputStream == null) {
+                    throw new IOException("Unable to open output stream for download");
+                }
+                outputStream.write(bytes);
+                outputStream.flush();
+            }
+
+            values.clear();
+            values.put(MediaStore.Downloads.IS_PENDING, 0);
+            activity.getContentResolver().update(uri, values, null, null);
+            return safeFileName;
+        }
+
+        File directory = activity.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS);
+        if (directory == null) {
+            directory = new File(activity.getCacheDir(), "downloads");
+        }
+        if (!directory.exists()) {
+            //noinspection ResultOfMethodCallIgnored
+            directory.mkdirs();
+        }
+
+        File targetFile = new File(directory, safeFileName);
+        try (OutputStream outputStream = new FileOutputStream(targetFile, false)) {
+            outputStream.write(bytes);
+            outputStream.flush();
+        }
+
+        return targetFile.getAbsolutePath();
+    }
+
     private void copyStream(InputStream inputStream, OutputStream outputStream) throws IOException {
         byte[] buffer = new byte[8192];
         int read;
@@ -929,6 +1003,18 @@ public class BatiQuantNativeAdsBridge {
         );
     }
 
+    private void dispatchBackupEvent(String requestId, String phase, String message) {
+        postJavascript(
+                "window.dispatchEvent(new CustomEvent('" + BACKUP_EVENT + "', { detail: { requestId: '"
+                        + escapeForJs(requestId)
+                        + "', phase: '"
+                        + escapeForJs(phase)
+                        + "', message: '"
+                        + escapeForJs(message)
+                        + "' } }));"
+        );
+    }
+
     private void dispatchPurchaseStatus(String message) {
         dispatchPurchaseEvent("status", message);
     }
@@ -973,6 +1059,20 @@ public class BatiQuantNativeAdsBridge {
                 candidate = candidate.substring(0, dotIndex);
             }
             candidate = candidate + ".pdf";
+        }
+        return candidate;
+    }
+
+    private String sanitizeJsonFileName(String input, String fallback) {
+        String candidate = input == null ? "" : input.trim();
+        if (candidate.isEmpty()) candidate = fallback;
+        candidate = candidate.replaceAll("[^a-zA-Z0-9._-]+", "_");
+        if (!candidate.toLowerCase().endsWith(".json")) {
+            int dotIndex = candidate.lastIndexOf('.');
+            if (dotIndex > 0) {
+                candidate = candidate.substring(0, dotIndex);
+            }
+            candidate = candidate + ".json";
         }
         return candidate;
     }

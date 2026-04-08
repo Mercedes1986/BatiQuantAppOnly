@@ -28,6 +28,7 @@ declare global {
         chooserTitle?: string,
       ) => Promise<boolean> | boolean;
       downloadPdfDocument?: (requestId: string, fileName: string, html: string) => Promise<boolean> | boolean;
+      downloadBackupJson?: (requestId: string, fileName: string, json: string) => Promise<boolean> | boolean;
       initializeBilling?: () => Promise<void> | void;
       refreshPurchases?: () => Promise<void> | void;
       launchRemoveAdsPurchase?: () => Promise<boolean> | boolean;
@@ -58,6 +59,12 @@ export interface NativeDocumentEventDetail {
   message?: string;
 }
 
+export interface NativeBackupEventDetail {
+  requestId: string;
+  phase: "success" | "error";
+  message?: string;
+}
+
 export type NativePurchasePhase =
   | "status"
   | "purchase-success"
@@ -75,7 +82,9 @@ export interface NativePurchaseEventDetail {
 }
 
 const DOCUMENT_EVENT_NAME = "batiquant-native-document";
+const BACKUP_EVENT_NAME = "batiquant-native-backup";
 const DOCUMENT_ACTION_TIMEOUT_MS = 30000;
+const BACKUP_ACTION_TIMEOUT_MS = 30000;
 
 const isBrowser = () => typeof window !== "undefined";
 
@@ -138,6 +147,11 @@ export const supportsNativeDocumentActions = (): boolean => {
   );
 };
 
+export const supportsNativeBackupActions = (): boolean => {
+  const bridge = getNativeAdsBridge();
+  return !!(bridge && typeof bridge.downloadBackupJson === "function");
+};
+
 export const supportsNativeBillingActions = (): boolean => {
   const bridge = getNativeAdsBridge();
   return !!(
@@ -156,6 +170,14 @@ const parseDocumentEvent = (event: Event): NativeDocumentEventDetail | null => {
   if (!customEvent?.detail) return null;
   const detail = customEvent.detail;
   if (!detail.requestId || !detail.action || !detail.phase) return null;
+  return detail;
+};
+
+const parseBackupEvent = (event: Event): NativeBackupEventDetail | null => {
+  const customEvent = event as CustomEvent<NativeBackupEventDetail>;
+  if (!customEvent?.detail) return null;
+  const detail = customEvent.detail;
+  if (!detail.requestId || !detail.phase) return null;
   return detail;
 };
 
@@ -237,4 +259,83 @@ export const runNativeDocumentAction = (
       reject(error instanceof Error ? error : new Error(`${action}-exception`));
     }
   });
+};
+
+const triggerBrowserDownload = (content: string, fileName: string, mimeType: string) => {
+  const blob = new Blob([content], { type: mimeType });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+
+  link.href = url;
+  link.download = fileName;
+  link.rel = "noopener";
+  link.style.display = "none";
+
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+
+  window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+};
+
+export const runNativeBackupDownload = (
+  fileName: string,
+  json: string,
+): Promise<NativeBackupEventDetail> => {
+  if (!supportsNativeBackupActions()) {
+    return Promise.reject(new Error("native-backup-actions-unavailable"));
+  }
+
+  const bridge = getNativeAdsBridge();
+  const downloadBackupJson = bridge?.downloadBackupJson;
+  if (typeof downloadBackupJson !== "function") {
+    return Promise.reject(new Error("native-bridge-unavailable"));
+  }
+
+  const requestId = createRequestId();
+
+  return new Promise<NativeBackupEventDetail>((resolve, reject) => {
+    const cleanup = () => {
+      window.removeEventListener(BACKUP_EVENT_NAME, onEvent as EventListener);
+      window.clearTimeout(timeoutId);
+    };
+
+    const onEvent = (event: Event) => {
+      const detail = parseBackupEvent(event);
+      if (!detail || detail.requestId !== requestId) return;
+      cleanup();
+      if (detail.phase === "success") {
+        resolve(detail);
+      } else {
+        reject(new Error(detail.message || "backup-download-failed"));
+      }
+    };
+
+    const timeoutId = window.setTimeout(() => {
+      cleanup();
+      reject(new Error("backup-download-timeout"));
+    }, BACKUP_ACTION_TIMEOUT_MS);
+
+    window.addEventListener(BACKUP_EVENT_NAME, onEvent as EventListener);
+
+    try {
+      const started = downloadBackupJson(requestId, fileName, json);
+      if (started === false) {
+        cleanup();
+        reject(new Error("backup-download-not-started"));
+      }
+    } catch (error) {
+      cleanup();
+      reject(error instanceof Error ? error : new Error("backup-download-exception"));
+    }
+  });
+};
+
+export const downloadBackupJsonFile = async (fileName: string, json: string): Promise<void> => {
+  if (supportsNativeBackupActions()) {
+    await runNativeBackupDownload(fileName, json);
+    return;
+  }
+
+  triggerBrowserDownload(json, fileName, "application/json;charset=utf-8");
 };

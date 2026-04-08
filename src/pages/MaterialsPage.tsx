@@ -40,6 +40,7 @@ import {
 
 import { CustomMaterial, Unit, TaxSettings, LaborSettings } from "../types";
 import { generateId } from "../services/storage";
+import { downloadBackupJsonFile } from "@/services/platformService";
 
 type TabKey = "system" | "custom" | "labor" | "data";
 
@@ -183,17 +184,16 @@ export const MaterialsPage: React.FC = () => {
     loadAll();
   };
 
-  const handleExport = () => {
+  const handleExport = async () => {
     try {
       const json = exportAppData();
-      const blob = new Blob([json], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
+      const fileName = `BatiQuant_Backup_${new Date().toISOString().split("T")[0]}.json`;
 
-      const linkEl = document.createElement("a");
-      linkEl.href = url;
-      linkEl.download = `BatiQuant_Backup_${new Date().toISOString().split("T")[0]}.json`;
-      linkEl.click();
-      URL.revokeObjectURL(url);
+      await downloadBackupJsonFile(fileName, json);
+
+      window.alert(
+        t("materials.export_success", { defaultValue: "Sauvegarde exportée avec succès." })
+      );
     } catch (e) {
       console.error(e);
       window.alert(t("materials.export_error", { defaultValue: "Export failed." }));
