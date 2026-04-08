@@ -14,7 +14,7 @@ def admobAppId = readConfigValue('BATIQUANT_ADMOB_APP_ID', 'ca-app-pub-394025609
 def admobBannerHome = readConfigValue('BATIQUANT_ADMOB_BANNER_HOME', 'ca-app-pub-3940256099942544/9214589741')
 def admobBannerResult = readConfigValue('BATIQUANT_ADMOB_BANNER_RESULT', 'ca-app-pub-3940256099942544/9214589741')
 def admobInterstitialCalcDone = readConfigValue('BATIQUANT_ADMOB_INTERSTITIAL_CALC_DONE', 'ca-app-pub-3940256099942544/1033173712')
-def playBillingRemoveAdsProductId = readConfigValue('BATIQUANT_PLAY_BILLING_REMOVE_ADS_PRODUCT_ID', 'remove_ads')
+def playBillingRemoveAdsProductId = readConfigValue('BATIQUANT_PLAY_BILLING_REMOVE_ADS_PRODUCT_ID', 'batiquant_premium')
 
 android {
     namespace = "com.batiquant.app"

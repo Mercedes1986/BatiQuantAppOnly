@@ -1,90 +1,29 @@
-apply plugin: 'com.android.application'
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
 
-def readConfigValue = { String key, String fallback ->
-    def prop = project.findProperty(key)?.toString()?.trim()
-    if (prop) return prop
-
-    def env = System.getenv(key)?.toString()?.trim()
-    if (env) return env
-
-    return fallback
-}
-
-def admobAppId = readConfigValue('BATIQUANT_ADMOB_APP_ID', 'ca-app-pub-3940256099942544~3347511713')
-def admobBannerHome = readConfigValue('BATIQUANT_ADMOB_BANNER_HOME', 'ca-app-pub-3940256099942544/9214589741')
-def admobBannerResult = readConfigValue('BATIQUANT_ADMOB_BANNER_RESULT', 'ca-app-pub-3940256099942544/9214589741')
-def admobInterstitialCalcDone = readConfigValue('BATIQUANT_ADMOB_INTERSTITIAL_CALC_DONE', 'ca-app-pub-3940256099942544/1033173712')
-def playBillingRemoveAdsProductId = readConfigValue('BATIQUANT_PLAY_BILLING_REMOVE_ADS_PRODUCT_ID', 'batiquant_premium')
-
-android {
-    namespace = "com.batiquant.app"
-    compileSdk = rootProject.ext.compileSdkVersion
-
-    defaultConfig {
-        applicationId "com.batiquant.app"
-        minSdkVersion rootProject.ext.minSdkVersion
-        targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        manifestPlaceholders = [admobAppId: admobAppId]
-
-        buildConfigField "String", "ADMOB_APP_ID", "\"${admobAppId}\""
-        buildConfigField "String", "ADMOB_BANNER_HOME", "\"${admobBannerHome}\""
-        buildConfigField "String", "ADMOB_BANNER_RESULT", "\"${admobBannerResult}\""
-        buildConfigField "String", "ADMOB_INTERSTITIAL_CALC_DONE", "\"${admobInterstitialCalcDone}\""
-        buildConfigField "String", "PLAY_BILLING_REMOVE_ADS_PRODUCT_ID", "\"${playBillingRemoveAdsProductId}\""
-
-        aaptOptions {
-             // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
-             // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
-            ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
-        }
+buildscript {
+    
+    repositories {
+        google()
+        mavenCentral()
     }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:8.13.0'
+        classpath 'com.google.gms:google-services:4.4.4'
 
-    buildFeatures {
-        buildConfig true
-    }
-
-    buildTypes {
-        debug {
-            minifyEnabled false
-        }
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
     }
 }
 
-repositories {
-    flatDir {
-        dirs '../capacitor-cordova-android-plugins/src/main/libs', 'libs'
+apply from: "variables.gradle"
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
     }
 }
 
-dependencies {
-    implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
-    implementation "androidx.coordinatorlayout:coordinatorlayout:$androidxCoordinatorLayoutVersion"
-    implementation "androidx.core:core-splashscreen:$coreSplashScreenVersion"
-    implementation project(':capacitor-android')
-    implementation 'com.google.android.gms:play-services-ads:25.1.0'
-    implementation 'com.google.android.ump:user-messaging-platform:4.0.0'
-    implementation 'com.android.billingclient:billing:8.3.0'
-    testImplementation "junit:junit:$junitVersion"
-    androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
-    androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
-    implementation project(':capacitor-cordova-android-plugins')
-}
-
-apply from: 'capacitor.build.gradle'
-
-try {
-    def servicesJSON = file('google-services.json')
-    if (servicesJSON.text) {
-        apply plugin: 'com.google.gms.google-services'
-    }
-} catch(Exception e) {
-    logger.info("google-services.json not found, google-services plugin not applied. Push Notifications won't work")
+task clean(type: Delete) {
+    delete rootProject.buildDir
 }
