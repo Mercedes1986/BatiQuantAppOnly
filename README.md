@@ -42,6 +42,7 @@ VITE_ADMOB_APP_ID_IOS=
 VITE_ADMOB_BANNER_HOME=
 VITE_ADMOB_BANNER_RESULT=
 VITE_ADMOB_INTERSTITIAL_CALC_DONE=
+VITE_PAID_APP=false
 ```
 
 ## Publicité, consentement et Pro
@@ -69,7 +70,7 @@ BATIQUANT_ADMOB_APP_ID=
 BATIQUANT_ADMOB_BANNER_HOME=
 BATIQUANT_ADMOB_BANNER_RESULT=
 BATIQUANT_ADMOB_INTERSTITIAL_CALC_DONE=
-BATIQUANT_PLAY_BILLING_REMOVE_ADS_PRODUCT_ID=remove_ads
+BATIQUANT_PLAY_BILLING_REMOVE_ADS_PRODUCT_ID=batiquant_premium
 ```
 
 Sans configuration explicite, le projet utilise les identifiants de test Google pour éviter d’envoyer du trafic invalide pendant le développement.

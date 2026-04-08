@@ -17,7 +17,7 @@ const truthy = (value: unknown): boolean => {
 const AD_FREE_EVENT = "batiquant:adfree_updated";
 const NATIVE_PURCHASE_EVENT = "batiquant-native-purchase";
 const PURCHASE_CACHE_KEY = "batiquant:purchase_cache_v2";
-const PURCHASE_WAIT_TIMEOUT_MS = 6000;
+const PURCHASE_WAIT_TIMEOUT_MS = 10000;
 
 export type PurchaseSource = "none" | "paid-build" | "billing" | "legacy";
 
@@ -303,9 +303,45 @@ export const startRemoveAdsPurchase = async (): Promise<PurchaseRuntimeState> =>
   }
 
   const bridge = getNativeAdsBridge();
-  const started = bridge?.launchRemoveAdsPurchase?.();
+  if (!bridge) {
+    throw new Error("billing-unavailable");
+  }
+
+  let started = bridge.launchRemoveAdsPurchase?.();
+
   if (started === false) {
-    throw new Error("purchase-not-started");
+    bridge.initializeBilling?.();
+    bridge.refreshPurchases?.();
+
+    let warmedUpState: PurchaseRuntimeState;
+    try {
+      warmedUpState = await waitForPurchaseUpdate([
+        "status",
+        "restore-complete",
+        "purchase-success",
+      ], PURCHASE_WAIT_TIMEOUT_MS);
+    } catch {
+      warmedUpState = getPurchaseRuntimeState();
+    }
+
+    emitPurchaseState(warmedUpState);
+
+    if (!warmedUpState.billingReady) {
+      throw new Error("billing-unavailable");
+    }
+
+    if (!warmedUpState.productId) {
+      throw new Error("product-id-missing");
+    }
+
+    if (!warmedUpState.productReady) {
+      throw new Error("product-not-ready");
+    }
+
+    started = bridge.launchRemoveAdsPurchase?.();
+    if (started === false) {
+      throw new Error("purchase-not-started");
+    }
   }
 
   const nextState = await waitForPurchaseUpdate([

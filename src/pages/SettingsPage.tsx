@@ -311,15 +311,22 @@ export const SettingsPage: React.FC = () => {
       refreshPurchaseUi();
     } catch (error) {
       const rawMessage = error instanceof Error ? error.message : "purchase-failed";
-      setPurchaseMessage(
-        rawMessage === "purchase-cancelled"
-          ? t("settings.pro.purchase_cancelled", {
-              defaultValue: "Achat annulé.",
-            })
-          : t("settings.pro.purchase_error", {
-              defaultValue: "Impossible d’ouvrir l’achat BatiQuant Pro pour le moment.",
-            }),
-      );
+      const message = rawMessage === "purchase-cancelled"
+        ? t("settings.pro.purchase_cancelled", {
+            defaultValue: "Achat annulé.",
+          })
+        : rawMessage === "billing-unavailable"
+        ? t("settings.pro.purchase_billing_unavailable", {
+            defaultValue: "Google Play Billing n’est pas encore prêt sur cet appareil. Réessayez dans quelques instants.",
+          })
+        : rawMessage === "product-not-ready" || rawMessage === "product-id-missing"
+        ? t("settings.pro.purchase_product_missing", {
+            defaultValue: "Le produit premium n’est pas encore synchronisé avec Google Play sur cette build. Vérifiez l’ID produit et republiez la release de test si nécessaire.",
+          })
+        : t("settings.pro.purchase_error", {
+            defaultValue: "Impossible d’ouvrir l’achat BatiQuant Pro pour le moment.",
+          });
+      setPurchaseMessage(message);
       refreshPurchaseUi();
     } finally {
       setPurchaseBusy(null);
