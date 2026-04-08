@@ -58,6 +58,7 @@ public class BatiQuantNativeAdsBridge {
     private static final String DOCUMENT_EVENT = "batiquant-native-document";
     private static final String BACKUP_EVENT = "batiquant-native-backup";
     private static final String PURCHASE_EVENT = "batiquant-native-purchase";
+    private static final int REQUEST_CREATE_BACKUP_DOCUMENT = 48021;
 
     private final Activity activity;
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
@@ -73,6 +74,10 @@ public class BatiQuantNativeAdsBridge {
     private boolean billingConnecting = false;
     private boolean billingReady = false;
     private boolean adFreePurchased = false;
+
+    private String pendingBackupRequestId;
+    private String pendingBackupFileName;
+    private String pendingBackupContent;
 
     private interface PdfReadyCallback {
         void onSuccess(File pdfFile);
@@ -374,17 +379,25 @@ public class BatiQuantNativeAdsBridge {
             return false;
         }
 
+        final String safeRequestId = safeText(requestId, "backup_request");
+        final String safeFileName = sanitizeJsonFileName(fileName, "BatiQuant_Backup.json");
+        final String safeJson = json;
+
         runOnMainThread(() -> {
             try {
+                if (launchBackupCreateDocument(safeRequestId, safeFileName, safeJson)) {
+                    return;
+                }
+
                 String savedLocation = saveTextToDownloads(
-                        safeText(json, "{}"),
-                        sanitizeJsonFileName(fileName, "BatiQuant_Backup.json"),
+                        safeJson,
+                        safeFileName,
                         "application/json"
                 );
-                dispatchBackupEvent(requestId, "success", savedLocation);
+                dispatchBackupEvent(safeRequestId, "success", savedLocation);
             } catch (Throwable error) {
                 Log.w(TAG, "Unable to download JSON backup", error);
-                dispatchBackupEvent(requestId, "error", "backup-download-failed");
+                dispatchBackupEvent(safeRequestId, "error", safeErrorMessage(error, "backup-download-failed"));
             }
         });
 
@@ -438,6 +451,7 @@ public class BatiQuantNativeAdsBridge {
     public void onHostDestroy() {
         runOnMainThread(() -> {
             voidBannerPlacement();
+            clearPendingBackupState();
             if (billingClient != null) {
                 try {
                     billingClient.endConnection();
@@ -449,6 +463,50 @@ public class BatiQuantNativeAdsBridge {
             billingReady = false;
             billingConnecting = false;
         });
+    }
+
+    public boolean handleActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode != REQUEST_CREATE_BACKUP_DOCUMENT) {
+            return false;
+        }
+
+        final String requestId = pendingBackupRequestId;
+        final String fallbackFileName = safeText(pendingBackupFileName, "BatiQuant_Backup.json");
+        final String content = pendingBackupContent;
+        clearPendingBackupState();
+
+        if (requestId == null || content == null) {
+            Log.w(TAG, "Backup activity result received without pending state");
+            return true;
+        }
+
+        if (resultCode != Activity.RESULT_OK) {
+            dispatchBackupEvent(requestId, "error", "backup-download-cancelled");
+            return true;
+        }
+
+        Uri uri = data != null ? data.getData() : null;
+        if (uri == null) {
+            dispatchBackupEvent(requestId, "error", "backup-download-no-uri");
+            return true;
+        }
+
+        runOnMainThread(() -> {
+            try (OutputStream outputStream = activity.getContentResolver().openOutputStream(uri, "w")) {
+                if (outputStream == null) {
+                    throw new IOException("Unable to open output stream for backup document");
+                }
+
+                outputStream.write(content.getBytes(StandardCharsets.UTF_8));
+                outputStream.flush();
+                dispatchBackupEvent(requestId, "success", safeText(uri.toString(), fallbackFileName));
+            } catch (Throwable error) {
+                Log.w(TAG, "Unable to write JSON backup document", error);
+                dispatchBackupEvent(requestId, "error", safeErrorMessage(error, "backup-download-write-failed"));
+            }
+        });
+
+        return true;
     }
 
     private void connectBillingClientIfNeeded() {
@@ -813,6 +871,34 @@ public class BatiQuantNativeAdsBridge {
         return targetFile.getAbsolutePath();
     }
 
+    private boolean launchBackupCreateDocument(String requestId, String fileName, String content) {
+        clearPendingBackupState();
+
+        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("application/json");
+        intent.putExtra(Intent.EXTRA_TITLE, fileName);
+
+        pendingBackupRequestId = requestId;
+        pendingBackupFileName = fileName;
+        pendingBackupContent = content;
+
+        try {
+            activity.startActivityForResult(intent, REQUEST_CREATE_BACKUP_DOCUMENT);
+            return true;
+        } catch (Throwable error) {
+            Log.w(TAG, "Unable to open backup document picker", error);
+            clearPendingBackupState();
+            return false;
+        }
+    }
+
+    private void clearPendingBackupState() {
+        pendingBackupRequestId = null;
+        pendingBackupFileName = null;
+        pendingBackupContent = null;
+    }
+
     private String saveTextToDownloads(String content, String requestedFileName, String mimeType) throws IOException {
         String safeFileName = sanitizeJsonFileName(requestedFileName, "BatiQuant_Backup.json");
         byte[] bytes = content.getBytes(StandardCharsets.UTF_8);
@@ -1075,6 +1161,15 @@ public class BatiQuantNativeAdsBridge {
             candidate = candidate + ".json";
         }
         return candidate;
+    }
+
+    private String safeErrorMessage(Throwable error, String fallback) {
+        if (error == null) return fallback;
+        String message = error.getMessage();
+        if (message == null || message.trim().isEmpty()) {
+            return fallback;
+        }
+        return message.trim();
     }
 
     private String safeText(String value, String fallback) {

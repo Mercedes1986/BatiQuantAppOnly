@@ -1,5 +1,6 @@
 package com.batiquant.app;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.webkit.WebView;
 
@@ -26,6 +27,14 @@ public class MainActivity extends BridgeActivity {
 
         nativeAdsBridge = new BatiQuantNativeAdsBridge(this, webView);
         webView.addJavascriptInterface(nativeAdsBridge, "BatiQuantNativeAds");
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (nativeAdsBridge != null) {
+            nativeAdsBridge.handleActivityResult(requestCode, resultCode, data);
+        }
     }
 
     @Override

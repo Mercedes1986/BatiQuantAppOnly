@@ -339,3 +339,28 @@ export const downloadBackupJsonFile = async (fileName: string, json: string): Pr
 
   triggerBrowserDownload(json, fileName, "application/json;charset=utf-8");
 };
+
+
+export const getBackupErrorMessage = (error: unknown): string => {
+  const raw = error instanceof Error ? error.message : String(error ?? "").trim();
+
+  switch (raw) {
+    case "empty-json":
+      return "Aucune donnée à exporter.";
+    case "backup-download-cancelled":
+      return "Export annulé.";
+    case "backup-download-no-uri":
+      return "Aucun emplacement de sauvegarde n’a été sélectionné.";
+    case "backup-download-timeout":
+      return "Le délai d’export a expiré.";
+    case "backup-download-not-started":
+    case "native-backup-actions-unavailable":
+    case "native-bridge-unavailable":
+      return "Le module de sauvegarde Android n’est pas disponible.";
+    case "backup-download-exception":
+    case "backup-download-failed":
+      return "Erreur d’export Android.";
+    default:
+      return raw || "Erreur d’export Android.";
+  }
+};

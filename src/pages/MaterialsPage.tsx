@@ -40,7 +40,7 @@ import {
 
 import { CustomMaterial, Unit, TaxSettings, LaborSettings } from "../types";
 import { generateId } from "../services/storage";
-import { downloadBackupJsonFile } from "@/services/platformService";
+import { downloadBackupJsonFile, getBackupErrorMessage } from "@/services/platformService";
 
 type TabKey = "system" | "custom" | "labor" | "data";
 
@@ -196,7 +196,8 @@ export const MaterialsPage: React.FC = () => {
       );
     } catch (e) {
       console.error(e);
-      window.alert(t("materials.export_error", { defaultValue: "Export failed." }));
+      const detail = getBackupErrorMessage(e);
+      window.alert(`${t("materials.export_error", { defaultValue: "Export failed." })}${detail ? `\n\n${detail}` : ""}`);
     }
   };
 

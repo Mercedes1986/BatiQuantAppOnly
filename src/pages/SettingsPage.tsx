@@ -38,7 +38,7 @@ import {
 } from "@/services/purchaseService";
 import { getHouseProjects, getSettings, saveSettings } from "@/services/storage";
 import { FREE_HOUSE_PROJECT_LIMIT } from "@/services/premiumService";
-import { downloadBackupJsonFile } from "@/services/platformService";
+import { downloadBackupJsonFile, getBackupErrorMessage } from "@/services/platformService";
 
 type SettingsTab = "app" | "company";
 type Currency = "EUR" | "USD" | "CAD" | "CHF";
@@ -158,10 +158,11 @@ export const SettingsPage: React.FC = () => {
       );
     } catch (error) {
       console.error(error);
+      const detail = getBackupErrorMessage(error);
       alert(
-        t("settings.export_error", {
+        `${t("settings.export_error", {
           defaultValue: "Erreur lors de l’export. Réessayez.",
-        })
+        })}${detail ? `\n\n${detail}` : ""}`
       );
     }
   };
