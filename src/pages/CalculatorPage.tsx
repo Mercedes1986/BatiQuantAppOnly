@@ -287,7 +287,7 @@ export const CalculatorPage: React.FC<Props> = ({ type, onBack, onNavigateProjec
               </h2>
               <p className="mb-4 text-3xl font-bold text-slate-900">{displayResult.summary}</p>
 
-              <div className="grid grid-cols-2 gap-4 border-t border-slate-100 pt-4 text-sm">
+              <div className="grid grid-cols-1 gap-3 border-t border-slate-100 pt-4 text-sm sm:grid-cols-2 sm:gap-4">
                 {Array.isArray(displayResult.details) &&
                   displayResult.details.map((detail: any, index: number) => (
                     <div key={index}>
@@ -315,7 +315,7 @@ export const CalculatorPage: React.FC<Props> = ({ type, onBack, onNavigateProjec
             </div>
 
             <div className="app-card rounded-[28px] p-4">
-              <div className="mb-4 flex items-center justify-between">
+              <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <h3 className="font-extrabold text-slate-800">
                   {t("calculator.materials_estimated", {
                     defaultValue: "Estimated materials",
@@ -330,14 +330,14 @@ export const CalculatorPage: React.FC<Props> = ({ type, onBack, onNavigateProjec
                 {Array.isArray(displayResult.materials) &&
                   displayResult.materials.map((material: any) => (
                     <li key={material.id} className="border-b border-slate-50 pb-2 last:border-0">
-                      <div className="flex items-start justify-between gap-3">
+                      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                         <div className="min-w-0 flex items-start gap-3">
                           <span className="truncate font-medium text-slate-700">
                             {material.name}
                           </span>
                         </div>
 
-                        <span className="whitespace-nowrap rounded bg-slate-100 px-2 py-0.5 font-extrabold text-slate-800">
+                        <span className="self-start rounded bg-slate-100 px-2 py-0.5 font-extrabold text-slate-800 sm:self-auto sm:whitespace-nowrap">
                           {material.quantity} {material.unit}
                         </span>
                       </div>
@@ -352,7 +352,7 @@ export const CalculatorPage: React.FC<Props> = ({ type, onBack, onNavigateProjec
             </div>
 
             <div className="rounded-[28px] border border-blue-100 bg-blue-50 p-4">
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 {hasTips && (
                   <button
                     type="button"

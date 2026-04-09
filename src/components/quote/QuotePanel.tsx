@@ -191,7 +191,7 @@ export const QuotePanel: React.FC<Props> = ({ project, onUpdate }) => {
             {t("quote.settings_title", { defaultValue: "Paramètres du devis" })}
           </h3>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label className="block text-xs font-extrabold text-slate-500 mb-1">
                 {t("quote.tax", { defaultValue: "TVA (%)" })}
@@ -242,7 +242,7 @@ export const QuotePanel: React.FC<Props> = ({ project, onUpdate }) => {
       )}
 
       <div className="bg-white border-2 border-blue-600 text-slate-900 p-6 rounded-2xl shadow-lg relative overflow-hidden">
-        <div className="grid grid-cols-2 gap-y-2 text-sm relative z-10">
+        <div className="relative z-10 grid grid-cols-[minmax(0,1fr)_auto] gap-x-3 gap-y-2 text-sm">
           <span className="text-slate-500">{t("quote.total_materials_ht", { defaultValue: "Total Matériaux HT" })}</span>
           <span className="text-right font-medium">{euro.format(computed.totalMaterialsHT)}</span>
 
@@ -270,9 +270,9 @@ export const QuotePanel: React.FC<Props> = ({ project, onUpdate }) => {
           </span>
           <span className="text-right">{euro.format(computed.taxAmount)}</span>
 
-          <div className="col-span-2 pt-2 mt-2 border-t border-slate-100 flex justify-between items-center">
+          <div className="col-span-2 mt-2 flex flex-col gap-1 border-t border-slate-100 pt-2 sm:flex-row sm:items-center sm:justify-between">
             <span className="text-lg font-extrabold">{t("quote.net_to_pay", { defaultValue: "NET À PAYER" })}</span>
-            <span className="text-3xl font-extrabold text-blue-600">{euro.format(computed.totalTTC)}</span>
+            <span className="text-2xl font-extrabold text-blue-600 sm:text-3xl">{euro.format(computed.totalTTC)}</span>
           </div>
         </div>
 
@@ -285,9 +285,9 @@ export const QuotePanel: React.FC<Props> = ({ project, onUpdate }) => {
             <button
               onClick={() => toggleSection(section.id)}
               type="button"
-              className="w-full flex items-center justify-between p-4 bg-slate-50 hover:bg-slate-100 transition-colors"
+              className="flex w-full flex-col items-start gap-2 bg-slate-50 p-4 transition-colors hover:bg-slate-100 sm:flex-row sm:items-center sm:justify-between"
             >
-              <div className="flex items-center space-x-3">
+              <div className="flex min-w-0 items-center gap-3">
                 {expandedSections[section.id] ? (
                   <ChevronDown size={20} className="text-slate-400" />
                 ) : (
@@ -302,79 +302,148 @@ export const QuotePanel: React.FC<Props> = ({ project, onUpdate }) => {
             </button>
 
             {expandedSections[section.id] && (
-              <div className="p-0 overflow-x-auto no-scrollbar">
-                <table className="min-w-[680px] w-full text-sm text-left">
-                  <thead className="bg-slate-50 text-slate-500 font-medium text-xs uppercase">
-                    <tr>
-                      <th className="p-3 pl-4">{t("quote.table.designation", { defaultValue: "Désignation" })}</th>
-                      <th className="p-3 text-center">{t("quote.table.qty", { defaultValue: "Qté" })}</th>
-                      <th className="p-3 text-right">{t("quote.table.unit_price", { defaultValue: "P.U." })}</th>
-                      <th className="p-3 text-right pr-4">{t("quote.table.total", { defaultValue: "Total" })}</th>
-                      <th className="w-8"></th>
-                    </tr>
-                  </thead>
+              <div className="p-0">
+                <div className="space-y-3 p-3 sm:hidden">
+                  {section.items.map((item, idx) => (
+                    <div
+                      key={`${section.id}-${idx}`}
+                      className={`rounded-2xl border border-slate-200 bg-white p-3 shadow-sm ${item.isManual ? "bg-amber-50/40" : ""}`}
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-slate-200 bg-white">
+                          <img
+                            src={
+                              systemImageByLabel.get(String(item.label || "").toLowerCase().trim()) ||
+                              "/images/calculators/menuiseries.png"
+                            }
+                            alt=""
+                            className="h-full w-full object-cover"
+                            draggable={false}
+                            loading="lazy"
+                            onError={(e) => {
+                              (e.currentTarget as HTMLImageElement).src = "/images/calculators/menuiseries.png";
+                            }}
+                          />
+                        </div>
 
-                  <tbody className="divide-y divide-slate-100">
-                    {section.items.map((item, idx) => (
-                      <tr key={`${section.id}-${idx}`} className={item.isManual ? "bg-amber-50/30" : ""}>
-                        <td className="p-3 pl-4">
-                          <div className="flex items-center gap-3">
-                            <div className="w-9 h-9 rounded-xl overflow-hidden border border-slate-200 bg-white flex items-center justify-center">
-                              <img
-                                src={
-                                  systemImageByLabel.get(String(item.label || "").toLowerCase().trim()) ||
-                                  "/images/calculators/menuiseries.png"
-                                }
-                                alt=""
-                                className="w-full h-full object-cover"
-                                draggable={false}
-                                loading="lazy"
-                                onError={(e) => {
-                                  (e.currentTarget as HTMLImageElement).src = "/images/calculators/menuiseries.png";
-                                }}
-                              />
-                            </div>
-
-                            <div>
-                              <div className="font-medium text-slate-800">{item.label}</div>
+                        <div className="min-w-0 flex-1">
+                          <div className="break-words font-medium text-slate-800">{item.label}</div>
                           {item.type === "labor" && (
-                            <span className="text-[10px] text-amber-600 bg-amber-100 px-1 rounded">
+                            <span className="mt-1 inline-flex rounded bg-amber-100 px-1.5 py-0.5 text-[10px] text-amber-600">
                               {t("quote.labor_tag", { defaultValue: "Main d'œuvre" })}
                             </span>
                           )}
-                            </div>
+                        </div>
+
+                        {item.isManual && (
+                          <button
+                            onClick={() => handleDeleteLine(item.id)}
+                            type="button"
+                            className="text-slate-300 transition-colors hover:text-red-500"
+                            aria-label={t("common.delete", { defaultValue: "Supprimer" })}
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        )}
+                      </div>
+
+                      <div className="mt-3 grid grid-cols-2 gap-2 text-xs text-slate-500">
+                        <div className="rounded-xl bg-slate-50 px-3 py-2">
+                          <div className="font-semibold uppercase tracking-wide text-slate-400">
+                            {t("quote.table.qty", { defaultValue: "Qté" })}
                           </div>
-                        </td>
+                          <div className="mt-1 font-extrabold text-slate-800">
+                            {item.quantity} <span className="text-[10px] text-slate-400">{item.unit}</span>
+                          </div>
+                        </div>
+                        <div className="rounded-xl bg-slate-50 px-3 py-2 text-right">
+                          <div className="font-semibold uppercase tracking-wide text-slate-400">
+                            {t("quote.table.unit_price", { defaultValue: "P.U." })}
+                          </div>
+                          <div className="mt-1 font-extrabold text-slate-800">{item.unitPrice.toFixed(2)}</div>
+                        </div>
+                      </div>
 
-                        <td className="p-3 text-center text-slate-600">
-                          {item.quantity}{" "}
-                          <span className="text-[10px] text-slate-400">{item.unit}</span>
-                        </td>
+                      <div className="mt-3 flex items-center justify-between rounded-xl border border-blue-100 bg-blue-50 px-3 py-2 text-sm">
+                        <span className="font-semibold text-blue-800">{t("quote.table.total", { defaultValue: "Total" })}</span>
+                        <span className="font-extrabold text-blue-700">{item.totalPrice.toFixed(2)}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
 
-                        <td className="p-3 text-right text-slate-600">{item.unitPrice.toFixed(2)}</td>
-
-                        <td className="p-3 text-right font-medium text-slate-800 pr-4">
-                          {item.totalPrice.toFixed(2)}
-                        </td>
-
-                        <td className="p-3 text-center">
-                          {item.isManual && (
-                            <button
-                              onClick={() => handleDeleteLine(item.id)}
-                              type="button"
-                              className="text-slate-300 hover:text-red-500 transition-colors"
-                              aria-label={t("common.delete", { defaultValue: "Supprimer" })}
-                            >
-                              <Trash2 size={16} />
-                            </button>
-                          )}
-                        </td>
+                <div className="hidden overflow-x-auto no-scrollbar sm:block">
+                  <table className="min-w-[640px] w-full text-sm text-left">
+                    <thead className="bg-slate-50 text-xs font-medium uppercase text-slate-500">
+                      <tr>
+                        <th className="p-3 pl-4">{t("quote.table.designation", { defaultValue: "Désignation" })}</th>
+                        <th className="p-3 text-center">{t("quote.table.qty", { defaultValue: "Qté" })}</th>
+                        <th className="p-3 text-right">{t("quote.table.unit_price", { defaultValue: "P.U." })}</th>
+                        <th className="p-3 pr-4 text-right">{t("quote.table.total", { defaultValue: "Total" })}</th>
+                        <th className="w-8"></th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
 
-                <div className="p-3 bg-slate-50 border-t border-slate-100">
+                    <tbody className="divide-y divide-slate-100">
+                      {section.items.map((item, idx) => (
+                        <tr key={`${section.id}-${idx}`} className={item.isManual ? "bg-amber-50/30" : ""}>
+                          <td className="p-3 pl-4">
+                            <div className="flex items-center gap-3">
+                              <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-xl border border-slate-200 bg-white">
+                                <img
+                                  src={
+                                    systemImageByLabel.get(String(item.label || "").toLowerCase().trim()) ||
+                                    "/images/calculators/menuiseries.png"
+                                  }
+                                  alt=""
+                                  className="h-full w-full object-cover"
+                                  draggable={false}
+                                  loading="lazy"
+                                  onError={(e) => {
+                                    (e.currentTarget as HTMLImageElement).src = "/images/calculators/menuiseries.png";
+                                  }}
+                                />
+                              </div>
+
+                              <div className="min-w-0">
+                                <div className="font-medium text-slate-800">{item.label}</div>
+                                {item.type === "labor" && (
+                                  <span className="rounded bg-amber-100 px-1 text-[10px] text-amber-600">
+                                    {t("quote.labor_tag", { defaultValue: "Main d'œuvre" })}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          </td>
+
+                          <td className="p-3 text-center text-slate-600">
+                            {item.quantity}{" "}
+                            <span className="text-[10px] text-slate-400">{item.unit}</span>
+                          </td>
+
+                          <td className="p-3 text-right text-slate-600">{item.unitPrice.toFixed(2)}</td>
+
+                          <td className="p-3 pr-4 text-right font-medium text-slate-800">{item.totalPrice.toFixed(2)}</td>
+
+                          <td className="p-3 text-center">
+                            {item.isManual && (
+                              <button
+                                onClick={() => handleDeleteLine(item.id)}
+                                type="button"
+                                className="text-slate-300 transition-colors hover:text-red-500"
+                                aria-label={t("common.delete", { defaultValue: "Supprimer" })}
+                              >
+                                <Trash2 size={16} />
+                              </button>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                <div className="border-t border-slate-100 bg-slate-50 p-3">
                   {showAddLine === section.id ? (
                     <AddLineForm
                       onCancel={() => setShowAddLine(null)}
@@ -457,7 +526,7 @@ const AddLineForm: React.FC<{ onCancel: () => void; onAdd: (l: Partial<QuoteManu
   };
 
   return (
-    <div className="grid grid-cols-2 gap-3 animate-in fade-in">
+    <div className="grid grid-cols-1 gap-3 animate-in fade-in sm:grid-cols-2">
       <div className="col-span-2">
         <input
           autoFocus
@@ -475,7 +544,7 @@ const AddLineForm: React.FC<{ onCancel: () => void; onAdd: (l: Partial<QuoteManu
           placeholder={t("quote.addline.qty", { defaultValue: "Qté" })}
           value={qty}
           onChange={(e) => setQty(e.target.value)}
-          className="w-20 p-2 border rounded bg-white text-slate-900 text-sm"
+          className="w-full min-w-0 p-2 border rounded bg-white text-slate-900 text-sm sm:w-20"
         />
         <select
           value={unit}
@@ -509,7 +578,7 @@ const AddLineForm: React.FC<{ onCancel: () => void; onAdd: (l: Partial<QuoteManu
         </select>
       </div>
 
-      <div className="col-span-2 flex justify-end space-x-2 mt-2">
+      <div className="col-span-2 mt-2 flex flex-wrap justify-end gap-2">
         <button onClick={onCancel} type="button" className="px-3 py-1.5 text-xs font-extrabold text-slate-500">
           {t("common.cancel", { defaultValue: "Annuler" })}
         </button>

@@ -62,9 +62,11 @@ const byNewest = <T,>(items: T[], getDate: (item: T) => string | undefined) =>
   });
 
 const CompactStatCard: React.FC<{ value: number; label: string }> = ({ value, label }) => (
-  <div className="rounded-[22px] border border-white/70 bg-white/74 px-4 py-3 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl">
-    <div className="text-xl font-extrabold leading-none text-slate-900">{value}</div>
-    <div className="mt-1 text-[11px] font-semibold uppercase tracking-wide text-slate-600">{label}</div>
+  <div className="min-w-0 rounded-[22px] border border-white/70 bg-white/74 px-3 py-3 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl sm:px-4">
+    <div className="truncate text-xl font-extrabold leading-none text-slate-900">{value}</div>
+    <div className="mt-1 break-words text-[10px] font-semibold uppercase leading-tight tracking-wide text-slate-600 sm:text-[11px]">
+      {label}
+    </div>
   </div>
 );
 
@@ -80,7 +82,7 @@ const ResumeCard: React.FC<{ card: ResumeCardData; onClick?: () => void; ctaLabe
       type="button"
       onClick={onClick}
       disabled={isDisabled}
-      className={`group flex w-full items-center gap-3 rounded-[24px] border px-4 py-4 text-left shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl transition-all ${
+      className={`group flex w-full min-w-0 flex-col gap-3 rounded-[24px] border px-4 py-4 text-left shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl transition-all sm:flex-row sm:items-center ${
         isDisabled
           ? "cursor-default border-white/60 bg-white/56 text-slate-400"
           : "border-white/70 bg-white/76 hover:-translate-y-0.5 hover:bg-white/88"
@@ -96,12 +98,12 @@ const ResumeCard: React.FC<{ card: ResumeCardData; onClick?: () => void; ctaLabe
 
       <div className="min-w-0 flex-1">
         <div className="text-[11px] font-extrabold uppercase tracking-[0.14em] text-slate-500">{card.label}</div>
-        <div className="mt-1 truncate text-[15px] font-extrabold text-slate-900">{card.title}</div>
-        <div className="mt-1 truncate text-[13px] font-medium text-slate-600">{card.meta}</div>
+        <div className="mt-1 break-words text-[15px] font-extrabold text-slate-900">{card.title}</div>
+        <div className="mt-1 break-words text-[13px] font-medium leading-relaxed text-slate-600">{card.meta}</div>
       </div>
 
       <div
-        className={`inline-flex h-9 shrink-0 items-center gap-1 rounded-full border px-3 text-xs font-extrabold transition-colors ${
+        className={`inline-flex h-9 shrink-0 self-start items-center gap-1 rounded-full border px-3 text-xs font-extrabold transition-colors sm:self-center ${
           isDisabled
             ? "border-slate-200 bg-slate-100 text-slate-400"
             : "border-blue-200 bg-blue-50 text-blue-700 group-hover:bg-blue-100"
@@ -151,7 +153,7 @@ const ShortcutPill: React.FC<{ item: Shortcut; onClick: () => void }> = ({ item,
       <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-slate-100 text-slate-600">
         {item.icon}
       </span>
-      <span className="truncate text-sm font-extrabold text-slate-800">{item.label}</span>
+      <span className="break-words text-sm font-extrabold leading-tight text-slate-800">{item.label}</span>
     </span>
     <ChevronRight size={17} className="shrink-0 text-slate-400" />
   </button>
@@ -159,10 +161,10 @@ const ShortcutPill: React.FC<{ item: Shortcut; onClick: () => void }> = ({ item,
 
 const FollowUpPill: React.FC<{ item: FollowUpCard }> = ({ item }) => (
   <div
-    className={`inline-flex min-w-[112px] items-center justify-between gap-3 rounded-full border px-3.5 py-2 text-sm font-semibold shadow-[0_8px_20px_rgba(15,23,42,0.04)] ${item.tone}`}
+    className={`flex w-full min-w-0 items-center justify-between gap-3 rounded-full border px-3.5 py-2 text-sm font-semibold shadow-[0_8px_20px_rgba(15,23,42,0.04)] sm:inline-flex sm:w-auto sm:min-w-[112px] ${item.tone}`}
   >
-    <span className="truncate">{item.label}</span>
-    <span className="rounded-full bg-white/90 px-2 py-0.5 text-xs font-extrabold text-slate-900">{item.value}</span>
+    <span className="min-w-0 flex-1 break-words leading-tight">{item.label}</span>
+    <span className="shrink-0 rounded-full bg-white/90 px-2 py-0.5 text-xs font-extrabold text-slate-900">{item.value}</span>
   </div>
 );
 
@@ -399,7 +401,7 @@ export const AppMenuPage: React.FC = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-3 gap-2 sm:min-w-[312px]">
+            <div className="grid w-full grid-cols-3 gap-2 lg:w-auto lg:min-w-[312px]">
               <CompactStatCard value={dashboard.quotesCount} label={t("menu.stats.quotes", { defaultValue: "Quotes" })} />
               <CompactStatCard value={dashboard.projectsCount} label={t("menu.stats.projects", { defaultValue: "Projects" })} />
               <CompactStatCard value={dashboard.sitesCount} label={t("menu.stats.sites", { defaultValue: "Sites" })} />
@@ -441,8 +443,8 @@ export const AppMenuPage: React.FC = () => {
                   <FollowUpPill key={item.label} item={item} />
                 ))}
                 {dashboard.totalSavedSteps > 0 ? (
-                  <div className="inline-flex min-w-[112px] items-center justify-between gap-3 rounded-full border border-slate-200/90 bg-slate-50/92 px-3.5 py-2 text-sm font-semibold text-slate-700 shadow-[0_8px_20px_rgba(15,23,42,0.04)]">
-                    <span>{t("menu.followup.saved_steps", { defaultValue: "Saved steps" })}</span>
+                  <div className="flex w-full min-w-0 items-center justify-between gap-3 rounded-full border border-slate-200/90 bg-slate-50/92 px-3.5 py-2 text-sm font-semibold text-slate-700 shadow-[0_8px_20px_rgba(15,23,42,0.04)] sm:inline-flex sm:w-auto sm:min-w-[112px]">
+                    <span className="min-w-0 flex-1 break-words leading-tight">{t("menu.followup.saved_steps", { defaultValue: "Saved steps" })}</span>
                     <span className="rounded-full bg-white/90 px-2 py-0.5 text-xs font-extrabold text-slate-900">
                       {dashboard.totalSavedSteps}
                     </span>

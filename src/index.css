@@ -218,7 +218,7 @@ input:-webkit-autofill:active {
   --app-safe-right: var(--safe-area-inset-right, env(safe-area-inset-right, 0px));
   --app-safe-bottom: var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px));
   --app-safe-left: var(--safe-area-inset-left, env(safe-area-inset-left, 0px));
-  --app-top-gap: max(16px, var(--app-safe-top));
+  --app-top-gap: max(24px, calc(var(--app-safe-top) + 10px));
   --bottom-nav-height: 84px;
   --bottom-nav-space: calc(var(--bottom-nav-height) + var(--app-safe-bottom) + 8px);
 }
@@ -239,7 +239,7 @@ body {
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
-  padding-top: calc(var(--app-top-gap) + 4px);
+  padding-top: calc(var(--app-top-gap) + 6px);
   padding-bottom: 18px;
   padding-left: max(0px, var(--app-safe-left));
   padding-right: max(0px, var(--app-safe-right));
@@ -281,6 +281,10 @@ body {
 }
 
 @media (max-width: 640px) {
+  :root {
+    --app-top-gap: max(30px, calc(var(--app-safe-top) + 14px));
+  }
+
   .app-main {
     padding-bottom: 14px;
   }

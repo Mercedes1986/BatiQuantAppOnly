@@ -263,12 +263,12 @@ export const ProjectsPage: React.FC = () => {
           <div className="printable-content space-y-4">
             <section className="glass-panel rounded-[32px] p-5 print:bg-white md:p-6">
               <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                <div>
-                  <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-blue-100 bg-blue-50 px-3 py-1 text-xs font-extrabold text-blue-700">
+                <div className="min-w-0">
+                  <div className="mb-3 inline-flex max-w-full items-center gap-2 rounded-full border border-blue-100 bg-blue-50 px-3 py-1 text-xs font-extrabold text-blue-700">
                     <Calculator size={14} />
                     {t("projects.title", { defaultValue: "My projects (calculations)" })}
                   </div>
-                  <h1 className="mb-1 text-3xl font-extrabold text-slate-900">{selectedProject.name}</h1>
+                  <h1 className="mb-1 break-words text-2xl font-extrabold leading-tight text-slate-900 sm:text-3xl">{selectedProject.name}</h1>
                   <p className="text-sm font-medium text-slate-500">
                     {t("projects.created_on", { defaultValue: "Created on" })}{" "}
                     {formatProjectDate(selectedProject.date, i18n.language)}
@@ -300,16 +300,16 @@ export const ProjectsPage: React.FC = () => {
                     items.map((item) => (
                       <li
                         key={item.id}
-                        className="flex items-center justify-between gap-3 rounded-2xl border border-slate-200/80 bg-white/85 p-3.5 print:border-slate-300"
+                        className="flex flex-col items-start gap-3 rounded-2xl border border-slate-200/80 bg-white/85 p-3.5 print:border-slate-300 sm:flex-row sm:items-center sm:justify-between"
                       >
                         <div className="min-w-0">
-                          <span className="block truncate text-sm font-extrabold text-slate-700">{item.name}</span>
+                          <span className="block break-words text-sm font-extrabold text-slate-700">{item.name}</span>
                           <span className="text-xs font-medium text-slate-500">
                             {toSafeNumber(item.quantity)} {item.unit} × {euro.format(toSafeNumber(item.unitPrice))}
                           </span>
                         </div>
 
-                        <span className="whitespace-nowrap font-extrabold text-slate-800">
+                        <span className="self-end rounded-xl border border-slate-200 bg-slate-100/80 px-3 py-1 font-extrabold text-slate-800 sm:self-auto">
                           {euro.format(toSafeNumber(item.totalPrice))}
                         </span>
                       </li>
@@ -333,14 +333,14 @@ export const ProjectsPage: React.FC = () => {
                     <div className="space-y-3">
                       {breakdown.map((item) => (
                         <div key={item.id} className="space-y-1.5 rounded-2xl border border-slate-200/80 bg-white/80 p-3">
-                          <div className="flex items-center justify-between gap-3">
+                          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                             <div className="min-w-0">
-                              <div className="truncate text-sm font-extrabold text-slate-800">{item.name}</div>
+                              <div className="break-words text-sm font-extrabold text-slate-800">{item.name}</div>
                               <div className="text-xs text-slate-500">
                                 {item.quantity} {item.unit} • {euro.format(item.unitPrice)}
                               </div>
                             </div>
-                            <div className="whitespace-nowrap text-sm font-extrabold text-slate-800">
+                            <div className="text-sm font-extrabold text-slate-800 sm:whitespace-nowrap">
                               {euro.format(item.value)}
                             </div>
                           </div>
@@ -501,19 +501,19 @@ export const ProjectsPage: React.FC = () => {
                 <button
                   key={project.id}
                   onClick={() => openProject(project)}
-                  className="glass-panel flex w-full items-center justify-between rounded-[24px] p-5 text-left transition-all hover:border-blue-200 active:scale-[0.98]"
+                  className="glass-panel flex w-full min-w-0 flex-col items-start gap-3 rounded-[24px] p-5 text-left transition-all hover:border-blue-200 active:scale-[0.98] sm:flex-row sm:items-center sm:justify-between"
                   type="button"
                 >
                   <div className="min-w-0">
-                    <h3 className="truncate text-lg font-extrabold text-slate-800">{project.name}</h3>
+                    <h3 className="break-words text-lg font-extrabold leading-tight text-slate-800">{project.name}</h3>
                     <p className="mt-1 text-xs font-medium text-slate-500">
                       {formatProjectDate(project.date, i18n.language)} • {getItemCount(project)}{" "}
                       {t("projects.items", { defaultValue: "items" })}
                     </p>
                   </div>
 
-                  <div className="ml-3 flex items-center space-x-3">
-                    <span className="rounded-xl border border-slate-200 bg-slate-100/90 px-3 py-1.5 text-sm font-extrabold text-slate-700">
+                  <div className="flex w-full items-center justify-between gap-3 sm:ml-3 sm:w-auto sm:justify-end">
+                    <span className="rounded-xl border border-slate-200 bg-slate-100/90 px-3 py-1.5 text-sm font-extrabold text-slate-700 sm:whitespace-nowrap">
                       {euro.format(total)}
                     </span>
                     <ChevronRight className="shrink-0 text-slate-300" size={20} />
