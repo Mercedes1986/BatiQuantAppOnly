@@ -227,6 +227,50 @@ body {
   overflow: hidden;
 }
 
+
+.app-bg {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100svh;
+  isolation: isolate;
+  background: var(--app-bg);
+}
+
+.app-bg__image,
+.app-bg__veil {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+
+.app-bg__image {
+  z-index: 0;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  opacity: 0.30;
+  transform: translateZ(0);
+  will-change: opacity, transform;
+}
+
+.app-bg__veil {
+  z-index: 1;
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.22),
+      rgba(255, 255, 255, 0.12) 30%,
+      rgba(255, 255, 255, 0.08) 100%
+    );
+  backdrop-filter: blur(1.5px);
+}
+
+.app-main,
+.app-bottom-nav-host {
+  position: relative;
+  z-index: 10;
+}
+
 .app-shell-grid {
   min-height: 100svh;
   height: 100svh;
