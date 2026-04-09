@@ -37,7 +37,7 @@ type Shortcut = {
 type ResumeCardData = {
   label: string;
   title: string;
-  meta: string;
+  meta: string[];
   path?: string;
 };
 
@@ -54,6 +54,8 @@ const formatDateValue = (value?: string | null, locale?: string) => {
   return new Date(time).toLocaleDateString(locale || undefined);
 };
 
+const hasText = (value: string | null | undefined): value is string => Boolean(value);
+
 const byNewest = <T,>(items: T[], getDate: (item: T) => string | undefined) =>
   [...items].sort((a, b) => {
     const aTime = new Date(getDate(a) || 0).getTime();
@@ -62,11 +64,9 @@ const byNewest = <T,>(items: T[], getDate: (item: T) => string | undefined) =>
   });
 
 const CompactStatCard: React.FC<{ value: number; label: string }> = ({ value, label }) => (
-  <div className="min-w-0 rounded-[22px] border border-white/70 bg-white/74 px-3 py-3 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl sm:px-4">
-    <div className="truncate text-xl font-extrabold leading-none text-slate-900">{value}</div>
-    <div className="mt-1 break-words text-[10px] font-semibold uppercase leading-tight tracking-wide text-slate-600 sm:text-[11px]">
-      {label}
-    </div>
+  <div className="rounded-[22px] border border-white/70 bg-white/74 px-4 py-3 shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl">
+    <div className="text-xl font-extrabold leading-none text-slate-900">{value}</div>
+    <div className="mt-1 text-[11px] font-semibold uppercase tracking-wide text-slate-600">{label}</div>
   </div>
 );
 
@@ -82,28 +82,37 @@ const ResumeCard: React.FC<{ card: ResumeCardData; onClick?: () => void; ctaLabe
       type="button"
       onClick={onClick}
       disabled={isDisabled}
-      className={`group flex w-full min-w-0 flex-col gap-3 rounded-[24px] border px-4 py-4 text-left shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl transition-all sm:flex-row sm:items-center ${
+      className={`group flex w-full max-w-full min-w-0 flex-col items-start gap-3 overflow-hidden rounded-[24px] border px-4 py-4 text-left shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur-xl transition-all sm:flex-row sm:items-center ${
         isDisabled
           ? "cursor-default border-white/60 bg-white/56 text-slate-400"
           : "border-white/70 bg-white/76 hover:-translate-y-0.5 hover:bg-white/88"
       }`}
     >
-      <div
-        className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl ${
-          isDisabled ? "bg-slate-100 text-slate-400" : "bg-blue-50 text-blue-700"
-        }`}
-      >
-        <Clock3 size={18} />
+      <div className="flex w-full min-w-0 items-start gap-3">
+        <div
+          className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl ${
+            isDisabled ? "bg-slate-100 text-slate-400" : "bg-blue-50 text-blue-700"
+          }`}
+        >
+          <Clock3 size={18} />
+        </div>
+
+        <div className="min-w-0 flex-1">
+          <div className="text-[11px] font-extrabold uppercase tracking-[0.14em] text-slate-500">{card.label}</div>
+          <div className="mt-1 break-words text-[15px] font-extrabold text-slate-900 sm:truncate">{card.title}</div>
+          <div className="mt-1 flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-1 text-[13px] font-medium leading-relaxed text-slate-600">
+            {card.meta.map((item, index) => (
+              <React.Fragment key={`${card.label}-${index}-${item}`}>
+                {index > 0 ? <span className="shrink-0 text-slate-400">•</span> : null}
+                <span className="min-w-0 break-words">{item}</span>
+              </React.Fragment>
+            ))}
+          </div>
+        </div>
       </div>
 
-      <div className="min-w-0 flex-1">
-        <div className="text-[11px] font-extrabold uppercase tracking-[0.14em] text-slate-500">{card.label}</div>
-        <div className="mt-1 break-words text-[15px] font-extrabold text-slate-900">{card.title}</div>
-        <div className="mt-1 break-words text-[13px] font-medium leading-relaxed text-slate-600">{card.meta}</div>
-      </div>
-
       <div
-        className={`inline-flex h-9 shrink-0 self-start items-center gap-1 rounded-full border px-3 text-xs font-extrabold transition-colors sm:self-center ${
+        className={`ml-14 inline-flex h-9 max-w-full shrink-0 items-center gap-1 self-start rounded-full border px-3 text-xs font-extrabold transition-colors sm:ml-0 sm:self-center ${
           isDisabled
             ? "border-slate-200 bg-slate-100 text-slate-400"
             : "border-blue-200 bg-blue-50 text-blue-700 group-hover:bg-blue-100"
@@ -153,7 +162,7 @@ const ShortcutPill: React.FC<{ item: Shortcut; onClick: () => void }> = ({ item,
       <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-slate-100 text-slate-600">
         {item.icon}
       </span>
-      <span className="break-words text-sm font-extrabold leading-tight text-slate-800">{item.label}</span>
+      <span className="truncate text-sm font-extrabold text-slate-800">{item.label}</span>
     </span>
     <ChevronRight size={17} className="shrink-0 text-slate-400" />
   </button>
@@ -161,10 +170,10 @@ const ShortcutPill: React.FC<{ item: Shortcut; onClick: () => void }> = ({ item,
 
 const FollowUpPill: React.FC<{ item: FollowUpCard }> = ({ item }) => (
   <div
-    className={`flex w-full min-w-0 items-center justify-between gap-3 rounded-full border px-3.5 py-2 text-sm font-semibold shadow-[0_8px_20px_rgba(15,23,42,0.04)] sm:inline-flex sm:w-auto sm:min-w-[112px] ${item.tone}`}
+    className={`inline-flex min-w-[112px] items-center justify-between gap-3 rounded-full border px-3.5 py-2 text-sm font-semibold shadow-[0_8px_20px_rgba(15,23,42,0.04)] ${item.tone}`}
   >
-    <span className="min-w-0 flex-1 break-words leading-tight">{item.label}</span>
-    <span className="shrink-0 rounded-full bg-white/90 px-2 py-0.5 text-xs font-extrabold text-slate-900">{item.value}</span>
+    <span className="truncate">{item.label}</span>
+    <span className="rounded-full bg-white/90 px-2 py-0.5 text-xs font-extrabold text-slate-900">{item.value}</span>
   </div>
 );
 
@@ -295,17 +304,17 @@ export const AppMenuPage: React.FC = () => {
             dashboard.latestQuote.client?.name || t("quotes.no_client", { defaultValue: "Unnamed client" }),
             formatDateValue(dashboard.latestQuote.createdAt || dashboard.latestQuote.date, i18n.language),
             latestQuoteTotal,
-          ]
-            .filter(Boolean)
-            .join(" • "),
+          ].filter(hasText),
           path: `/app/quotes/${dashboard.latestQuote.id}`,
         }
       : {
           label: t("menu.resume.quote_label", { defaultValue: "Last quote" }),
           title: t("menu.resume.no_quote_title", { defaultValue: "No quote yet" }),
-          meta: t("menu.resume.no_quote_meta", {
-            defaultValue: "Create a quote from a project or a site to find it here.",
-          }),
+          meta: [
+            t("menu.resume.no_quote_meta", {
+              defaultValue: "Create a quote from a project or a site to find it here.",
+            }),
+          ],
         },
     dashboard.latestProject
       ? {
@@ -315,17 +324,17 @@ export const AppMenuPage: React.FC = () => {
             formatDateValue(dashboard.latestProject.date, i18n.language),
             `${dashboard.latestProject.items.length} ${t("projects.items", { defaultValue: "items" })}`,
             latestProjectTotal,
-          ]
-            .filter(Boolean)
-            .join(" • "),
+          ].filter(hasText),
           path: `/app/projects?id=${dashboard.latestProject.id}`,
         }
       : {
           label: t("menu.resume.project_label", { defaultValue: "Last project" }),
           title: t("menu.resume.no_project_title", { defaultValue: "No saved project" }),
-          meta: t("menu.resume.no_project_meta", {
-            defaultValue: "Save a calculator result to continue it later from here.",
-          }),
+          meta: [
+            t("menu.resume.no_project_meta", {
+              defaultValue: "Save a calculator result to continue it later from here.",
+            }),
+          ],
         },
     dashboard.latestSite
       ? {
@@ -337,17 +346,17 @@ export const AppMenuPage: React.FC = () => {
               defaultValue: "{{count}} saved steps",
               count: latestSiteSteps,
             }),
-          ]
-            .filter(Boolean)
-            .join(" • "),
+          ].filter(hasText),
           path: `/app/house?id=${dashboard.latestSite.id}`,
         }
       : {
           label: t("menu.resume.site_label", { defaultValue: "Last site" }),
           title: t("menu.resume.no_site_title", { defaultValue: "No site yet" }),
-          meta: t("menu.resume.no_site_meta", {
-            defaultValue: "Create a site to track steps, costs and documents in one place.",
-          }),
+          meta: [
+            t("menu.resume.no_site_meta", {
+              defaultValue: "Create a site to track steps, costs and documents in one place.",
+            }),
+          ],
         },
   ];
 
@@ -401,7 +410,7 @@ export const AppMenuPage: React.FC = () => {
               </div>
             </div>
 
-            <div className="grid w-full grid-cols-3 gap-2 lg:w-auto lg:min-w-[312px]">
+            <div className="grid grid-cols-3 gap-2 sm:min-w-[312px]">
               <CompactStatCard value={dashboard.quotesCount} label={t("menu.stats.quotes", { defaultValue: "Quotes" })} />
               <CompactStatCard value={dashboard.projectsCount} label={t("menu.stats.projects", { defaultValue: "Projects" })} />
               <CompactStatCard value={dashboard.sitesCount} label={t("menu.stats.sites", { defaultValue: "Sites" })} />
@@ -443,8 +452,8 @@ export const AppMenuPage: React.FC = () => {
                   <FollowUpPill key={item.label} item={item} />
                 ))}
                 {dashboard.totalSavedSteps > 0 ? (
-                  <div className="flex w-full min-w-0 items-center justify-between gap-3 rounded-full border border-slate-200/90 bg-slate-50/92 px-3.5 py-2 text-sm font-semibold text-slate-700 shadow-[0_8px_20px_rgba(15,23,42,0.04)] sm:inline-flex sm:w-auto sm:min-w-[112px]">
-                    <span className="min-w-0 flex-1 break-words leading-tight">{t("menu.followup.saved_steps", { defaultValue: "Saved steps" })}</span>
+                  <div className="inline-flex min-w-[112px] items-center justify-between gap-3 rounded-full border border-slate-200/90 bg-slate-50/92 px-3.5 py-2 text-sm font-semibold text-slate-700 shadow-[0_8px_20px_rgba(15,23,42,0.04)]">
+                    <span>{t("menu.followup.saved_steps", { defaultValue: "Saved steps" })}</span>
                     <span className="rounded-full bg-white/90 px-2 py-0.5 text-xs font-extrabold text-slate-900">
                       {dashboard.totalSavedSteps}
                     </span>
