@@ -93,6 +93,30 @@ const sanitizeInvoices = (value: unknown): InvoiceDocument[] => {
   );
 };
 
+const extractSequenceFromNumber = (value: unknown, prefix: "DEV" | "FAC", year: number): number => {
+  if (typeof value !== "string") return 0;
+  const match = value.match(new RegExp(`^${prefix}-${year}-(\\d+)$`));
+  if (!match) return 0;
+  const parsed = Number(match[1]);
+  return Number.isFinite(parsed) ? Math.max(0, parsed) : 0;
+};
+
+const normalizeCountersForData = (
+  counters: Counters,
+  quotes: QuoteDocument[],
+  invoices: InvoiceDocument[],
+): Counters => {
+  const year = counters.year || new Date().getFullYear();
+  const inferredQuote = quotes.reduce((max, quote) => Math.max(max, extractSequenceFromNumber(quote.number, "DEV", year)), 0);
+  const inferredInvoice = invoices.reduce((max, invoice) => Math.max(max, extractSequenceFromNumber(invoice.number, "FAC", year)), 0);
+
+  return {
+    year,
+    quote: Math.max(counters.quote, inferredQuote),
+    invoice: Math.max(counters.invoice, inferredInvoice),
+  };
+};
+
 const emitDocumentsChanged = (detail: DocumentsEventDetail) => {
   if (typeof window === "undefined") return;
   try {
@@ -151,7 +175,9 @@ export const getDocumentCounters = (): Counters => getCounters();
 
 export const replaceDocumentCounters = (counters: Counters) => {
   ensureMigratedOnce();
-  writeJson(KEYS.COUNTERS, sanitizeCounters(counters));
+  const safeCounters = sanitizeCounters(counters);
+  const normalized = normalizeCountersForData(safeCounters, getQuotes(), getInvoices());
+  writeJson(KEYS.COUNTERS, normalized);
   emitDocumentsChanged({ key: "counters", reason: "import" });
 };
 

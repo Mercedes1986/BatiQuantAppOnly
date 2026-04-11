@@ -398,6 +398,25 @@ const mergeById = <T extends { id: string }>(current: T[], incoming: T[]): T[] =
   return Array.from(map.values());
 };
 
+const mergeDocumentCounters = (
+  current: { quote: number; invoice: number; year: number } | undefined,
+  incoming: { quote: number; invoice: number; year: number } | undefined,
+): { quote: number; invoice: number; year: number } | undefined => {
+  if (!current) return incoming;
+  if (!incoming) return current;
+
+  const currentYear = typeof current.year === "number" ? current.year : new Date().getFullYear();
+  const incomingYear = typeof incoming.year === "number" ? incoming.year : currentYear;
+
+  if (incomingYear !== currentYear) return current;
+
+  return {
+    year: currentYear,
+    quote: Math.max(current.quote || 0, incoming.quote || 0),
+    invoice: Math.max(current.invoice || 0, incoming.invoice || 0),
+  };
+};
+
 const sanitizeBackupProjects = (value: unknown): Project[] =>
   Array.isArray(value) ? (value.filter((item): item is Project => isRecord(item) && typeof item.id === "string") as Project[]) : [];
 
@@ -540,7 +559,7 @@ export const importAppData = (jsonString: string, mode: "merge" | "replace"): bo
       if (companyProfile) replaceCompanyProfile(companyProfile);
       replaceQuotes(mergeById(getQuotes(), quotes));
       replaceInvoices(mergeById(getInvoices(), invoices));
-      if (docCounters) replaceDocumentCounters(docCounters);
+      replaceDocumentCounters(mergeDocumentCounters(getDocumentCounters(), docCounters) ?? getDocumentCounters());
     }
 
     emitMaterialsChanged({ reason: "import" });

@@ -37,6 +37,23 @@ const DEFAULT_SETTINGS: UserSettings = {
   isPro: false,
 };
 
+const PURCHASE_CACHE_KEY = "batiquant:purchase_cache_v2";
+
+const isBrowser = (): boolean => typeof window !== "undefined";
+
+const hasCachedProEntitlement = (): boolean => {
+  if (!isBrowser()) return false;
+
+  try {
+    const raw = window.localStorage.getItem(PURCHASE_CACHE_KEY);
+    if (!raw) return false;
+    const parsed = JSON.parse(raw) as { entitled?: unknown };
+    return parsed.entitled === true;
+  } catch {
+    return false;
+  }
+};
+
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   !!value && typeof value === "object" && !Array.isArray(value);
 
@@ -230,15 +247,9 @@ const readProjects = (): Project[] => sanitizeProjectList(readJson<unknown>(PROJ
 const readHouseProjects = (): HouseProject[] => sanitizeHouseProjectList(readJson<unknown>(HOUSE_PROJECTS_KEY, []));
 const readSettings = (): UserSettings => sanitizeSettings(readJson<unknown>(SETTINGS_KEY, DEFAULT_SETTINGS));
 
-const isHouseProjectsPremiumEnabled = (): boolean => readSettings().isPro === true;
-
-const enforceHouseProjectLimit = (projects: HouseProject[]): HouseProject[] => {
-  if (isHouseProjectsPremiumEnabled()) return projects;
-  if (projects.length <= FREE_HOUSE_PROJECT_LIMIT) return projects;
-
-  return [...projects]
-    .sort((a, b) => Date.parse(b.date || "") - Date.parse(a.date || ""))
-    .slice(0, FREE_HOUSE_PROJECT_LIMIT);
+const isHouseProjectsPremiumEnabled = (): boolean => {
+  const settings = readSettings();
+  return settings.isPro === true || hasCachedProEntitlement();
 };
 
 export const getProjects = (): Project[] => {
@@ -309,7 +320,7 @@ export const saveHouseProject = (project: HouseProject): SaveHouseProjectResult 
 
 export const replaceHouseProjects = (projects: HouseProject[]): void => {
   ensureMigratedOnce();
-  writeJson(HOUSE_PROJECTS_KEY, enforceHouseProjectLimit(sanitizeHouseProjectList(projects)));
+  writeJson(HOUSE_PROJECTS_KEY, sanitizeHouseProjectList(projects));
   emitChanged({ reason: "import", key: "house_projects" });
 };
 

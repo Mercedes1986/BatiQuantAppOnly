@@ -203,9 +203,25 @@ export const getPurchaseRuntimeState = (): PurchaseRuntimeState => {
 
   if (!nativeSnapshot) return cached;
 
+  const keepCachedEntitlement =
+    cached.entitled === true &&
+    nativeSnapshot.entitled !== true &&
+    nativeSnapshot.billingReady !== true;
+
+  const entitled = nativeSnapshot.entitled || keepCachedEntitlement;
+  const source: PurchaseSource = entitled
+    ? nativeSnapshot.entitled
+      ? "billing"
+      : cached.source === "paid-build"
+        ? "paid-build"
+        : cached.source === "legacy" || cached.source === "billing"
+          ? cached.source
+          : "legacy"
+    : "none";
+
   const merged: PurchaseRuntimeState = {
-    entitled: nativeSnapshot.entitled,
-    source: nativeSnapshot.entitled ? "billing" : "none",
+    entitled,
+    source,
     billingReady: nativeSnapshot.billingReady,
     productReady: nativeSnapshot.productReady,
     productId: nativeSnapshot.productId || cached.productId,
