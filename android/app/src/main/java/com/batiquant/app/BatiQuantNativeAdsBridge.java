@@ -76,6 +76,12 @@ public class BatiQuantNativeAdsBridge {
     private AdView bannerView;
     private String activeBannerPlacement;
     private int bottomChromeHeightPx = 0;
+    private final int bannerTopMarginPx = dpToPx(8);
+    private final int bannerContentGapPx = dpToPx(12);
+    private int baseWebViewPaddingLeft = 0;
+    private int baseWebViewPaddingTop = 0;
+    private int baseWebViewPaddingRight = 0;
+    private int baseWebViewPaddingBottom = 0;
 
     private boolean mobileAdsInitialized = false;
     private boolean interstitialLoading = false;
@@ -96,10 +102,13 @@ public class BatiQuantNativeAdsBridge {
     public BatiQuantNativeAdsBridge(Activity activity, WebView webView) {
         this.activity = activity;
         this.webView = webView;
+        cacheBaseWebViewPadding();
     }
 
     public void rebindWebView(WebView nextWebView) {
         this.webView = nextWebView;
+        cacheBaseWebViewPadding();
+        applyWebViewBannerInset(bannerView != null ? getCurrentBannerInsetPx() : 0);
     }
 
     @JavascriptInterface
@@ -1172,7 +1181,9 @@ public class BatiQuantNativeAdsBridge {
 
         if (bannerView != null && bannerUnitId.equals(bannerView.getAdUnitId()) && safeText(placement, "").equals(activeBannerPlacement)) {
             container.setVisibility(View.VISIBLE);
-            dispatchBannerSpace(container.getHeight() > 0 ? container.getHeight() : dpToPx(60));
+            int bannerHeight = container.getHeight() > 0 ? container.getHeight() : dpToPx(60);
+            applyWebViewBannerInset(bannerHeight + bannerContentGapPx + bannerTopMarginPx);
+            dispatchBannerSpace(bannerHeight + bannerContentGapPx + bannerTopMarginPx);
             return;
         }
 
@@ -1185,7 +1196,9 @@ public class BatiQuantNativeAdsBridge {
             @Override
             public void onAdLoaded() {
                 container.setVisibility(View.VISIBLE);
-                dispatchBannerSpace(adView.getAdSize() != null ? adView.getAdSize().getHeightInPixels(activity) : dpToPx(60));
+                int bannerHeight = adView.getAdSize() != null ? adView.getAdSize().getHeightInPixels(activity) : dpToPx(60);
+                applyWebViewBannerInset(bannerHeight + bannerContentGapPx + bannerTopMarginPx);
+                dispatchBannerSpace(bannerHeight + bannerContentGapPx + bannerTopMarginPx);
             }
 
             @Override
@@ -1215,6 +1228,7 @@ public class BatiQuantNativeAdsBridge {
             container.setVisibility(View.GONE);
             updateBannerContainerLayout(container);
         }
+        applyWebViewBannerInset(0);
         voidBannerPlacement();
     }
 
@@ -1241,8 +1255,9 @@ public class BatiQuantNativeAdsBridge {
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
         );
-        params.gravity = android.view.Gravity.BOTTOM;
-        params.bottomMargin = Math.max(0, bottomChromeHeightPx);
+        params.gravity = android.view.Gravity.TOP;
+        params.topMargin = bannerTopMarginPx;
+        params.bottomMargin = 0;
 
         ((ViewGroup) content).addView(container, params);
         return container;
@@ -1270,10 +1285,39 @@ public class BatiQuantNativeAdsBridge {
 
         params.width = ViewGroup.LayoutParams.MATCH_PARENT;
         params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-        params.gravity = android.view.Gravity.BOTTOM;
-        params.bottomMargin = Math.max(0, bottomChromeHeightPx);
+        params.gravity = android.view.Gravity.TOP;
+        params.topMargin = bannerTopMarginPx;
+        params.bottomMargin = 0;
         container.setLayoutParams(params);
         container.requestLayout();
+    }
+
+    private void cacheBaseWebViewPadding() {
+        if (webView == null) return;
+        baseWebViewPaddingLeft = webView.getPaddingLeft();
+        baseWebViewPaddingTop = webView.getPaddingTop();
+        baseWebViewPaddingRight = webView.getPaddingRight();
+        baseWebViewPaddingBottom = webView.getPaddingBottom();
+        webView.setClipToPadding(false);
+    }
+
+    private void applyWebViewBannerInset(int insetPx) {
+        if (webView == null) return;
+        int safeInset = Math.max(0, insetPx);
+        webView.setPadding(
+                baseWebViewPaddingLeft,
+                baseWebViewPaddingTop + safeInset,
+                baseWebViewPaddingRight,
+                baseWebViewPaddingBottom
+        );
+        webView.requestLayout();
+    }
+
+    private int getCurrentBannerInsetPx() {
+        if (bannerView == null || bannerView.getAdSize() == null) {
+            return dpToPx(60) + bannerContentGapPx + bannerTopMarginPx;
+        }
+        return bannerView.getAdSize().getHeightInPixels(activity) + bannerContentGapPx + bannerTopMarginPx;
     }
 
     private void destroyBannerView() {
