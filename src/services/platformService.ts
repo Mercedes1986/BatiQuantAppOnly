@@ -6,6 +6,7 @@ declare global {
       initialize?: () => Promise<void> | void;
       showBanner?: (placement: string) => Promise<void> | void;
       hideBanner?: (placement?: string) => Promise<void> | void;
+      setBottomChromeHeight?: (heightPx: number) => Promise<void> | void;
       showInterstitial?: (placement: string) => Promise<boolean> | boolean;
       openPrivacyOptions?: () => Promise<void> | void;
       canRequestAds?: () => Promise<boolean> | boolean;
@@ -105,6 +106,19 @@ type NativeBackupBridge = NativeAdsBridge & {
 
 export const getNativeAdsBridge = (): NativeAdsBridge | null =>
   isNativeAdsBridgeAvailable() ? window.BatiQuantNativeAds! : null;
+
+export const reportNativeBottomChromeHeight = (heightPx: number): void => {
+  const bridge = getNativeAdsBridge();
+  if (!bridge || typeof bridge.setBottomChromeHeight !== "function") {
+    return;
+  }
+
+  try {
+    bridge.setBottomChromeHeight(Math.max(0, Math.round(heightPx)));
+  } catch {
+    // Ignore bridge/reporting failures: banner rendering should degrade safely.
+  }
+};
 
 const getNativeBackupBridge = (): NativeBackupBridge | null => {
   const bridge = getNativeAdsBridge();

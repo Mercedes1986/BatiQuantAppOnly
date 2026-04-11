@@ -1,5 +1,5 @@
 // src/App.tsx
-import React, { useCallback, useEffect, useMemo, useState, Suspense } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState, Suspense } from "react";
 import {
   BrowserRouter,
   Routes,
@@ -48,6 +48,7 @@ import { armInterstitialAfterCalculation, clearPendingInterstitial, getAdLifecyc
 import { initConsent } from "./services/consentService";
 import { getPrivacyPolicyUrl } from "./services/privacyService";
 import { initializePurchaseState, refreshPurchaseState } from "./services/purchaseService";
+import { reportNativeBottomChromeHeight } from "./services/platformService";
 
 // --- helper: keep prop typing for React.lazy ---
 const lazyNamed = <T extends React.ComponentType<any>>(factory: () => Promise<{ default: T }>) =>
@@ -570,6 +571,7 @@ const AppLayout = () => {
   const [currentCalc, setCurrentCalc] = useState<CalculatorType | null>(null);
   const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
   const [adRefreshTick, setAdRefreshTick] = useState(0);
+  const bottomNavHostRef = useRef<HTMLDivElement | null>(null);
 
   // Background image per section (served from /public/backgrounds)
   const bgUrl = useMemo(() => {
@@ -663,6 +665,35 @@ const AppLayout = () => {
   }, []);
 
   useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const reportBottomChromeHeight = () => {
+      const navHeight = isKeyboardOpen ? 0 : (bottomNavHostRef.current?.offsetHeight ?? 0);
+      const separationGap = navHeight > 0 ? 12 : 0;
+      reportNativeBottomChromeHeight(navHeight + separationGap);
+    };
+
+    reportBottomChromeHeight();
+
+    const resizeObserver = typeof ResizeObserver !== "undefined" && bottomNavHostRef.current
+      ? new ResizeObserver(() => reportBottomChromeHeight())
+      : null;
+
+    if (resizeObserver && bottomNavHostRef.current) {
+      resizeObserver.observe(bottomNavHostRef.current);
+    }
+
+    window.addEventListener("resize", reportBottomChromeHeight);
+    window.addEventListener("orientationchange", reportBottomChromeHeight);
+
+    return () => {
+      resizeObserver?.disconnect();
+      window.removeEventListener("resize", reportBottomChromeHeight);
+      window.removeEventListener("orientationchange", reportBottomChromeHeight);
+    };
+  }, [isKeyboardOpen, location.pathname]);
+
+  useEffect(() => {
     const refresh = () => setAdRefreshTick((v) => v + 1);
     const { adFreeUpdated } = getAdLifecycleEvents();
 
@@ -739,7 +770,7 @@ const AppLayout = () => {
       </main>
 
       {!isKeyboardOpen ? (
-        <div className="app-bottom-nav-host relative z-20">
+        <div ref={bottomNavHostRef} className="app-bottom-nav-host relative z-20">
           <BottomNav currentTab={currentTab} onChange={handleNavChange} />
         </div>
       ) : null}

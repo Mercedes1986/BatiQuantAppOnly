@@ -75,6 +75,7 @@ public class BatiQuantNativeAdsBridge {
     private ProductDetails removeAdsProductDetails;
     private AdView bannerView;
     private String activeBannerPlacement;
+    private int bottomChromeHeightPx = 0;
 
     private boolean mobileAdsInitialized = false;
     private boolean interstitialLoading = false;
@@ -191,6 +192,14 @@ public class BatiQuantNativeAdsBridge {
     @JavascriptInterface
     public void hideBanner(String placement) {
         runOnMainThread(this::hideBannerInternal);
+    }
+
+    @JavascriptInterface
+    public void setBottomChromeHeight(int heightPx) {
+        runOnMainThread(() -> {
+            bottomChromeHeightPx = Math.max(0, heightPx);
+            updateBannerContainerLayout();
+        });
     }
 
     @JavascriptInterface
@@ -1204,6 +1213,7 @@ public class BatiQuantNativeAdsBridge {
         if (container != null) {
             container.removeAllViews();
             container.setVisibility(View.GONE);
+            updateBannerContainerLayout(container);
         }
         voidBannerPlacement();
     }
@@ -1211,6 +1221,7 @@ public class BatiQuantNativeAdsBridge {
     private FrameLayout ensureBannerContainer() {
         FrameLayout existing = activity.findViewById(R.id.banner_container);
         if (existing != null) {
+            updateBannerContainerLayout(existing);
             return existing;
         }
 
@@ -1224,15 +1235,45 @@ public class BatiQuantNativeAdsBridge {
         container.setId(R.id.banner_container);
         container.setVisibility(View.GONE);
         container.setClipToPadding(false);
+        container.setPadding(dpToPx(8), 0, dpToPx(8), 0);
 
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
         );
         params.gravity = android.view.Gravity.BOTTOM;
+        params.bottomMargin = Math.max(0, bottomChromeHeightPx);
 
         ((ViewGroup) content).addView(container, params);
         return container;
+    }
+
+    private void updateBannerContainerLayout() {
+        FrameLayout container = activity.findViewById(R.id.banner_container);
+        if (container != null) {
+            updateBannerContainerLayout(container);
+        }
+    }
+
+    private void updateBannerContainerLayout(FrameLayout container) {
+        ViewGroup.LayoutParams layoutParams = container.getLayoutParams();
+        FrameLayout.LayoutParams params;
+
+        if (layoutParams instanceof FrameLayout.LayoutParams) {
+            params = (FrameLayout.LayoutParams) layoutParams;
+        } else {
+            params = new FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+            );
+        }
+
+        params.width = ViewGroup.LayoutParams.MATCH_PARENT;
+        params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+        params.gravity = android.view.Gravity.BOTTOM;
+        params.bottomMargin = Math.max(0, bottomChromeHeightPx);
+        container.setLayoutParams(params);
+        container.requestLayout();
     }
 
     private void destroyBannerView() {
