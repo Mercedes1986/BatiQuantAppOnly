@@ -12,6 +12,8 @@ import android.os.Looper;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -31,7 +33,10 @@ import com.android.billingclient.api.PurchasesUpdatedListener;
 import com.android.billingclient.api.QueryProductDetailsParams;
 import com.android.billingclient.api.QueryPurchasesParams;
 import com.google.android.gms.ads.AdError;
+import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdSize;
+import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.FullScreenContentCallback;
 import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.MobileAds;
@@ -68,6 +73,8 @@ public class BatiQuantNativeAdsBridge {
     private ConsentInformation consentInformation;
     private BillingClient billingClient;
     private ProductDetails removeAdsProductDetails;
+    private AdView bannerView;
+    private String activeBannerPlacement;
 
     private boolean mobileAdsInitialized = false;
     private boolean interstitialLoading = false;
@@ -178,12 +185,12 @@ public class BatiQuantNativeAdsBridge {
 
     @JavascriptInterface
     public void showBanner(String placement) {
-        voidBannerPlacement();
+        runOnMainThread(() -> loadBannerForPlacement(placement));
     }
 
     @JavascriptInterface
     public void hideBanner(String placement) {
-        voidBannerPlacement();
+        runOnMainThread(this::hideBannerInternal);
     }
 
     @JavascriptInterface
@@ -441,15 +448,23 @@ public class BatiQuantNativeAdsBridge {
             if (billingReady) {
                 queryExistingPurchases();
             }
+            if (bannerView != null) {
+                try { bannerView.resume(); } catch (Throwable ignored) {}
+            }
         });
     }
 
     public void onHostPause() {
-        // no-op
+        runOnMainThread(() -> {
+            if (bannerView != null) {
+                try { bannerView.pause(); } catch (Throwable ignored) {}
+            }
+        });
     }
 
     public void onHostDestroy() {
         runOnMainThread(() -> {
+            destroyBannerView();
             voidBannerPlacement();
             clearPendingBackupState();
             if (billingClient != null) {
@@ -1124,6 +1139,109 @@ public class BatiQuantNativeAdsBridge {
                         + escapeForJs(message)
                         + "' } }));"
         );
+    }
+
+    private void loadBannerForPlacement(String placement) {
+        if (!canRequestAds() || !mobileAdsInitialized || adFreePurchased) {
+            hideBannerInternal();
+            return;
+        }
+
+        FrameLayout container = activity.findViewById(R.id.banner_container);
+        if (container == null) {
+            Log.w(TAG, "Banner container not found");
+            voidBannerPlacement();
+            return;
+        }
+
+        String bannerUnitId = resolveBannerUnitId(placement);
+        if (bannerUnitId == null || bannerUnitId.trim().isEmpty()) {
+            Log.w(TAG, "Banner unit id missing for placement: " + placement);
+            hideBannerInternal();
+            return;
+        }
+
+        if (bannerView != null && bannerUnitId.equals(bannerView.getAdUnitId()) && safeText(placement, "").equals(activeBannerPlacement)) {
+            container.setVisibility(View.VISIBLE);
+            dispatchBannerSpace(container.getHeight() > 0 ? container.getHeight() : dpToPx(60));
+            return;
+        }
+
+        destroyBannerView();
+
+        AdView adView = new AdView(activity);
+        adView.setAdUnitId(bannerUnitId);
+        adView.setAdSize(getAdaptiveBannerSize(container));
+        adView.setAdListener(new AdListener() {
+            @Override
+            public void onAdLoaded() {
+                container.setVisibility(View.VISIBLE);
+                dispatchBannerSpace(adView.getAdSize() != null ? adView.getAdSize().getHeightInPixels(activity) : dpToPx(60));
+            }
+
+            @Override
+            public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                Log.w(TAG, "Banner failed to load: " + loadAdError.getMessage());
+                hideBannerInternal();
+            }
+        });
+
+        bannerView = adView;
+        activeBannerPlacement = safeText(placement, "");
+
+        container.removeAllViews();
+        container.addView(adView, new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+        ));
+        container.setVisibility(View.INVISIBLE);
+        adView.loadAd(new AdRequest.Builder().build());
+    }
+
+    private void hideBannerInternal() {
+        FrameLayout container = activity.findViewById(R.id.banner_container);
+        destroyBannerView();
+        if (container != null) {
+            container.removeAllViews();
+            container.setVisibility(View.GONE);
+        }
+        voidBannerPlacement();
+    }
+
+    private void destroyBannerView() {
+        if (bannerView != null) {
+            try { bannerView.destroy(); } catch (Throwable ignored) {}
+            bannerView = null;
+        }
+        activeBannerPlacement = null;
+    }
+
+    private String resolveBannerUnitId(String placement) {
+        return BuildConfig.ADMOB_BANNER_HOME;
+    }
+
+    private AdSize getAdaptiveBannerSize(FrameLayout container) {
+        int adWidthPixels = container.getWidth();
+        if (adWidthPixels <= 0) {
+            adWidthPixels = activity.getResources().getDisplayMetrics().widthPixels;
+        }
+        float density = activity.getResources().getDisplayMetrics().density;
+        int adWidth = Math.max(320, Math.round(adWidthPixels / density));
+        return AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(activity, adWidth);
+    }
+
+    private void dispatchBannerSpace(int heightPx) {
+        final int safeHeight = Math.max(0, heightPx);
+        postJavascript(
+                "(function(){"
+                        + "document.documentElement.style.setProperty('--native-banner-space', '" + safeHeight + "px');"
+                        + "window.dispatchEvent(new CustomEvent('batiquant-native-banner', { detail: { visible: " + (safeHeight > 0 ? "true" : "false") + ", height: " + safeHeight + " } }));"
+                        + "})();"
+        );
+    }
+
+    private int dpToPx(int dp) {
+        return Math.round(dp * activity.getResources().getDisplayMetrics().density);
     }
 
     private void voidBannerPlacement() {

@@ -16,7 +16,7 @@ const startsWithAny = (pathname: string, routes: readonly string[]) =>
 export const AD_CONFIG = {
   PLATFORM: (env.VITE_AD_PLATFORM || "mobile") as AdPlatform,
   ENABLE_ADS: truthy(env.VITE_ADS_ENABLED ?? "true"),
-  ENABLE_INLINE_BANNERS: truthy(env.VITE_ENABLE_INLINE_BANNERS ?? "false"),
+  ENABLE_INLINE_BANNERS: truthy(env.VITE_ENABLE_INLINE_BANNERS ?? "true"),
   ENABLE_WEB_PLACEHOLDERS: truthy(env.VITE_ENABLE_WEB_AD_PLACEHOLDERS ?? "false"),
   ENABLE_DEBUG_LABELS: truthy(env.DEV) || truthy(env.VITE_ENABLE_AD_DEBUG),
   PRIVACY_POLICY_URL: String(env.VITE_PRIVACY_POLICY_URL || "").trim(),

@@ -3,6 +3,7 @@
 @tailwind utilities;
 
 :root {
+  --native-banner-space: 0px;
   color-scheme: light;
   --app-bg: #d8e7ff;
   --panel-bg: rgba(255, 255, 255, 0.60);
@@ -214,6 +215,7 @@ input:-webkit-autofill:active {
 }
 
 :root {
+  --native-banner-space: 0px;
   --app-safe-top: var(--safe-area-inset-top, env(safe-area-inset-top, 0px));
   --app-safe-right: var(--safe-area-inset-right, env(safe-area-inset-right, 0px));
   --app-safe-bottom: var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px));
@@ -284,7 +286,7 @@ body {
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
   padding-top: calc(var(--app-top-gap) + 6px);
-  padding-bottom: 18px;
+  padding-bottom: calc(18px + var(--native-banner-space));
   padding-left: max(0px, var(--app-safe-left));
   padding-right: max(0px, var(--app-safe-right));
   scroll-padding-top: calc(var(--app-top-gap) + 20px);
@@ -326,11 +328,12 @@ body {
 
 @media (max-width: 640px) {
   :root {
+  --native-banner-space: 0px;
     --app-top-gap: max(30px, calc(var(--app-safe-top) + 14px));
   }
 
   .app-main {
-    padding-bottom: 14px;
+    padding-bottom: calc(14px + var(--native-banner-space));
   }
 
   .app-bottom-nav-host {

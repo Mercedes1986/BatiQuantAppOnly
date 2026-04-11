@@ -13,6 +13,10 @@ def readConfigValue = { String key, String fallback ->
 def admobAppId = readConfigValue('BATIQUANT_ADMOB_APP_ID', 'ca-app-pub-3940256099942544~3347511713')
 def admobBannerHome = readConfigValue('BATIQUANT_ADMOB_BANNER_HOME', 'ca-app-pub-3940256099942544/9214589741')
 def admobBannerResult = readConfigValue('BATIQUANT_ADMOB_BANNER_RESULT', 'ca-app-pub-3940256099942544/9214589741')
+def admobBannerProjects = readConfigValue('BATIQUANT_ADMOB_BANNER_PROJECTS', admobBannerHome)
+def admobBannerHouse = readConfigValue('BATIQUANT_ADMOB_BANNER_HOUSE', admobBannerHome)
+def admobBannerMaterials = readConfigValue('BATIQUANT_ADMOB_BANNER_MATERIALS', admobBannerHome)
+def admobBannerQuicktools = readConfigValue('BATIQUANT_ADMOB_BANNER_QUICKTOOLS', admobBannerHome)
 def admobInterstitialCalcDone = readConfigValue('BATIQUANT_ADMOB_INTERSTITIAL_CALC_DONE', 'ca-app-pub-3940256099942544/1033173712')
 def playBillingRemoveAdsProductId = readConfigValue('BATIQUANT_PLAY_BILLING_REMOVE_ADS_PRODUCT_ID', 'batiquant_premium')
 
@@ -32,6 +36,10 @@ android {
         buildConfigField "String", "ADMOB_APP_ID", "\"${admobAppId}\""
         buildConfigField "String", "ADMOB_BANNER_HOME", "\"${admobBannerHome}\""
         buildConfigField "String", "ADMOB_BANNER_RESULT", "\"${admobBannerResult}\""
+        buildConfigField "String", "ADMOB_BANNER_PROJECTS", "\"${admobBannerProjects}\""
+        buildConfigField "String", "ADMOB_BANNER_HOUSE", "\"${admobBannerHouse}\""
+        buildConfigField "String", "ADMOB_BANNER_MATERIALS", "\"${admobBannerMaterials}\""
+        buildConfigField "String", "ADMOB_BANNER_QUICKTOOLS", "\"${admobBannerQuicktools}\""
         buildConfigField "String", "ADMOB_INTERSTITIAL_CALC_DONE", "\"${admobInterstitialCalcDone}\""
         buildConfigField "String", "PLAY_BILLING_REMOVE_ADS_PRODUCT_ID", "\"${playBillingRemoveAdsProductId}\""
 
