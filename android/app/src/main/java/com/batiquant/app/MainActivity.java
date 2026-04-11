@@ -24,6 +24,7 @@ public class MainActivity extends BridgeActivity {
 
         WebView webView = bridge.getWebView();
         webView.setFitsSystemWindows(true);
+        webView.setOverScrollMode(WebView.OVER_SCROLL_NEVER);
 
         nativeAdsBridge = new BatiQuantNativeAdsBridge(this, webView);
         webView.addJavascriptInterface(nativeAdsBridge, "BatiQuantNativeAds");

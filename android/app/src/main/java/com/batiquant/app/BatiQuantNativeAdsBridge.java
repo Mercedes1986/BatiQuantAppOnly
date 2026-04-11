@@ -76,8 +76,9 @@ public class BatiQuantNativeAdsBridge {
     private AdView bannerView;
     private String activeBannerPlacement;
     private int bottomChromeHeightPx = 0;
-    private final int bannerTopMarginPx = dpToPx(8);
-    private final int bannerContentGapPx = dpToPx(18);
+    private int bannerTopMarginPx;
+    private int bannerContentGapPx;
+    private int statusBarInsetPx;
     private int baseWebViewPaddingLeft = 0;
     private int baseWebViewPaddingTop = 0;
     private int baseWebViewPaddingRight = 0;
@@ -102,6 +103,9 @@ public class BatiQuantNativeAdsBridge {
     public BatiQuantNativeAdsBridge(Activity activity, WebView webView) {
         this.activity = activity;
         this.webView = webView;
+        this.bannerTopMarginPx = dpToPx(4);
+        this.bannerContentGapPx = dpToPx(12);
+        this.statusBarInsetPx = resolveStatusBarInsetPx();
         cacheBaseWebViewPadding();
     }
 
@@ -1256,7 +1260,7 @@ public class BatiQuantNativeAdsBridge {
                 ViewGroup.LayoutParams.WRAP_CONTENT
         );
         params.gravity = android.view.Gravity.TOP;
-        params.topMargin = bannerTopMarginPx;
+        params.topMargin = statusBarInsetPx + bannerTopMarginPx;
         params.bottomMargin = 0;
 
         ((ViewGroup) content).addView(container, params);
@@ -1271,6 +1275,7 @@ public class BatiQuantNativeAdsBridge {
     }
 
     private void updateBannerContainerLayout(FrameLayout container) {
+        statusBarInsetPx = resolveStatusBarInsetPx();
         ViewGroup.LayoutParams layoutParams = container.getLayoutParams();
         FrameLayout.LayoutParams params;
 
@@ -1286,7 +1291,7 @@ public class BatiQuantNativeAdsBridge {
         params.width = ViewGroup.LayoutParams.MATCH_PARENT;
         params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
         params.gravity = android.view.Gravity.TOP;
-        params.topMargin = bannerTopMarginPx;
+        params.topMargin = statusBarInsetPx + bannerTopMarginPx;
         params.bottomMargin = 0;
         container.setLayoutParams(params);
         container.requestLayout();
@@ -1370,6 +1375,27 @@ public class BatiQuantNativeAdsBridge {
 
     private int dpToPx(int dp) {
         return Math.round(dp * activity.getResources().getDisplayMetrics().density);
+    }
+
+    private int resolveStatusBarInsetPx() {
+        try {
+            if (webView != null && webView.getRootWindowInsets() != null) {
+                return webView.getRootWindowInsets().getSystemWindowInsetTop();
+            }
+        } catch (Throwable ignored) {
+            // ignore and fall back
+        }
+
+        try {
+            int resourceId = activity.getResources().getIdentifier("status_bar_height", "dimen", "android");
+            if (resourceId > 0) {
+                return activity.getResources().getDimensionPixelSize(resourceId);
+            }
+        } catch (Throwable ignored) {
+            // ignore and fall back
+        }
+
+        return 0;
     }
 
     private void voidBannerPlacement() {
