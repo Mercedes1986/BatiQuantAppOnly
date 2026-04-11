@@ -76,8 +76,10 @@ public class BatiQuantNativeAdsBridge {
     private AdView bannerView;
     private String activeBannerPlacement;
     private int bottomChromeHeightPx = 0;
-    private final int bannerTopMarginPx = dpToPx(8);
-    private final int bannerContentGapPx = dpToPx(12);
+    private final int bannerTopMarginDp = 8;
+    private final int bannerContentGapDp = 12;
+    private int bannerTopMarginPx = 0;
+    private int bannerContentGapPx = 0;
     private int baseWebViewPaddingLeft = 0;
     private int baseWebViewPaddingTop = 0;
     private int baseWebViewPaddingRight = 0;
@@ -102,6 +104,8 @@ public class BatiQuantNativeAdsBridge {
     public BatiQuantNativeAdsBridge(Activity activity, WebView webView) {
         this.activity = activity;
         this.webView = webView;
+        this.bannerTopMarginPx = dpToPx(bannerTopMarginDp);
+        this.bannerContentGapPx = dpToPx(bannerContentGapDp);
         cacheBaseWebViewPadding();
     }
 
