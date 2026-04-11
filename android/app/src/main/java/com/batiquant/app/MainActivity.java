@@ -40,7 +40,7 @@ public class MainActivity extends BridgeActivity {
     @Override
     public void onResume() {
         super.onResume();
-        if (nativeAdsBridge != null && bridge != null) {
+        if (nativeAdsBridge != null && bridge != null && bridge.getWebView() != null) {
             nativeAdsBridge.rebindWebView(bridge.getWebView());
             nativeAdsBridge.onHostResume();
         }

@@ -285,7 +285,7 @@ body {
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
-  padding-top: calc(var(--app-top-gap) + 6px + var(--native-banner-space));
+  padding-top: calc(var(--app-top-gap) + 6px);
   padding-bottom: 18px;
   padding-left: max(0px, var(--app-safe-left));
   padding-right: max(0px, var(--app-safe-right));
@@ -333,7 +333,7 @@ body {
   }
 
   .app-main {
-    padding-top: calc(var(--app-top-gap) + 6px + var(--native-banner-space));
+    padding-top: calc(var(--app-top-gap) + 6px);
     padding-bottom: 14px;
   }
 
