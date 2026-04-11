@@ -1147,9 +1147,9 @@ public class BatiQuantNativeAdsBridge {
             return;
         }
 
-        FrameLayout container = activity.findViewById(R.id.banner_container);
+        FrameLayout container = ensureBannerContainer();
         if (container == null) {
-            Log.w(TAG, "Banner container not found");
+            Log.w(TAG, "Banner container not available");
             voidBannerPlacement();
             return;
         }
@@ -1208,6 +1208,33 @@ public class BatiQuantNativeAdsBridge {
         voidBannerPlacement();
     }
 
+    private FrameLayout ensureBannerContainer() {
+        FrameLayout existing = activity.findViewById(R.id.banner_container);
+        if (existing != null) {
+            return existing;
+        }
+
+        View content = activity.findViewById(android.R.id.content);
+        if (!(content instanceof ViewGroup)) {
+            Log.w(TAG, "Android content root is not a ViewGroup");
+            return null;
+        }
+
+        FrameLayout container = new FrameLayout(activity);
+        container.setId(R.id.banner_container);
+        container.setVisibility(View.GONE);
+        container.setClipToPadding(false);
+
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+        );
+        params.gravity = android.view.Gravity.BOTTOM;
+
+        ((ViewGroup) content).addView(container, params);
+        return container;
+    }
+
     private void destroyBannerView() {
         if (bannerView != null) {
             try { bannerView.destroy(); } catch (Throwable ignored) {}
@@ -1217,7 +1244,23 @@ public class BatiQuantNativeAdsBridge {
     }
 
     private String resolveBannerUnitId(String placement) {
-        return BuildConfig.ADMOB_BANNER_HOME;
+        String safePlacement = safeText(placement, "");
+        switch (safePlacement) {
+            case "dashboard_banner":
+                return BuildConfig.ADMOB_BANNER_HOME;
+            case "projects_banner":
+                return BuildConfig.ADMOB_BANNER_PROJECTS;
+            case "house_banner":
+                return BuildConfig.ADMOB_BANNER_HOUSE;
+            case "materials_banner":
+                return BuildConfig.ADMOB_BANNER_MATERIALS;
+            case "quicktools_banner":
+                return BuildConfig.ADMOB_BANNER_QUICKTOOLS;
+            case "calculator_result_banner":
+                return BuildConfig.ADMOB_BANNER_RESULT;
+            default:
+                return BuildConfig.ADMOB_BANNER_HOME;
+        }
     }
 
     private AdSize getAdaptiveBannerSize(FrameLayout container) {
