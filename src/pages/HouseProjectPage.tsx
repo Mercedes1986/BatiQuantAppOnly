@@ -69,8 +69,7 @@ export const HouseProjectPage: React.FC = () => {
   const premiumEnabled = useMemo(() => hasPremiumAccess(), [planVersion]);
   const houseProjectLimit = useMemo(() => getHouseProjectLimit(premiumEnabled), [premiumEnabled]);
 
-  // Hero image (same spirit as Projects page)
-  const heroImageSrc = "/images/chantiers/creer-chantier.png";
+
 
   const constructionSteps = useMemo<readonly ConstructionStepGroup[]>(() => getConstructionSteps(), [i18n.language]);
 
