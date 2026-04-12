@@ -44,7 +44,7 @@ import type { HouseProject } from "./types";
 
 import { ArrowLeft, Save, Loader2, AlertTriangle } from "lucide-react";
 import ConsentModal from "./components/privacy/ConsentModal";
-import { armInterstitialAfterCalculation, clearPendingInterstitial, getAdLifecycleEvents, hideBanner, initializeAds, showBanner, showPendingInterstitialIfReady } from "./services/adsService";
+import { armInterstitialAfterCalculation, clearPendingInterstitial, hideBanner, initializeAds, showPendingInterstitialIfReady } from "./services/adsService";
 import { initConsent } from "./services/consentService";
 import { getPrivacyPolicyUrl } from "./services/privacyService";
 import { initializePurchaseState, refreshPurchaseState } from "./services/purchaseService";
@@ -555,14 +555,6 @@ const ProjectCalculatorWrapper: React.FC = () => {
   );
 };
 
-const resolveBannerPlacementForPath = (pathname: string) => {
-  if (pathname === "/app" || pathname === "/app/menu") return "dashboard_banner" as const;
-  if (pathname === "/app/calculators" || pathname === "/app/projects") return "projects_banner" as const;
-  if (pathname.startsWith("/app/house")) return "house_banner" as const;
-  if (pathname.startsWith("/app/materials")) return "materials_banner" as const;
-  if (pathname === "/app/quick-tools" || pathname.startsWith("/app/quick-tools/")) return "quicktools_banner" as const;
-  return null;
-};
 
 // --- 2. Layouts ---
 const AppLayout = () => {
@@ -570,7 +562,6 @@ const AppLayout = () => {
   const location = useLocation();
   const [currentCalc, setCurrentCalc] = useState<CalculatorType | null>(null);
   const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
-  const [adRefreshTick, setAdRefreshTick] = useState(0);
   const bottomNavHostRef = useRef<HTMLDivElement | null>(null);
 
   // Background image per section (served from /public/backgrounds)
@@ -693,44 +684,11 @@ const AppLayout = () => {
     };
   }, [isKeyboardOpen, location.pathname]);
 
-  useEffect(() => {
-    const refresh = () => setAdRefreshTick((v) => v + 1);
-    const { adFreeUpdated } = getAdLifecycleEvents();
-
-    window.addEventListener("batiquant-native-privacy", refresh as EventListener);
-    window.addEventListener(adFreeUpdated, refresh as EventListener);
-
-    return () => {
-      window.removeEventListener("batiquant-native-privacy", refresh as EventListener);
-      window.removeEventListener(adFreeUpdated, refresh as EventListener);
-    };
-  }, []);
 
   useEffect(() => {
-    const placement = resolveBannerPlacementForPath(location.pathname);
-    const shouldHide = !placement
-      || isKeyboardOpen
-      || currentCalc !== null
-      || location.pathname.startsWith("/app/calculator")
-      || location.pathname.startsWith("/app/settings")
-      || location.pathname.startsWith("/app/quotes")
-      || location.pathname.startsWith("/app/invoices")
-      || location.pathname.startsWith("/app/print");
-
-    const run = async () => {
-      if (shouldHide) {
-        await hideBanner();
-        return;
-      }
-
-      const shown = await showBanner(placement);
-      if (!shown) {
-        document.documentElement.style.setProperty("--native-banner-space", "0px");
-      }
-    };
-
-    void run();
-  }, [location.pathname, isKeyboardOpen, currentCalc, adRefreshTick]);
+    void hideBanner();
+    document.documentElement.style.setProperty("--native-banner-space", "0px");
+  }, [location.pathname, isKeyboardOpen, currentCalc]);
 
   // ✅ /app/calculators?calc=... -> opens calculator (safe)
   useEffect(() => {

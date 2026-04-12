@@ -28,7 +28,7 @@ import { StructuralCalculator } from "../components/calculators/StructuralCalcul
 import { SubstructureCalculator } from "../components/calculators/SubstructureCalculator";
 import { TileCalculator } from "../components/calculators/TileCalculator";
 import { getCalculators, getStaticTips, localizeLegacyText } from "../constants";
-import { armInterstitialAfterCalculation, clearPendingInterstitial } from "../services/adsService";
+import { armInterstitialAfterCalculation, clearPendingInterstitial, showInterstitialIfReady } from "../services/adsService";
 import { generateId, saveProject } from "../services/storage";
 import { CalculatorType } from "../types";
 import type {
@@ -203,6 +203,11 @@ export const CalculatorPage: React.FC<Props> = ({ type, onBack, onNavigateProjec
     saveProject(project);
     setShowSaveModal(false);
     setNewProjectName("");
+
+    await showInterstitialIfReady("calculator_interstitial", {
+      contextKey: `project-save-${project.id}`,
+    });
+
     await onNavigateProjects();
   };
 

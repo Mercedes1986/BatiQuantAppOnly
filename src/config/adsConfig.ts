@@ -16,7 +16,7 @@ const startsWithAny = (pathname: string, routes: readonly string[]) =>
 export const AD_CONFIG = {
   PLATFORM: (env.VITE_AD_PLATFORM || "mobile") as AdPlatform,
   ENABLE_ADS: truthy(env.VITE_ADS_ENABLED ?? "true"),
-  ENABLE_INLINE_BANNERS: truthy(env.VITE_ENABLE_INLINE_BANNERS ?? "true"),
+  ENABLE_INLINE_BANNERS: truthy(env.VITE_ENABLE_INLINE_BANNERS ?? "false"),
   ENABLE_WEB_PLACEHOLDERS: truthy(env.VITE_ENABLE_WEB_AD_PLACEHOLDERS ?? "false"),
   ENABLE_DEBUG_LABELS: truthy(env.DEV) || truthy(env.VITE_ENABLE_AD_DEBUG),
   PRIVACY_POLICY_URL: String(env.VITE_PRIVACY_POLICY_URL || "").trim(),
@@ -31,8 +31,8 @@ export const AD_CONFIG = {
     calculator_result_banner: String(env.VITE_ADMOB_BANNER_RESULT || env.VITE_ADMOB_BANNER_HOME || "").trim(),
     calculator_interstitial: String(env.VITE_ADMOB_INTERSTITIAL_CALC_DONE || "").trim(),
   } as Record<AdPlacement, string>,
-  INTERSTITIAL_COOLDOWN_MS: Number(env.VITE_ADMOB_INTERSTITIAL_COOLDOWN_MS || 120000),
-  INTERSTITIAL_EVERY_N_RESULTS: Math.max(2, Number(env.VITE_ADMOB_INTERSTITIAL_EVERY_N_RESULTS || 2)),
+  INTERSTITIAL_COOLDOWN_MS: Number(env.VITE_ADMOB_INTERSTITIAL_COOLDOWN_MS || 180000),
+  INTERSTITIAL_EVERY_N_RESULTS: Math.max(2, Number(env.VITE_ADMOB_INTERSTITIAL_EVERY_N_RESULTS || 3)),
   INTERSTITIAL_REPEAT_RESULT_WINDOW_MS: Math.max(
     10000,
     Number(env.VITE_ADMOB_INTERSTITIAL_REPEAT_RESULT_WINDOW_MS || 30000),
