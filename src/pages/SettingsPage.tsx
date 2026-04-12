@@ -217,20 +217,24 @@ export const SettingsPage: React.FC = () => {
           return;
         }
 
-        const success = importAppData(content, "replace");
-        if (success) {
+        const result = importAppData(content, "replace");
+        if (result.ok) {
           alert(
             t("settings.restore_ok", {
               defaultValue: "Données restaurées avec succès !",
-            })
+            }) + (result.importedCounts
+              ? `\n\nProjets : ${result.importedCounts.projects}\nChantiers : ${result.importedCounts.houseProjects}\nMatériaux perso : ${result.importedCounts.customMaterials}\nDevis : ${result.importedCounts.quotes}\nFactures : ${result.importedCounts.invoices}`
+              : "")
           );
           window.location.reload();
         } else {
-          alert(
-            t("settings.invalid_backup", {
-              defaultValue: "Erreur: Fichier de sauvegarde invalide.",
-            })
-          );
+          const errorMessage =
+            result.reason === "empty-backup"
+              ? t("settings.empty_backup", { defaultValue: "Fichier vide ou illisible." })
+              : t("settings.invalid_backup", {
+                  defaultValue: "Erreur: Fichier de sauvegarde invalide.",
+                });
+          alert(errorMessage);
         }
       } catch (error) {
         console.error(error);

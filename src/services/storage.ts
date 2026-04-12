@@ -1,5 +1,6 @@
 import { FREE_HOUSE_PROJECT_LIMIT } from "@/config/premiumConfig";
-import type { HouseProject, Project, UserSettings } from "../types";
+import type { CalculatorSnapshot, HouseProject, Project, QuoteData, UserSettings } from "../types";
+import { CalculatorType } from "../types";
 import {
   canUsePersistentStorage,
   markNamespaceMigrated,
@@ -71,6 +72,68 @@ const toIsoDateString = (value: unknown): string => {
   return Number.isFinite(timestamp) ? new Date(timestamp).toISOString() : new Date().toISOString();
 };
 
+const isCalculatorType = (value: unknown): value is CalculatorType =>
+  typeof value === "string" && Object.values(CalculatorType).includes(value as CalculatorType);
+
+const sanitizeCalculatorType = (value: unknown): CalculatorType | undefined =>
+  isCalculatorType(value) ? value : undefined;
+
+const sanitizeCalculatorSnapshot = (value: unknown): CalculatorSnapshot | undefined => {
+  if (!isRecord(value)) return undefined;
+
+  const calculatorType = sanitizeCalculatorType(value.calculatorType);
+  if (!calculatorType) return undefined;
+
+  const version = Math.max(1, Math.trunc(toFiniteNumber(value.version, 1)) || 1);
+  const values = isRecord(value.values) ? value.values : {};
+
+  return {
+    version,
+    calculatorType,
+    values,
+  };
+};
+
+
+const sanitizeQuoteManualLineUnit = (value: unknown): QuoteData["manualLines"][number]["unit"] => {
+  const unit = toTrimmedString(value, "unit") as QuoteData["manualLines"][number]["unit"];
+  return unit;
+};
+
+const sanitizeQuoteManualLineCategory = (value: unknown): QuoteData["manualLines"][number]["category"] => {
+  return value === "labor" || value === "service" || value === "material" ? value : "material";
+};
+
+const sanitizeQuoteData = (value: unknown): QuoteData | undefined => {
+  if (!isRecord(value) || !isRecord(value.settings)) return undefined;
+
+  const settings = value.settings;
+  const manualLines = Array.isArray(value.manualLines)
+    ? value.manualLines
+        .filter((line): line is Record<string, unknown> => isRecord(line))
+        .map((line) => ({
+          id: toTrimmedString(line.id) || `line_${Math.random().toString(36).slice(2, 10)}`,
+          stepId: toTrimmedString(line.stepId, "global") || "global",
+          label: toTrimmedString(line.label, "Ligne manuelle"),
+          quantity: Math.max(0, toFiniteNumber(line.quantity, 0)),
+          unit: sanitizeQuoteManualLineUnit(line.unit),
+          unitPrice: Math.max(0, toFiniteNumber(line.unitPrice, 0)),
+          category: sanitizeQuoteManualLineCategory(line.category),
+        }))
+    : [];
+
+  return {
+    settings: {
+      taxRate: Math.max(0, toFiniteNumber(settings.taxRate, 20)),
+      marginPercent: Math.max(0, toFiniteNumber(settings.marginPercent, 0)),
+      discountAmount: Math.max(0, toFiniteNumber(settings.discountAmount, 0)),
+      showLabor: settings.showLabor === true,
+    },
+    manualLines,
+    updatedAt: toIsoDateString(value.updatedAt),
+  };
+};
+
 const sanitizeMaterialItem = (value: unknown): Project["items"][number] | null => {
   if (!isRecord(value)) return null;
 
@@ -119,11 +182,9 @@ const sanitizeProject = (value: unknown): Project | null => {
     date: toIsoDateString(value.date),
     items,
     notes: typeof value.notes === "string" ? value.notes : "",
-    calculatorType: toTrimmedString(value.calculatorType) || undefined,
+    calculatorType: sanitizeCalculatorType(value.calculatorType),
     calculatorLabel: toTrimmedString(value.calculatorLabel) || undefined,
-    calculatorSnapshot: isRecord(value.calculatorSnapshot)
-      ? (value.calculatorSnapshot as Project["calculatorSnapshot"])
-      : undefined,
+    calculatorSnapshot: sanitizeCalculatorSnapshot(value.calculatorSnapshot),
   };
 };
 
@@ -144,10 +205,8 @@ const sanitizeHouseStep = (value: unknown): HouseProject["steps"][keyof HousePro
     materials,
     cost: Math.max(0, explicitCost),
     notes: typeof value.notes === "string" ? value.notes : undefined,
-    calculatorType: toTrimmedString(value.calculatorType) || undefined,
-    calculatorSnapshot: isRecord(value.calculatorSnapshot)
-      ? (value.calculatorSnapshot as NonNullable<HouseProject["steps"][keyof HouseProject["steps"]]>["calculatorSnapshot"])
-      : undefined,
+    calculatorType: sanitizeCalculatorType(value.calculatorType),
+    calculatorSnapshot: sanitizeCalculatorSnapshot(value.calculatorSnapshot),
   };
 };
 
@@ -175,31 +234,31 @@ const sanitizeHouseProject = (value: unknown): HouseProject | null => {
     date: toIsoDateString(value.date),
     params: {
       surfaceArea: Math.max(0, toFiniteNumber(params.surfaceArea)),
-      groundArea: Math.max(0, toFiniteNumber(params.groundArea, params.surfaceArea)),
+      groundArea: Math.max(0, toFiniteNumber(params.groundArea, toFiniteNumber(params.surfaceArea))),
       perimeter: Math.max(0, toFiniteNumber(params.perimeter)),
       levels: Math.max(1, Math.trunc(toFiniteNumber(params.levels, 1)) || 1),
       ceilingHeight: Math.max(0, toFiniteNumber(params.ceilingHeight, 2.5)),
     },
     steps: nextSteps,
-    quote: isRecord(value.quote) ? (value.quote as HouseProject["quote"]) : undefined,
+    quote: sanitizeQuoteData(value.quote),
   };
 };
 
-const sanitizeProjectList = (value: unknown): Project[] => {
+export const sanitizeProjectList = (value: unknown): Project[] => {
   if (!Array.isArray(value)) return [];
   return value
     .map((project) => sanitizeProject(project))
     .filter((project): project is Project => project !== null);
 };
 
-const sanitizeHouseProjectList = (value: unknown): HouseProject[] => {
+export const sanitizeHouseProjectList = (value: unknown): HouseProject[] => {
   if (!Array.isArray(value)) return [];
   return value
     .map((project) => sanitizeHouseProject(project))
     .filter((project): project is HouseProject => project !== null);
 };
 
-const sanitizeSettings = (value: unknown): UserSettings => {
+export const sanitizeSettings = (value: unknown): UserSettings => {
   if (!isRecord(value)) return { ...DEFAULT_SETTINGS };
 
   const currency = typeof value.currency === "string" && value.currency.trim() ? value.currency : "€";

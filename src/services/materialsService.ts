@@ -26,6 +26,9 @@ import {
   replaceHouseProjects,
   replaceProjects,
   replaceSettings,
+  sanitizeHouseProjectList,
+  sanitizeProjectList,
+  sanitizeSettings,
 } from "./storage";
 import {
   getCompanyProfile,
@@ -425,14 +428,6 @@ const sanitizeBackupHouseProjects = (value: unknown): HouseProject[] =>
     ? (value.filter((item): item is HouseProject => isRecord(item) && typeof item.id === "string") as HouseProject[])
     : [];
 
-const sanitizeBackupSettings = (value: unknown): UserSettings | undefined =>
-  isRecord(value)
-    ? {
-        currency: typeof value.currency === "string" && value.currency.trim() ? value.currency : "€",
-        taxRate: typeof value.taxRate === "number" && Number.isFinite(value.taxRate) ? value.taxRate : 20,
-        isPro: false,
-      }
-    : undefined;
 
 const sanitizeBackupCompanyProfile = (value: unknown): CompanyProfile | null | undefined => {
   if (value === null) return null;
@@ -507,13 +502,58 @@ export const exportAppData = (): string => {
   return JSON.stringify(data, null, 2);
 };
 
-export const importAppData = (jsonString: string, mode: "merge" | "replace"): boolean => {
+export type ImportAppDataResult = {
+  ok: boolean;
+  reason?: "invalid-json" | "invalid-backup" | "empty-backup" | "import-failed";
+  importedCounts?: {
+    projects: number;
+    houseProjects: number;
+    customMaterials: number;
+    quotes: number;
+    invoices: number;
+  };
+};
+
+const stripUtf8Bom = (value: string): string => value.replace(/^﻿/, "").trim();
+
+const isLikelyBackupPayload = (value: Partial<AppDataBackup>): boolean => {
+  return [
+    "customPrices",
+    "customMaterials",
+    "favorites",
+    "usage",
+    "mappings",
+    "taxSettings",
+    "laborSettings",
+    "projects",
+    "houseProjects",
+    "userSettings",
+    "companyProfile",
+    "quotes",
+    "invoices",
+    "docCounters",
+  ].some((key) => key in value);
+};
+
+export const importAppData = (jsonString: string, mode: "merge" | "replace"): ImportAppDataResult => {
   migrateOnce();
 
   try {
-    const parsed = JSON.parse(jsonString) as Partial<AppDataBackup>;
-    if (!parsed || typeof parsed !== "object") return false;
-    if (typeof parsed.version !== "number" || parsed.version < 1) return false;
+    const normalizedInput = stripUtf8Bom(String(jsonString || ""));
+    if (!normalizedInput) {
+      return { ok: false, reason: "empty-backup" };
+    }
+
+    const parsed = JSON.parse(normalizedInput) as Partial<AppDataBackup>;
+    if (!parsed || typeof parsed !== "object") {
+      return { ok: false, reason: "invalid-backup" };
+    }
+
+    const numericVersion = typeof parsed.version === "string" ? Number(parsed.version) : parsed.version;
+    const hasRecognizedPayload = isLikelyBackupPayload(parsed);
+    if ((typeof numericVersion === "number" && numericVersion < 1) || (!numericVersion && !hasRecognizedPayload)) {
+      return { ok: false, reason: "invalid-backup" };
+    }
 
     const customPrices = sanitizePriceMap(parsed.customPrices);
     const customMaterials = sanitizeCustomMaterials(parsed.customMaterials);
@@ -522,13 +562,25 @@ export const importAppData = (jsonString: string, mode: "merge" | "replace"): bo
     const mappings = sanitizeMappings(parsed.mappings);
     const taxSettings = sanitizeTaxSettings(parsed.taxSettings);
     const laborSettings = sanitizeLaborSettings(parsed.laborSettings);
-    const projects = sanitizeBackupProjects(parsed.projects);
-    const houseProjects = sanitizeBackupHouseProjects(parsed.houseProjects);
-    const userSettings = sanitizeBackupSettings(parsed.userSettings);
+    const projects = sanitizeProjectList(sanitizeBackupProjects(parsed.projects));
+    const houseProjects = sanitizeHouseProjectList(sanitizeBackupHouseProjects(parsed.houseProjects));
+    const userSettings = parsed.userSettings ? sanitizeSettings({ ...parsed.userSettings, isPro: false }) : undefined;
     const companyProfile = sanitizeBackupCompanyProfile(parsed.companyProfile);
     const quotes = sanitizeBackupQuotes(parsed.quotes);
     const invoices = sanitizeBackupInvoices(parsed.invoices);
     const docCounters = sanitizeBackupCounters(parsed.docCounters);
+
+    if (
+      !hasRecognizedPayload &&
+      !customMaterials.length &&
+      !projects.length &&
+      !houseProjects.length &&
+      !quotes.length &&
+      !invoices.length &&
+      Object.keys(customPrices).length === 0
+    ) {
+      return { ok: false, reason: "invalid-backup" };
+    }
 
     if (mode === "replace") {
       setPriceMap(customPrices);
@@ -549,24 +601,56 @@ export const importAppData = (jsonString: string, mode: "merge" | "replace"): bo
       setCustomMaterials(mergeById(getCustomMaterials(), customMaterials));
       setPriceMap({ ...readPriceMap(), ...customPrices });
       setMappings({ ...getMappings(), ...mappings });
-      setFavorites([...getFavorites(), ...favorites]);
+      setFavorites(Array.from(new Set([...getFavorites(), ...favorites])));
       setUsage({ ...readUsage(), ...usage });
       setTaxSettingsSafe(taxSettings);
       setLaborSettingsSafe(laborSettings);
       replaceProjects(mergeById(getProjects(), projects));
       replaceHouseProjects(mergeById(getHouseProjects(), houseProjects));
       if (userSettings) replaceSettings({ ...getSettings(), ...userSettings, isPro: getSettings().isPro });
-      if (companyProfile) replaceCompanyProfile(companyProfile);
+      if (companyProfile !== undefined) replaceCompanyProfile(companyProfile);
       replaceQuotes(mergeById(getQuotes(), quotes));
       replaceInvoices(mergeById(getInvoices(), invoices));
       replaceDocumentCounters(mergeDocumentCounters(getDocumentCounters(), docCounters) ?? getDocumentCounters());
     }
 
     emitMaterialsChanged({ reason: "import" });
-    return true;
+
+    if (typeof window !== "undefined") {
+      try {
+        window.dispatchEvent(
+          new CustomEvent("batiquant:backup_restored", {
+            detail: {
+              mode,
+              projects: projects.length,
+              houseProjects: houseProjects.length,
+              customMaterials: customMaterials.length,
+              quotes: quotes.length,
+              invoices: invoices.length,
+            },
+          })
+        );
+      } catch {
+        // ignore
+      }
+    }
+
+    return {
+      ok: true,
+      importedCounts: {
+        projects: projects.length,
+        houseProjects: houseProjects.length,
+        customMaterials: customMaterials.length,
+        quotes: quotes.length,
+        invoices: invoices.length,
+      },
+    };
   } catch (error) {
     console.error("Import failed", error);
-    return false;
+    return {
+      ok: false,
+      reason: error instanceof SyntaxError ? "invalid-json" : "import-failed",
+    };
   }
 };
 

@@ -211,12 +211,19 @@ export const MaterialsPage: React.FC = () => {
         const content = evt.target?.result;
         if (!content || typeof content !== "string") throw new Error("invalid");
 
-        const ok = importAppData(content, "replace");
-        if (ok) {
-          window.alert(t("materials.import_ok", { defaultValue: "Import successful!" }));
+        const result = importAppData(content, "replace");
+        if (result.ok) {
+          window.alert(t("materials.import_ok", { defaultValue: "Import successful!" }) + (result.importedCounts
+            ? `\n\nProjects: ${result.importedCounts.projects}\nHouse projects: ${result.importedCounts.houseProjects}\nCustom materials: ${result.importedCounts.customMaterials}\nQuotes: ${result.importedCounts.quotes}\nInvoices: ${result.importedCounts.invoices}`
+            : ""));
           loadAll();
+          window.location.reload();
         } else {
-          window.alert(t("materials.import_invalid", { defaultValue: "Error: Invalid file." }));
+          window.alert(
+            result.reason === "empty-backup"
+              ? t("materials.import_empty", { defaultValue: "Error: Empty or unreadable file." })
+              : t("materials.import_invalid", { defaultValue: "Error: Invalid file." })
+          );
         }
       } catch (err) {
         console.error(err);
