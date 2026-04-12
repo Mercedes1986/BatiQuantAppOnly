@@ -1,6 +1,5 @@
 import React, { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { getSystemMaterialsList } from "../../services/materialsService";
 import {
   Settings,
   Download,
@@ -11,6 +10,8 @@ import {
   Euro,
   Percent,
   FileText,
+  Package,
+  Users,
 } from "lucide-react";
 
 import { HouseProject, QuoteManualLine, Unit } from "../../types";
@@ -60,20 +61,11 @@ export const QuotePanel: React.FC<Props> = ({ project, onUpdate }) => {
     [i18n.language]
   );
 
-  // Label->image index for lines coming from calculators
-  const systemImageByLabel = useMemo(() => {
-    const map = new Map<string, string>();
-    try {
-      const list = getSystemMaterialsList();
-      list.forEach((m: any) => {
-        const k = String(m.label || "").toLowerCase().trim();
-        if (k) map.set(k, m.imageUrl || "");
-      });
-    } catch {
-      // ignore
-    }
-    return map;
-  }, [i18n.language]);
+  const getLineVisual = (item: { type?: string; unit?: string }) => {
+    if (item.type === "labor") return { icon: Users, className: "border-amber-200 bg-amber-50 text-amber-700" };
+    if (item.type === "service") return { icon: Settings, className: "border-violet-200 bg-violet-50 text-violet-700" };
+    return { icon: Package, className: "border-slate-200 bg-slate-50 text-slate-600" };
+  };
 
   const computed: ComputedQuote = useMemo(() => calculateQuote(project), [project]);
 
@@ -310,21 +302,15 @@ export const QuotePanel: React.FC<Props> = ({ project, onUpdate }) => {
                       className={`rounded-2xl border border-slate-200 bg-white p-3 shadow-sm ${item.isManual ? "bg-amber-50/40" : ""}`}
                     >
                       <div className="flex items-start gap-3">
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-slate-200 bg-white">
-                          <img
-                            src={
-                              systemImageByLabel.get(String(item.label || "").toLowerCase().trim()) ||
-                              "/images/calculators/menuiseries.png"
-                            }
-                            alt=""
-                            className="h-full w-full object-cover"
-                            draggable={false}
-                            loading="lazy"
-                            onError={(e) => {
-                              (e.currentTarget as HTMLImageElement).src = "/images/calculators/menuiseries.png";
-                            }}
-                          />
-                        </div>
+                        {(() => {
+                          const visual = getLineVisual(item);
+                          const LineIcon = visual.icon;
+                          return (
+                            <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border ${visual.className}`}>
+                              <LineIcon size={18} />
+                            </div>
+                          );
+                        })()}
 
                         <div className="min-w-0 flex-1">
                           <div className="break-words font-medium text-slate-800">{item.label}</div>
@@ -389,21 +375,15 @@ export const QuotePanel: React.FC<Props> = ({ project, onUpdate }) => {
                         <tr key={`${section.id}-${idx}`} className={item.isManual ? "bg-amber-50/30" : ""}>
                           <td className="p-3 pl-4">
                             <div className="flex items-center gap-3">
-                              <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-xl border border-slate-200 bg-white">
-                                <img
-                                  src={
-                                    systemImageByLabel.get(String(item.label || "").toLowerCase().trim()) ||
-                                    "/images/calculators/menuiseries.png"
-                                  }
-                                  alt=""
-                                  className="h-full w-full object-cover"
-                                  draggable={false}
-                                  loading="lazy"
-                                  onError={(e) => {
-                                    (e.currentTarget as HTMLImageElement).src = "/images/calculators/menuiseries.png";
-                                  }}
-                                />
-                              </div>
+                              {(() => {
+                                const visual = getLineVisual(item);
+                                const LineIcon = visual.icon;
+                                return (
+                                  <div className={`flex h-9 w-9 items-center justify-center rounded-xl border ${visual.className}`}>
+                                    <LineIcon size={16} />
+                                  </div>
+                                );
+                              })()}
 
                               <div className="min-w-0">
                                 <div className="font-medium text-slate-800">{item.label}</div>

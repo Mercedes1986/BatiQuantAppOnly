@@ -1,7 +1,7 @@
 // MaterialsPage.tsx (updated: sizing + aesthetics for Categories & Products, keys unchanged)
 import React, { useEffect, useRef, useMemo, useState, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
-import { getMaterialImageUrl, getMaterialMetadata } from "../constants";
+import { getMaterialMetadata } from "../constants";
 import {
   Search,
   RotateCcw,
@@ -18,6 +18,7 @@ import {
   Info,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { CategoryBadge, CategoryVisual } from "../components/ui/CategoryVisual";
 
 import {
   getSystemMaterialsList,
@@ -400,19 +401,11 @@ export const MaterialsPage: React.FC = () => {
                         />
                       </button>
 
-                      {/* Bigger image */}
-                      <div className="w-20 h-20 rounded-2xl bg-white border border-slate-200 overflow-hidden flex items-center justify-center shrink-0">
-                        <img
-                          src={item.imageUrl || getMaterialImageUrl(String(item.key || ""))}
-                          alt={item.label || String(item.key || "") }
-                          className="w-full h-full object-cover"
-                          loading="lazy"
-                          draggable={false}
-                          onError={(e) => {
-                            (e.currentTarget as HTMLImageElement).src = "/images/materials/_missing.png";
-                          }}
-                        />
-                      </div>
+                      <CategoryVisual
+                        category={String(item.category || "")}
+                        label={String(item.label || item.key || "")}
+                        size="lg"
+                      />
 
                       <div className="min-w-0">
                         <span className="font-extrabold text-slate-900 block text-sm leading-snug truncate">
@@ -420,9 +413,12 @@ export const MaterialsPage: React.FC = () => {
                         </span>
 
                         <div className="flex flex-wrap gap-1.5 mt-1.5">
-                          <span className="text-[10px] uppercase font-extrabold text-slate-800 bg-slate-50 px-2 py-1 rounded-full border border-slate-200">
+                          <CategoryBadge
+                            category={String(item.category || "")}
+                            label={String(item.label || item.key || "")}
+                          >
                             {item.category}
-                          </span>
+                          </CategoryBadge>
 
                           {item.isMapped && (
                             <span className="text-[10px] font-extrabold text-emerald-800 bg-emerald-100/70 px-2 py-1 rounded-full border border-emerald-200 flex items-center">

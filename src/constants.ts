@@ -69,8 +69,6 @@ export const getCalculators = (): CalculatorConfig[] => [
     icon: "Mountain",
     color: "bg-stone-600",
     description: tr("calculators.groundwork.desc", "Excavation, trenches, backfill"),
-    imageSrc: "/images/calculators/terrassement.png",
-    imageAlt: tr("calculators.groundwork.alt", "Groundworks: excavation, trenches and backfill"),
   },
   {
     id: CalculatorType.FOUNDATIONS,
@@ -78,8 +76,6 @@ export const getCalculators = (): CalculatorConfig[] => [
     icon: "Warehouse",
     color: "bg-stone-700",
     description: tr("calculators.foundations.desc", "Footings, raft, concrete, rebar"),
-    imageSrc: "/images/calculators/fondations.png",
-    imageAlt: tr("calculators.foundations.alt", "Foundations: footings, raft, concrete and rebar"),
   },
   {
     id: CalculatorType.SUBSTRUCTURE,
@@ -87,8 +83,6 @@ export const getCalculators = (): CalculatorConfig[] => [
     icon: "Component",
     color: "bg-stone-600",
     description: tr("calculators.substructure.desc", "Crawl space, retaining walls, drainage"),
-    imageSrc: "/images/calculators/soubassement.png",
-    imageAlt: tr("calculators.substructure.alt", "Substructure: crawl space, retaining walls, drainage"),
   },
   {
     id: CalculatorType.CONCRETE,
@@ -96,8 +90,6 @@ export const getCalculators = (): CalculatorConfig[] => [
     icon: "Layers",
     color: "bg-gray-500",
     description: tr("calculators.concrete.desc", "Slabs, floors, mix ratios"),
-    imageSrc: "/images/calculators/beton-dalle.png",
-    imageAlt: tr("calculators.concrete.alt", "Concrete and slab: slabs, floors and mix ratios"),
   },
   {
     id: CalculatorType.WALLS,
@@ -105,8 +97,6 @@ export const getCalculators = (): CalculatorConfig[] => [
     icon: "BrickWall",
     color: "bg-stone-500",
     description: tr("calculators.walls.desc", "Blocks, bricks, lintels"),
-    imageSrc: "/images/calculators/murs.png",
-    imageAlt: tr("calculators.walls.alt", "Walls: blocks, bricks and lintels"),
   },
   {
     id: CalculatorType.STAIRS,
@@ -114,8 +104,6 @@ export const getCalculators = (): CalculatorConfig[] => [
     icon: "TrendingUp",
     color: "bg-stone-400",
     description: tr("calculators.stairs.desc", "Steps, slab, formwork"),
-    imageSrc: "/images/calculators/escalier-beton.png",
-    imageAlt: tr("calculators.stairs.alt", "Concrete stairs: steps, slab and formwork"),
   },
   {
     id: CalculatorType.ROOF,
@@ -123,8 +111,6 @@ export const getCalculators = (): CalculatorConfig[] => [
     icon: "Home",
     color: "bg-orange-600",
     description: tr("calculators.roof.desc", "Framing, tiles, gutters"),
-    imageSrc: "/images/calculators/toiture.png",
-    imageAlt: tr("calculators.roof.alt", "Roof: framing, tiles and gutters"),
   },
   {
     id: CalculatorType.JOINERY,
@@ -132,8 +118,6 @@ export const getCalculators = (): CalculatorConfig[] => [
     icon: "BoxSelect",
     color: "bg-sky-600",
     description: tr("calculators.joinery.desc", "Windows, doors, shutters"),
-    imageSrc: "/images/calculators/menuiseries.png",
-    imageAlt: tr("calculators.joinery.alt", "Joinery: windows, doors and shutters"),
   },
   {
     id: CalculatorType.PLACO,
@@ -141,8 +125,6 @@ export const getCalculators = (): CalculatorConfig[] => [
     icon: "Square",
     color: "bg-indigo-500",
     description: tr("calculators.placo.desc", "Partitions, linings, ceilings"),
-    imageSrc: "/images/calculators/placo-isolation.png",
-    imageAlt: tr("calculators.placo.alt", "Drywall and insulation: partitions, linings and ceilings"),
   },
   {
     id: CalculatorType.ELECTRICITY,
@@ -150,8 +132,6 @@ export const getCalculators = (): CalculatorConfig[] => [
     icon: "Zap",
     color: "bg-yellow-500",
     description: tr("calculators.electricity.desc", "Cables, conduits, devices"),
-    imageSrc: "/images/calculators/electricite.png",
-    imageAlt: tr("calculators.electricity.alt", "Electrical: cables, conduits and devices"),
   },
   {
     id: CalculatorType.PLUMBING,
@@ -159,8 +139,6 @@ export const getCalculators = (): CalculatorConfig[] => [
     icon: "Droplets",
     color: "bg-cyan-500",
     description: tr("calculators.plumbing.desc", "Pipes, drains, fittings"),
-    imageSrc: "/images/calculators/plomberie.png",
-    imageAlt: tr("calculators.plumbing.alt", "Plumbing: pipes, drains and fittings"),
   },
   {
     id: CalculatorType.HVAC,
@@ -168,8 +146,6 @@ export const getCalculators = (): CalculatorConfig[] => [
     icon: "Thermometer",
     color: "bg-red-500",
     description: tr("calculators.hvac.desc", "Ventilation, radiators, heat pumps"),
-    imageSrc: "/images/calculators/chauffage-vmc.png",
-    imageAlt: tr("calculators.hvac.alt", "Heating and ventilation: radiators, heat pumps and ventilation"),
   },
   {
     id: CalculatorType.SCREED,
@@ -177,8 +153,6 @@ export const getCalculators = (): CalculatorConfig[] => [
     icon: "Layers",
     color: "bg-stone-400",
     description: tr("calculators.screed.desc", "Liquid screed, traditional screed"),
-    imageSrc: "/images/calculators/chapes.png",
-    imageAlt: tr("calculators.screed.alt", "Screeds: liquid screed and traditional screed"),
   },
   {
     id: CalculatorType.TILES,
@@ -186,8 +160,6 @@ export const getCalculators = (): CalculatorConfig[] => [
     icon: "Grid3X3",
     color: "bg-teal-500",
     description: tr("calculators.tiles.desc", "Floor tiles, wall tiles, adhesive"),
-    imageSrc: "/images/calculators/carrelage.png",
-    imageAlt: tr("calculators.tiles.alt", "Tiling: floor tiles, wall tiles and adhesive"),
   },
   {
     id: CalculatorType.RAGREAGE,
@@ -195,8 +167,6 @@ export const getCalculators = (): CalculatorConfig[] => [
     icon: "Layers",
     color: "bg-amber-600",
     description: tr("calculators.leveling.desc", "Floor leveling (renovation)"),
-    imageSrc: "/images/calculators/ragreage.png",
-    imageAlt: tr("calculators.leveling.alt", "Leveling: floor leveling in renovation"),
   },
   {
     id: CalculatorType.PAINT,
@@ -204,8 +174,6 @@ export const getCalculators = (): CalculatorConfig[] => [
     icon: "PaintBucket",
     color: "bg-blue-500",
     description: tr("calculators.paint.desc", "Walls, ceilings"),
-    imageSrc: "/images/calculators/peinture.png",
-    imageAlt: tr("calculators.paint.alt", "Painting: walls and ceilings"),
   },
   {
     id: CalculatorType.FACADE,
@@ -213,8 +181,6 @@ export const getCalculators = (): CalculatorConfig[] => [
     icon: "PaintRoller",
     color: "bg-orange-300",
     description: tr("calculators.facade.desc", "Render, cladding"),
-    imageSrc: "/images/calculators/facade.png",
-    imageAlt: tr("calculators.facade.alt", "Facade: render and cladding"),
   },
   {
     id: CalculatorType.EXTERIOR,
@@ -222,8 +188,6 @@ export const getCalculators = (): CalculatorConfig[] => [
     icon: "Fence",
     color: "bg-green-600",
     description: tr("calculators.exterior.desc", "Terrace, fencing, paths"),
-    imageSrc: "/images/calculators/exterieurs.png",
-    imageAlt: tr("calculators.exterior.alt", "Exteriors: terrace, fencing and paths"),
   },
   {
     id: CalculatorType.QUICK_TOOLS,
@@ -231,8 +195,6 @@ export const getCalculators = (): CalculatorConfig[] => [
     icon: "Calculator",
     color: "bg-blue-700",
     description: tr("calculators.quick_tools.desc", "Conversions, net area, packaging, slope, linear runs, voltage drop"),
-    imageSrc: "/backgrounds/bg-menu.png",
-    imageAlt: tr("calculators.quick_tools.alt", "Quick site tools: conversions, net area, packaging and voltage drop"),
   },
 ];
 

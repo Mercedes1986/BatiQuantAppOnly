@@ -11,7 +11,6 @@ interface CalculatorCardProps {
 export const CalculatorCard: React.FC<CalculatorCardProps> = ({ config, onClick }) => {
   const { t } = useTranslation();
   const IconComponent = (Icons as any)[config.icon] || Icons.Calculator;
-  const [imgOk, setImgOk] = React.useState(true);
 
   return (
     <button
@@ -19,38 +18,28 @@ export const CalculatorCard: React.FC<CalculatorCardProps> = ({ config, onClick 
       onClick={onClick}
       className="group app-card w-full overflow-hidden rounded-[24px] text-left transition-all hover:border-blue-200 hover:shadow-md active:scale-[0.99]"
     >
-      <div className="relative h-[108px] sm:h-[118px]">
-        {config.imageSrc && imgOk ? (
-          <img
-            src={config.imageSrc}
-            alt={config.imageAlt || config.name}
-            className="absolute inset-0 h-full w-full object-cover"
-            loading="lazy"
-            decoding="async"
-            onError={() => setImgOk(false)}
-          />
-        ) : (
-          <div className="absolute inset-0 bg-gradient-to-br from-slate-100 to-slate-200" />
-        )}
-
-        <div className="absolute inset-0 bg-black/20" />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/72 via-black/38 to-transparent" />
-
-        <div className="relative flex h-full flex-col justify-center p-3 pr-12 sm:p-4 sm:pr-14">
-          <h3 className="line-clamp-2 text-[15px] font-extrabold leading-tight text-white drop-shadow-sm sm:text-base">
-            {config.name}
-          </h3>
-          <p className="mt-1 line-clamp-2 text-[12px] leading-snug text-white/90 drop-shadow-sm sm:text-sm">
-            {config.description}
-          </p>
-        </div>
-
-        <div className={`absolute right-3 top-3 rounded-xl border border-white/70 p-2 ${config.color} text-white shadow-md`}>
-          <IconComponent size={16} />
-        </div>
-
-        <div className="absolute bottom-3 right-3 text-white/80 transition-colors drop-shadow group-hover:text-white">
+      <div className="relative min-h-[108px] bg-gradient-to-br from-slate-50 via-white to-slate-100 p-3 sm:min-h-[118px] sm:p-4">
+        <div className="absolute right-3 top-3 text-slate-300 transition-colors group-hover:text-slate-400">
           <Icons.ChevronRight size={18} />
+        </div>
+
+        <div className="flex h-full items-start gap-3 pr-8 sm:gap-4 sm:pr-10">
+          <div className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-white/80 ${config.color} text-white shadow-sm sm:h-16 sm:w-16`}>
+            <IconComponent size={24} />
+          </div>
+
+          <div className="min-w-0 flex-1">
+            <h3 className="line-clamp-2 text-[15px] font-extrabold leading-tight text-slate-900 sm:text-base">
+              {config.name}
+            </h3>
+            <p className="mt-1 line-clamp-3 text-[12px] leading-snug text-slate-600 sm:text-sm">
+              {config.description}
+            </p>
+            <div className="mt-3 inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-slate-500">
+              <Icons.Sparkles size={12} className="text-slate-400" />
+              {t("calculator.ready", { defaultValue: "Ready to use" })}
+            </div>
+          </div>
         </div>
       </div>
 

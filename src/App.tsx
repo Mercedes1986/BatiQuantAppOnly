@@ -564,27 +564,6 @@ const AppLayout = () => {
   const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
   const bottomNavHostRef = useRef<HTMLDivElement | null>(null);
 
-  // Background image per section (served from /public/backgrounds)
-  const bgUrl = useMemo(() => {
-    // IMPORTANT: ensure absolute URLs in dev/prod.
-    // If BASE_URL is empty (common in dev), we still want `/backgrounds/...` (not `backgrounds/...`).
-    const rawBase = (import.meta.env.BASE_URL ?? "/") || "/";
-    const base = rawBase.replace(/\/+$/, "");
-    const p = location.pathname;
-
-    const pick = (name: string) => `${base}/backgrounds/${name}`;
-
-    if (p.includes("/app/house")) return pick("bg-house.png");
-    if (p.includes("/app/materials")) return pick("bg-materials.png");
-    if (p.includes("/app/settings") || p.includes("/app/help") || p.includes("/app/privacy")) return pick("bg-settings.png");
-    if (p.includes("/app/quotes") || p.includes("/app/invoices") || p.includes("/app/print")) return pick("bg-docs.png");
-    if (p.includes("/app/menu")) return pick("bg-menu.png");
-    if (p.includes("/app/quick-tools")) return pick("bg-menu.png");
-    // projects + calculators + calculator wrapper
-    if (p.includes("/app/projects") || p.includes("/app/calculators") || p.includes("/app/calculator")) return pick("bg-projects.png");
-    return pick("bg-menu.png");
-  }, [location.pathname]);
-
   const currentTab = location.pathname.startsWith("/app/menu")
     ? "menu"
     : location.pathname.includes("quick-tools")
@@ -720,7 +699,6 @@ const AppLayout = () => {
 
   return (
     <div className="app-bg app-shell-grid relative">
-      <div className="app-bg__image" style={{ backgroundImage: `url('${bgUrl}')` }} aria-hidden="true" />
       <div className="app-bg__veil" aria-hidden="true" />
 
       <main className="app-main relative z-10">

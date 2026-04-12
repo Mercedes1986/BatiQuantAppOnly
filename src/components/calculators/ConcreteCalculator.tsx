@@ -60,6 +60,7 @@ export const ConcreteCalculator: React.FC<Props> = ({ onCalculate, initialArea, 
 
   // --- 4. Pricing & Logistics ---
   const [usePump, setUsePump] = useState(false);
+  const [showPriceEditor, setShowPriceEditor] = useState(false);
 
   // helper price: catalog > defaultPrices > fallback
   const priceOr = (key: string, defaultVal: number) => {
@@ -129,6 +130,7 @@ export const ConcreteCalculator: React.FC<Props> = ({ onCalculate, initialArea, 
     if (values.useJoints !== undefined) setUseJoints(values.useJoints as any);
     if (values.jointSpacing !== undefined) setJointSpacing(values.jointSpacing as any);
     if (values.usePump !== undefined) setUsePump(values.usePump as any);
+    if (values.showPriceEditor !== undefined) setShowPriceEditor(values.showPriceEditor as any);
     if (values.prices !== undefined) setPrices(values.prices as any);
   }, [initialSnapshot]);
 
@@ -160,6 +162,7 @@ export const ConcreteCalculator: React.FC<Props> = ({ onCalculate, initialArea, 
       useJoints,
       jointSpacing,
       usePump,
+      showPriceEditor,
       prices,
     },
   };
@@ -868,67 +871,119 @@ export const ConcreteCalculator: React.FC<Props> = ({ onCalculate, initialArea, 
             {t("calc.concrete.step4.hint", { defaultValue: "Ajustez les prix unitaires." })}
           </div>
 
-          <div className="bg-white p-3 rounded-xl border border-slate-200">
-            <div className="flex justify-between items-center mb-3">
-              <h4 className="text-xs font-bold text-slate-500 uppercase">{t("calc.concrete.prices.title", { defaultValue: "Tarifs" })}</h4>
-              <button type="button" onClick={() => setProMode(!proMode)} className="text-xs flex items-center text-blue-600">
-                <Settings size={12} className="mr-1" />{" "}
-                {proMode ? t("calc.concrete.prices.pro", { defaultValue: "Mode Pro" }) : t("calc.concrete.prices.simple", { defaultValue: "Mode Simple" })}
-              </button>
+          <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h4 className="text-sm font-extrabold text-slate-900">
+                  {t("calc.concrete.prices.title", { defaultValue: "Tarifs" })}
+                </h4>
+                <p className="mt-1 text-xs text-slate-500">
+                  {t("calc.concrete.step4.compact_hint", { defaultValue: "Vous pouvez calculer directement avec les tarifs enregistrés puis ajuster uniquement si nécessaire." })}
+                </p>
+              </div>
+
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowPriceEditor((value) => !value)}
+                  className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-extrabold text-slate-700"
+                >
+                  {showPriceEditor
+                    ? t("common.hide", { defaultValue: "Hide" })
+                    : t("calc.concrete.prices.edit", { defaultValue: "Modifier les prix" })}
+                </button>
+                <button type="button" onClick={() => setProMode(!proMode)} className="rounded-xl border border-blue-100 bg-blue-50 px-3 py-2 text-xs font-extrabold text-blue-700">
+                  <Settings size={12} className="mr-1 inline-block" />
+                  {proMode ? t("calc.concrete.prices.pro", { defaultValue: "Mode Pro" }) : t("calc.concrete.prices.simple", { defaultValue: "Mode Simple" })}
+                </button>
+              </div>
             </div>
 
-            {isBPE ? (
-              <div className="grid grid-cols-2 gap-3 bg-blue-50 p-3 rounded border border-blue-100">
-                <div>
-                  <label className="block text-[10px] uppercase font-bold text-blue-800 mb-1">{t("calc.concrete.prices.bpe_m3", { defaultValue: "Ready-mix (€/m³)" })}</label>
-                  <input type="number" value={prices.concreteBPE} onChange={(e) => updatePrice("concreteBPE", e.target.value)} className="w-full p-2 text-sm border rounded bg-white text-slate-900" />
+            {!showPriceEditor ? (
+              <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
+                  <div className="text-[10px] font-bold uppercase tracking-wide text-slate-500">
+                    {isBPE ? t("calc.concrete.prices.bpe_m3", { defaultValue: "Ready-mix (€/m³)" }) : t("calc.concrete.prices.cement_bag", { defaultValue: "Cement (€/bag)" })}
+                  </div>
+                  <div className="mt-1 text-base font-extrabold text-slate-800">
+                    {isBPE ? prices.concreteBPE : prices.cementBag}
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-[10px] uppercase font-bold text-blue-800 mb-1">{t("calc.concrete.prices.delivery", { defaultValue: "Delivery (€)" })}</label>
-                  <input type="number" value={prices.delivery} onChange={(e) => updatePrice("delivery", e.target.value)} className="w-full p-2 text-sm border rounded bg-white text-slate-900" />
+                <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
+                  <div className="text-[10px] font-bold uppercase tracking-wide text-slate-500">
+                    {t("calc.concrete.prices.delivery", { defaultValue: "Delivery (€)" })}
+                  </div>
+                  <div className="mt-1 text-base font-extrabold text-slate-800">{prices.delivery}</div>
                 </div>
-                <div className="col-span-2">
-                  <label className="block text-[10px] uppercase font-bold text-blue-800 mb-1">{t("calc.concrete.prices.pump", { defaultValue: "Pump (€)" })}</label>
-                  <input type="number" value={prices.pump} onChange={(e) => updatePrice("pump", e.target.value)} className="w-full p-2 text-sm border rounded bg-white text-slate-900" />
+                <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
+                  <div className="text-[10px] font-bold uppercase tracking-wide text-slate-500">
+                    {t("calc.concrete.prices.mesh_panel", { defaultValue: "Mesh panel (€/panel)" })}
+                  </div>
+                  <div className="mt-1 text-base font-extrabold text-slate-800">{prices.meshPanel}</div>
+                </div>
+                <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
+                  <div className="text-[10px] font-bold uppercase tracking-wide text-slate-500">
+                    {t("calc.concrete.prices.formwork_m2", { defaultValue: "Formwork (€/m²)" })}
+                  </div>
+                  <div className="mt-1 text-base font-extrabold text-slate-800">{prices.formworkM2}</div>
                 </div>
               </div>
             ) : (
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-[10px] uppercase font-bold text-slate-500 mb-1">{t("calc.concrete.prices.cement_bag", { defaultValue: "Cement (€/bag)" })}</label>
-                  <input type="number" value={prices.cementBag} onChange={(e) => updatePrice("cementBag", e.target.value)} className="w-full p-2 text-sm border rounded bg-white text-slate-900" />
-                </div>
-                <div>
-                  <label className="block text-[10px] uppercase font-bold text-slate-500 mb-1">{t("calc.concrete.prices.sand_ton", { defaultValue: "Sand (€/t)" })}</label>
-                  <input type="number" value={prices.sandTon} onChange={(e) => updatePrice("sandTon", e.target.value)} className="w-full p-2 text-sm border rounded bg-white text-slate-900" />
-                </div>
-                <div>
-                  <label className="block text-[10px] uppercase font-bold text-slate-500 mb-1">{t("calc.concrete.prices.gravel_ton", { defaultValue: "Gravel (€/t)" })}</label>
-                  <input type="number" value={prices.gravelTon} onChange={(e) => updatePrice("gravelTon", e.target.value)} className="w-full p-2 text-sm border rounded bg-white text-slate-900" />
-                </div>
-              </div>
-            )}
+              <div className="mt-4 space-y-3">
+                {isBPE ? (
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                    <div>
+                      <label className="mb-1 block text-[10px] uppercase font-bold text-slate-500">{t("calc.concrete.prices.bpe_m3", { defaultValue: "Ready-mix (€/m³)" })}</label>
+                      <input type="number" value={prices.concreteBPE} onChange={(e) => updatePrice("concreteBPE", e.target.value)} className="w-full rounded-xl border border-slate-200 bg-white p-3 text-sm text-slate-900" />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-[10px] uppercase font-bold text-slate-500">{t("calc.concrete.prices.delivery", { defaultValue: "Delivery (€)" })}</label>
+                      <input type="number" value={prices.delivery} onChange={(e) => updatePrice("delivery", e.target.value)} className="w-full rounded-xl border border-slate-200 bg-white p-3 text-sm text-slate-900" />
+                    </div>
+                    <div className="sm:col-span-2">
+                      <label className="mb-1 block text-[10px] uppercase font-bold text-slate-500">{t("calc.concrete.prices.pump", { defaultValue: "Pump (€)" })}</label>
+                      <input type="number" value={prices.pump} onChange={(e) => updatePrice("pump", e.target.value)} className="w-full rounded-xl border border-slate-200 bg-white p-3 text-sm text-slate-900" />
+                    </div>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                    <div>
+                      <label className="mb-1 block text-[10px] uppercase font-bold text-slate-500">{t("calc.concrete.prices.cement_bag", { defaultValue: "Cement (€/bag)" })}</label>
+                      <input type="number" value={prices.cementBag} onChange={(e) => updatePrice("cementBag", e.target.value)} className="w-full rounded-xl border border-slate-200 bg-white p-3 text-sm text-slate-900" />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-[10px] uppercase font-bold text-slate-500">{t("calc.concrete.prices.sand_ton", { defaultValue: "Sand (€/t)" })}</label>
+                      <input type="number" value={prices.sandTon} onChange={(e) => updatePrice("sandTon", e.target.value)} className="w-full rounded-xl border border-slate-200 bg-white p-3 text-sm text-slate-900" />
+                    </div>
+                    <div className="sm:col-span-2">
+                      <label className="mb-1 block text-[10px] uppercase font-bold text-slate-500">{t("calc.concrete.prices.gravel_ton", { defaultValue: "Gravel (€/t)" })}</label>
+                      <input type="number" value={prices.gravelTon} onChange={(e) => updatePrice("gravelTon", e.target.value)} className="w-full rounded-xl border border-slate-200 bg-white p-3 text-sm text-slate-900" />
+                    </div>
+                  </div>
+                )}
 
-            <div className="grid grid-cols-2 gap-3 mt-3">
-              <div>
-                <label className="block text-[10px] uppercase font-bold text-slate-500 mb-1">{t("calc.concrete.prices.mesh_panel", { defaultValue: "Mesh panel (€/panel)" })}</label>
-                <input type="number" value={prices.meshPanel} onChange={(e) => updatePrice("meshPanel", e.target.value)} className="w-full p-2 text-sm border rounded bg-white text-slate-900" />
-              </div>
-              <div>
-                <label className="block text-[10px] uppercase font-bold text-slate-500 mb-1">{t("calc.concrete.prices.formwork_m2", { defaultValue: "Formwork (€/m²)" })}</label>
-                <input type="number" value={prices.formworkM2} onChange={(e) => updatePrice("formworkM2", e.target.value)} className="w-full p-2 text-sm border rounded bg-white text-slate-900" />
-              </div>
-            </div>
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <div>
+                    <label className="mb-1 block text-[10px] uppercase font-bold text-slate-500">{t("calc.concrete.prices.mesh_panel", { defaultValue: "Mesh panel (€/panel)" })}</label>
+                    <input type="number" value={prices.meshPanel} onChange={(e) => updatePrice("meshPanel", e.target.value)} className="w-full rounded-xl border border-slate-200 bg-white p-3 text-sm text-slate-900" />
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-[10px] uppercase font-bold text-slate-500">{t("calc.concrete.prices.formwork_m2", { defaultValue: "Formwork (€/m²)" })}</label>
+                    <input type="number" value={prices.formworkM2} onChange={(e) => updatePrice("formworkM2", e.target.value)} className="w-full rounded-xl border border-slate-200 bg-white p-3 text-sm text-slate-900" />
+                  </div>
+                </div>
 
-            {proMode && (
-              <div className="mt-4 pt-3 border-t border-slate-100">
-                <label className="block text-[10px] text-blue-600 font-bold mb-1">{t("calc.concrete.prices.labor_m2", { defaultValue: "Labor (€/m²)" })}</label>
-                <input type="number" value={prices.laborM2} onChange={(e) => updatePrice("laborM2", e.target.value)} className="w-full p-2 text-sm border border-blue-200 rounded bg-white text-slate-900" />
+                {proMode && (
+                  <div>
+                    <label className="mb-1 block text-[10px] font-bold uppercase text-blue-600">{t("calc.concrete.prices.labor_m2", { defaultValue: "Labor (€/m²)" })}</label>
+                    <input type="number" value={prices.laborM2} onChange={(e) => updatePrice("laborM2", e.target.value)} className="w-full rounded-xl border border-blue-200 bg-white p-3 text-sm text-slate-900" />
+                  </div>
+                )}
               </div>
             )}
           </div>
 
-          <div className="flex flex-col gap-3 pt-4 sm:flex-row">
+          <div className="flex flex-col gap-3 pt-2 sm:flex-row">
             <button type="button" onClick={() => setStep(3)} className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-extrabold shadow-sm">
               {t("common.back", { defaultValue: "Back" })}
             </button>

@@ -57,6 +57,8 @@ export const CalculatorPage: React.FC<Props> = ({ type, onBack, onNavigateProjec
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [newProjectName, setNewProjectName] = useState("");
   const [showTips, setShowTips] = useState(false);
+  const [showResultDetails, setShowResultDetails] = useState(false);
+  const [showMaterials, setShowMaterials] = useState(false);
 
   const calculationSequenceRef = useRef(0);
 
@@ -106,6 +108,8 @@ export const CalculatorPage: React.FC<Props> = ({ type, onBack, onNavigateProjec
 
     if (sequence !== calculationSequenceRef.current) return;
     setResult(nextResult);
+    setShowResultDetails(false);
+    setShowMaterials(false);
     armInterstitialAfterCalculation("calculator_interstitial", { contextKey: resultKey });
   }, [type]);
 
@@ -284,25 +288,95 @@ export const CalculatorPage: React.FC<Props> = ({ type, onBack, onNavigateProjec
 
         {displayResult && (
           <div className="animate-in slide-in-from-bottom-2 space-y-4">
-            <div className="app-card rounded-[28px] border-l-4 border-blue-600 p-6">
+            <div className="app-card rounded-[28px] border-l-4 border-blue-600 p-5">
               <h2 className="mb-1 text-sm uppercase tracking-wider text-slate-500">
                 {t("calculator.result_estimated", {
                   defaultValue: "Estimated result",
                 })}
               </h2>
-              <p className="mb-4 text-3xl font-bold text-slate-900">{displayResult.summary}</p>
+              <p className="text-2xl font-bold text-slate-900 sm:text-3xl">{displayResult.summary}</p>
 
-              <div className="grid grid-cols-1 gap-3 border-t border-slate-100 pt-4 text-sm sm:grid-cols-2 sm:gap-4">
-                {Array.isArray(displayResult.details) &&
-                  displayResult.details.map((detail: any, index: number) => (
-                    <div key={index}>
-                      <span className="block text-slate-500">{detail.label}</span>
-                      <span className="font-semibold text-slate-800">
-                        {detail.value} {detail.unit}
-                      </span>
-                    </div>
-                  ))}
+              <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <div className="rounded-2xl border border-emerald-100 bg-emerald-50 px-4 py-3">
+                  <div className="text-xs font-bold uppercase tracking-wide text-emerald-700">
+                    {t("common.total", { defaultValue: "Total" })}
+                  </div>
+                  <div className="mt-1 text-xl font-extrabold text-emerald-700">
+                    {euro.format(Number(displayResult.totalCost || 0))}
+                  </div>
+                </div>
+                <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+                  <div className="text-xs font-bold uppercase tracking-wide text-slate-500">
+                    {t("calculator.materials_estimated", { defaultValue: "Estimated materials" })}
+                  </div>
+                  <div className="mt-1 text-xl font-extrabold text-slate-800">
+                    {displayResult.materials.length}
+                  </div>
+                </div>
               </div>
+
+              <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+                <button
+                  type="button"
+                  onClick={() => setShowResultDetails((value) => !value)}
+                  className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-extrabold text-slate-700"
+                >
+                  {showResultDetails
+                    ? t("common.hide", { defaultValue: "Hide" })
+                    : t("common.details", { defaultValue: "Details" })}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowMaterials((value) => !value)}
+                  className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-extrabold text-slate-700"
+                >
+                  {showMaterials
+                    ? t("common.hide", { defaultValue: "Hide" })
+                    : t("calculator.materials_estimated", { defaultValue: "Estimated materials" })}
+                </button>
+              </div>
+
+              {showResultDetails && (
+                <div className="mt-4 grid grid-cols-1 gap-3 border-t border-slate-100 pt-4 text-sm sm:grid-cols-2 sm:gap-4">
+                  {Array.isArray(displayResult.details) &&
+                    displayResult.details.map((detail: any, index: number) => (
+                      <div key={index}>
+                        <span className="block text-slate-500">{detail.label}</span>
+                        <span className="font-semibold text-slate-800">
+                          {detail.value} {detail.unit}
+                        </span>
+                      </div>
+                    ))}
+                </div>
+              )}
+
+              {showMaterials && (
+                <div className="mt-4 border-t border-slate-100 pt-4">
+                  <ul className="space-y-3 text-sm">
+                    {Array.isArray(displayResult.materials) &&
+                      displayResult.materials.map((material: any) => (
+                        <li key={material.id} className="border-b border-slate-50 pb-2 last:border-0">
+                          <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                            <div className="min-w-0 flex items-start gap-3">
+                              <span className="truncate font-medium text-slate-700">
+                                {material.name}
+                              </span>
+                            </div>
+
+                            <span className="self-start rounded bg-slate-100 px-2 py-0.5 font-extrabold text-slate-800 sm:self-auto sm:whitespace-nowrap">
+                              {material.quantity} {material.unit}
+                            </span>
+                          </div>
+                          {material.details && (
+                            <p className="mt-1 border-l-2 border-slate-200 pl-2 text-xs italic text-slate-500">
+                              {material.details}
+                            </p>
+                          )}
+                        </li>
+                      ))}
+                  </ul>
+                </div>
+              )}
 
               {Array.isArray(displayResult.warnings) && displayResult.warnings.length > 0 && (
                 <div className="mt-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
@@ -317,43 +391,6 @@ export const CalculatorPage: React.FC<Props> = ({ type, onBack, onNavigateProjec
                   </ul>
                 </div>
               )}
-            </div>
-
-            <div className="app-card rounded-[28px] p-4">
-              <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                <h3 className="font-extrabold text-slate-800">
-                  {t("calculator.materials_estimated", {
-                    defaultValue: "Estimated materials",
-                  })}
-                </h3>
-                <span className="text-lg font-extrabold text-emerald-600">
-                  ~ {euro.format(Number(displayResult.totalCost || 0))}
-                </span>
-              </div>
-
-              <ul className="space-y-3 text-sm">
-                {Array.isArray(displayResult.materials) &&
-                  displayResult.materials.map((material: any) => (
-                    <li key={material.id} className="border-b border-slate-50 pb-2 last:border-0">
-                      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-                        <div className="min-w-0 flex items-start gap-3">
-                          <span className="truncate font-medium text-slate-700">
-                            {material.name}
-                          </span>
-                        </div>
-
-                        <span className="self-start rounded bg-slate-100 px-2 py-0.5 font-extrabold text-slate-800 sm:self-auto sm:whitespace-nowrap">
-                          {material.quantity} {material.unit}
-                        </span>
-                      </div>
-                      {material.details && (
-                        <p className="mt-1 border-l-2 border-slate-200 pl-2 text-xs italic text-slate-500">
-                          {material.details}
-                        </p>
-                      )}
-                    </li>
-                  ))}
-              </ul>
             </div>
 
             <div className="rounded-[28px] border border-blue-100 bg-blue-50 p-4">

@@ -29,7 +29,7 @@ import {
 import { HouseProject, ConstructionStepId, ClientInfo, CalculatorType } from "@/types";
 import { getConstructionSteps, type ConstructionStepDef, type ConstructionStepGroup } from "@/constants";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { QuotePanel } from "@/components/quote/QuotePanel";
+import { QuotePanel } from "../components/quote/QuotePanel";
 import { calculateQuote } from "@/services/quote";
 import { createQuoteFromProject } from "@/services/documentLogic";
 import { getCompanyProfile, getQuotes } from "@/services/documentsStorage";
