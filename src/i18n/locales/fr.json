@@ -63,7 +63,8 @@
     "shopping_list": "Liste d’achats",
     "tech_details": "Détails techniques",
     "tips_prefix": "Astuce :",
-    "title_fallback": "Calculateur"
+    "title_fallback": "Calculateur",
+    "ready": "Prêt à l'emploi"
   },
   "nav": {
     "menu": "Accueil",
