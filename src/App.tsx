@@ -153,7 +153,7 @@ const SubstructureCalculator = lazyNamed(() =>
   import("@/components/calculators/SubstructureCalculator").then((m) => ({ default: m.SubstructureCalculator }))
 );
 const RoofCalculator = lazyNamed(() =>
-  import("@/components/calculators/RoofCalculator").then((m) => ({ default: m.RoofCalculator }))
+  import("./components/calculators/RoofCalculator").then((m) => ({ default: m.RoofCalculator }))
 );
 const JoineryCalculator = lazyNamed(() =>
   import("@/components/calculators/JoineryCalculator").then((m) => ({ default: m.JoineryCalculator }))

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { CalculatorType, CalculationResult, Unit, CalculatorSnapshot } from "@/types";
 import { DEFAULT_PRICES } from "../../constants";
@@ -44,7 +44,7 @@ const priceOr = (key: string, fallback: number) => {
 export const RoofCalculator: React.FC<Props> = ({ onCalculate,
   initialSnapshot
 }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const [step, setStep] = useState(1);
   const [proMode, setProMode] = useState(false);
@@ -71,9 +71,9 @@ export const RoofCalculator: React.FC<Props> = ({ onCalculate,
   const [downspouts, setDownspouts] = useState<number>(4);
   const [valleyLen, setValleyLen] = useState<string>("0"); // m
 
-  const coverLabel = (m: CoverMaterial) => t(`calc.roof.cover.${m}`, { defaultValue: m });
-  const gutterLabel = (g: GutterType) => t(`calc.roof.gutter.${g}`, { defaultValue: g });
-  const roofTypeLabel = (rt: RoofType) => t(`calc.roof.type.${rt}`, { defaultValue: rt });
+  const coverLabel = useCallback((m: CoverMaterial) => t(`calc.roof.cover.${m}`, { defaultValue: m }), [t, i18n.language]);
+  const gutterLabel = useCallback((g: GutterType) => t(`calc.roof.gutter.${g}`, { defaultValue: g }), [t, i18n.language]);
+  const roofTypeLabel = useCallback((rt: RoofType) => t(`calc.roof.type.${rt}`, { defaultValue: rt }), [t, i18n.language]);
 
   // --- 5. Pricing ---
   const [prices, setPrices] = useState(() => ({
@@ -116,7 +116,7 @@ export const RoofCalculator: React.FC<Props> = ({ onCalculate,
     if (values.prices !== undefined) setPrices(values.prices as any);
   }, [initialSnapshot]);
 
-  const snapshot: CalculatorSnapshot = {
+  const snapshot: CalculatorSnapshot = useMemo(() => ({
     version: 1,
     calculatorType: CalculatorType.ROOF,
     values: {
@@ -138,7 +138,25 @@ export const RoofCalculator: React.FC<Props> = ({ onCalculate,
       valleyLen,
       prices,
     },
-  };
+  }), [
+    step,
+    proMode,
+    roofType,
+    dimL,
+    dimW,
+    overhang,
+    slope,
+    coverMaterial,
+    wastePct,
+    useScreen,
+    useInsulation,
+    insulThick,
+    useVapor,
+    gutterType,
+    downspouts,
+    valleyLen,
+    prices,
+  ]);
 
 
   // --- Auto-update Defaults based on Cover Material (non-destructive) ---
@@ -482,36 +500,50 @@ export const RoofCalculator: React.FC<Props> = ({ onCalculate,
     gutterLabel,
   ]);
 
-  useEffect(() => {
-    if (!calculationData.ok) {
-      onCalculate({
-      snapshot,
-        summary: t("calc.roof.title", { defaultValue: "Roof" }),
-        details: [],
-        materials: [],
-        totalCost: 0,
-        warnings: [t("calc.roof.warn.fill_dims", { defaultValue: "Fill in Length and Width to calculate the roof." })],
-      });
-      return;
-    }
+  const emittedResultKeyRef = useRef<string>("");
 
-    onCalculate({
-      summary: t("calc.roof.summary", {
-        area: calculationData.realArea.toFixed(1),
-        defaultValue: `${calculationData.realArea.toFixed(1)} m²`,
-      }),
-      details: [
-        { label: t("calc.roof.detail.projected_area", { defaultValue: "Projected area" }), value: calculationData.projectedArea.toFixed(1), unit: "m²" },
-        { label: t("calc.roof.detail.slope", { defaultValue: "Slope" }), value: slope, unit: "%" },
-        { label: t("calc.roof.detail.real_area", { defaultValue: "Roof area" }), value: calculationData.realArea.toFixed(1), unit: "m²" },
-        { label: t("calc.roof.detail.ridge", { defaultValue: "Ridge" }), value: calculationData.ridgeLen.toFixed(1), unit: "m" },
-        { label: t("calc.roof.detail.eaves", { defaultValue: "Eaves" }), value: calculationData.eavesLen.toFixed(1), unit: "m" },
-      ],
-      materials: calculationData.materials,
-      totalCost: calculationData.totalCost,
-      warnings: calculationData.warnings.length ? calculationData.warnings : undefined,
+  useEffect(() => {
+    const nextResult: CalculationResult = !calculationData.ok
+      ? {
+          snapshot,
+          summary: t("calc.roof.title", { defaultValue: "Roof" }),
+          details: [],
+          materials: [],
+          totalCost: 0,
+          warnings: [t("calc.roof.warn.fill_dims", { defaultValue: "Fill in Length and Width to calculate the roof." })],
+        }
+      : {
+          snapshot,
+          summary: t("calc.roof.summary", {
+            area: calculationData.realArea.toFixed(1),
+            defaultValue: `${calculationData.realArea.toFixed(1)} m²`,
+          }),
+          details: [
+            { label: t("calc.roof.detail.projected_area", { defaultValue: "Projected area" }), value: calculationData.projectedArea.toFixed(1), unit: "m²" },
+            { label: t("calc.roof.detail.slope", { defaultValue: "Slope" }), value: slope, unit: "%" },
+            { label: t("calc.roof.detail.real_area", { defaultValue: "Roof area" }), value: calculationData.realArea.toFixed(1), unit: "m²" },
+            { label: t("calc.roof.detail.ridge", { defaultValue: "Ridge" }), value: calculationData.ridgeLen.toFixed(1), unit: "m" },
+            { label: t("calc.roof.detail.eaves", { defaultValue: "Eaves" }), value: calculationData.eavesLen.toFixed(1), unit: "m" },
+          ],
+          materials: calculationData.materials,
+          totalCost: calculationData.totalCost,
+          warnings: calculationData.warnings.length ? calculationData.warnings : undefined,
+        };
+
+    const nextKey = JSON.stringify({
+      ok: calculationData.ok,
+      step,
+      summary: nextResult.summary,
+      totalCost: nextResult.totalCost,
+      details: nextResult.details,
+      materials: nextResult.materials,
+      warnings: nextResult.warnings,
     });
-  }, [calculationData, onCalculate, slope, t]);
+
+    if (nextKey === emittedResultKeyRef.current) return;
+    emittedResultKeyRef.current = nextKey;
+    onCalculate(nextResult);
+  }, [calculationData, onCalculate, slope, snapshot, step, t]);
 
   const stepTitle = (s: number) => t(`calc.roof.steps.${s}`, { defaultValue: String(s) });
 
