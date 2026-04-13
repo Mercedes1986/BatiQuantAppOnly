@@ -38,7 +38,9 @@
     "waste_plus": "Pertes +",
     "back_to_quote": "Retour au devis",
     "open": "Ouvrir",
-    "total": "Total"
+    "total": "Total",
+    "hide": "Masquer",
+    "details": "Détails"
   },
   "calculator": {
     "open": "Ouvrir le calculateur",
@@ -2867,6 +2869,43 @@
     "exterior": {
       "1": "Compactez par couches : la majorité des désordres extérieurs vient d’une préparation de support insuffisante.",
       "2": "Intégrez le drainage dès la conception (pentes, évacuation loin du bâtiment, couches perméables)."
+    },
+    "placo": {
+      "1": "Décalez les joints des plaques et espacez les vis d’environ 30 cm pour un doublage standard.",
+      "2": "Ajoutez une bande résiliente sous les rails pour limiter les ponts acoustiques."
+    },
+    "elec": {
+      "1": "Regroupez les circuits par usage et prévoyez des lignes dédiées pour les gros appareils.",
+      "2": "Anticipez les cheminements avant de saigner : des parcours plus courts réduisent câble, gaine et main-d’œuvre."
+    },
+    "plumbing": {
+      "1": "Privilégiez une distribution en nourrice lorsque l’accès maintenance est simple : l’équilibrage est plus facile.",
+      "2": "Respectez les bonnes pentes d’évacuation et évitez les changements de direction trop serrés."
+    },
+    "roof": {
+      "1": "Vérifiez les pentes minimales imposées par le matériau de couverture (tuiles, zinc, membranes).",
+      "2": "Ajoutez une marge pour les découpes autour des noues, arêtiers et pénétrations."
+    },
+    "screed": {
+      "1": "Respectez les temps de prise et de séchage avant la pose du revêtement de sol.",
+      "2": "Utilisez une bande périphérique pour limiter les fissures et améliorer l’acoustique."
+    },
+    "leveling": {
+      "1": "Le primaire est essentiel : il améliore l’adhérence et limite les bulles sur les supports poreux.",
+      "2": "Pour les fortes épaisseurs, prévoyez éventuellement des fibres ou une trame selon le support."
+    },
+    "tiles": {
+      "1": "Faites un calepinage à blanc sur quelques rangs pour valider le tracé et limiter les petites coupes.",
+      "2": "Utilisez la bonne taille de peigne : les grands formats demandent plus de colle et souvent un double encollage."
+    },
+    "facade": {
+      "1": "Vérifiez la compatibilité du support entre enduit et peinture, notamment sur la perméabilité à la vapeur.",
+      "2": "Anticipez l’échafaudage : il représente souvent une part importante du coût."
+    },
+    "quick": {
+      "1": "Utilisez ces outils pour des estimations rapides sur chantier, puis validez le dimensionnement final avant achat ou exécution.",
+      "2": "Gardez une marge de perte réaliste : coupes, recouvrements et contraintes de chantier ajoutent souvent 5 à 15 %.",
+      "3": "Pour les dimensionnements électriques, vérifiez toujours les normes applicables et les conditions de pose."
     }
   },
   "packaging": {

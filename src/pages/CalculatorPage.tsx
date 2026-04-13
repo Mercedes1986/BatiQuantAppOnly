@@ -70,22 +70,41 @@ export const CalculatorPage: React.FC<Props> = ({ type, onBack, onNavigateProjec
     return {
       ...result,
       summary: localizeLegacyText(result.summary),
-      details: result.details.map((detail) => ({
-        ...detail,
-        label: localizeLegacyText(detail.label),
-        value:
-          typeof detail.value === "string"
-            ? localizeLegacyText(detail.value)
-            : detail.value,
-      })),
-      materials: result.materials.map((material) => ({
-        ...material,
-        name: localizeLegacyText(material.name),
-        details: material.details ? localizeLegacyText(material.details) : material.details,
-      })),
+      details: Array.isArray(result.details)
+        ? result.details
+            .map((detail) => ({
+              ...detail,
+              label: localizeLegacyText(detail.label),
+              value:
+                typeof detail.value === "string"
+                  ? localizeLegacyText(detail.value)
+                  : detail.value,
+            }))
+            .filter(
+              (detail) =>
+                Boolean(detail?.label) &&
+                detail?.value !== undefined &&
+                detail?.value !== null &&
+                `${detail.value}`.trim() !== "",
+            )
+        : [],
+      materials: Array.isArray(result.materials)
+        ? result.materials.map((material) => ({
+            ...material,
+            name: localizeLegacyText(material.name),
+            details: material.details ? localizeLegacyText(material.details) : material.details,
+          }))
+        : [],
       warnings: result.warnings?.map((warning) => localizeLegacyText(warning)),
     };
   }, [result, i18n.language]);
+
+  const hasResultDetails = Boolean(
+    displayResult && Array.isArray(displayResult.details) && displayResult.details.length > 0,
+  );
+  const hasResultMaterials = Boolean(
+    displayResult && Array.isArray(displayResult.materials) && displayResult.materials.length > 0,
+  );
 
   const euro = useMemo(
     () =>
@@ -191,7 +210,7 @@ export const CalculatorPage: React.FC<Props> = ({ type, onBack, onNavigateProjec
     const dateLabel = new Date().toLocaleDateString(i18n.language || "en-GB");
     const projectNotes =
       tips.length > 0
-        ? `${t("calculator.tips_prefix", { defaultValue: "Pro tips:" })}\n${tips
+        ? `${t("calculator.tips_prefix", { defaultValue: "Astuces Pro :" })}\n${tips
             .map((entry: string) => `- ${entry}`)
             .join("\n")}`
         : "";
@@ -215,6 +234,15 @@ export const CalculatorPage: React.FC<Props> = ({ type, onBack, onNavigateProjec
     await onNavigateProjects();
   };
 
+  useEffect(() => {
+    if (!hasResultDetails && showResultDetails) {
+      setShowResultDetails(false);
+    }
+    if (!hasResultMaterials && showMaterials) {
+      setShowMaterials(false);
+    }
+  }, [hasResultDetails, hasResultMaterials, showMaterials, showResultDetails]);
+
   const handleShare = async () => {
     if (!displayResult) return;
 
@@ -222,7 +250,7 @@ export const CalculatorPage: React.FC<Props> = ({ type, onBack, onNavigateProjec
       `${config.name} — BatiQuant`,
       displayResult.summary,
       "",
-      t("calculator.materials_estimated", { defaultValue: "Estimated materials" }),
+      t("calculator.materials_estimated", { defaultValue: "Matériaux estimés" }),
       ...displayResult.materials.map(
         (material) => `• ${material.name}: ${material.quantity} ${material.unit}`,
       ),
@@ -307,7 +335,7 @@ export const CalculatorPage: React.FC<Props> = ({ type, onBack, onNavigateProjec
                 </div>
                 <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
                   <div className="text-xs font-bold uppercase tracking-wide text-slate-500">
-                    {t("calculator.materials_estimated", { defaultValue: "Estimated materials" })}
+                    {t("calculator.materials_estimated", { defaultValue: "Matériaux estimés" })}
                   </div>
                   <div className="mt-1 text-xl font-extrabold text-slate-800">
                     {displayResult.materials.length}
@@ -315,28 +343,34 @@ export const CalculatorPage: React.FC<Props> = ({ type, onBack, onNavigateProjec
                 </div>
               </div>
 
-              <div className="mt-4 flex flex-col gap-2 sm:flex-row">
-                <button
-                  type="button"
-                  onClick={() => setShowResultDetails((value) => !value)}
-                  className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-extrabold text-slate-700"
-                >
-                  {showResultDetails
-                    ? t("common.hide", { defaultValue: "Hide" })
-                    : t("common.details", { defaultValue: "Details" })}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setShowMaterials((value) => !value)}
-                  className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-extrabold text-slate-700"
-                >
-                  {showMaterials
-                    ? t("common.hide", { defaultValue: "Hide" })
-                    : t("calculator.materials_estimated", { defaultValue: "Estimated materials" })}
-                </button>
-              </div>
+              {(hasResultDetails || hasResultMaterials) && (
+                <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+                  {hasResultDetails && (
+                    <button
+                      type="button"
+                      onClick={() => setShowResultDetails((value) => !value)}
+                      className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-extrabold text-slate-700"
+                    >
+                      {showResultDetails
+                        ? t("common.hide", { defaultValue: "Masquer" })
+                        : t("common.details", { defaultValue: "Détails" })}
+                    </button>
+                  )}
+                  {hasResultMaterials && (
+                    <button
+                      type="button"
+                      onClick={() => setShowMaterials((value) => !value)}
+                      className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-extrabold text-slate-700"
+                    >
+                      {showMaterials
+                        ? t("common.hide", { defaultValue: "Masquer" })
+                        : t("calculator.materials_estimated", { defaultValue: "Matériaux estimés" })}
+                    </button>
+                  )}
+                </div>
+              )}
 
-              {showResultDetails && (
+              {showResultDetails && hasResultDetails && (
                 <div className="mt-4 grid grid-cols-1 gap-3 border-t border-slate-100 pt-4 text-sm sm:grid-cols-2 sm:gap-4">
                   {Array.isArray(displayResult.details) &&
                     displayResult.details.map((detail: any, index: number) => (
@@ -350,7 +384,7 @@ export const CalculatorPage: React.FC<Props> = ({ type, onBack, onNavigateProjec
                 </div>
               )}
 
-              {showMaterials && (
+              {showMaterials && hasResultMaterials && (
                 <div className="mt-4 border-t border-slate-100 pt-4">
                   <ul className="space-y-3 text-sm">
                     {Array.isArray(displayResult.materials) &&
@@ -411,8 +445,8 @@ export const CalculatorPage: React.FC<Props> = ({ type, onBack, onNavigateProjec
                     />
                     <span>
                       {showTips
-                        ? t("calculator.hide_tips", { defaultValue: "Hide tips" })
-                        : t("calculator.pro_tips", { defaultValue: "Pro tips" })}
+                        ? t("calculator.hide_tips", { defaultValue: "Masquer les astuces" })
+                        : t("calculator.pro_tips", { defaultValue: "Astuces Pro" })}
                     </span>
                   </button>
                 )}
@@ -421,7 +455,7 @@ export const CalculatorPage: React.FC<Props> = ({ type, onBack, onNavigateProjec
                   <div className="col-span-2 animate-in fade-in slide-in-from-top-2 rounded-xl border border-amber-100 bg-amber-50 p-4 text-sm text-amber-900">
                     <h4 className="mb-2 flex items-center font-extrabold">
                       <CheckCircle2 size={16} className="mr-2" />
-                      {t("calculator.best_practices", { defaultValue: "Best practices" })}
+                      {t("calculator.best_practices", { defaultValue: "Bonnes pratiques" })}
                     </h4>
                     <ul className="space-y-2">
                       {tips.map((tip: string, index: number) => (
