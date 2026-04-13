@@ -20,7 +20,7 @@ import { BottomNav } from "./components/BottomNav";
 
 // App pages
 import { DashboardPage } from "./pages/DashboardPage";
-import { CalculatorPage } from "./pages/CalculatorPage";
+import CalculatorPage from "./pages/CalculatorPage";
 import { ProjectsPage } from "./pages/ProjectsPage";
 import { SettingsPage } from "./pages/SettingsPage";
 import { HouseProjectPage } from "./pages/HouseProjectPage";

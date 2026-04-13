@@ -569,3 +569,5 @@ export const CalculatorPage: React.FC<Props> = ({ type, onBack, onNavigateProjec
     </div>
   );
 };
+
+export default CalculatorPage;

@@ -41,10 +41,31 @@ const priceOr = (key: string, fallback: number) => {
   return fallback;
 };
 
+const buildRoofEmissionSignature = (result: CalculationResult) =>
+  JSON.stringify({
+    summary: result.summary,
+    totalCost: Number(result.totalCost || 0),
+    details: Array.isArray(result.details)
+      ? result.details.map((detail) => ({
+          label: detail.label,
+          value: detail.value,
+          unit: detail.unit || "",
+        }))
+      : [],
+    materials: Array.isArray(result.materials)
+      ? result.materials.map((material) => ({
+          id: material.id,
+          quantity: Number(material.quantity || 0),
+          totalPrice: Number(material.totalPrice || 0),
+        }))
+      : [],
+    warnings: Array.isArray(result.warnings) ? result.warnings : [],
+  });
+
 export const RoofCalculator: React.FC<Props> = ({ onCalculate,
   initialSnapshot
 }) => {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
 
   const [step, setStep] = useState(1);
   const [proMode, setProMode] = useState(false);
@@ -71,9 +92,9 @@ export const RoofCalculator: React.FC<Props> = ({ onCalculate,
   const [downspouts, setDownspouts] = useState<number>(4);
   const [valleyLen, setValleyLen] = useState<string>("0"); // m
 
-  const coverLabel = useCallback((m: CoverMaterial) => t(`calc.roof.cover.${m}`, { defaultValue: m }), [t, i18n.language]);
-  const gutterLabel = useCallback((g: GutterType) => t(`calc.roof.gutter.${g}`, { defaultValue: g }), [t, i18n.language]);
-  const roofTypeLabel = useCallback((rt: RoofType) => t(`calc.roof.type.${rt}`, { defaultValue: rt }), [t, i18n.language]);
+  const coverLabel = useCallback((m: CoverMaterial) => t(`calc.roof.cover.${m}`, { defaultValue: m }), [t]);
+  const gutterLabel = useCallback((g: GutterType) => t(`calc.roof.gutter.${g}`, { defaultValue: g }), [t]);
+  const roofTypeLabel = useCallback((rt: RoofType) => t(`calc.roof.type.${rt}`, { defaultValue: rt }), [t]);
 
   // --- 5. Pricing ---
   const [prices, setPrices] = useState(() => ({
@@ -530,20 +551,12 @@ export const RoofCalculator: React.FC<Props> = ({ onCalculate,
           warnings: calculationData.warnings.length ? calculationData.warnings : undefined,
         };
 
-    const nextKey = JSON.stringify({
-      ok: calculationData.ok,
-      step,
-      summary: nextResult.summary,
-      totalCost: nextResult.totalCost,
-      details: nextResult.details,
-      materials: nextResult.materials,
-      warnings: nextResult.warnings,
-    });
+    const nextKey = buildRoofEmissionSignature(nextResult);
 
     if (nextKey === emittedResultKeyRef.current) return;
     emittedResultKeyRef.current = nextKey;
     onCalculate(nextResult);
-  }, [calculationData, onCalculate, slope, snapshot, step, t]);
+  }, [calculationData, onCalculate, slope, snapshot, t]);
 
   const stepTitle = (s: number) => t(`calc.roof.steps.${s}`, { defaultValue: String(s) });
 
