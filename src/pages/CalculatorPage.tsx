@@ -28,14 +28,14 @@ import { StructuralCalculator } from "../components/calculators/StructuralCalcul
 import { SubstructureCalculator } from "../components/calculators/SubstructureCalculator";
 import { TileCalculator } from "../components/calculators/TileCalculator";
 import { getCalculators, getStaticTips, localizeLegacyText } from "../constants";
-import { armInterstitialAfterCalculation, clearPendingInterstitial, showInterstitialIfReady } from "../services/adsService";
+import {
+  armInterstitialAfterCalculation,
+  clearPendingInterstitial,
+  showInterstitialIfReady,
+} from "../services/adsService";
 import { generateId, saveProject } from "../services/storage";
 import { CalculatorType } from "../types";
-import type {
-  CalculationResult,
-  CalculatorConfig,
-  Project,
-} from "../types";
+import type { CalculationResult, CalculatorConfig, Project } from "../types";
 
 interface Props {
   type: CalculatorType;
@@ -62,49 +62,62 @@ export const CalculatorPage: React.FC<Props> = ({ type, onBack, onNavigateProjec
 
   const calculationSequenceRef = useRef(0);
 
-  const tips = (getStaticTips()[type] || []) as string[];
+  const tips = useMemo(
+    () => ((getStaticTips()[type] || []) as string[]).map((tip) => localizeLegacyText(tip)),
+    [type, i18n.language],
+  );
   const hasTips = tips.length > 0;
 
   const displayResult = useMemo(() => {
     if (!result) return null;
-    return {
-      ...result,
-      summary: localizeLegacyText(result.summary),
-      details: Array.isArray(result.details)
-        ? result.details
-            .map((detail) => ({
-              ...detail,
-              label: localizeLegacyText(detail.label),
-              value:
-                typeof detail.value === "string"
-                  ? localizeLegacyText(detail.value)
-                  : detail.value,
-            }))
-            .filter(
-              (detail) =>
-                Boolean(detail?.label) &&
-                detail?.value !== undefined &&
-                detail?.value !== null &&
-                `${detail.value}`.trim() !== "",
-            )
-        : [],
-      materials: Array.isArray(result.materials)
-        ? result.materials.map((material) => ({
+
+    const details = Array.isArray(result.details)
+      ? result.details
+          .map((detail) => ({
+            ...detail,
+            label: localizeLegacyText(detail.label),
+            value:
+              typeof detail.value === "string"
+                ? localizeLegacyText(detail.value)
+                : detail.value,
+          }))
+          .filter(
+            (detail) =>
+              Boolean(detail?.label) &&
+              detail?.value !== undefined &&
+              detail?.value !== null &&
+              `${detail.value}`.trim() !== "",
+          )
+      : [];
+
+    const materials = Array.isArray(result.materials)
+      ? result.materials
+          .map((material, index) => ({
             ...material,
+            id: material.id || `${type}-material-${index}`,
             name: localizeLegacyText(material.name),
             details: material.details ? localizeLegacyText(material.details) : material.details,
           }))
-        : [],
+          .filter(
+            (material) =>
+              Boolean(material?.name) &&
+              material.quantity !== undefined &&
+              material.quantity !== null &&
+              Number(material.quantity) > 0,
+          )
+      : [];
+
+    return {
+      ...result,
+      summary: localizeLegacyText(result.summary),
+      details,
+      materials,
       warnings: result.warnings?.map((warning) => localizeLegacyText(warning)),
     };
-  }, [result, i18n.language]);
+  }, [result, type, i18n.language]);
 
-  const hasResultDetails = Boolean(
-    displayResult && Array.isArray(displayResult.details) && displayResult.details.length > 0,
-  );
-  const hasResultMaterials = Boolean(
-    displayResult && Array.isArray(displayResult.materials) && displayResult.materials.length > 0,
-  );
+  const hasResultDetails = Boolean(displayResult?.details?.length);
+  const hasResultMaterials = Boolean(displayResult?.materials?.length);
 
   const euro = useMemo(
     () =>
@@ -115,29 +128,40 @@ export const CalculatorPage: React.FC<Props> = ({ type, onBack, onNavigateProjec
     [i18n.language],
   );
 
-  const handleCalculated = useCallback((nextResult: CalculationResult) => {
-    const sequence = ++calculationSequenceRef.current;
+  const handleCalculated = useCallback(
+    (nextResult: CalculationResult) => {
+      const sequence = ++calculationSequenceRef.current;
 
-    const resultKey = JSON.stringify({
-      type,
-      summary: nextResult.summary,
-      totalCost: Number(nextResult.totalCost || 0),
-      materials: nextResult.materials.length,
-    });
+      const resultKey = JSON.stringify({
+        type,
+        summary: nextResult.summary,
+        totalCost: Number(nextResult.totalCost || 0),
+        materials: Array.isArray(nextResult.materials) ? nextResult.materials.length : 0,
+      });
 
-    if (sequence !== calculationSequenceRef.current) return;
-    setResult(nextResult);
-    setShowResultDetails(false);
-    setShowMaterials(false);
-    armInterstitialAfterCalculation("calculator_interstitial", { contextKey: resultKey });
-  }, [type]);
-
+      if (sequence !== calculationSequenceRef.current) return;
+      setResult(nextResult);
+      setShowResultDetails(false);
+      setShowMaterials(false);
+      armInterstitialAfterCalculation("calculator_interstitial", { contextKey: resultKey });
+    },
+    [type],
+  );
 
   useEffect(() => {
     return () => {
       clearPendingInterstitial("calculator_interstitial");
     };
   }, []);
+
+  useEffect(() => {
+    if (!hasResultDetails && showResultDetails) {
+      setShowResultDetails(false);
+    }
+    if (!hasResultMaterials && showMaterials) {
+      setShowMaterials(false);
+    }
+  }, [hasResultDetails, hasResultMaterials, showMaterials, showResultDetails]);
 
   if (!config) {
     return (
@@ -162,11 +186,19 @@ export const CalculatorPage: React.FC<Props> = ({ type, onBack, onNavigateProjec
       case CalculatorType.STRUCTURAL:
         return <StructuralCalculator onCalculate={handleCalculated} />;
       case CalculatorType.GROUNDWORK:
-        return <StructuralCalculator onCalculate={handleCalculated} initialMode="groundwork" hideTabs />;
+        return (
+          <StructuralCalculator
+            onCalculate={handleCalculated}
+            initialMode="groundwork"
+            hideTabs
+          />
+        );
       case CalculatorType.FOUNDATIONS:
         return <FoundationsCalculator onCalculate={handleCalculated} />;
       case CalculatorType.WALLS:
-        return <StructuralCalculator onCalculate={handleCalculated} initialMode="walls" hideTabs />;
+        return (
+          <StructuralCalculator onCalculate={handleCalculated} initialMode="walls" hideTabs />
+        );
       case CalculatorType.SUBSTRUCTURE:
         return <SubstructureCalculator onCalculate={handleCalculated} />;
       case CalculatorType.STAIRS:
@@ -204,10 +236,20 @@ export const CalculatorPage: React.FC<Props> = ({ type, onBack, onNavigateProjec
     await onBack();
   }, [onBack]);
 
+  const handleToggleDetails = useCallback(() => {
+    if (!hasResultDetails) return;
+    setShowResultDetails((value) => !value);
+  }, [hasResultDetails]);
+
+  const handleToggleMaterials = useCallback(() => {
+    if (!hasResultMaterials) return;
+    setShowMaterials((value) => !value);
+  }, [hasResultMaterials]);
+
   const handleAddToProject = async () => {
     if (!displayResult) return;
 
-    const dateLabel = new Date().toLocaleDateString(i18n.language || "en-GB");
+    const dateLabel = new Date().toLocaleDateString(i18n.language || "fr-FR");
     const projectNotes =
       tips.length > 0
         ? `${t("calculator.tips_prefix", { defaultValue: "Astuces Pro :" })}\n${tips
@@ -233,15 +275,6 @@ export const CalculatorPage: React.FC<Props> = ({ type, onBack, onNavigateProjec
 
     await onNavigateProjects();
   };
-
-  useEffect(() => {
-    if (!hasResultDetails && showResultDetails) {
-      setShowResultDetails(false);
-    }
-    if (!hasResultMaterials && showMaterials) {
-      setShowMaterials(false);
-    }
-  }, [hasResultDetails, hasResultMaterials, showMaterials, showResultDetails]);
 
   const handleShare = async () => {
     if (!displayResult) return;
@@ -292,7 +325,7 @@ export const CalculatorPage: React.FC<Props> = ({ type, onBack, onNavigateProjec
   return (
     <div className="app-shell app-shell--calculator min-h-full bg-transparent p-4 safe-bottom-offset">
       <div className="mx-auto max-w-5xl space-y-4">
-        <section className="glass-panel rounded-[30px] p-4 shadow-sm">
+        <section className="glass-panel relative z-0 overflow-hidden rounded-[30px] p-4 shadow-sm">
           <div className="mb-4 flex items-center justify-between gap-3">
             <button
               type="button"
@@ -311,12 +344,14 @@ export const CalculatorPage: React.FC<Props> = ({ type, onBack, onNavigateProjec
             </div>
           </div>
 
-          <div className="app-card rounded-[26px] p-4">{renderCalculator()}</div>
+          <div className="app-card relative z-0 overflow-hidden rounded-[26px] p-4">
+            {renderCalculator()}
+          </div>
         </section>
 
         {displayResult && (
-          <div className="animate-in slide-in-from-bottom-2 space-y-4">
-            <div className="app-card rounded-[28px] border-l-4 border-blue-600 p-5">
+          <div className="relative z-30 isolate animate-in slide-in-from-bottom-2 space-y-4">
+            <div className="app-card rounded-[28px] border-l-4 border-blue-600 p-5 shadow-[0_18px_50px_rgba(15,23,42,0.16)]">
               <h2 className="mb-1 text-sm uppercase tracking-wider text-slate-500">
                 {t("calculator.result_estimated", {
                   defaultValue: "Estimated result",
@@ -348,8 +383,9 @@ export const CalculatorPage: React.FC<Props> = ({ type, onBack, onNavigateProjec
                   {hasResultDetails && (
                     <button
                       type="button"
-                      onClick={() => setShowResultDetails((value) => !value)}
-                      className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-extrabold text-slate-700"
+                      onClick={handleToggleDetails}
+                      aria-expanded={showResultDetails}
+                      className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-extrabold text-slate-700 shadow-sm transition active:scale-[0.99]"
                     >
                       {showResultDetails
                         ? t("common.hide", { defaultValue: "Masquer" })
@@ -359,8 +395,9 @@ export const CalculatorPage: React.FC<Props> = ({ type, onBack, onNavigateProjec
                   {hasResultMaterials && (
                     <button
                       type="button"
-                      onClick={() => setShowMaterials((value) => !value)}
-                      className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-extrabold text-slate-700"
+                      onClick={handleToggleMaterials}
+                      aria-expanded={showMaterials}
+                      className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-extrabold text-slate-700 shadow-sm transition active:scale-[0.99]"
                     >
                       {showMaterials
                         ? t("common.hide", { defaultValue: "Masquer" })
@@ -372,42 +409,43 @@ export const CalculatorPage: React.FC<Props> = ({ type, onBack, onNavigateProjec
 
               {showResultDetails && hasResultDetails && (
                 <div className="mt-4 grid grid-cols-1 gap-3 border-t border-slate-100 pt-4 text-sm sm:grid-cols-2 sm:gap-4">
-                  {Array.isArray(displayResult.details) &&
-                    displayResult.details.map((detail: any, index: number) => (
-                      <div key={index}>
-                        <span className="block text-slate-500">{detail.label}</span>
-                        <span className="font-semibold text-slate-800">
-                          {detail.value} {detail.unit}
-                        </span>
-                      </div>
-                    ))}
+                  {displayResult.details.map((detail: any, index: number) => (
+                    <div key={`${detail.label}-${index}`}>
+                      <span className="block text-slate-500">{detail.label}</span>
+                      <span className="font-semibold text-slate-800">
+                        {detail.value} {detail.unit}
+                      </span>
+                    </div>
+                  ))}
                 </div>
               )}
 
               {showMaterials && hasResultMaterials && (
                 <div className="mt-4 border-t border-slate-100 pt-4">
                   <ul className="space-y-3 text-sm">
-                    {Array.isArray(displayResult.materials) &&
-                      displayResult.materials.map((material: any) => (
-                        <li key={material.id} className="border-b border-slate-50 pb-2 last:border-0">
-                          <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-                            <div className="min-w-0 flex items-start gap-3">
-                              <span className="truncate font-medium text-slate-700">
-                                {material.name}
-                              </span>
-                            </div>
-
-                            <span className="self-start rounded bg-slate-100 px-2 py-0.5 font-extrabold text-slate-800 sm:self-auto sm:whitespace-nowrap">
-                              {material.quantity} {material.unit}
+                    {displayResult.materials.map((material: any, index: number) => (
+                      <li
+                        key={material.id || `${material.name}-${index}`}
+                        className="border-b border-slate-50 pb-2 last:border-0"
+                      >
+                        <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                          <div className="min-w-0 flex items-start gap-3">
+                            <span className="truncate font-medium text-slate-700">
+                              {material.name}
                             </span>
                           </div>
-                          {material.details && (
-                            <p className="mt-1 border-l-2 border-slate-200 pl-2 text-xs italic text-slate-500">
-                              {material.details}
-                            </p>
-                          )}
-                        </li>
-                      ))}
+
+                          <span className="self-start rounded bg-slate-100 px-2 py-0.5 font-extrabold text-slate-800 sm:self-auto sm:whitespace-nowrap">
+                            {material.quantity} {material.unit}
+                          </span>
+                        </div>
+                        {material.details && (
+                          <p className="mt-1 border-l-2 border-slate-200 pl-2 text-xs italic text-slate-500">
+                            {material.details}
+                          </p>
+                        )}
+                      </li>
+                    ))}
                   </ul>
                 </div>
               )}
@@ -432,7 +470,7 @@ export const CalculatorPage: React.FC<Props> = ({ type, onBack, onNavigateProjec
                 {hasTips && (
                   <button
                     type="button"
-                    onClick={() => setShowTips(!showTips)}
+                    onClick={() => setShowTips((value) => !value)}
                     className={`col-span-2 flex items-center justify-center space-x-2 rounded-xl p-3 font-extrabold shadow-md transition-all active:scale-95 ${
                       showTips
                         ? "border-amber-200 bg-amber-100 text-amber-800"
@@ -459,7 +497,7 @@ export const CalculatorPage: React.FC<Props> = ({ type, onBack, onNavigateProjec
                     </h4>
                     <ul className="space-y-2">
                       {tips.map((tip: string, index: number) => (
-                        <li key={index} className="flex items-start">
+                        <li key={`${tip}-${index}`} className="flex items-start">
                           <span className="mr-2">•</span>
                           <span>{tip}</span>
                         </li>
@@ -517,11 +555,10 @@ export const CalculatorPage: React.FC<Props> = ({ type, onBack, onNavigateProjec
               >
                 {t("common.cancel", { defaultValue: "Cancel" })}
               </button>
-
               <button
                 type="button"
                 onClick={handleAddToProject}
-                className="flex-1 rounded-lg bg-blue-600 p-3 font-extrabold text-white shadow-lg"
+                className="flex-1 rounded-xl bg-blue-600 p-3 font-extrabold text-white"
               >
                 {t("common.save", { defaultValue: "Save" })}
               </button>
