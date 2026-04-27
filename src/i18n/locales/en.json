@@ -2377,25 +2377,25 @@
     "app": {
       "currency": "Currency",
       "language": "Language",
-      "title": "App"
+      "title": "Application"
     },
     "data": {
-      "backup": "Backup",
+      "backup": "Back up",
       "export_json": "Export JSON",
       "import_json": "Import JSON",
-      "import_title": "Import",
+      "import_title": "Import a backup",
       "importing": "Importing…",
       "importing_short": "Importing…",
       "restore": "Restore",
-      "title": "Data",
-      "warning": "Keep a backup of your data."
+      "title": "Data & backup",
+      "warning": "Important: your data is stored on this device. Remember to export a backup regularly."
     },
-    "export_error": "Export error",
-    "file_read_error": "File read error",
-    "file_too_big": "File too big",
-    "footer": "Your preferences and projects remain stored on your device.",
-    "import_confirm": "Import this backup?",
-    "invalid_backup": "Invalid backup",
+    "export_error": "Export failed. Please try again.",
+    "file_read_error": "Unable to read the file.",
+    "file_too_big": "File too large (max 5 MB).",
+    "footer": "Your preferences, projects and sites stay stored on your device.",
+    "import_confirm": "Warning: importing this backup will replace your current data. Continue?",
+    "invalid_backup": "Invalid backup file.",
     "pro": {
       "subtitle": "Remove ads and keep a clean professional experience.",
       "title": "BatiQuant Pro",
@@ -2435,14 +2435,17 @@
       "free_benefit_sites": "1 saved site with ads",
       "value_pitch": "Pro keeps the app simple: the same calculators, but no ads and unlimited site tracking when you start managing real jobs."
     },
-    "restore_ok": "Restore successful",
+    "restore_ok": "Data restored successfully.",
     "support": {
       "help": "Help & FAQ",
-      "privacy": "Privacy policy"
+      "privacy": "Privacy policy",
+      "privacy_policy": "Privacy policy",
+      "privacy_description": "Opening the public privacy policy page.",
+      "open_privacy_options": "Open privacy page"
     },
     "tabs": {
-      "app": "App",
-      "company": "Company"
+      "app": "Application",
+      "company": "Company & billing"
     },
     "title": "Settings",
     "ads": {
@@ -2461,6 +2464,19 @@
       "ad_free_status": "The Pro license disables all ads in the app.",
       "ad_free_mode": "Ad-free mode is active.",
       "remove_ads_hint": "Ads are automatically disabled after purchasing or restoring a Pro license."
+    },
+    "export_success": "Backup exported successfully.",
+    "empty_backup": "Empty or unreadable file.",
+    "engagement": {
+      "title": "Reviews & feedback",
+      "subtitle": "Help us improve BatiQuant with practical field feedback.",
+      "rate_title": "Rate BatiQuant",
+      "rate_text": "Open the Google Play listing to leave a rating or review.",
+      "feedback_title": "Send feedback",
+      "feedback_text": "Report a problem or suggest an improvement by email.",
+      "feedback_subject": "BatiQuant user feedback",
+      "feedback_body_intro": "Hello, I would like to share feedback about BatiQuant.",
+      "feedback_body_label": "My feedback:"
     }
   },
   "tutorial_auth": {
@@ -3019,5 +3035,26 @@
       "file_prefix_invoice": "Invoice"
     },
     "mobile_pdf_hint": "On mobile, BatiQuant generates a PDF so the document screen stays in your app with its Back button. To print, open the PDF in your viewer and use the viewer’s print option."
+  },
+  "welcome": {
+    "badge": "Welcome",
+    "title": "Welcome to BatiQuant",
+    "subtitle": "Calculate quantities, organize projects and keep your jobsite data in one place.",
+    "skip": "Skip",
+    "start": "Explore calculators",
+    "items": {
+      "calculators": {
+        "title": "Jobsite calculators",
+        "text": "Quickly estimate materials and quantities."
+      },
+      "projects": {
+        "title": "Projects and sites",
+        "text": "Save your results and track your jobs."
+      },
+      "exports": {
+        "title": "Quotes and backups",
+        "text": "Find, export and back up your data."
+      }
+    }
   }
 }

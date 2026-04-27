@@ -10,9 +10,11 @@ import {
   HardDrive,
   HelpCircle,
   Languages,
+  MessageSquare,
   RotateCcw,
   Shield,
   ShieldCheck,
+  Star,
   User,
   Upload,
 } from "lucide-react";
@@ -39,6 +41,9 @@ import {
 import { getHouseProjects, getSettings, saveSettings } from "@/services/storage";
 import { FREE_HOUSE_PROJECT_LIMIT } from "@/services/premiumService";
 import { downloadBackupJsonFile, getBackupErrorMessage } from "@/services/platformService";
+import { LEGAL } from "@/config/legal";
+
+const PLAY_STORE_REVIEW_URL = "https://play.google.com/store/apps/details?id=com.batiquant.app";
 
 type SettingsTab = "app" | "company";
 type Currency = "EUR" | "USD" | "CAD" | "CHF";
@@ -75,6 +80,21 @@ const storedValueToCurrencyCode = (stored: string): Currency => {
   if (normalized === "€" || normalized === "EUR") return "EUR";
   if (normalized === "$") return "USD";
   return "EUR";
+};
+
+const openExternalAction = (url: string) => {
+  if (typeof window === "undefined") return;
+  try {
+    const opened = window.open(url, "_blank", "noopener,noreferrer");
+    if (!opened) window.location.href = url;
+  } catch {
+    window.location.href = url;
+  }
+};
+
+const openMailAction = (href: string) => {
+  if (typeof window === "undefined") return;
+  window.location.href = href;
 };
 
 const currencySelectLabel = (currency: Currency): string => {
@@ -338,6 +358,37 @@ export const SettingsPage: React.FC = () => {
     } finally {
       setPurchaseBusy(null);
     }
+  };
+
+  const handleRateBatiQuant = () => {
+    openExternalAction(PLAY_STORE_REVIEW_URL);
+  };
+
+  const handleSendFeedback = () => {
+    const subject = t("settings.engagement.feedback_subject", {
+      defaultValue: "Retour utilisateur BatiQuant",
+    });
+    const body = [
+      t("settings.engagement.feedback_body_intro", {
+        defaultValue:
+          "Bonjour, je souhaite vous transmettre un retour concernant BatiQuant.",
+      }),
+      "",
+      t("settings.engagement.feedback_body_label", {
+        defaultValue: "Mon retour :",
+      }),
+      "",
+      "",
+      "---",
+      versionLabel,
+      typeof navigator !== "undefined" ? navigator.userAgent : "",
+    ].join("\\n");
+
+    openMailAction(
+      "mailto:" + LEGAL.SUPPORT_EMAIL +
+        "?subject=" + encodeURIComponent(subject) +
+        "&body=" + encodeURIComponent(body)
+    );
   };
 
   const handleRestorePurchases = async () => {
@@ -705,6 +756,74 @@ export const SettingsPage: React.FC = () => {
                     <option value="en">English</option>
                   </select>
                 </div>
+              </div>
+            </section>
+
+            <section className="overflow-hidden rounded-[28px] border border-slate-200/80 bg-white/72 shadow-sm backdrop-blur-md">
+              <div className="border-b border-slate-100 px-5 py-4">
+                <div className="flex items-center gap-3">
+                  <div className="rounded-2xl bg-amber-100 p-3 text-amber-700">
+                    <Star size={20} />
+                  </div>
+                  <div>
+                    <h3 className="font-extrabold text-slate-800">
+                      {t("settings.engagement.title", { defaultValue: "Avis & commentaires" })}
+                    </h3>
+                    <p className="text-xs text-slate-500">
+                      {t("settings.engagement.subtitle", {
+                        defaultValue: "Aidez-nous à améliorer BatiQuant avec votre retour terrain.",
+                      })}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid gap-3 p-5 md:grid-cols-2">
+                <button
+                  type="button"
+                  onClick={handleRateBatiQuant}
+                  className="group rounded-2xl border border-slate-200 bg-white/80 p-4 text-left transition-colors hover:border-amber-200 hover:bg-amber-50/70"
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="rounded-2xl bg-amber-100 p-3 text-amber-700 transition-transform group-hover:scale-105">
+                      <Star size={20} />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <h4 className="text-sm font-extrabold text-slate-800">
+                        {t("settings.engagement.rate_title", { defaultValue: "Noter BatiQuant" })}
+                      </h4>
+                      <p className="mt-1 text-xs leading-5 text-slate-500">
+                        {t("settings.engagement.rate_text", {
+                          defaultValue: "Ouvrez la fiche Google Play pour laisser une note ou un avis.",
+                        })}
+                      </p>
+                    </div>
+                    <ChevronRight size={18} className="mt-1 text-slate-300" />
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleSendFeedback}
+                  className="group rounded-2xl border border-slate-200 bg-white/80 p-4 text-left transition-colors hover:border-blue-200 hover:bg-blue-50/70"
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="rounded-2xl bg-blue-100 p-3 text-blue-700 transition-transform group-hover:scale-105">
+                      <MessageSquare size={20} />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <h4 className="text-sm font-extrabold text-slate-800">
+                        {t("settings.engagement.feedback_title", { defaultValue: "Envoyer un commentaire" })}
+                      </h4>
+                      <p className="mt-1 text-xs leading-5 text-slate-500">
+                        {t("settings.engagement.feedback_text", {
+                          defaultValue: "Signalez un problème ou proposez une amélioration par e-mail.",
+                        })}
+                      </p>
+                    </div>
+                    <ChevronRight size={18} className="mt-1 text-slate-300" />
+                  </div>
+                </button>
               </div>
             </section>
 
