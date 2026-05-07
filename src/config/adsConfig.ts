@@ -41,7 +41,9 @@ export const AD_CONFIG = {
     4000,
     Number(env.VITE_ADMOB_INTERSTITIAL_WAIT_TIMEOUT_MS || 8000),
   ),
-  DENY_LIST: ["/app/settings", "/app/quotes", "/app/invoices", "/app/print"],
+  // Keep only print/export flows ad-free. Top banners are now allowed on all app pages,
+  // including calculator screens, settings, quotes and invoices.
+  DENY_LIST: ["/app/print"],
   SAFE_ROUTES: [
     "/app",
     "/app/dashboard",
@@ -52,6 +54,11 @@ export const AD_CONFIG = {
     "/app/materials",
     "/app/menu",
     "/app/quick-tools",
+    "/app/settings",
+    "/app/help",
+    "/app/privacy",
+    "/app/quotes",
+    "/app/invoices",
   ],
 } as const;
 

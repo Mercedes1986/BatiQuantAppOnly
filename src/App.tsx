@@ -671,22 +671,17 @@ const AppLayout = () => {
 
 
   const activeBannerPlacement = useMemo<Exclude<AdPlacement, "calculator_interstitial"> | null>(() => {
-    if (isKeyboardOpen || currentCalc !== null) return null;
+    // Hide banners while typing so the keyboard never competes with the ad area.
+    if (isKeyboardOpen) return null;
 
     const pathname = location.pathname || "/";
 
-    // No banners on screens with forms, documents, privacy, settings, printing, or full calculators.
-    if (
-      pathname.startsWith("/app/settings") ||
-      pathname.startsWith("/app/help") ||
-      pathname.startsWith("/app/privacy") ||
-      pathname.startsWith("/app/quotes") ||
-      pathname.startsWith("/app/invoices") ||
-      pathname.startsWith("/app/print") ||
-      pathname.startsWith("/app/calculator") ||
-      pathname.startsWith("/app/quick-tools/")
-    ) {
-      return null;
+    // Keep print/export screens clean. Everything else in the app can display a top banner.
+    if (pathname.startsWith("/app/print")) return null;
+
+    // Full calculator opened from /app/calculators?calc=... or any calculator route.
+    if (currentCalc !== null || pathname.startsWith("/app/calculator")) {
+      return "calculator_result_banner";
     }
 
     if (pathname.startsWith("/app/projects")) return "projects_banner";
@@ -694,7 +689,9 @@ const AppLayout = () => {
     if (pathname.startsWith("/app/materials")) return "materials_banner";
     if (pathname.startsWith("/app/quick-tools")) return "quicktools_banner";
     if (pathname.startsWith("/app/calculators")) return "dashboard_banner";
-    if (pathname.startsWith("/app/menu") || pathname === "/app") return "dashboard_banner";
+
+    // Fallback for dashboard, menu, settings, help, privacy, quotes, invoices and future pages.
+    if (pathname.startsWith("/app") || pathname === "/") return "dashboard_banner";
 
     return null;
   }, [currentCalc, isKeyboardOpen, location.pathname]);
