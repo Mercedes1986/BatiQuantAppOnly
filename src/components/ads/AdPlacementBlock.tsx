@@ -11,6 +11,11 @@ interface AdPlacementBlockProps {
   variant?: AdSlotVariant;
   minHeight?: number;
   className?: string;
+  /**
+   * Keep false for the Android app: banners are rendered by the native layer as an overlay.
+   * Turning this on is only useful for browser QA placeholders.
+   */
+  renderPlaceholder?: boolean;
 }
 
 const defaultRenderState = (pathname: string, placement: AdPlacement): AdSlotRenderState =>
@@ -21,12 +26,13 @@ export const AdPlacementBlock: React.FC<AdPlacementBlockProps> = ({
   variant = "banner",
   minHeight,
   className,
+  renderPlaceholder = false,
 }) => {
   const location = useLocation();
   const pathname = location.pathname || "/";
 
   const [renderState, setRenderState] = useState<AdSlotRenderState>(() =>
-    defaultRenderState(pathname, placement)
+    defaultRenderState(pathname, placement),
   );
 
   const slotId = useMemo(() => getAdUnitId(placement), [placement]);
@@ -51,16 +57,19 @@ export const AdPlacementBlock: React.FC<AdPlacementBlockProps> = ({
   }, [pathname, placement]);
 
   useEffect(() => {
-    if (!renderState.shouldRender || renderState.showPlaceholder) return;
+    if (!renderState.shouldRender || renderState.showPlaceholder) {
+      void hideBanner(placement);
+      return;
+    }
 
     let cancelled = false;
 
     const run = async () => {
       const shown = await showBanner(placement);
-      if (!shown && !cancelled) {
+      if (!shown && !cancelled && renderPlaceholder && AD_CONFIG.ENABLE_WEB_PLACEHOLDERS) {
         setRenderState((current) => ({
           ...current,
-          showPlaceholder: AD_CONFIG.ENABLE_WEB_PLACEHOLDERS,
+          showPlaceholder: true,
           reason: "mobile-bridge-missing",
         }));
       }
@@ -72,11 +81,9 @@ export const AdPlacementBlock: React.FC<AdPlacementBlockProps> = ({
       cancelled = true;
       void hideBanner(placement);
     };
-  }, [placement, renderState.shouldRender, renderState.showPlaceholder]);
+  }, [placement, renderPlaceholder, renderState.shouldRender, renderState.showPlaceholder]);
 
-  if (!renderState.shouldRender) return null;
-
-  if (!renderState.showPlaceholder) {
+  if (!renderState.shouldRender || !renderState.showPlaceholder || !renderPlaceholder) {
     return null;
   }
 

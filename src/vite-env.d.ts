@@ -7,6 +7,8 @@ interface ImportMetaEnv {
   readonly VITE_BUILD_DATE?: string;
   readonly VITE_APP_VERSION?: string;
   readonly VITE_AD_PLATFORM?: "none" | "web" | "mobile";
+  readonly VITE_ADS_ENABLED?: string;
+  readonly VITE_ENABLE_INLINE_BANNERS?: string;
   readonly VITE_ENABLE_WEB_AD_PLACEHOLDERS?: string;
   readonly VITE_ENABLE_AD_DEBUG?: string;
   readonly VITE_PRIVACY_POLICY_URL?: string;
@@ -14,7 +16,15 @@ interface ImportMetaEnv {
   readonly VITE_ADMOB_APP_ID_IOS?: string;
   readonly VITE_ADMOB_BANNER_HOME?: string;
   readonly VITE_ADMOB_BANNER_RESULT?: string;
+  readonly VITE_ADMOB_BANNER_PROJECTS?: string;
+  readonly VITE_ADMOB_BANNER_HOUSE?: string;
+  readonly VITE_ADMOB_BANNER_MATERIALS?: string;
+  readonly VITE_ADMOB_BANNER_QUICKTOOLS?: string;
   readonly VITE_ADMOB_INTERSTITIAL_CALC_DONE?: string;
+  readonly VITE_ADMOB_INTERSTITIAL_COOLDOWN_MS?: string;
+  readonly VITE_ADMOB_INTERSTITIAL_EVERY_N_RESULTS?: string;
+  readonly VITE_ADMOB_INTERSTITIAL_REPEAT_RESULT_WINDOW_MS?: string;
+  readonly VITE_ADMOB_INTERSTITIAL_WAIT_TIMEOUT_MS?: string;
 }
 
 interface ImportMeta {

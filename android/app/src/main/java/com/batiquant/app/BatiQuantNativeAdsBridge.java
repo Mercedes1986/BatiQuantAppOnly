@@ -76,13 +76,6 @@ public class BatiQuantNativeAdsBridge {
     private AdView bannerView;
     private String activeBannerPlacement;
     private int bottomChromeHeightPx = 0;
-    private int bannerTopMarginPx;
-    private int bannerContentGapPx;
-    private int statusBarInsetPx;
-    private int baseWebViewPaddingLeft = 0;
-    private int baseWebViewPaddingTop = 0;
-    private int baseWebViewPaddingRight = 0;
-    private int baseWebViewPaddingBottom = 0;
 
     private boolean mobileAdsInitialized = false;
     private boolean interstitialLoading = false;
@@ -103,16 +96,11 @@ public class BatiQuantNativeAdsBridge {
     public BatiQuantNativeAdsBridge(Activity activity, WebView webView) {
         this.activity = activity;
         this.webView = webView;
-        this.bannerTopMarginPx = dpToPx(4);
-        this.bannerContentGapPx = dpToPx(12);
-        this.statusBarInsetPx = resolveStatusBarInsetPx();
-        cacheBaseWebViewPadding();
     }
 
     public void rebindWebView(WebView nextWebView) {
         this.webView = nextWebView;
-        cacheBaseWebViewPadding();
-        applyWebViewBannerInset(bannerView != null ? getCurrentBannerInsetPx() : 0);
+        // Banner is rendered as a native overlay. Do not pad the WebView: no layout shift.
     }
 
     @JavascriptInterface
@@ -1186,8 +1174,7 @@ public class BatiQuantNativeAdsBridge {
         if (bannerView != null && bannerUnitId.equals(bannerView.getAdUnitId()) && safeText(placement, "").equals(activeBannerPlacement)) {
             container.setVisibility(View.VISIBLE);
             int bannerHeight = container.getHeight() > 0 ? container.getHeight() : dpToPx(60);
-            applyWebViewBannerInset(bannerHeight + bannerContentGapPx + bannerTopMarginPx);
-            dispatchBannerSpace(bannerHeight + bannerContentGapPx + bannerTopMarginPx);
+            dispatchBannerSpace(bannerHeight);
             return;
         }
 
@@ -1201,8 +1188,7 @@ public class BatiQuantNativeAdsBridge {
             public void onAdLoaded() {
                 container.setVisibility(View.VISIBLE);
                 int bannerHeight = adView.getAdSize() != null ? adView.getAdSize().getHeightInPixels(activity) : dpToPx(60);
-                applyWebViewBannerInset(bannerHeight + bannerContentGapPx + bannerTopMarginPx);
-                dispatchBannerSpace(bannerHeight + bannerContentGapPx + bannerTopMarginPx);
+                dispatchBannerSpace(bannerHeight);
             }
 
             @Override
@@ -1232,7 +1218,6 @@ public class BatiQuantNativeAdsBridge {
             container.setVisibility(View.GONE);
             updateBannerContainerLayout(container);
         }
-        applyWebViewBannerInset(0);
         voidBannerPlacement();
     }
 
@@ -1259,9 +1244,9 @@ public class BatiQuantNativeAdsBridge {
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
         );
-        params.gravity = android.view.Gravity.TOP;
-        params.topMargin = statusBarInsetPx + bannerTopMarginPx;
-        params.bottomMargin = 0;
+        params.gravity = android.view.Gravity.BOTTOM;
+        params.topMargin = 0;
+        params.bottomMargin = Math.max(0, bottomChromeHeightPx);
 
         ((ViewGroup) content).addView(container, params);
         return container;
@@ -1275,7 +1260,6 @@ public class BatiQuantNativeAdsBridge {
     }
 
     private void updateBannerContainerLayout(FrameLayout container) {
-        statusBarInsetPx = resolveStatusBarInsetPx();
         ViewGroup.LayoutParams layoutParams = container.getLayoutParams();
         FrameLayout.LayoutParams params;
 
@@ -1290,40 +1274,13 @@ public class BatiQuantNativeAdsBridge {
 
         params.width = ViewGroup.LayoutParams.MATCH_PARENT;
         params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-        params.gravity = android.view.Gravity.TOP;
-        params.topMargin = statusBarInsetPx + bannerTopMarginPx;
-        params.bottomMargin = 0;
+        params.gravity = android.view.Gravity.BOTTOM;
+        params.topMargin = 0;
+        params.bottomMargin = Math.max(0, bottomChromeHeightPx);
         container.setLayoutParams(params);
         container.requestLayout();
     }
 
-    private void cacheBaseWebViewPadding() {
-        if (webView == null) return;
-        baseWebViewPaddingLeft = webView.getPaddingLeft();
-        baseWebViewPaddingTop = webView.getPaddingTop();
-        baseWebViewPaddingRight = webView.getPaddingRight();
-        baseWebViewPaddingBottom = webView.getPaddingBottom();
-        webView.setClipToPadding(false);
-    }
-
-    private void applyWebViewBannerInset(int insetPx) {
-        if (webView == null) return;
-        int safeInset = Math.max(0, insetPx);
-        webView.setPadding(
-                baseWebViewPaddingLeft,
-                baseWebViewPaddingTop + safeInset,
-                baseWebViewPaddingRight,
-                baseWebViewPaddingBottom
-        );
-        webView.requestLayout();
-    }
-
-    private int getCurrentBannerInsetPx() {
-        if (bannerView == null || bannerView.getAdSize() == null) {
-            return dpToPx(60) + bannerContentGapPx + bannerTopMarginPx;
-        }
-        return bannerView.getAdSize().getHeightInPixels(activity) + bannerContentGapPx + bannerTopMarginPx;
-    }
 
     private void destroyBannerView() {
         if (bannerView != null) {
@@ -1367,7 +1324,6 @@ public class BatiQuantNativeAdsBridge {
         final int safeHeight = Math.max(0, heightPx);
         postJavascript(
                 "(function(){"
-                        + "document.documentElement.style.setProperty('--native-banner-space', '" + safeHeight + "px');"
                         + "window.dispatchEvent(new CustomEvent('batiquant-native-banner', { detail: { visible: " + (safeHeight > 0 ? "true" : "false") + ", height: " + safeHeight + " } }));"
                         + "})();"
         );
@@ -1377,31 +1333,9 @@ public class BatiQuantNativeAdsBridge {
         return Math.round(dp * activity.getResources().getDisplayMetrics().density);
     }
 
-    private int resolveStatusBarInsetPx() {
-        try {
-            if (webView != null && webView.getRootWindowInsets() != null) {
-                return webView.getRootWindowInsets().getSystemWindowInsetTop();
-            }
-        } catch (Throwable ignored) {
-            // ignore and fall back
-        }
-
-        try {
-            int resourceId = activity.getResources().getIdentifier("status_bar_height", "dimen", "android");
-            if (resourceId > 0) {
-                return activity.getResources().getDimensionPixelSize(resourceId);
-            }
-        } catch (Throwable ignored) {
-            // ignore and fall back
-        }
-
-        return 0;
-    }
-
     private void voidBannerPlacement() {
         postJavascript(
                 "(function(){"
-                        + "document.documentElement.style.setProperty('--native-banner-space', '0px');"
                         + "window.dispatchEvent(new CustomEvent('batiquant-native-banner', { detail: { visible: false, height: 0 } }));"
                         + "})();"
         );

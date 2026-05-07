@@ -17,6 +17,7 @@ import i18next from "i18next";
 
 // Layout / UI
 import { BottomNav } from "./components/BottomNav";
+import AdPlacementBlock from "./components/ads/AdPlacementBlock";
 
 // App pages
 import { DashboardPage } from "./pages/DashboardPage";
@@ -41,6 +42,7 @@ import { getHouseProjects, saveHouseProject } from "./services/storage";
 // Types
 import { CalculatorType, ConstructionStepId } from "./types";
 import type { HouseProject } from "./types";
+import type { AdPlacement } from "./types/ads";
 
 import { ArrowLeft, Save, Loader2, AlertTriangle, Calculator, CheckCircle2, ClipboardList, FolderOpen, X } from "lucide-react";
 import ConsentModal from "./components/privacy/ConsentModal";
@@ -580,7 +582,10 @@ const AppLayout = () => {
               : "menu";
 
   const exitCalculatorFlow = useCallback(async () => {
-    const leavingCalculatorFlow = currentCalc !== null || location.pathname.startsWith("/app/calculator");
+    const leavingCalculatorFlow =
+      currentCalc !== null ||
+      location.pathname.startsWith("/app/calculator") ||
+      location.pathname.startsWith("/app/quick-tools/");
 
     if (leavingCalculatorFlow) {
       await showPendingInterstitialIfReady("calculator_interstitial");
@@ -665,10 +670,42 @@ const AppLayout = () => {
   }, [isKeyboardOpen, location.pathname]);
 
 
+  const activeBannerPlacement = useMemo<Exclude<AdPlacement, "calculator_interstitial"> | null>(() => {
+    if (isKeyboardOpen || currentCalc !== null) return null;
+
+    const pathname = location.pathname || "/";
+
+    // No banners on screens with forms, documents, privacy, settings, printing, or full calculators.
+    if (
+      pathname.startsWith("/app/settings") ||
+      pathname.startsWith("/app/help") ||
+      pathname.startsWith("/app/privacy") ||
+      pathname.startsWith("/app/quotes") ||
+      pathname.startsWith("/app/invoices") ||
+      pathname.startsWith("/app/print") ||
+      pathname.startsWith("/app/calculator") ||
+      pathname.startsWith("/app/quick-tools/")
+    ) {
+      return null;
+    }
+
+    if (pathname.startsWith("/app/projects")) return "projects_banner";
+    if (pathname.startsWith("/app/house")) return "house_banner";
+    if (pathname.startsWith("/app/materials")) return "materials_banner";
+    if (pathname.startsWith("/app/quick-tools")) return "quicktools_banner";
+    if (pathname.startsWith("/app/calculators")) return "dashboard_banner";
+    if (pathname.startsWith("/app/menu") || pathname === "/app") return "dashboard_banner";
+
+    return null;
+  }, [currentCalc, isKeyboardOpen, location.pathname]);
+
   useEffect(() => {
+    if (activeBannerPlacement) return;
+
+    // The native banner is overlay-only. Hiding it must never reserve or remove DOM space.
     void hideBanner();
     document.documentElement.style.setProperty("--native-banner-space", "0px");
-  }, [location.pathname, isKeyboardOpen, currentCalc]);
+  }, [activeBannerPlacement]);
 
   // ✅ /app/calculators?calc=... -> opens calculator (safe)
   useEffect(() => {
@@ -705,6 +742,10 @@ const AppLayout = () => {
       <main className="app-main relative z-10">
         {layoutContent}
       </main>
+
+      {activeBannerPlacement ? (
+        <AdPlacementBlock placement={activeBannerPlacement} />
+      ) : null}
 
       {!isKeyboardOpen ? (
         <div ref={bottomNavHostRef} className="app-bottom-nav-host relative z-20">

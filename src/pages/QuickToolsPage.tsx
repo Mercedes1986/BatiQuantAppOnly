@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 
 import { QuickToolsCalculator, type ToolKey } from "@/components/calculators/QuickToolsCalc";
+import { armInterstitialAfterCalculation, clearPendingInterstitial, showPendingInterstitialIfReady } from "@/services/adsService";
 import type { CalculationResult } from "@/types";
 
 type ToolConfig = {
@@ -146,7 +147,17 @@ export const QuickToolsPage: React.FC = () => {
   const [result, setResult] = React.useState<CalculationResult | null>(null);
   const handleCalculated = React.useCallback((nextResult: CalculationResult) => {
     setResult(nextResult);
-  }, []);
+
+    const resultKey = JSON.stringify({
+      type: tool || "quick-tools",
+      summary: String(nextResult.summary || ""),
+      totalCost: Number(nextResult.totalCost || 0),
+      details: Array.isArray(nextResult.details) ? nextResult.details.length : 0,
+      materials: Array.isArray(nextResult.materials) ? nextResult.materials.length : 0,
+    });
+
+    armInterstitialAfterCalculation("calculator_interstitial", { contextKey: resultKey });
+  }, [tool]);
 
   const tools = React.useMemo(() => getToolConfigs(t), [t]);
   const activeTool = tools.find((item) => item.key === tool);
@@ -157,7 +168,21 @@ export const QuickToolsPage: React.FC = () => {
 
   React.useEffect(() => {
     setResult(null);
+    clearPendingInterstitial("calculator_interstitial");
   }, [tool]);
+
+  React.useEffect(() => {
+    return () => {
+      clearPendingInterstitial("calculator_interstitial");
+    };
+  }, []);
+
+  const handleBackToTools = React.useCallback(async () => {
+    if (result) {
+      await showPendingInterstitialIfReady("calculator_interstitial");
+    }
+    navigate("/app/quick-tools");
+  }, [navigate, result]);
 
   if (tool && !activeTool) {
     navigate("/app/quick-tools", { replace: true });
@@ -173,7 +198,7 @@ export const QuickToolsPage: React.FC = () => {
           <section className="glass-panel rounded-[32px] p-4 sm:p-5">
             <div className="flex items-center gap-3">
               <button
-                onClick={() => navigate("/app/quick-tools")}
+                onClick={handleBackToTools}
                 className="flex h-11 w-11 items-center justify-center rounded-2xl border border-white/70 bg-white/70 text-slate-600 shadow-[0_12px_28px_rgba(15,23,42,0.06)] backdrop-blur-xl"
                 type="button"
                 aria-label={t("common.back", { defaultValue: "Back" })}

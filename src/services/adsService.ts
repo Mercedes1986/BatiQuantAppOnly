@@ -1,4 +1,4 @@
-import { AD_CONFIG, getAdPermission } from "@/config/adsConfig";
+import { AD_CONFIG, getAdPermission, hasAdUnitId } from "@/config/adsConfig";
 import { canServeLimitedAds } from "@/services/consentService";
 import { getAdFreeEventName, hasAdFreeEntitlement } from "@/services/purchaseService";
 import {
@@ -104,8 +104,14 @@ export const getAdRenderState = (
     return { shouldRender: false, showPlaceholder: false, reason: "disabled" };
   }
 
-  if (isBannerPlacement(placement) && !AD_CONFIG.ENABLE_INLINE_BANNERS) {
-    return { shouldRender: false, showPlaceholder: false, reason: "disabled" };
+  if (isBannerPlacement(placement)) {
+    if (!AD_CONFIG.ENABLE_INLINE_BANNERS) {
+      return { shouldRender: false, showPlaceholder: false, reason: "disabled" };
+    }
+
+    if (!hasAdUnitId(placement)) {
+      return { shouldRender: false, showPlaceholder: false, reason: "disabled" };
+    }
   }
 
   const permission = getAdPermission(pathname);
@@ -115,12 +121,12 @@ export const getAdRenderState = (
 
   const platform = getPlatform();
 
-  if (platform === "mobile" && isNativeAdsBridgeAvailable()) {
-    return { shouldRender: true, showPlaceholder: false, reason: "mobile-ready" };
-  }
-
   if (!getCanRequestAds()) {
     return { shouldRender: false, showPlaceholder: false, reason: "no-consent" };
+  }
+
+  if (platform === "mobile" && isNativeAdsBridgeAvailable()) {
+    return { shouldRender: true, showPlaceholder: false, reason: "mobile-ready" };
   }
 
   if (platform === "mobile") {
@@ -143,7 +149,10 @@ export const showBanner = async (
 ): Promise<boolean> => {
   if (!AD_CONFIG.ENABLE_INLINE_BANNERS) return false;
   if (hasAdFreeEntitlement()) return false;
+  if (!hasAdUnitId(placement)) return false;
+  if (!getCanRequestAds()) return false;
   if (!isNativeAdsBridgeAvailable()) return false;
+
   try {
     await getNativeAdsBridge()?.showBanner?.(placement);
     return true;
@@ -155,8 +164,8 @@ export const showBanner = async (
 export const hideBanner = async (
   placement?: Exclude<AdPlacement, "calculator_interstitial">,
 ): Promise<boolean> => {
-  if (!AD_CONFIG.ENABLE_INLINE_BANNERS) return false;
   if (!isNativeAdsBridgeAvailable()) return false;
+
   try {
     await getNativeAdsBridge()?.hideBanner?.(placement);
     return true;
