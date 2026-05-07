@@ -188,6 +188,11 @@ public class BatiQuantNativeAdsBridge {
 
     @JavascriptInterface
     public void showBanner(String placement) {
+        if (adFreePurchased) {
+            runOnMainThread(this::hideBannerInternal);
+            return;
+        }
+
         runOnMainThread(() -> loadBannerForPlacement(placement));
     }
 
@@ -206,6 +211,13 @@ public class BatiQuantNativeAdsBridge {
 
     @JavascriptInterface
     public boolean showInterstitial(String placement) {
+        if (adFreePurchased) {
+            interstitialAd = null;
+            interstitialLoading = false;
+            dispatchInterstitialEvent("blocked_ad_free", placement);
+            return false;
+        }
+
         if (!canRequestAds()) return false;
         if (interstitialAd == null) return false;
 
@@ -213,6 +225,11 @@ public class BatiQuantNativeAdsBridge {
         interstitialAd = null;
 
         runOnMainThread(() -> {
+            if (adFreePurchased) {
+                dispatchInterstitialEvent("blocked_ad_free", placement);
+                return;
+            }
+
             adToShow.setFullScreenContentCallback(new FullScreenContentCallback() {
                 @Override
                 public void onAdShowedFullScreenContent() {
@@ -675,6 +692,11 @@ public class BatiQuantNativeAdsBridge {
         }
 
         adFreePurchased = entitled;
+
+        if (entitled) {
+            runOnMainThread(this::clearNativeAdsForAdFreePurchase);
+        }
+
         dispatchPurchaseEvent(successPhase, entitled ? "ad-free-active" : "no-active-remove-ads-purchase");
     }
 
@@ -1045,6 +1067,12 @@ public class BatiQuantNativeAdsBridge {
     }
 
     private void preloadInterstitial() {
+        if (adFreePurchased) {
+            interstitialAd = null;
+            interstitialLoading = false;
+            return;
+        }
+
         if (!mobileAdsInitialized || !canRequestAds() || interstitialLoading || interstitialAd != null) {
             return;
         }
@@ -1059,6 +1087,12 @@ public class BatiQuantNativeAdsBridge {
                     @Override
                     public void onAdLoaded(@NonNull InterstitialAd loadedAd) {
                         interstitialLoading = false;
+
+                        if (adFreePurchased) {
+                            interstitialAd = null;
+                            return;
+                        }
+
                         interstitialAd = loadedAd;
                     }
 
@@ -1199,6 +1233,11 @@ public class BatiQuantNativeAdsBridge {
         adView.setAdListener(new AdListener() {
             @Override
             public void onAdLoaded() {
+                if (adFreePurchased) {
+                    hideBannerInternal();
+                    return;
+                }
+
                 container.setVisibility(View.VISIBLE);
 
                 ViewGroup.LayoutParams lp = container.getLayoutParams();
@@ -1231,6 +1270,12 @@ public class BatiQuantNativeAdsBridge {
         ));
 
         adView.loadAd(new AdRequest.Builder().build());
+    }
+
+    private void clearNativeAdsForAdFreePurchase() {
+        hideBannerInternal();
+        interstitialAd = null;
+        interstitialLoading = false;
     }
 
     private void hideBannerInternal() {
