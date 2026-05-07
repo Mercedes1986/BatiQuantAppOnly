@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -1171,7 +1172,9 @@ public class BatiQuantNativeAdsBridge {
             return;
         }
 
-        if (bannerView != null && bannerUnitId.equals(bannerView.getAdUnitId()) && safeText(placement, "").equals(activeBannerPlacement)) {
+        if (bannerView != null
+                && bannerUnitId.equals(bannerView.getAdUnitId())
+                && safeText(placement, "").equals(activeBannerPlacement)) {
             container.setVisibility(View.VISIBLE);
             int bannerHeight = container.getHeight() > 0 ? container.getHeight() : dpToPx(60);
             dispatchBannerSpace(bannerHeight);
@@ -1180,6 +1183,16 @@ public class BatiQuantNativeAdsBridge {
 
         destroyBannerView();
 
+        // Reserve the top ad slot before the ad loads. This prevents the banner from
+        // overlaying buttons or the bottom navigation while AdMob is still loading.
+        ViewGroup.LayoutParams existingParams = container.getLayoutParams();
+        if (existingParams != null) {
+            existingParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
+            existingParams.height = dpToPx(60);
+            container.setLayoutParams(existingParams);
+        }
+        container.setVisibility(View.VISIBLE);
+
         AdView adView = new AdView(activity);
         adView.setAdUnitId(bannerUnitId);
         adView.setAdSize(getAdaptiveBannerSize(container));
@@ -1187,7 +1200,17 @@ public class BatiQuantNativeAdsBridge {
             @Override
             public void onAdLoaded() {
                 container.setVisibility(View.VISIBLE);
-                int bannerHeight = adView.getAdSize() != null ? adView.getAdSize().getHeightInPixels(activity) : dpToPx(60);
+
+                ViewGroup.LayoutParams lp = container.getLayoutParams();
+                if (lp != null) {
+                    lp.width = ViewGroup.LayoutParams.MATCH_PARENT;
+                    lp.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+                    container.setLayoutParams(lp);
+                }
+
+                int bannerHeight = adView.getAdSize() != null
+                        ? adView.getAdSize().getHeightInPixels(activity)
+                        : dpToPx(60);
                 dispatchBannerSpace(bannerHeight);
             }
 
@@ -1206,18 +1229,26 @@ public class BatiQuantNativeAdsBridge {
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
         ));
-        container.setVisibility(View.INVISIBLE);
+
         adView.loadAd(new AdRequest.Builder().build());
     }
 
     private void hideBannerInternal() {
         FrameLayout container = activity.findViewById(R.id.banner_container);
         destroyBannerView();
+
         if (container != null) {
             container.removeAllViews();
             container.setVisibility(View.GONE);
-            updateBannerContainerLayout(container);
+
+            ViewGroup.LayoutParams lp = container.getLayoutParams();
+            if (lp != null) {
+                lp.width = ViewGroup.LayoutParams.MATCH_PARENT;
+                lp.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+                container.setLayoutParams(lp);
+            }
         }
+
         voidBannerPlacement();
     }
 
@@ -1238,17 +1269,17 @@ public class BatiQuantNativeAdsBridge {
         container.setId(R.id.banner_container);
         container.setVisibility(View.GONE);
         container.setClipToPadding(false);
-        container.setPadding(dpToPx(8), 0, dpToPx(8), 0);
+        container.setPadding(dpToPx(8), dpToPx(6), dpToPx(8), dpToPx(4));
 
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
         );
-        params.gravity = android.view.Gravity.BOTTOM;
+        params.gravity = android.view.Gravity.TOP;
         params.topMargin = 0;
-        params.bottomMargin = Math.max(0, bottomChromeHeightPx);
+        params.bottomMargin = 0;
 
-        ((ViewGroup) content).addView(container, params);
+        ((ViewGroup) content).addView(container, 0, params);
         return container;
     }
 
@@ -1261,23 +1292,28 @@ public class BatiQuantNativeAdsBridge {
 
     private void updateBannerContainerLayout(FrameLayout container) {
         ViewGroup.LayoutParams layoutParams = container.getLayoutParams();
-        FrameLayout.LayoutParams params;
 
-        if (layoutParams instanceof FrameLayout.LayoutParams) {
-            params = (FrameLayout.LayoutParams) layoutParams;
+        if (layoutParams instanceof LinearLayout.LayoutParams) {
+            LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) layoutParams;
+            params.width = ViewGroup.LayoutParams.MATCH_PARENT;
+            params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+            container.setLayoutParams(params);
+        } else if (layoutParams instanceof FrameLayout.LayoutParams) {
+            FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) layoutParams;
+            params.width = ViewGroup.LayoutParams.MATCH_PARENT;
+            params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+            params.gravity = android.view.Gravity.TOP;
+            params.topMargin = 0;
+            params.bottomMargin = 0;
+            container.setLayoutParams(params);
         } else {
-            params = new FrameLayout.LayoutParams(
+            container.setLayoutParams(new ViewGroup.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT
-            );
+            ));
         }
 
-        params.width = ViewGroup.LayoutParams.MATCH_PARENT;
-        params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-        params.gravity = android.view.Gravity.BOTTOM;
-        params.topMargin = 0;
-        params.bottomMargin = Math.max(0, bottomChromeHeightPx);
-        container.setLayoutParams(params);
+        container.setPadding(dpToPx(8), dpToPx(6), dpToPx(8), dpToPx(4));
         container.requestLayout();
     }
 
