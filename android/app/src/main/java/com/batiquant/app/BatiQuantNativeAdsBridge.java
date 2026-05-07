@@ -101,7 +101,7 @@ public class BatiQuantNativeAdsBridge {
 
     public void rebindWebView(WebView nextWebView) {
         this.webView = nextWebView;
-        // Banner is rendered as a native overlay. Do not pad the WebView: no layout shift.
+        // Banner is rendered in a native top slot above the WebView. It never covers app controls.
     }
 
     @JavascriptInterface
@@ -1259,12 +1259,66 @@ public class BatiQuantNativeAdsBridge {
             return existing;
         }
 
+        if (webView == null) {
+            Log.w(TAG, "WebView not available for banner host");
+            return null;
+        }
+
+        View parentView = (View) webView.getParent();
+        if (parentView instanceof LinearLayout && ((LinearLayout) parentView).findViewById(R.id.banner_container) != null) {
+            FrameLayout container = ((LinearLayout) parentView).findViewById(R.id.banner_container);
+            updateBannerContainerLayout(container);
+            return container;
+        }
+
+        if (webView.getParent() instanceof ViewGroup) {
+            ViewGroup parent = (ViewGroup) webView.getParent();
+            int originalIndex = parent.indexOfChild(webView);
+            ViewGroup.LayoutParams originalWebViewParams = webView.getLayoutParams();
+
+            parent.removeView(webView);
+
+            LinearLayout root = new LinearLayout(activity);
+            root.setId(R.id.root_container);
+            root.setOrientation(LinearLayout.VERTICAL);
+            root.setClipToPadding(false);
+            root.setFitsSystemWindows(false);
+
+            FrameLayout container = new FrameLayout(activity);
+            container.setId(R.id.banner_container);
+            container.setVisibility(View.GONE);
+            container.setClipToPadding(false);
+            container.setPadding(dpToPx(8), dpToPx(6), dpToPx(8), dpToPx(4));
+
+            root.addView(container, new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+            ));
+
+            root.addView(webView, new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    0,
+                    1f
+            ));
+
+            if (originalIndex >= 0 && originalIndex <= parent.getChildCount()) {
+                parent.addView(root, originalIndex, originalWebViewParams);
+            } else {
+                parent.addView(root, originalWebViewParams);
+            }
+
+            updateBannerContainerLayout(container);
+            return container;
+        }
+
         View content = activity.findViewById(android.R.id.content);
         if (!(content instanceof ViewGroup)) {
             Log.w(TAG, "Android content root is not a ViewGroup");
             return null;
         }
 
+        // Fallback: top overlay. Kept only for unusual Capacitor layouts where the
+        // WebView parent cannot be wrapped.
         FrameLayout container = new FrameLayout(activity);
         container.setId(R.id.banner_container);
         container.setVisibility(View.GONE);
@@ -1279,7 +1333,11 @@ public class BatiQuantNativeAdsBridge {
         params.topMargin = 0;
         params.bottomMargin = 0;
 
-        ((ViewGroup) content).addView(container, 0, params);
+        ((ViewGroup) content).addView(container, params);
+        container.bringToFront();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            container.setElevation(dpToPx(12));
+        }
         return container;
     }
 
