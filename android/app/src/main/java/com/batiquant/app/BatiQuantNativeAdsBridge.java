@@ -1263,7 +1263,7 @@ public class BatiQuantNativeAdsBridge {
             container.setLayoutParams(existingParams);
         }
         container.setVisibility(View.VISIBLE);
-        container.bringToFront();
+        raiseBannerIfOverlay(container);
 
         AdView adView = new AdView(activity);
         adView.setAdUnitId(bannerUnitId);
@@ -1277,7 +1277,7 @@ public class BatiQuantNativeAdsBridge {
                 }
 
                 container.setVisibility(View.VISIBLE);
-                container.bringToFront();
+                raiseBannerIfOverlay(container);
 
                 ViewGroup.LayoutParams lp = container.getLayoutParams();
                 if (lp != null) {
@@ -1343,20 +1343,37 @@ public class BatiQuantNativeAdsBridge {
     }
 
     private FrameLayout ensureBannerContainer() {
-        FrameLayout existing = activity.findViewById(R.id.banner_container);
-        if (existing != null) {
-            updateBannerContainerLayout(existing);
-            return existing;
-        }
-
         if (webView == null) {
             Log.w(TAG, "WebView not available for banner host");
             return null;
         }
 
+        FrameLayout existing = activity.findViewById(R.id.banner_container);
+        if (existing != null) {
+            if (isBannerContainerHostedAboveWebView(existing)) {
+                updateBannerContainerLayout(existing);
+                return existing;
+            }
+
+            // Defensive cleanup: an older build could have created the banner slot
+            // after the WebView. In a vertical LinearLayout that means bottom-of-screen.
+            // Remove that stale host and recreate a guaranteed top slot.
+            removeViewFromParent(existing);
+        }
+
         View parentView = (View) webView.getParent();
-        if (parentView instanceof LinearLayout && ((LinearLayout) parentView).findViewById(R.id.banner_container) != null) {
-            FrameLayout container = ((LinearLayout) parentView).findViewById(R.id.banner_container);
+
+        if (parentView instanceof LinearLayout) {
+            LinearLayout root = (LinearLayout) parentView;
+            FrameLayout container = createBannerContainer();
+            int webViewIndex = root.indexOfChild(webView);
+            int insertIndex = webViewIndex >= 0 ? webViewIndex : 0;
+
+            root.addView(container, insertIndex, new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+            ));
+
             updateBannerContainerLayout(container);
             return container;
         }
@@ -1374,11 +1391,7 @@ public class BatiQuantNativeAdsBridge {
             root.setClipToPadding(false);
             root.setFitsSystemWindows(false);
 
-            FrameLayout container = new FrameLayout(activity);
-            container.setId(R.id.banner_container);
-            container.setVisibility(View.GONE);
-            container.setClipToPadding(false);
-            container.setPadding(0, dpToPx(6), 0, dpToPx(4));
+            FrameLayout container = createBannerContainer();
 
             root.addView(container, new LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
@@ -1409,11 +1422,7 @@ public class BatiQuantNativeAdsBridge {
 
         // Fallback: top overlay. Kept only for unusual Capacitor layouts where the
         // WebView parent cannot be wrapped.
-        FrameLayout container = new FrameLayout(activity);
-        container.setId(R.id.banner_container);
-        container.setVisibility(View.GONE);
-        container.setClipToPadding(false);
-        container.setPadding(0, dpToPx(6), 0, dpToPx(4));
+        FrameLayout container = createBannerContainer();
 
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
@@ -1424,11 +1433,58 @@ public class BatiQuantNativeAdsBridge {
         params.bottomMargin = 0;
 
         ((ViewGroup) content).addView(container, params);
-        container.bringToFront();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            container.setElevation(dpToPx(12));
-        }
+        raiseBannerIfOverlay(container);
         return container;
+    }
+
+    private FrameLayout createBannerContainer() {
+        FrameLayout container = new FrameLayout(activity);
+        container.setId(R.id.banner_container);
+        container.setVisibility(View.GONE);
+        container.setClipToPadding(false);
+        container.setPadding(0, dpToPx(6), 0, dpToPx(4));
+        return container;
+    }
+
+    private boolean isBannerContainerHostedAboveWebView(FrameLayout container) {
+        if (container == null || webView == null) {
+            return false;
+        }
+
+        if (container.getParent() instanceof LinearLayout && webView.getParent() == container.getParent()) {
+            LinearLayout parent = (LinearLayout) container.getParent();
+            int bannerIndex = parent.indexOfChild(container);
+            int webViewIndex = parent.indexOfChild(webView);
+            return bannerIndex >= 0 && webViewIndex >= 0 && bannerIndex < webViewIndex;
+        }
+
+        // Overlay fallback is acceptable only when it is explicitly anchored to TOP.
+        if (container.getLayoutParams() instanceof FrameLayout.LayoutParams) {
+            FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) container.getLayoutParams();
+            return params.gravity == android.view.Gravity.TOP;
+        }
+
+        return false;
+    }
+
+    private void removeViewFromParent(View view) {
+        if (view != null && view.getParent() instanceof ViewGroup) {
+            ((ViewGroup) view.getParent()).removeView(view);
+        }
+    }
+
+    private void raiseBannerIfOverlay(FrameLayout container) {
+        if (container == null) return;
+
+        // Never call bringToFront() when the banner is inside the vertical top host.
+        // In a LinearLayout, bringToFront() can reorder the child after the WebView,
+        // which places the banner at the bottom of the app.
+        if (container.getParent() instanceof FrameLayout) {
+            container.bringToFront();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                container.setElevation(dpToPx(12));
+            }
+        }
     }
 
     private void updateBannerContainerLayout() {
