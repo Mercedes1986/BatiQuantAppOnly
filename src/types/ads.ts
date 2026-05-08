@@ -26,6 +26,7 @@ export interface AdSlotRenderState {
     | "no-consent"
     | "web-placeholder"
     | "mobile-bridge-missing"
+    | "mobile-waiting-consent"
     | "mobile-ready";
 }
 

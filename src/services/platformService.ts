@@ -1,4 +1,4 @@
-import type { AdPlatform } from "@/types/ads";
+import type { AdPlatform } from "../types/ads";
 
 declare global {
   interface Window {

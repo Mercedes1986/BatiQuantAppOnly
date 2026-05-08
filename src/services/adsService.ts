@@ -13,7 +13,7 @@ import type {
   AdRuntimeState,
   AdSlotRenderState,
   NativeInterstitialPhase,
-} from "@/types/ads";
+} from "../types/ads";
 
 let initialized = false;
 let interstitialOpportunityCount = 0;
@@ -121,12 +121,19 @@ export const getAdRenderState = (
 
   const platform = getPlatform();
 
-  if (!getCanRequestAds()) {
-    return { shouldRender: false, showPlaceholder: false, reason: "no-consent" };
+  if (platform === "mobile" && isNativeAdsBridgeAvailable()) {
+    // Let the native bridge receive the banner request even if consent / Mobile Ads
+    // initialization is not ready yet. The Android side now queues the placement and
+    // retries after UMP + MobileAds.initialize() complete.
+    return {
+      shouldRender: true,
+      showPlaceholder: false,
+      reason: getCanRequestAds() ? "mobile-ready" : "mobile-waiting-consent",
+    };
   }
 
-  if (platform === "mobile" && isNativeAdsBridgeAvailable()) {
-    return { shouldRender: true, showPlaceholder: false, reason: "mobile-ready" };
+  if (!getCanRequestAds()) {
+    return { shouldRender: false, showPlaceholder: false, reason: "no-consent" };
   }
 
   if (platform === "mobile") {
@@ -150,8 +157,12 @@ export const showBanner = async (
   if (!AD_CONFIG.ENABLE_INLINE_BANNERS) return false;
   if (hasAdFreeEntitlement()) return false;
   if (!hasAdUnitId(placement)) return false;
-  if (!getCanRequestAds()) return false;
   if (!isNativeAdsBridgeAvailable()) return false;
+
+  // On mobile, the native bridge can safely defer the banner request until
+  // consent and Mobile Ads initialization are ready. Returning early here would
+  // make real devices miss the first banner request.
+  if (!getCanRequestAds() && getPlatform() !== "mobile") return false;
 
   try {
     await getNativeAdsBridge()?.showBanner?.(placement);

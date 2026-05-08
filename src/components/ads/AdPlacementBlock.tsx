@@ -47,11 +47,13 @@ export const AdPlacementBlock: React.FC<AdPlacementBlockProps> = ({
 
     window.addEventListener("consent-updated", refresh);
     window.addEventListener("batiquant-native-privacy", refresh as EventListener);
+    window.addEventListener("batiquant-native-ads-ready", refresh as EventListener);
     window.addEventListener(adFreeUpdated, refresh as EventListener);
 
     return () => {
       window.removeEventListener("consent-updated", refresh);
       window.removeEventListener("batiquant-native-privacy", refresh as EventListener);
+      window.removeEventListener("batiquant-native-ads-ready", refresh as EventListener);
       window.removeEventListener(adFreeUpdated, refresh as EventListener);
     };
   }, [pathname, placement]);
@@ -67,7 +69,7 @@ export const AdPlacementBlock: React.FC<AdPlacementBlockProps> = ({
     const run = async () => {
       const shown = await showBanner(placement);
       if (!shown && !cancelled && renderPlaceholder && AD_CONFIG.ENABLE_WEB_PLACEHOLDERS) {
-        setRenderState((current) => ({
+        setRenderState((current: AdSlotRenderState) => ({
           ...current,
           showPlaceholder: true,
           reason: "mobile-bridge-missing",

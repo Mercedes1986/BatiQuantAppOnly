@@ -1,4 +1,4 @@
-import type { AdPlacement, AdPlatform } from "@/types/ads";
+import type { AdPlacement, AdPlatform } from "../types/ads";
 
 export type AdPermission = "deny" | "placeholder" | "allow";
 
